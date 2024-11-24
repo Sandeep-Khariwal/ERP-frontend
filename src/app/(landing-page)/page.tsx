@@ -1,5 +1,3 @@
-import Image from "next/image";
-import styles from "./page.module.css";
 import { Stack, Text } from "@mantine/core";
 
 export default function Home() {
