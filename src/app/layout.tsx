@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import '@mantine/core/styles.css';
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
+import "@mantine/notifications/styles.css";
 import { MantineProvider } from "@mantine/core";
-
+import { ReduxProvider } from "./redux/provider";
+import { Notifications } from "@mantine/notifications";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,10 +20,41 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body >
-       <MantineProvider >
-        {children}
-      </MantineProvider>
+      <body>
+        <MantineProvider
+          theme={{
+            colors: {
+              customBlue: [
+                "#E8EDFF",
+                "#D0DBFF",
+                "#B8C9FF",
+                "#A0B7FF",
+                "#88A5FF",
+                "#7093FF",
+                "#5881FF",
+                "#406FFF",
+                "#285DFF",
+                "#104BFF",
+              ],
+            },
+            fontFamily: "Nunito,Poppins,Greycliff CF, Verdana, sans-serif",
+            fontFamilyMonospace: "Greycliff CF, Monaco, Courier, monospace",
+            components: {
+              Modal: {
+                defaultProps: {
+                  closeOnClickOutside: false,
+                },
+              },
+            },
+          }}
+        >
+          <ReduxProvider>
+            <React.StrictMode>
+
+            {children}
+            </React.StrictMode>
+            </ReduxProvider>
+        </MantineProvider>
       </body>
     </html>
   );
