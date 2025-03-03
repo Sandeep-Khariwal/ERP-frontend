@@ -21,6 +21,13 @@ export function GetAllStudentsFromBatch(id:string) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetAllTeachersFromBatch(id:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/institute/getTeachersFromBatch/${id}`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
 export function GetStudent(id:string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/institute/getStudent/${id}`)

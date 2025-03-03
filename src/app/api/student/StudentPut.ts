@@ -24,3 +24,39 @@ export function UpdateFeeRecord(id: string, data: FeeRecordData) {
       .catch((error: any) => reject(error));
   });
 }
+export function AddStudentRollNumber(id: string, data:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/addStudentRollNumber/${id}`,{rollNo:data})
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+export async function UpdateStudentAttendance(data: {
+  studentId: string;
+  date: Date | null;
+  currentAttendanceStatus: string;
+}) {
+  return ApiHelper.put(`/api/v1/instituteStudent/update/attendance`, {
+    studentId: data.studentId,
+    date: data.date,
+    currentAttendanceStatus: data.currentAttendanceStatus,
+  });
+}
+export function insertNewAttendance(data: {
+  date: Date;
+  instituteClassId: string;
+  attendance: any;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `/api/v1/instituteClass/insertAttendance/${data.instituteClassId}`,
+      {
+        date: data.date,
+        attendance: data.attendance,
+      }
+    )
+      .then((response) => resolve(response))
+      .catch((error) => reject(error));
+  });
+}

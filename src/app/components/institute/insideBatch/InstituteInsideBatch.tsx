@@ -1,6 +1,13 @@
 "use client";
 
-import { Button, Flex, ScrollArea, Stack, Text } from "@mantine/core";
+import {
+  Button,
+  Flex,
+  LoadingOverlay,
+  ScrollArea,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
 import { useState } from "react";
@@ -9,8 +16,15 @@ import { AddMoreDetails } from "../student/addMoreDetails/AddMoreDetails";
 import { StudentData } from "@/interfaces/batchInterface";
 import StudentSection from "./StudentSection";
 import FeeRecordSection from "../student/fees/FeeRecord";
-import { BatchOverviewCards } from "./BatchOverviewCards";
 import OverView from "./OverView";
+import { TakeAttendanceView } from "./TakeAttendanceView";
+import { StudentsDataWithBatch } from "@/interface/student.interface";
+import { CreateStudent } from "@/app/api/institute/InstitutePostApi";
+import { SuccessNotification } from "@/app/helperFunction/Notification";
+import StudentPage from "../../student/StudentPage";
+import { StudentTabs } from "../InstituteStudents";
+import TeachersSection from "./TeacherSection";
+import AddMarksModal from "./AddMarksModal";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -36,10 +50,13 @@ export function InstituteInsideBatch(props: {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [openAddStudentModal, setOpenAddStudentModal] =
     useState<boolean>(false);
+  const [takeAttendance, setTakeAttandance] = useState<boolean>(false);
+  const [openAddMarksModal, setOpenAddMarksModal] = useState<boolean>(false);
   const [showSelectedScreen, setShowSelectedScreen] = useState<Screen>(
     Screen.NONE
   );
   const [editStudentDetails, setEditStudentDetails] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>(Tabs.OVERVIEW);
 
   const [studentData, setStudentData] = useState<StudentData>({
@@ -52,9 +69,10 @@ export function InstituteInsideBatch(props: {
   });
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
-
+  const [students, setStudents] = useState<StudentsDataWithBatch[]>([]);
   return (
     <>
+      <LoadingOverlay visible={isLoading} />
       {Screen.NONE === showSelectedScreen && (
         <Stack w={isMd ? "95%" : "80%"} mt={20} mx={"auto"} h={"100%"}>
           <Flex w={"100%"} align={"center"} justify={"start"} gap={10}>
@@ -78,10 +96,10 @@ export function InstituteInsideBatch(props: {
                     key={i}
                     onClick={() => setActiveTab(item)}
                     mx={isMd ? 14 : 30}
-                    c={activeTab === item ? "#1B1212" : "#28282B"}
+                    c={activeTab === item ? "#1B1212" : "#2F4F4F"}
                     fw={600}
                     style={{ cursor: "pointer", whiteSpace: "nowrap" }}
-                    fz={19}
+                    fz={16}
                     ff={"Roboto"}
                     w={"auto"}
                   >
@@ -106,7 +124,7 @@ export function InstituteInsideBatch(props: {
           )}
           {Tabs.STUDENT === activeTab && (
             <Stack w={"100%"}>
-              <Flex w={"100%"}>
+              <Flex w={"100%"} gap={10}>
                 <Button
                   variant="outline"
                   c={"#111"}
@@ -117,31 +135,106 @@ export function InstituteInsideBatch(props: {
                 >
                   + Add Student
                 </Button>
+                <Button
+                  variant="outline"
+                  c={"#111"}
+                  style={{ borderColor: "#111" }}
+                  onClick={() => {
+                    setTakeAttandance(true);
+                  }}
+                >
+                  Attendance
+                </Button>
+                <Button
+                  variant="outline"
+                  c={"#111"}
+                  style={{ borderColor: "#111" }}
+                  onClick={() => {
+                    setOpenAddMarksModal(true);
+                  }}
+                >
+                  + Add Marks
+                </Button>
               </Flex>
-              <StudentSection
+              {takeAttendance ? (
+                <Stack>
+                  <TakeAttendanceView
+                    students={students}
+                    batchId={props.batchId}
+                    onBackClicked={() => {
+                      setTakeAttandance(false);
+                    }}
+                    subjects={[]}
+                  />
+                </Stack>
+              ) : (
+                <StudentSection
+                  batchId={props.batchId}
+                  setEditStudentDetails={setEditStudentDetails}
+                  setShowSelectedScreen={setShowSelectedScreen}
+                  setSelectedStudentId={setSelectedStudentId}
+                  batchName={props.batchName}
+                  setStudents={setStudents}
+                />
+              )}
+            </Stack>
+          )}
+          {openAddMarksModal && (
+            <AddMarksModal
+              opened={openAddMarksModal}
+              batchId={props.batchId}
+              students={students}
+              setOpenAddMarksModal={setOpenAddMarksModal}
+            />
+          )}
+          {Tabs.TEACHER === activeTab && (
+            <Stack w={"100%"} mt={20} mx={"auto"}>
+              <TeachersSection
                 batchId={props.batchId}
-                setEditStudentDetails={setEditStudentDetails}
-                setShowSelectedScreen={setShowSelectedScreen}
-                setSelectedStudentId={setSelectedStudentId}
                 batchName={props.batchName}
               />
             </Stack>
           )}
-          {Tabs.TEACHER === activeTab && (
-            <Stack>
-              <Text>teacher tab</Text>
-            </Stack>
-          )}
           {Tabs.STUDY_MATERIAL === activeTab && (
-            <Stack>
-              <Text>STUDY_MATERIAL tab</Text>
+            <Stack
+              w={"100%"}
+              mih={isMd ? "100vh" : "70vh"}
+              bg={"white"}
+              mt={20}
+              mx={"auto"}
+            >
+              <Text m={"auto"}>STUDY_MATERIAL comming soon</Text>
             </Stack>
           )}
           {Tabs.ASSIGNMENT === activeTab && (
-            <Stack>
-              <Text>ASSIGNMENT tab</Text>
+            <Stack
+              w={"100%"}
+              mih={isMd ? "100vh" : "70vh"}
+              bg={"white"}
+              mt={20}
+              mx={"auto"}
+            >
+              <Text m={"auto"}>ASSIGNMENT comming soon</Text>
             </Stack>
           )}
+        </Stack>
+      )}
+
+      {Screen.VIEWPROFILE === showSelectedScreen && (
+        <Stack
+          w={isMd ? "100%" : "80%"}
+          mih={isMd ? "100vh" : "90vh"}
+          mt={20}
+          mx={"auto"}
+          py={30}
+        >
+          <StudentPage
+            onClickBack={() => {
+              setShowSelectedScreen(Screen.NONE);
+            }}
+            studentId={selectedStudentId}
+            activeTab={StudentTabs.OVERVIEW}
+          />
         </Stack>
       )}
 
@@ -162,27 +255,14 @@ export function InstituteInsideBatch(props: {
       )}
 
       {Screen.VIEWFEEDETAILS === showSelectedScreen && (
-        <Stack w={"100%"} h={"100%"} align="center">
+        <Stack
+          w={isMd ? "100%" : "80%"}
+          mih={isMd ? "100vh" : "90vh"}
+          mt={20}
+          mx={"auto"}
+        >
           <FeeRecordSection
-            feeRecords={[
-              {
-                _id: "62dcd9e2f8f5d0b9c0844c9a",
-                batch: {
-                  _id: "b12345",
-                  name: "Batch A",
-                },
-                student: "student_001",
-                name: "Semester 1 Fee",
-                dueDate: new Date("2025-02-28T00:00:00Z"),
-                totalAmount: 1500.0,
-                type: "Tuition",
-                status: "Unpaid",
-                amountPaid: 0.0,
-                createdAt: new Date("2025-02-28T00:00:00Z"),
-                updatedAt: new Date("2025-02-28T00:00:00Z"),
-                payments: [],
-              },
-            ]}
+            fromBatch={true}
             userType={"teacher"}
             dateOfJoining={new Date()}
             batch={props?.batchId}
@@ -203,8 +283,20 @@ export function InstituteInsideBatch(props: {
       {openAddStudentModal && (
         <AddNewStudentModal
           isOpen={openAddStudentModal}
-          onNextButtonClicked={() => {
+          onNextButtonClicked={(val) => {
             // setShowAddMoreDetails(true);
+            setIsLoading(true);
+            CreateStudent(val)
+              .then(() => {
+                SuccessNotification("Student created!!");
+                setIsLoading(false);
+                setOpenAddStudentModal(false);
+              })
+              .catch((e) => {
+                console.log(e);
+                setIsLoading(false);
+                setOpenAddStudentModal(false);
+              });
           }}
           batchId={props.batchId}
           instituteId={props.instituteId}

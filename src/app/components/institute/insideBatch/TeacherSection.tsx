@@ -1,8 +1,7 @@
 "use client";
 
-import { GetAllStudentsFromBatch } from "@/app/api/institute/InstituteGetApi";
+import { GetAllTeachersFromBatch } from "@/app/api/institute/InstituteGetApi";
 import {
-  Badge,
   Button,
   Flex,
   LoadingOverlay,
@@ -15,26 +14,22 @@ import {
 import { useMediaQuery } from "@mantine/hooks";
 import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
-import { Screen } from "./InstituteInsideBatch";
 import { RemoveStudentFromBatch } from "@/app/api/student/StudentDeleteApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
-import { StudentsDataWithBatch } from "@/interface/student.interface";
 
-const StudentSection = (props: {
+const TeachersSection = (props: {
   batchId: string;
   batchName: string;
-  setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
-  setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
-  setStudents: React.Dispatch<React.SetStateAction<StudentsDataWithBatch[]>>;
+//   setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
+//   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
+//   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
+//   setStudents: React.Dispatch<React.SetStateAction<StudentsDataWithBatch[]>>;
 }) => {
-  const [students, setStudents] = useState<
+  const [teachers, setTeachers] = useState<
     {
       _id: string;
       name: string;
       phoneNumber: string;
-      parentName: string;
-      feeStatus: string;
     }[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -42,17 +37,15 @@ const StudentSection = (props: {
   useEffect(() => {
     if (props.batchId) {
       setIsLoading(true);
-      GetAllStudentsFromBatch(props.batchId)
+      GetAllTeachersFromBatch(props.batchId)
         .then((x: any) => {
           setIsLoading(false);
-          const { students } = x.students;
-          const studentData = students.map((s: any) => {
+          const { teachers } = x.teachers;
+          const teachersData = teachers.map((s: any) => {
             return {
               _id: s._id,
               name: s.name,
               phoneNumber: s.phoneNumber,
-              parentName: s.parentName,
-              feeStatus: "Paid",
             };
           });
           // const studentD = students.map((s: any) => {
@@ -61,8 +54,9 @@ const StudentSection = (props: {
           //     label: s.name,
           //   };
           // });
-          props.setStudents(students);
-          setStudents(studentData);
+        //   props.setStudents(students);
+        setTeachers(teachersData)
+        //   setTeachers(studentData);
         })
         .catch((e) => {
           console.log(e);
@@ -76,7 +70,7 @@ const StudentSection = (props: {
   const removeStudentFromBatch = () => {
     RemoveStudentFromBatch(deletingStudentId, props.batchId)
       .then((x) => {
-        setStudents((prev) => prev.filter((s) => s._id !== deletingStudentId));
+        setTeachers((prev) => prev.filter((s) => s._id !== deletingStudentId));
         SuccessNotification("Student removed from batch");
         setShowWarning(false);
       })
@@ -85,7 +79,7 @@ const StudentSection = (props: {
       });
   };
 
-  const isMd = useMediaQuery(`(max-width: 968px)`);
+  // const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
     <Stack>
       <LoadingOverlay visible={isLoading} />
@@ -96,8 +90,8 @@ const StudentSection = (props: {
         bg={"white"}
         fz={18}
       >
-        <Table.Thead bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}>
-          <Table.Tr>
+        <Table.Thead  bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}  >
+          <Table.Tr >
             <Table.Th
               style={{
                 fontFamily: "Roboto",
@@ -108,21 +102,6 @@ const StudentSection = (props: {
             >
               Name
             </Table.Th>
-            {!isMd ? (
-              <Table.Th
-                style={{
-                  fontFamily: "Roboto",
-                  fontWeight: 700,
-                  color: "#2F4F4F",
-                  fontSize: 18,
-                }}
-              >
-                Parent's Name
-              </Table.Th>
-            ) : (
-              <></>
-            )}
-            {!isMd && (
               <Table.Th
                 style={{
                   fontFamily: "Roboto",
@@ -133,19 +112,6 @@ const StudentSection = (props: {
               >
                 Phone Number
               </Table.Th>
-            )}
-            <Table.Th
-              style={{
-                fontFamily: "Roboto",
-                fontWeight: 600,
-                color: "#2F4F4F",
-                fontSize: 18,
-                whiteSpace: "nowrap",
-              }}
-            >
-              Fee Status
-            </Table.Th>
-            {!isMd ? (
               <Table.Th
                 style={{
                   fontFamily: "Roboto",
@@ -156,9 +122,6 @@ const StudentSection = (props: {
               >
                 Message
               </Table.Th>
-            ) : (
-              <></>
-            )}
             <Table.Th
               style={{
                 fontFamily: "Roboto",
@@ -172,13 +135,13 @@ const StudentSection = (props: {
           </Table.Tr>
         </Table.Thead>
         <tbody>
-          {students.map((item: any, index: number) => {
+          {teachers.map((item: any, index: number) => {
             return (
               <Table.Tr
                 style={
                   item.isInActive
                     ? {
-                        backgroundColor: "#FAFCFF",
+                       
                         textAlign: "center",
                         fontFamily: "Nunito",
                         padding: "1rem",
@@ -196,75 +159,26 @@ const StudentSection = (props: {
                     fontWeight: 500,
                     padding: "1rem",
                   }}
+                  ta={"start"}
                 >
                   {item.name}
                 </Table.Td>
-                {!isMd ? (
                   <Table.Td
                     style={{
                       color: item.isInActive ? "#bebebe" : "#7D7D7D",
                       fontWeight: 500,
                     }}
-                  >
-                    {item.parentName}
-                  </Table.Td>
-                ) : (
-                  <></>
-                )}
-                {!isMd && (
-                  <Table.Td
-                    style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      fontWeight: 500,
-                    }}
+                    ta={"start"}
                   >
                     {item.phoneNumber[0]}
                   </Table.Td>
-                )}
-                <Table.Td>
-                  {" "}
-                  <Badge
-                    // c={
-                    //   getColor(
-                    //     getStatus(
-                    //       findCurrentBatchFeeTotalFees(
-                    //         item.feeRecords
-                    //       ) ?? 0,
-                    //       findCurrentBatchFeePaidAmount(
-                    //         item.feeRecords
-                    //       ) ?? 0
-                    //     )
-                    //   )?.color
-                    // }
-                    // bg={
-                    //   getColor(
-                    //     getStatus(
-                    //       findCurrentBatchFeeTotalFees(
-                    //         item.feeRecords
-                    //       ) ?? 0,
-                    //       findCurrentBatchFeePaidAmount(
-                    //         item.feeRecords
-                    //       ) ?? 0
-                    //     )
-                    //   )?.backgroundColor
-                    // }
-                    size="lg"
-                    radius="xs"
-                  >
-                    {item.feeStatus}
-                  </Badge>
-                </Table.Td>
-                {!isMd ? (
-                  <Table.Td>
+                  <Table.Td ta={"start"}>
                     <a href={`sms:${item.phoneNumber[0]}?body=Hello!, `}>
                       <div>
                         <IconMessage cursor="pointer" color="#7D7D7D" />
                       </div>
                     </a>
                   </Table.Td>
-                ) : (
-                  <></>
-                )}
                 <Table.Td style={{ cursor: "pointer" }}>
                   <Menu>
                     <Menu.Target>
@@ -279,10 +193,10 @@ const StudentSection = (props: {
                       </Flex>
                     </Menu.Target>
                     <Menu.Dropdown>
-                      <Menu.Item
+                      {/* <Menu.Item
                         onClick={() => {
-                          props.setSelectedStudentId(item._id);
-                          props.setShowSelectedScreen(Screen.VIEWPROFILE);
+                        //   props.setSelectedStudentId(item._id);
+                        //   props.setShowSelectedScreen(Screen.VIEWPROFILE);
                         }}
                       >
                         {" "}
@@ -290,46 +204,24 @@ const StudentSection = (props: {
                       </Menu.Item>
                       <Menu.Item
                         onClick={() => {
-                          props.setSelectedStudentId(item._id);
-                          props.setEditStudentDetails(true);
-                          props.setShowSelectedScreen(Screen.ADDMORESCREEN);
+                        //   props.setSelectedStudentId(item._id);
+                        //   props.setEditStudentDetails(true);
+                        //   props.setShowSelectedScreen(Screen.ADDMORESCREEN);
                           // setSelectedStudent(item);
                           // setEditStudentFee(true);
                         }}
                       >
                         {" "}
                         Edit Profile
-                      </Menu.Item>
-                      <Menu.Item
-                        onClick={() => {
-                          // setSelectedStudent(item);
-                          // setStudentActiveTab("Fee Records");
-                          // setEditStudentFee(false);
-                          props.setSelectedStudentId(item._id);
-                          props.setShowSelectedScreen(Screen.VIEWFEEDETAILS);
-                        }}
-                      >
-                        {" "}
-                        View Fee Details
-                      </Menu.Item>
-                      {/* <Menu.Item
-                                      onClick={() => {
-                                        downloadBatchCombineFee(
-                                          item._id,
-                                          item.feeRecords,
-                                          item
-                                        );
-                                      }}
-                                    >
-                                      Download Receipt
-                                    </Menu.Item> */}
+                      </Menu.Item> */}
+                     
                       <Menu.Item
                         onClick={() => {
                           setShowWarning(true);
                           setDeletingStudentId(item._id);
                         }}
                       >
-                        Remove Student
+                        Remove Teacher
                       </Menu.Item>
                     </Menu.Dropdown>
                   </Menu>
@@ -346,7 +238,7 @@ const StudentSection = (props: {
         opened={showWarning}
         onClose={() => setShowWarning(false)}
       >
-        <Text>Are you sure?. you want to delete this student</Text>
+        <Text>Are you sure?. you want to remove teacher</Text>
         <Flex w={"100%"} align={"center"} justify={"end"} gap={10} pt={20}>
           <Button variant="outline" onClick={() => setShowWarning(false)}>
             Cancel
@@ -360,4 +252,4 @@ const StudentSection = (props: {
   );
 };
 
-export default StudentSection;
+export default TeachersSection;

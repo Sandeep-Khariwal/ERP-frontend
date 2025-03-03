@@ -1,7 +1,6 @@
 "use client"
 import {
     Button,
-    Center,
     Flex,
     Grid,
     Modal,
@@ -10,15 +9,12 @@ import {
     TextInput,
   } from "@mantine/core";
   import { useMediaQuery } from "@mantine/hooks";
-  import { DatePicker } from "@mantine/dates";
+  import { DatePickerInput } from "@mantine/dates";
   import { Dispatch, SetStateAction, useState } from "react";
-//   import { showNotification } from "@mantine/notifications";
-  
-//   import { E164Number } from "libphonenumber-js/types.cjs";
   
   import PhoneInput from "react-phone-input-2";
   import "react-phone-input-2/lib/style.css";
-import { IconCalendar, IconPlus, IconX } from "@tabler/icons-react";
+import {  IconPlus, IconX } from "@tabler/icons-react";
 import { Screen } from "./insideBatch/InstituteInsideBatch";
   
   interface FormData {
@@ -43,7 +39,6 @@ import { Screen } from "./insideBatch/InstituteInsideBatch";
     setFormData?: Dispatch<SetStateAction<any | undefined>>;
     instituteId?: string;
     batchId?:string;
-    setInstituteStudentData?: Dispatch<SetStateAction<any[]>>;
   }
   
   export const AddNewStudentModal: React.FC<AddNewStudentModalProps> = ({
@@ -54,16 +49,15 @@ import { Screen } from "./insideBatch/InstituteInsideBatch";
     setFormData,
     instituteId,
     batchId,
-    setInstituteStudentData,
   }) => {
-    const isMd = useMediaQuery(`(max-width: 820px)`);
+    // const isMd = useMediaQuery(`(max-width: 820px)`);
     const [additionalPhoneNumbers, setAdditionalPhoneNumbers] = useState<
       string[]
     >([]);
   
     const [studentName, setStudentName] = useState<string>("");
     const [parentName, setParentName] = useState<string>("");
-    const [dateofBirth, setDateOfBirth] = useState<Date>(new Date());
+    const [dateofBirth, setDateOfBirth] = useState<Date | null>(new Date());
     const [address, setAddress] = useState<string>("");
     const [phoneNumber, setPhoneNumber] = useState<string>("");
   
@@ -175,6 +169,17 @@ import { Screen } from "./insideBatch/InstituteInsideBatch";
                 border: "solid 1px #00000040",
               }}
             />
+
+                      <DatePickerInput
+                        label="Date Of Birth"
+                        ff={"Poppins"}
+                        placeholder="Select Date"
+                        radius={"md"}
+                        value={dateofBirth}
+                        onChange={(date) => {
+                          setDateOfBirth(date || null)
+                        }}
+                      />
   
             {additionalPhoneNumbers.map((phoneNumber, index) => {
               return (
@@ -229,6 +234,7 @@ import { Screen } from "./insideBatch/InstituteInsideBatch";
                 Add Phone Number
               </Button>
             </Stack>
+
             <Button
               fullWidth
               variant="outline"
@@ -268,8 +274,8 @@ import { Screen } from "./insideBatch/InstituteInsideBatch";
                       phoneNumber: [...additionalPhoneNumbers, phoneNumber],
                       parentName: parentName,
                       instituteId,
-                      batchId: "",
-                      dateOfBirth: datePickerValue,
+                      batchId: batchId || "",
+                      dateOfBirth: dateofBirth,
                       address: address,
                       totalRewardpoints: 0,
                       noofGivenTests: 0,

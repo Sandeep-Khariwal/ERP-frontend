@@ -1,14 +1,14 @@
+import { SaveUserToken } from "@/app/api/LocalStorageUtility";
 import { createSlice } from "@reduxjs/toolkit";
-import { SaveUserToken } from "../api/LocalStorageUtility";
 
-interface InstituteDetails {
+export interface InstituteDetails {
   name: string;
   _id: string;
   phoneNumber: string;
   address: string;
 }
 
-interface instituteDetailsIntialState {
+export interface instituteDetailsIntialState {
   instituteDetails: InstituteDetails | null;
 }
 const intitalproductState: instituteDetailsIntialState = {

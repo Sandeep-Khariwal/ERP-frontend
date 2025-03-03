@@ -18,3 +18,17 @@ export function GetStudentForPdf(id: string) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetStudentOverview(id:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/student/getStudentOverview/${id}`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+export function GetStudentAttendance(id:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/student/getStudentAttendance/${id}`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

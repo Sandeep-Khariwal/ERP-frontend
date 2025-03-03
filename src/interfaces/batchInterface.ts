@@ -43,11 +43,11 @@ export interface Installment {
   export interface StudentPayload {
     name: string;
     parentName: string;
-    dateOfBirth: Date;
-    address: string;
+    dateOfBirth?: Date;
+    address?: string;
     phoneNumber: string[];
     parentNumber:string;
-    gender:string;
+    gender?:string;
     instituteId:string;
     batchId?:string
   }

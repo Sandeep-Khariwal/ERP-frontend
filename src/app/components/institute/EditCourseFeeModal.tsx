@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Button,
   Flex,
   Modal,
@@ -14,7 +13,6 @@ import {
 import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { getThisAndNextYearMonths, months } from "./helperFunctions";
-import { IconTrash } from "@tabler/icons-react";
 import {
   FeeData,
   feeOptions,
@@ -30,9 +28,6 @@ export function EditCourseFeeModal(props: {
   batchId: string;
   setisCourseFeesEdit: (val: any | null) => void;
 }) {
-  const [isViewMonthlyDetails, setIsViewMonthlyDetails] = useState<any | null>(
-    null
-  );
   const [selectedClassMonthFeeData, setSelectedClassMonthFeeData] = useState<
     FeeData[]
   >([]);
@@ -375,36 +370,36 @@ export function EditCourseFeeModal(props: {
       const nextYearMonthsArray = getThisAndNextYearMonths();
       if (selectedFeeOption === FeeOptions.MONTHLY) {
         setDatesData(nextYearMonthsArray);
-        const found = selectedClassMonthFeeData.find((x) => {
-          return (
-            new Date(x.monthDate).toUTCString() ===
-            new Date(nextYearMonthsArray[0].value).toUTCString()
-          );
-        });
-        if (found) {
-          setPrice(found.coursefees);
-        } else {
+        // const found = selectedClassMonthFeeData.find((x) => {
+        //   return (
+        //     new Date(x.monthDate).toUTCString() ===
+        //     new Date(nextYearMonthsArray[0].value).toUTCString()
+        //   );
+        // });
+        // if (found) {
+        //   setPrice(found.coursefees);
+        // } else {
           setPrice(defaultCoursePrice);
-        }
+        // }
       } else {
         setDatesData(getThisAndNextYearMonths());
       }
     }
-  }, [props.isCourseFeesEdit, selectedFeeOption, selectedClassMonthFeeData]);
+  }, [props.isCourseFeesEdit, selectedFeeOption]);
 
   useEffect(() => {
     if (selectedMonth) {
       if (selectedFeeOption === FeeOptions.MONTHLY) {
-        const found = selectedClassMonthFeeData.find((x) => {
-          return (
-            new Date(x.monthDate).toUTCString() === selectedMonth.toUTCString()
-          );
-        });
-        if (found) {
-          setPrice(found.coursefees);
-        } else {
+        // const found = selectedClassMonthFeeData.find((x) => {
+        //   return (
+        //     new Date(x.monthDate).toUTCString() === selectedMonth.toUTCString()
+        //   );
+        // });
+        // if (found) {
+        //   setPrice(found.coursefees);
+        // } else {
           setPrice(defaultCoursePrice);
-        }
+        // }
       } else if (selectedFeeOption === FeeOptions.YEARLY) {
         const found = selectedClassYearlyFeeData.find((x) => {
           return (

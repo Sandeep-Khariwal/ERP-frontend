@@ -12,7 +12,7 @@ import {
 import { DatePickerInput } from "@mantine/dates";
 import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus, IconX } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import PhoneInput from "react-phone-input-2";
 
 interface StudentFormValues {
@@ -35,12 +35,8 @@ const StepOne = (props: {
   setAdditionalPhoneNumbers: React.Dispatch<React.SetStateAction<string[]>>;
   additionalPhoneNumbers: string[]
 }) => {
-  
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const isMobile = useMediaQuery("(max-width: 800px)");
-  const [phoneNumber, setPhoneNumber] = useState<string>(
-    props.formData?.phoneNumber[0] || ""
-  );
 
   const handleInputChange = (field: string, value: any) => {
     props.onChangeInputValue(field, value);
@@ -96,7 +92,6 @@ const StepOne = (props: {
                 if (finalPhoneNum[0] == "0") {
                   finalPhoneNum = finalPhoneNum.substring(1);
                 }
-                setPhoneNumber(`+${finalPhoneNum}`);
                 handleInputChange("phoneNumber", [`+${finalPhoneNum}`]);
               }
             }}

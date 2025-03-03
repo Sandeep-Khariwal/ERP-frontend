@@ -21,9 +21,6 @@ import {
 import { Installment } from "@/interfaces/batchInterface";
 import { createReceiptPdf } from "./HtmlToPdf";
 import { GetStudentForPdf } from "@/app/api/student/StudentGetApi";
-//   import { GetStudentInfoById } from "../features/instituteStudentSlice";
-//   import { downloadreceipt } from "../../components/FeeReceiptPdf/FeeReceiptPdf";
-//   import useParentCommunication from "../../hooks/useParentCommunication";
 
 export interface FeeRecord {
   _id: string;
@@ -128,7 +125,6 @@ const FeeRecordTable = (props: {
       .catch((e) => {
         console.log(e);
       });
-    // Dummy data for testing
   };
 
   const renderRows = props.data.map((row, index) => (
@@ -139,7 +135,7 @@ const FeeRecordTable = (props: {
         backgroundColor: "#F8F8F8",
         borderRadius: "1rem",
         overflowX: "auto",
-        marginBottom: "10px", // Adds space between rows
+        marginBottom: "10px",
       }}
       key={index}
     >

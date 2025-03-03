@@ -15,7 +15,7 @@ const OverView = (props: { batchId: string }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (props.batchId) {
+    if (props.batchId && !totalStudents) {
       setIsLoading(true);
       GetBatchOverview(props.batchId)
         .then((x: any) => {

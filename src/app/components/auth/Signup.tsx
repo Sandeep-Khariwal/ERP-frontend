@@ -1,16 +1,14 @@
 "use client";
+
 import { CreateAdmin } from "@/app/api/admin/adminSlice";
 import { CreateInstitute } from "@/app/api/institute/instituteSlice";
 import {
   ErrorNotification,
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
-import { setAdminDetails } from "@/app/redux/adminSlice";
-import {
-  saveToken,
-  setDetails,
-} from "@/app/redux/instituteSlice";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
+import { setAdminDetails } from "@/app/redux/slices/adminSlice";
+import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
 import {
   Flex,
   Paper,
@@ -22,8 +20,7 @@ import {
   LoadingOverlay,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function Signup(props: { onClickLogin: () => void }) {

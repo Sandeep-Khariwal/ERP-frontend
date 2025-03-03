@@ -1,7 +1,6 @@
 "use client";
 import {
   GetBatchFee,
-  GetStudentFeeRecords,
 } from "@/app/api/institute/InstituteGetApi";
 import { Installment } from "@/interfaces/batchInterface";
 import {

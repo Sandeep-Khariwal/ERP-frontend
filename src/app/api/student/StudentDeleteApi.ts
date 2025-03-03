@@ -1,9 +1,9 @@
 import ApiHelper from "../ApiHelper";
 
-export function RemoveStudentFromBatch(id: string) {
+export function RemoveStudentFromBatch(studentId: string, batchId:string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.delete(
-      `${process.env.URL}/api/v1/student/removeStudentFromBatch/${id}`
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/removeStudentFromBatch/${batchId}`,{studentId:studentId}
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));

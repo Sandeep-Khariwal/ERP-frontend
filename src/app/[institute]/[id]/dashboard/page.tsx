@@ -2,16 +2,15 @@
 import { DesktopNavbar } from "@/app/components/institute/DesktopNavbar";
 import { InstituteDashboard } from "@/app/components/institute/InstituteDashboard";
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
-import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
-import { Box, Flex, Text } from "@mantine/core";
+import { Box, Flex } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useState } from "react";
 
 export enum Tabs {
   DASHBOARD = "dashboard",
   STUDENT = "student",
-  TEACHER = "teacher",
+  // TEACHER = "teacher",
 }
 
 const dashboard = () => {
@@ -55,7 +54,7 @@ const dashboard = () => {
         >
           {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
           {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-          {Tabs.TEACHER === selectedTab && <InstituteTeachers />}
+          {/* {Tabs.TEACHER === selectedTab && <InstituteTeachers />} */}
         </Box>
       </Flex>
     </>

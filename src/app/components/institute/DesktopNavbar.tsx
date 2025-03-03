@@ -1,29 +1,35 @@
+"use client";
+
 import { Box, Divider, Flex, Stack, Text } from "@mantine/core";
-import {
-  IconDashboard,
-  IconDashboardFilled,
-  IconDashboardOff,
-  IconLayoutDashboard,
-} from "@tabler/icons-react";
 import { MdOutlineDashboard } from "react-icons/md";
 import { PiStudent } from "react-icons/pi";
-import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { IoSettingsOutline } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
-import { useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { Tabs } from "@/app/[institute]/[id]/dashboard/page";
 import { useMediaQuery } from "@mantine/hooks";
+import { LogOut } from "@/app/api/LocalStorageUtility";
+import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/app/redux/redux.hooks";
+import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
   onClickCollapse: () => void;
-  onSelectTab: (val:Tabs) => void;
+  onSelectTab: (val: Tabs) => void;
 }) => {
-    const isMd = useMediaQuery(`(max-width: 968px)`);
+  const isMd = useMediaQuery(`(max-width: 968px)`);
+  const navigation = useRouter();
+  const dispatch = useAppDispatch()
   return (
     <>
-      <Stack w={isMd?"0px":"100%"}  c={"white"} h={"100vh"} bg={"#E6E1FF"} p={10}>
+      <Stack
+        w={isMd ? "0px" : "100%"}
+        c={"white"}
+        h={"100vh"}
+        bg={"#E6E1FF"}
+        p={10}
+      >
         <Stack
           w={"100%"}
           c={"white"}
@@ -40,8 +46,7 @@ export const DesktopNavbar = (props: {
             <Box w={"90%"}>
               <Flex
                 onClick={() => props.onClickCollapse()}
-                style={{ cursor: "pointer"}}
-               
+                style={{ cursor: "pointer" }}
                 my={10}
                 align={"center"}
                 justify={props.isCollapsed ? "center" : "start"}
@@ -64,9 +69,9 @@ export const DesktopNavbar = (props: {
                 align={"center"}
                 justify={props.isCollapsed ? "center" : "start"}
                 gap={10}
-                onClick={()=>props.onSelectTab(Tabs.DASHBOARD)}
+                onClick={() => props.onSelectTab(Tabs.DASHBOARD)}
               >
-                <MdOutlineDashboard size={28}  />
+                <MdOutlineDashboard size={28} />
                 {!props.isCollapsed && (
                   <Text fw={600} fz={20}>
                     Dashboard
@@ -79,16 +84,16 @@ export const DesktopNavbar = (props: {
                 align={"center"}
                 justify={props.isCollapsed ? "center" : "start"}
                 gap={10}
-                onClick={()=>props.onSelectTab(Tabs.STUDENT)}
+                onClick={() => props.onSelectTab(Tabs.STUDENT)}
               >
-                <PiStudent size={28}  />
+                <PiStudent size={28} />
                 {!props.isCollapsed && (
                   <Text fw={600} fz={20}>
                     Student
                   </Text>
                 )}
               </Flex>
-              <Flex
+              {/* <Flex
                 style={{ cursor: "pointer" }}
                 my={10}
                 align={"center"}
@@ -102,11 +107,11 @@ export const DesktopNavbar = (props: {
                     Teacher
                   </Text>
                 )}
-              </Flex>
+              </Flex> */}
             </Box>
 
             <Box w={"100%"}>
-              <Flex
+              {/* <Flex
                 style={{ cursor: "pointer" }}
                 my={10}
                 align={"center"}
@@ -119,7 +124,7 @@ export const DesktopNavbar = (props: {
                     Settings
                   </Text>
                 )}
-              </Flex>
+              </Flex> */}
               <Flex
                 style={{ cursor: "pointer" }}
                 my={10}
@@ -127,7 +132,20 @@ export const DesktopNavbar = (props: {
                 justify={props.isCollapsed ? "center" : "start"}
                 gap={10}
               >
-                <IoSettingsOutline size={28}  />
+                <IoSettingsOutline
+                  size={28}
+                  onClick={() => {
+                    LogOut();
+                     dispatch(setDetails({
+                      name: "",
+                      _id: "",
+                      phoneNumber: "",
+                      address: ""
+                    }));
+                    dispatch(saveToken(""))
+                    navigation.push("/");
+                  }}
+                />
                 {!props.isCollapsed && <Text>sandeep khariwal</Text>}
               </Flex>
             </Box>

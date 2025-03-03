@@ -16,3 +16,14 @@ export function CreateTeacher(data: {
       .catch((error: any) => reject(error));
   });
 }
+
+export function TeacherLogin(data:{
+  email:string,
+  password:string,
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(`${process.env.URL}/api/v1/teacher/login`,data)
+      .then((response) => resolve(response))
+      .catch((error:any) => reject(error));
+  });
+}

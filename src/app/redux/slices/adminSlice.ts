@@ -1,5 +1,5 @@
+import { SaveUserToken } from "@/app/api/LocalStorageUtility";
 import { createSlice } from "@reduxjs/toolkit";
-import { SaveUserToken } from "../api/LocalStorageUtility";
 
 interface Admin {
   name: string;

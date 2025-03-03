@@ -33,16 +33,16 @@ export function InstituteProfile(props: InstituteProfileProps) {
   const [userData, setUserData] = useState<{ [key: string]: string } | null>(
     null
   );
-  const [editUserData, setEditUserData] = useState<{
-    selectedImage: string;
-    name: string;
-    phoneNo: string;
-    email: string;
-    featureAccess: any;
-    batches: string[];
-    _id: string;
-  } | null>(null);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  // const [editUserData, setEditUserData] = useState<{
+  //   selectedImage: string;
+  //   name: string;
+  //   phoneNo: string;
+  //   email: string;
+  //   featureAccess: any;
+  //   batches: string[];
+  //   _id: string;
+  // } | null>(null);
+  // const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const isMd = useMediaQuery(`(max-width: 768px)`);
   const isLg = useMediaQuery(`(max-width: 1024px)`);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -59,14 +59,14 @@ export function InstituteProfile(props: InstituteProfileProps) {
 
   const handleCloseModal = () => {
     setIsUserModel(false);
-    setEditUserData(null);
-    setSelectedUserId(null);
+    // setEditUserData(null);
+    // setSelectedUserId(null);
     setUserData(null);
   };
 
-  const handleViewProfile = (userId: string) => {
-    setSelectedUserId(userId);
-  };
+  // const handleViewProfile = (userId: string) => {
+  //   setSelectedUserId(userId);
+  // };
 
   const handleEditProfile = (userId: string) => {
     setIsModalOpen(true);
@@ -134,7 +134,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
             instituteId={props?.instituteId}
             isOpen={isModalOpen}
             onClose={() => {
-              setEditUserData(null);
+              // setEditUserData(null);
               setIsModalOpen(false);
             }}
           />

@@ -1,14 +1,21 @@
+"use client";
+
 import { Tabs } from "@/app/[institute]/[id]/dashboard/page";
+import { LogOut } from "@/app/api/LocalStorageUtility";
+import { useAppDispatch } from "@/app/redux/redux.hooks";
+import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
 import { Flex, Stack, Text } from "@mantine/core";
 import { IconCircle0, IconHome } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 import React from "react";
-import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { PiStudent } from "react-icons/pi";
 
 const MobileNavbar = (props: {
   onClickCollapse: () => void;
   onSelectTab: (val: Tabs) => void;
 }) => {
+  const navigation = useRouter();
+  const dispatch = useAppDispatch();
   return (
     <Flex
       w={"96%"}
@@ -20,10 +27,9 @@ const MobileNavbar = (props: {
         left: "50%",
         transform: "translateX(-50%)",
         borderRadius: "2rem",
-        zIndex:10
+        zIndex: 10,
       }}
       px={15}
-      
       bg={"linear-gradient(135deg, #9C27B0, #3F51B5)"}
     >
       <Stack
@@ -50,7 +56,7 @@ const MobileNavbar = (props: {
           Student
         </Text>
       </Stack>
-      <Stack
+      {/* <Stack
         style={{ cursor: "pointer" }}
         my={10}
         align={"center"}
@@ -61,13 +67,25 @@ const MobileNavbar = (props: {
         <Text fw={600} fz={15} c={"#FFFFFF"}>
           Teacher
         </Text>
-      </Stack>
+      </Stack> */}
       <Stack
         style={{ cursor: "pointer" }}
         my={10}
         align={"center"}
         gap={10}
-        onClick={() => props.onSelectTab(Tabs.TEACHER)}
+        onClick={() => {
+          LogOut();
+          dispatch(
+            setDetails({
+              name: "",
+              _id: "",
+              phoneNumber: "",
+              address: "",
+            })
+          );
+          dispatch(saveToken(""));
+          navigation.push("/");
+        }}
       >
         <IconCircle0 size={36} style={{ color: "#FFFFFF" }} />
         <Text fw={600} fz={15} c={"#FFFFFF"}>

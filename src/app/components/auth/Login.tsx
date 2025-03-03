@@ -1,8 +1,11 @@
 "use client";
+
 import { LoginAdmin } from "@/app/api/admin/adminSlice";
-import { saveToken, setAdminDetails } from "@/app/redux/adminSlice";
-import { setDetails } from "@/app/redux/instituteSlice";
+import { TeacherLogin } from "@/app/api/teacher/TeacherPostApi";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
+import { saveToken, setAdminDetails } from "@/app/redux/slices/adminSlice";
+import { setDetails } from "@/app/redux/slices/instituteSlice";
+import { setTeacherDetails } from "@/app/redux/slices/teacherSlice";
 import { UserType } from "@/enums";
 import {
   Flex,
@@ -11,7 +14,6 @@ import {
   PasswordInput,
   Button,
   Text,
-  Checkbox,
   Stack,
   Tabs,
 } from "@mantine/core";
@@ -44,7 +46,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
       LoginAdmin(loginData)
         .then((x: any) => {
           const { admin, token } = x;
-          console.log("x : ", x);
           dispatch(
             setAdminDetails({
               name: admin.name,
@@ -73,12 +74,42 @@ export default function Login(props: { onCreateAccount: () => void }) {
 
     // for user login
     if (UserType.USER) {
+
     }
     // for student login
     if (UserType.STUDENT) {
     }
     // for teacher login
     if (UserType.TEACHER) {
+      TeacherLogin(loginData)
+      .then((x: any) => {
+        const { teacher, token } = x;
+        console.log("teacher is : ",x);
+        
+        dispatch(
+          setTeacherDetails({
+            name: teacher.name,
+            _id: teacher._id,
+            phone: teacher.phoneNumber[0],
+            institute: teacher.instituteId._id,
+          })
+        );
+        dispatch(saveToken(token));
+
+        const instituteDetails = {
+          name: teacher.instituteId.name,
+          _id: teacher.instituteId._id,
+          phoneNumber: "",
+          address: teacher.instituteId.address,
+        };
+        dispatch(setDetails(instituteDetails));
+        navigation.push(
+          `/teacher/${teacher._id}/${teacher.name}`
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+      });
     }
   };
   return (
@@ -201,6 +232,14 @@ export default function Login(props: { onCreateAccount: () => void }) {
                       value={loginData?.email}
                       onChange={handleChange}
                     />
+                    <PasswordInput
+                      label="Password"
+                      placeholder="Enter your password"
+                      required
+                      name="password"
+                      value={loginData?.password}
+                      onChange={handleChange}
+                    />
                   </Tabs.Panel>
 
                   <Tabs.Panel value={UserType.STUDENT} py={20}>
@@ -220,6 +259,14 @@ export default function Login(props: { onCreateAccount: () => void }) {
                       required
                       name="email"
                       value={loginData?.email}
+                      onChange={handleChange}
+                    />
+                    <PasswordInput
+                      label="Password"
+                      placeholder="Enter your password"
+                      required
+                      name="password"
+                      value={loginData?.password}
                       onChange={handleChange}
                     />
                   </Tabs.Panel>

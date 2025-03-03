@@ -1,4 +1,5 @@
 "use client";
+import { ErrorNotification } from "@/app/helperFunction/Notification";
 import {
   Box,
   Card,
@@ -7,9 +8,12 @@ import {
   Button,
   Menu,
   Text,
+  TextInput,
 } from "@mantine/core";
 import {
+  IconCheck,
   IconDotsVertical,
+  IconX,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import {  useState } from "react";
@@ -32,7 +36,7 @@ export function SingleBatchCard(props: {
   setDeleteModal: (val: boolean) => void;
 }) {
   const [isnameEdit, setIsnameEdit] = useState<boolean>(false);
-  
+  const [nameValue, setNameValue] = useState<string>(props.name);
   return (
     <>
       <Card
@@ -66,7 +70,7 @@ export function SingleBatchCard(props: {
               {props.name}
             </Text>
           )}
-          {/* {isnameEdit && (
+          {isnameEdit && (
               <NameEditor
                 fileName={nameValue}
                 setOnRenameClicked={setIsnameEdit}
@@ -74,7 +78,7 @@ export function SingleBatchCard(props: {
                   if (props.onEditBatchName) props.onEditBatchName(val);
                 }}
               />
-            )} */}
+            )}
           {
             <Menu>
               <Menu.Target>
@@ -359,5 +363,63 @@ export function AddCardWithButton(props: {
         </Center>
       </Card>
     </>
+  );
+}
+
+export function NameEditor(props: {
+  fileName: string;
+  setOnRenameClicked: (val: boolean) => void;
+  onRenameClick: (val: string) => void;
+}) {
+  const [value, setValue] = useState<string>(props.fileName);
+  return (
+    <Flex
+      align="center"
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <TextInput
+        value={value}
+        onChange={(e) => {
+          setValue(e.currentTarget.value);
+        }}
+        styles={{
+          input: {
+            fontSize: "22px",
+            background: "transparent",
+            border: "none",
+            borderBottom: "1px solid black",
+            borderRadius: "0px",
+            "&:focus-within": {
+              borderBottom: "1px solid black",
+            },
+          },
+        }}
+      />
+      <IconCheck
+        onClick={() => {
+          if (!value) {
+            ErrorNotification("Name is required!!");
+            return;
+          }
+          props.setOnRenameClicked(false);
+          props.onRenameClick(value);
+        }}
+        style={{
+          cursor: "pointer",
+          width: "10vh",
+        }}
+      />
+      <IconX
+        onClick={() => {
+          props.setOnRenameClicked(false);
+        }}
+        style={{
+          cursor: "pointer",
+          width: "10vh",
+        }}
+      />
+    </Flex>
   );
 }

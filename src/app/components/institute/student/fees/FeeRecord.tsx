@@ -22,7 +22,6 @@ import { DateTimePicker } from "@mantine/dates";
 import {
   IconArrowLeft,
   IconCalendar,
-  IconCaretDownFilled,
 } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
 import FeeRecordTable, { FeeRecord } from "./FeeRecordTable";
@@ -41,20 +40,15 @@ export interface FeeRecordData {
 const FeeRecordSection = (props: {
   userType: string;
   batchName: string;
-  feeRecords: FeeRecord[];
   dateOfJoining: Date;
   batch?: string;
   studentId: string;
   onPaymentClick: () => void;
   onClickBack: () => void;
+  fromBatch:boolean
 }) => {
-  const [assignedBatch, setAssignedBatch] = useState<Map<string, string>>(
-    new Map()
-  );
 
   const isMd = useMediaQuery(`(max-width: 968px)`);
-
-  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [installments, setInstallments] = useState<Installment[]>([]);
 
   // const instituteDetails = useSelector<RootState, InstituteDetails | null>(
@@ -79,37 +73,7 @@ const FeeRecordSection = (props: {
   const [feeRecordsMap, setFeeRecordsMap] = useState<
     Map<string, FeeRecordData>
   >(new Map());
-
-  const [batchWiseFeeRecords, setBatchWiseFeeRecords] = useState<FeeRecord[][]>(
-    []
-  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const groupFeeRecords = (records: FeeRecord[]) => {
-    const groupFeeData: { [key: string]: FeeRecord[] } = {};
-    records.forEach((record: FeeRecord) => {
-      const { _id } = record?.batch;
-
-      if (!groupFeeData[_id]) {
-        groupFeeData[_id] = [];
-      }
-      groupFeeData[_id].push(record);
-    });
-
-    return Object.values(groupFeeData);
-  };
-
-  useEffect(() => {
-    const groupData = groupFeeRecords(props.feeRecords);
-    setBatchWiseFeeRecords(groupData);
-    const newMap = new Map(assignedBatch);
-    props.feeRecords.forEach((item) => {
-      if (!newMap.has(item.batch._id)) {
-        newMap.set(item.batch._id, item.batch.name);
-      }
-    });
-    setAssignedBatch(newMap);
-  }, [props.feeRecords]);
 
   const handleChange = (key: string, value: any) => {
     if (key === "paymentDate") {
@@ -177,6 +141,7 @@ const FeeRecordSection = (props: {
         })
         .catch((e) => {
           console.log(e);
+          setIsLoading(false);
         });
     }
   }, [props.studentId, openPaymentModel]);
@@ -185,13 +150,15 @@ const FeeRecordSection = (props: {
     <>
       <LoadingOverlay visible={isLoading} />
       <Stack
-        w={isMd ? "100%" : "80%"}
+        w={isMd ? "100%" : "100%"}
         style={{ backgroundColor: "#ffffff" }}
         mih={isMd ? "100vh" : "90vh"}
         m={"auto"}
         my={isMd ? 0 : 20}
       >
-        <Flex w={"100%"} p={10} align={"center"} justify={"start"} gap={3}>
+        {
+          props.fromBatch && 
+          <Flex w={"100%"} p={10} align={"center"} justify={"start"} gap={3}>
           <IconArrowLeft
             size={32}
             style={{ cursor: "pointer" }}
@@ -201,6 +168,7 @@ const FeeRecordSection = (props: {
             Back
           </Text>
         </Flex>
+        }
         <Grid p={10}>
           <Grid.Col span={isMd ? 12 : 10}>
             <SimpleGrid

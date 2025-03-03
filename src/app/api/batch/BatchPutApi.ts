@@ -1,15 +1,16 @@
+
 import ApiHelper from "../ApiHelper";
 
-export function GetBatchOverview(id:string) {
+export function DeleteTheBatch(id:string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/batch/getBatchOverview/${id}`)
+    ApiHelper.put(`${process.env.URL}/api/v1/batch/deleteBatch/${id}`,{})
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
 }
-export function GetAllSubjectsFromBatch(id:string) {
+export function EditTheBatchName(id:string,name:string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/batch/getAllSubjectsFromBatch/${id}`)
+    ApiHelper.put(`${process.env.URL}/api/v1/batch/editBatchName/${id}`,{name})
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
