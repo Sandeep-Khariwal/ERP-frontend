@@ -23,7 +23,7 @@ import {
   ChartOptions,
 } from "chart.js";
 import { ChartData, StudentOverView } from "./StudentPage";
-import { AddStudentRollNumber } from "@/app/api/student/StudentPut";
+import { AddStudentRollNumber } from "@/api/student/StudentPut";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 
 ChartJS.register(

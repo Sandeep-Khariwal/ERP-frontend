@@ -1,9 +1,11 @@
 "use client";
 import { useMediaQuery } from "@mantine/hooks";
 import { AddCardWithButton, SingleBatchCard } from "./DashboardCards";
+import { useEffect } from "react";
 
 export enum UserType {
   STUDENT,
+  TEACHER,
   OTHERS,
 }
 
@@ -29,7 +31,6 @@ interface InstituteBatchesSectionProps {
 
 export function InstituteBatchesSection(props: InstituteBatchesSectionProps) {
   const isMd = useMediaQuery(`(max-width: 968px)`);
-  
   return (
     <>
       {props.userType == UserType.OTHERS && !isMd && (

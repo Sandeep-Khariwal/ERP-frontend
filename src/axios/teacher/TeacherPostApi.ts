@@ -1,4 +1,5 @@
-import ApiHelper from "../ApiHelper";
+import ApiHelper from "../../ApiHelper";
+
 
 export function CreateTeacher(data: {
     name:string,
@@ -23,6 +24,25 @@ export function TeacherLogin(data:{
 }) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(`${process.env.URL}/api/v1/teacher/login`,data)
+      .then((response) => resolve(response))
+      .catch((error:any) => reject(error));
+  });
+}
+export function StudentLogin(data:{
+  email:string,
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(`${process.env.URL}/api/v1/student/login`,data)
+      .then((response) => resolve(response))
+      .catch((error:any) => reject(error));
+  });
+}
+export function StudentOtpVarification(data:{
+  studentId:string,
+  otp:string;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(`${process.env.URL}/api/v1/student/varify`,data)
       .then((response) => resolve(response))
       .catch((error:any) => reject(error));
   });

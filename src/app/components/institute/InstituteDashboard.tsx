@@ -20,7 +20,7 @@ import {
   CreateBatchAndSubjects,
   GetAccountByToken,
   GetInstituteBatches,
-} from "@/app/api/institute/instituteSlice";
+} from "@/api/institute/instituteSlice";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { EditCourseFeeModal } from "./EditCourseFeeModal";
 import { InstituteInsideBatch } from "./insideBatch/InstituteInsideBatch";
@@ -35,7 +35,7 @@ import {
 import {
   IconCaretDownFilled,
 } from "@tabler/icons-react";
-import { DeleteTheBatch, EditTheBatchName } from "@/app/api/batch/BatchPutApi";
+import { DeleteTheBatch, EditTheBatchName } from "@/api/batch/BatchPutApi";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 
 export interface Batch {
@@ -309,7 +309,7 @@ export const InstituteDashboard = () => {
                   firstThreeStudents: batch?.firstThreeStudents || [],
                   firstThreeTeachers: batch?.firstThreeTeachers || [],
                 }))}
-                userType={1}
+                userType={2}
                 setDeleteBatchId={(val: string) => {
                   setDeleteBatchId(val);
                   setBatchDeleteWarning(true);

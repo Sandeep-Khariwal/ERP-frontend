@@ -27,8 +27,9 @@ import { showNotification } from "@mantine/notifications";
 import FeeRecordTable, { FeeRecord } from "./FeeRecordTable";
 import { StudentFeesCards } from "./StudentFeesCard";
 import { Installment } from "@/interfaces/batchInterface";
-import { GetStudentFeeInstallments } from "@/app/api/student/StudentGetApi";
-import { UpdateMultipleFeeRecord } from "@/app/api/student/StudentPut";
+import { GetStudentFeeInstallments } from "@/api/student/StudentGetApi";
+import { UpdateMultipleFeeRecord } from "@/api/student/StudentPut";
+import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 
 interface FormValues {
   paymentDate: Date;
@@ -38,7 +39,7 @@ export interface FeeRecordData {
   paidDate: Date;
 }
 const FeeRecordSection = (props: {
-  userType: string;
+  userType: UserType;
   batchName: string;
   dateOfJoining: Date;
   batch?: string;
@@ -189,7 +190,7 @@ const FeeRecordSection = (props: {
             <Text size="sm" c="blue">
               Fee Records
             </Text>
-            {props.userType === "teacher" ? (
+            {props.userType === UserType.OTHERS ? (
               <Button
                 onClick={() => {
                   if (totalOverdue <= 0) {

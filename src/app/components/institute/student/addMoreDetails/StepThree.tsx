@@ -1,7 +1,7 @@
 "use client";
 import {
   GetBatchFee,
-} from "@/app/api/institute/InstituteGetApi";
+} from "@/api/institute/InstituteGetApi";
 import { Installment } from "@/interfaces/batchInterface";
 import {
   ActionIcon,

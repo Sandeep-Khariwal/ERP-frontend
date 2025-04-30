@@ -30,7 +30,7 @@ import {
 } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { GetStudentOverview } from "@/app/api/student/StudentGetApi";
+import { GetStudentOverview } from "@/api/student/StudentGetApi";
 import { StudentTabs } from "../../InstituteStudents";
 
 ChartJS.register(

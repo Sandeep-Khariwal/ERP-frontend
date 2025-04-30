@@ -15,11 +15,11 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
-import { GetInstituteBatches } from "@/app/api/institute/instituteSlice";
-import { CreateAdmin } from "@/app/api/admin/adminSlice";
-import { CreateTeacher } from "@/app/api/teacher/TeacherPostApi";
+import { GetInstituteBatches } from "@/api/institute/instituteSlice";
+import { CreateAdmin } from "@/axios/admin/adminSlice";
+import { CreateTeacher } from "@/api/teacher/TeacherPostApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
-import { CreateUser } from "@/app/api/user/UserPostApi";
+import { CreateUser } from "@/axios/user/UserPostApi";
 
 const AddStaffModal = (props: {
   isOpen: boolean;

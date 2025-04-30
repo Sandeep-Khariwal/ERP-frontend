@@ -1,7 +1,7 @@
 "use client";
 
-import { GetBatchOptionalSubjects } from "@/app/api/institute/InstituteGetApi";
-import { GetInstituteBatches } from "@/app/api/institute/instituteSlice";
+import { GetBatchOptionalSubjects } from "@/api/institute/InstituteGetApi";
+import { GetInstituteBatches } from "@/api/institute/instituteSlice";
 import {
   Container,
   Grid,

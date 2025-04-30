@@ -1,7 +1,7 @@
 "use client";
 
-import { GetAllSubjectsFromBatch } from "@/app/api/batch/BatchGetApi";
-import { CreateTest } from "@/app/api/batch/BatchPostApi";
+import { GetAllSubjectsFromBatch } from "@/api/batch/BatchGetApi";
+import { CreateTest } from "@/api/batch/BatchPostApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
 import {

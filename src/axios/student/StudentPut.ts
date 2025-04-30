@@ -1,5 +1,6 @@
 import { FeeRecordData } from "@/app/components/institute/student/fees/FeeRecord";
-import ApiHelper from "../ApiHelper";
+import ApiHelper from "../../ApiHelper";
+
 
 export function UpdateMultipleFeeRecord(
   installments: Map<string, FeeRecordData>
@@ -37,7 +38,7 @@ export async function UpdateStudentAttendance(data: {
   date: Date | null;
   currentAttendanceStatus: string;
 }) {
-  return ApiHelper.put(`/api/v1/instituteStudent/update/attendance`, {
+  return ApiHelper.put(`${process.env.URL}/api/v1/instituteStudent/update/attendance`, {
     studentId: data.studentId,
     date: data.date,
     currentAttendanceStatus: data.currentAttendanceStatus,
@@ -50,7 +51,7 @@ export function insertNewAttendance(data: {
 }) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(
-      `/api/v1/instituteClass/insertAttendance/${data.instituteClassId}`,
+      `${process.env.URL}/api/v1/instituteClass/insertAttendance/${data.instituteClassId}`,
       {
         date: data.date,
         attendance: data.attendance,

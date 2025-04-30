@@ -2,22 +2,20 @@
 
 import { LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { GetAccountByToken } from "./api/institute/instituteSlice";
 import { useAppDispatch } from "./redux/redux.hooks";
 import { useRouter } from "next/navigation";
 import {
   ErrorNotification,
-  SuccessNotification,
 } from "./helperFunction/Notification";
 import { UserType } from "@/enums";
 import { setAdminDetails } from "./redux/slices/adminSlice";
 import { setTeacherDetails } from "./redux/slices/teacherSlice";
 import { setStudentDetails } from "./redux/slices/studentSlice";
 import { setDetails } from "./redux/slices/instituteSlice";
+import { GetAccountByToken } from "@/axios/institute/instituteSlice";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [adminScreen, setAdminScreen] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const navigation = useRouter();
 

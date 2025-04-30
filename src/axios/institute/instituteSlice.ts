@@ -1,5 +1,5 @@
 import { FeeOptions, Installment } from "@/interfaces/batchInterface";
-import ApiHelper from "../ApiHelper";
+import ApiHelper from "../../ApiHelper";
 
 export function CreateInstitute(data: {
   name: string;

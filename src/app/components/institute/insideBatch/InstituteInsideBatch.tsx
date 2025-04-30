@@ -19,12 +19,13 @@ import FeeRecordSection from "../student/fees/FeeRecord";
 import OverView from "./OverView";
 import { TakeAttendanceView } from "./TakeAttendanceView";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
-import { CreateStudent } from "@/app/api/institute/InstitutePostApi";
+import { CreateStudent } from "@/api/institute/InstitutePostApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import StudentPage from "../../student/StudentPage";
 import { StudentTabs } from "../InstituteStudents";
 import TeachersSection from "./TeacherSection";
 import AddMarksModal from "./AddMarksModal";
+import { UserType } from "../../dashboard/InstituteBatchesSection";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -263,7 +264,7 @@ export function InstituteInsideBatch(props: {
         >
           <FeeRecordSection
             fromBatch={true}
-            userType={"teacher"}
+            userType={UserType.TEACHER}
             dateOfJoining={new Date()}
             batch={props?.batchId}
             studentId={selectedStudentId}

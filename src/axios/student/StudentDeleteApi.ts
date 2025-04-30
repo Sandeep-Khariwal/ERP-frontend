@@ -1,4 +1,5 @@
-import ApiHelper from "../ApiHelper";
+import ApiHelper from "../../ApiHelper";
+
 
 export function RemoveStudentFromBatch(studentId: string, batchId:string) {
   return new Promise((resolve, reject) => {

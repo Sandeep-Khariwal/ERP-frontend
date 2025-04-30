@@ -20,7 +20,8 @@ import {
 } from "@tabler/icons-react";
 import { Installment } from "@/interfaces/batchInterface";
 import { createReceiptPdf } from "./HtmlToPdf";
-import { GetStudentForPdf } from "@/app/api/student/StudentGetApi";
+import { GetStudentForPdf } from "@/api/student/StudentGetApi";
+import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 
 export interface FeeRecord {
   _id: string;
@@ -48,7 +49,7 @@ const FeeRecordTable = (props: {
   dateOfJoining: Date;
   data: Installment[];
   studentId: string;
-  userType: string;
+  userType: UserType;
   batchName: string;
 }) => {
   const batchTotalFees = props.data.reduce(
@@ -220,7 +221,7 @@ const FeeRecordTable = (props: {
           ? `${new Date(row.updatedAt || 0).toLocaleDateString()}`
           : "N/A"}
       </Table.Td>
-      {props.userType === "teacher" && (
+      {props.userType === UserType.TEACHER && (
         <>
           <Table.Td
             style={{
@@ -364,7 +365,7 @@ const FeeRecordTable = (props: {
                   >
                     Paid On
                   </Table.Th>
-                  {props.userType === "teacher" && (
+                  {props.userType === UserType.STUDENT && (
                     <th
                       style={{
                         paddingLeft: isMd ? "10px" : "5px",

@@ -17,13 +17,14 @@ import {
 } from "@tabler/icons-react";
 import Image from "next/image";
 import {  useState } from "react";
+import { UserType } from "./InstituteBatchesSection";
 
 export function SingleBatchCard(props: {
   id: string;
   name: string;
   noOfStudents: number;
   firstThreeStudents: string[];
-  userType: any;
+  userType: UserType;
   onbatchCardClick: () => void;
   onEditBatchName: (val: string) => void;
   onEditCourseFees: () => void;
@@ -53,6 +54,9 @@ export function SingleBatchCard(props: {
           cursor: "pointer",
         }}
       >
+        {
+          props.userType === UserType.OTHERS && 
+       
         <Flex justify="space-between" align="center" ml={5} mr={5}>
           {!isnameEdit && (
             <Text
@@ -216,6 +220,7 @@ export function SingleBatchCard(props: {
             </Menu>
           }
         </Flex>
+}
         <Flex direction="column" ml={5}>
           <Flex>
             <Text mr={4} fz={12} fw={500} c="#8F8F8F">

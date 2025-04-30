@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
-import { GetUserToken } from "./LocalStorageUtility";
+import { GetUserToken } from "./axios/LocalStorageUtility";
 
 class ApiHelper {
   private instance: AxiosInstance;

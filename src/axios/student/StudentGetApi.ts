@@ -1,4 +1,5 @@
-import ApiHelper from "../ApiHelper";
+import ApiHelper from "../../ApiHelper";
+
 
 export function GetStudentFeeInstallments(id: string) {
   return new Promise((resolve, reject) => {

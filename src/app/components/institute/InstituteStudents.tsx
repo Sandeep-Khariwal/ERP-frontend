@@ -16,8 +16,8 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useAppSelector } from "@/app/redux/redux.hooks";
-import { GetInstituteBatches } from "@/app/api/institute/instituteSlice";
-import { GetAllStudentsFromBatch } from "@/app/api/institute/InstituteGetApi";
+import { GetInstituteBatches } from "@/api/institute/instituteSlice";
+import { GetAllStudentsFromBatch } from "@/api/institute/InstituteGetApi";
 import StudentPage from "../student/StudentPage";
 
 export interface StudentList {

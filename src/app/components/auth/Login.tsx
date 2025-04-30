@@ -1,10 +1,14 @@
 "use client";
 
-import { LoginAdmin } from "@/app/api/admin/adminSlice";
-import { TeacherLogin } from "@/app/api/teacher/TeacherPostApi";
+import { LoginAdmin } from "@/axios/admin/adminSlice";
+import {
+  ErrorNotification,
+  SuccessNotification,
+} from "@/app/helperFunction/Notification";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { saveToken, setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
+import { setStudentDetails } from "@/app/redux/slices/studentSlice";
 import { setTeacherDetails } from "@/app/redux/slices/teacherSlice";
 import { UserType } from "@/enums";
 import {
@@ -16,12 +20,17 @@ import {
   Text,
   Stack,
   Tabs,
+  Modal,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import PinInput from "./OtpInput";
+import { StudentLogin, StudentOtpVarification, TeacherLogin } from "@/axios/teacher/TeacherPostApi";
 
 export default function Login(props: { onCreateAccount: () => void }) {
   const [userType, setUserType] = useState<UserType>(UserType.STUDENT);
+  const [studentId, setStudentId] = useState<string>("");
+  const [studentEmail, setStudentEmail] = useState<string>("");
   const [loginData, setLoginData] = useState<{
     email: string;
     password: string;
@@ -31,6 +40,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
   });
   const dispatch = useAppDispatch();
   const navigation = useRouter();
+  const [openOtpModal, setOpenOtpModal] = useState<boolean>(false);
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
@@ -73,45 +83,91 @@ export default function Login(props: { onCreateAccount: () => void }) {
     }
 
     // for user login
-    if (UserType.USER) {
-
+    if (userType === UserType.USER) {
     }
     // for student login
-    if (UserType.STUDENT) {
+    if (userType === UserType.STUDENT) {
+      StudentLogin(loginData)
+        .then((x: any) => {
+          const { studentId, email } = x;
+          setStudentEmail(email);
+          setStudentId(studentId);
+          setOpenOtpModal(true);
+        })
+        .catch((e: any) => {
+          const { message } = e.response.data;
+          ErrorNotification(message);
+          SuccessNotification("error found!!");
+          console.log(e);
+        });
     }
     // for teacher login
-    if (UserType.TEACHER) {
+    if (userType === UserType.TEACHER) {
       TeacherLogin(loginData)
+        .then((x: any) => {
+          const { teacher, token } = x;
+          dispatch(
+            setTeacherDetails({
+              name: teacher.name,
+              _id: teacher._id,
+              phone: teacher.phoneNumber[0],
+              institute: teacher.instituteId._id,
+            })
+          );
+          dispatch(saveToken(token));
+
+          const instituteDetails = {
+            name: teacher.instituteId.name,
+            _id: teacher.instituteId._id,
+            phoneNumber: "",
+            address: teacher.instituteId.address,
+          };
+          dispatch(setDetails(instituteDetails));
+          navigation.push(`/teacher/${teacher._id}/${teacher.name}`);
+        })
+        .catch((e: any) => {
+          const { message } = e.response.data;
+          ErrorNotification(message);
+          SuccessNotification("error found!!");
+          console.log(e);
+        });
+    }
+  };
+
+  const varifyStudentOtp = (otp: string) => {
+    StudentOtpVarification({
+      studentId,
+      otp,
+    })
       .then((x: any) => {
-        const { teacher, token } = x;
-        console.log("teacher is : ",x);
-        
+        const { student, token } = x;
         dispatch(
-          setTeacherDetails({
-            name: teacher.name,
-            _id: teacher._id,
-            phone: teacher.phoneNumber[0],
-            institute: teacher.instituteId._id,
+          setStudentDetails({
+            name: student.name,
+            _id: student._id,
+            phone: student.phoneNumber[0],
+            institute: student.instituteId._id,
           })
         );
         dispatch(saveToken(token));
-
+        setOpenOtpModal(false);
         const instituteDetails = {
-          name: teacher.instituteId.name,
-          _id: teacher.instituteId._id,
+          name: student.instituteId.name,
+          _id: student.instituteId._id,
           phoneNumber: "",
-          address: teacher.instituteId.address,
+          address: student.instituteId.address,
         };
         dispatch(setDetails(instituteDetails));
-        navigation.push(
-          `/teacher/${teacher._id}/${teacher.name}`
-        );
+        navigation.push(`/student/${student._id}/${student.name}`);
       })
-      .catch((e) => {
+      .catch((e: any) => {
+        const { message } = e.response.data;
+        ErrorNotification(message);
+        SuccessNotification("error found!!");
         console.log(e);
       });
-    }
   };
+
   return (
     <>
       <Flex
@@ -298,6 +354,17 @@ export default function Login(props: { onCreateAccount: () => void }) {
           </Flex>
         </Flex>
       </Flex>
+
+      <Modal opened={openOtpModal} title="OTP Varification!!" withCloseButton={false} onClose={() => setOpenOtpModal(false)}>
+        <Flex w={"100%"} align={"center"} justify={"center"} mt={10} >
+        <PinInput
+        studentEmail={studentEmail}
+          onComplete={(otp: string) => {
+            varifyStudentOtp(otp);
+          }}
+        />
+        </Flex>
+      </Modal>
     </>
   );
 }

@@ -15,15 +15,15 @@ import StepOne from "./StepOne";
 import {
   CreateStudent,
   CreateStudentFeeRecords,
-} from "@/app/api/institute/InstitutePostApi";
+} from "@/api/institute/InstitutePostApi";
 import AssignBatch from "./StepTwo";
 import {
   UpdateStudent,
   UpdateStudentBasicInfo,
-} from "@/app/api/institute/InstitutePutApi";
+} from "@/api/institute/InstitutePutApi";
 import StepThree from "./StepThree";
 import { Installment } from "@/interfaces/batchInterface";
-import { GetStudent } from "@/app/api/institute/InstituteGetApi";
+import { GetStudent } from "@/api/institute/InstituteGetApi";
 
 interface StudentFormValues {
   name: string;

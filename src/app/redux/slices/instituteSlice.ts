@@ -1,4 +1,4 @@
-import { SaveUserToken } from "@/app/api/LocalStorageUtility";
+import { LogOut, SaveUserToken } from "@/axios/LocalStorageUtility";
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface InstituteDetails {

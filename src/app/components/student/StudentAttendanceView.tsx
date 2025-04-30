@@ -1,6 +1,6 @@
 "use client";
 
-import { GetStudentAttendance } from "@/app/api/student/StudentGetApi";
+import { GetStudentAttendance } from "@/api/student/StudentGetApi";
 import { Card, LoadingOverlay, Stack, Table, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { AttendanceStatus } from "../institute/insideBatch/AttendanceCard";

@@ -1,7 +1,7 @@
 "use client";
 
-import { CreateAdmin } from "@/app/api/admin/adminSlice";
-import { CreateInstitute } from "@/app/api/institute/instituteSlice";
+import { CreateAdmin } from "@/axios/admin/adminSlice";
+import { CreateInstitute } from "@/api/institute/instituteSlice";
 import {
   ErrorNotification,
   SuccessNotification,

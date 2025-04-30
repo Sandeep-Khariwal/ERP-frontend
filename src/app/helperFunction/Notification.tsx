@@ -1,5 +1,4 @@
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
 
 export function SuccessNotification(message: string) {
 

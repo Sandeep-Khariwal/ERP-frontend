@@ -5,7 +5,6 @@ import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
 import { MantineProvider } from "@mantine/core";
 import { ReduxProvider } from "./redux/provider";
-import { Notifications } from "@mantine/notifications";
 import React from "react";
 
 export const metadata: Metadata = {

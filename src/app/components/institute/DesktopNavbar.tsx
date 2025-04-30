@@ -8,7 +8,7 @@ import { IoMdClose } from "react-icons/io";
 import { FaBars } from "react-icons/fa";
 import { Tabs } from "@/app/[institute]/[id]/dashboard/page";
 import { useMediaQuery } from "@mantine/hooks";
-import { LogOut } from "@/app/api/LocalStorageUtility";
+import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";

@@ -1,6 +1,6 @@
 "use client";
 
-import { GetAllStudentsFromBatch } from "@/app/api/institute/InstituteGetApi";
+import { GetAllStudentsFromBatch } from "@/api/institute/InstituteGetApi";
 import {
   Badge,
   Button,
@@ -16,7 +16,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { Screen } from "./InstituteInsideBatch";
-import { RemoveStudentFromBatch } from "@/app/api/student/StudentDeleteApi";
+import { RemoveStudentFromBatch } from "@/api/student/StudentDeleteApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
 

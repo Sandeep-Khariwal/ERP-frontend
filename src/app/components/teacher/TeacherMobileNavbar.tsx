@@ -1,18 +1,24 @@
 "use client";
 
-import { Tabs } from "@/app/[institute]/[id]/dashboard/page";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
+import { setTeacherDetails, TeacherLogOut } from "@/app/redux/slices/teacherSlice";
 import { Flex, Stack, Text } from "@mantine/core";
 import { IconCircle0, IconHome } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { PiStudent } from "react-icons/pi";
+import {  PiUser } from "react-icons/pi";
 
-const MobileNavbar = (props: {
+export enum TeacherTabs {
+    HOME = "home",
+    PROFILE = "profile",
+    // TEACHER = "teacher",
+  }
+
+const TeacherMobileNavbar = (props: {
   onClickCollapse: () => void;
-  onSelectTab: (val: Tabs) => void;
+  onSelectTab: (val: TeacherTabs) => void;
 }) => {
   const navigation = useRouter();
   const dispatch = useAppDispatch();
@@ -20,10 +26,10 @@ const MobileNavbar = (props: {
     <Flex
       w={"96%"}
       align={"center"}
-      justify={"space-between"}
+      justify={"space-around"}
       style={{
-        position: "absolute",
-        bottom: "1%",
+        position: "fixed",
+        bottom: "0px",
         left: "50%",
         transform: "translateX(-50%)",
         borderRadius: "2rem",
@@ -37,25 +43,25 @@ const MobileNavbar = (props: {
         my={10}
         align={"center"}
         gap={10}
-        onClick={() => props.onSelectTab(Tabs.DASHBOARD)}
+        onClick={() => props.onSelectTab(TeacherTabs.HOME)}
       >
         <IconHome size={36} style={{ color: "#FFFFFF" }} />
         <Text fw={600} fz={15} c={"#FFFFFF"}>
           Home
         </Text>
       </Stack>
-      <Stack
+      {/* <Stack
         style={{ cursor: "pointer" }}
         my={10}
         align={"center"}
         gap={10}
-        onClick={() => props.onSelectTab(Tabs.STUDENT)}
+        onClick={() => props.onSelectTab(TeacherTabs.PROFILE)}
       >
-        <PiStudent size={36} style={{ color: "#FFFFFF" }} />
+        <PiUser size={36} style={{ color: "#FFFFFF" }} />
         <Text fw={600} fz={15} c={"#FFFFFF"}>
-          Student
+          Profile
         </Text>
-      </Stack>
+      </Stack> */}
       {/* <Stack
         style={{ cursor: "pointer" }}
         my={10}
@@ -76,24 +82,24 @@ const MobileNavbar = (props: {
         onClick={() => {
           LogOut();
           dispatch(
-            setDetails({
+            setTeacherDetails({
               name: "",
               _id: "",
-              phoneNumber: "",
-              address: "",
+              phone: "",
+              institute: "",
             })
           );
-          dispatch(saveToken(""));
+          dispatch(TeacherLogOut(""));
           navigation.push("/");
         }}
       >
         <IconCircle0 size={36} style={{ color: "#FFFFFF" }} />
         <Text fw={600} fz={15} c={"#FFFFFF"}>
-          Profile
+          Log out
         </Text>
       </Stack>
     </Flex>
   );
 };
 
-export default MobileNavbar;
+export default TeacherMobileNavbar;

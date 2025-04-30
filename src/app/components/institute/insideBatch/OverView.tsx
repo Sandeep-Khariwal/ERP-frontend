@@ -4,7 +4,7 @@ import { Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { BatchOverviewCards } from "./BatchOverviewCards";
 import { useMediaQuery } from "@mantine/hooks";
-import { GetBatchOverview } from "@/app/api/batch/BatchGetApi";
+import { GetBatchOverview } from "@/api/batch/BatchGetApi";
 
 const OverView = (props: { batchId: string }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);

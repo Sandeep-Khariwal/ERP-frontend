@@ -1,5 +1,6 @@
 import { AttendanceInterface } from "@/interface/student.interface";
-import ApiHelper from "../ApiHelper";
+import ApiHelper from "../../ApiHelper";
+
 
 export function CreateAttendance(batchId: string, data: AttendanceInterface[]) {
   return new Promise((resolve, reject) => {

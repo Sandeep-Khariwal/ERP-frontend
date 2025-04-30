@@ -38,5 +38,5 @@ export function SaveUserToken(token:string) {
 
 export function LogOut() {
   window.localStorage.removeItem(LocalStorageKey.Token)
-  document.cookie = ""
+  document.cookie = `shikshaPayToken=""}; path=/; max-age=0`
 }

@@ -1,4 +1,4 @@
-import ApiHelper from "../ApiHelper";
+import ApiHelper from "../../ApiHelper";
 
 export function GetBatchOverview(id:string) {
   return new Promise((resolve, reject) => {

@@ -1,4 +1,4 @@
-import { SaveUserToken } from "@/app/api/LocalStorageUtility";
+import { LogOut, SaveUserToken } from "@/axios/LocalStorageUtility";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface Teacher {
@@ -35,7 +35,10 @@ export const teacherDetails = createSlice({
       const token = actions.payload;
       SaveUserToken(token)
     },
+    TeacherLogOut(state, actions) {
+      LogOut()
+    },
   },
 });
-export const { setTeacherDetails , saveToken } = teacherDetails.actions;
+export const { setTeacherDetails , saveToken, TeacherLogOut } = teacherDetails.actions;
 export default teacherDetails.reducer;

@@ -6,7 +6,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { StudentTabs } from "../institute/InstituteStudents";
 import FeeRecordSection from "../institute/student/fees/FeeRecord";
-import { GetStudentOverview } from "@/app/api/student/StudentGetApi";
+import { GetStudentOverview } from "@/api/student/StudentGetApi";
 import StudentOverview from "./StudentOverview";
 import StudentAttendanceView from "./StudentAttendanceView";
 import { ChartOptions } from "chart.js";

@@ -1,5 +1,5 @@
 import { Installment, StudentPayload } from "@/interfaces/batchInterface";
-import ApiHelper from "../ApiHelper";
+import ApiHelper from "../../ApiHelper";
 
 export function CreateStudent(studentPayload: StudentPayload) {
   return new Promise((resolve, reject) => {
