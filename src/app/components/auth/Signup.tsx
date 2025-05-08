@@ -1,7 +1,6 @@
 "use client";
 
 import { CreateAdmin } from "@/axios/admin/adminSlice";
-import { CreateInstitute } from "@/api/institute/instituteSlice";
 import {
   ErrorNotification,
   SuccessNotification,
@@ -22,6 +21,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { CreateInstitute } from "@/axios/institute/instituteSlice";
 
 export default function Signup(props: { onClickLogin: () => void }) {
   const [formData, setFormData] = useState<{

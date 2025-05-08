@@ -15,9 +15,9 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
-import { GetInstituteBatches } from "@/api/institute/instituteSlice";
+import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
 import { CreateAdmin } from "@/axios/admin/adminSlice";
-import { CreateTeacher } from "@/api/teacher/TeacherPostApi";
+import { CreateTeacher } from "@/axios/teacher/TeacherPostApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { CreateUser } from "@/axios/user/UserPostApi";
 

@@ -12,7 +12,6 @@ import {
   Flex,
   Modal,
   NumberInput,
-  Select,
   Container,
   LoadingOverlay,
 } from "@mantine/core";
@@ -24,12 +23,12 @@ import {
   IconCalendar,
 } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
-import FeeRecordTable, { FeeRecord } from "./FeeRecordTable";
+import FeeRecordTable from "./FeeRecordTable";
 import { StudentFeesCards } from "./StudentFeesCard";
 import { Installment } from "@/interfaces/batchInterface";
-import { GetStudentFeeInstallments } from "@/api/student/StudentGetApi";
-import { UpdateMultipleFeeRecord } from "@/api/student/StudentPut";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
+import { UpdateMultipleFeeRecord } from "@/axios/student/StudentPut";
+import { GetStudentFeeInstallments } from "@/axios/student/StudentGetApi";
 
 interface FormValues {
   paymentDate: Date;
@@ -147,6 +146,9 @@ const FeeRecordSection = (props: {
     }
   }, [props.studentId, openPaymentModel]);
 
+  console.log("props.userType : ", props.userType,UserType.OTHERS);
+  
+
   return (
     <>
       <LoadingOverlay visible={isLoading} />
@@ -190,7 +192,7 @@ const FeeRecordSection = (props: {
             <Text size="sm" c="blue">
               Fee Records
             </Text>
-            {props.userType === UserType.OTHERS ? (
+            {(props.userType == UserType.OTHERS || props.userType == UserType.TEACHER) && (
               <Button
                 onClick={() => {
                   if (totalOverdue <= 0) {
@@ -206,8 +208,6 @@ const FeeRecordSection = (props: {
               >
                 Record Payment
               </Button>
-            ) : (
-              ""
             )}
           </Flex>
           <Modal

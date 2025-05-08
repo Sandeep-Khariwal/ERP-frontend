@@ -1,8 +1,9 @@
 "use client";
 
-import { GetAllSubjectsFromBatch } from "@/api/batch/BatchGetApi";
-import { CreateTest } from "@/api/batch/BatchPostApi";
+
 import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
+import { CreateTest } from "@/axios/batch/BatchPostApi";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
 import {
   Button,

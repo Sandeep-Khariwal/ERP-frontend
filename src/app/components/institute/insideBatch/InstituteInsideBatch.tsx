@@ -19,13 +19,13 @@ import FeeRecordSection from "../student/fees/FeeRecord";
 import OverView from "./OverView";
 import { TakeAttendanceView } from "./TakeAttendanceView";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
-import { CreateStudent } from "@/api/institute/InstitutePostApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import StudentPage from "../../student/StudentPage";
 import { StudentTabs } from "../InstituteStudents";
 import TeachersSection from "./TeacherSection";
 import AddMarksModal from "./AddMarksModal";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
+import { CreateStudent } from "@/axios/institute/InstitutePostApi";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -234,6 +234,7 @@ export function InstituteInsideBatch(props: {
               setShowSelectedScreen(Screen.NONE);
             }}
             studentId={selectedStudentId}
+            userType={UserType.OTHERS}
             activeTab={StudentTabs.OVERVIEW}
           />
         </Stack>

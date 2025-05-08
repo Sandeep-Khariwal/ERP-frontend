@@ -33,7 +33,7 @@ import Image from "next/image";
 import {
   CreateAttendance,
   GetAttendanceOnDate,
-} from "@/api/batch/BatchPostApi";
+} from "@/axios/batch/BatchPostApi";
 
 interface TakeAttendanceViewProps {
   students: StudentsDataWithBatch[];

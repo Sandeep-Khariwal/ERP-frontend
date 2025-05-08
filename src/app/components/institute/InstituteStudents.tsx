@@ -16,9 +16,10 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useAppSelector } from "@/app/redux/redux.hooks";
-import { GetInstituteBatches } from "@/api/institute/instituteSlice";
-import { GetAllStudentsFromBatch } from "@/api/institute/InstituteGetApi";
 import StudentPage from "../student/StudentPage";
+import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
+import { GetAllStudentsFromBatch } from "@/axios/institute/InstituteGetApi";
+import { UserType } from "../dashboard/InstituteBatchesSection";
 
 export interface StudentList {
   _id: string;
@@ -117,16 +118,23 @@ export const InstituteStudents = () => {
 
       {StudentTabs.OTHER !== activeTab && (
         <Stack
-        w={"100%"}
-        style={{ borderRadius: "1rem" }}
-        bg={"white"}
-        align={"center"}
-        justify={"space-between"}
-        p={10}
-        py={20}
-        mt={10}
+          w={"100%"}
+          style={{ borderRadius: "1rem" }}
+          bg={"white"}
+          align={"center"}
+          justify={"space-between"}
+          p={10}
+          py={20}
+          mt={10}
         >
-        <StudentPage studentId={selectedStudentId} activeTab={activeTab} onClickBack={()=>{setActiveTab(StudentTabs.OTHER)}} />
+          <StudentPage
+            studentId={selectedStudentId}
+            userType={UserType.OTHERS}
+            activeTab={activeTab}
+            onClickBack={() => {
+              setActiveTab(StudentTabs.OTHER);
+            }}
+          />
         </Stack>
       )}
 

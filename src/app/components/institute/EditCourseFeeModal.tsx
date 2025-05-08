@@ -19,7 +19,7 @@ import {
   FeeOptions,
   Installment,
 } from "@/interfaces/batchInterface";
-import { CreateBatchFee } from "@/api/institute/instituteSlice";
+import { CreateBatchFee } from "@/axios/institute/instituteSlice";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 
 export function EditCourseFeeModal(props: {

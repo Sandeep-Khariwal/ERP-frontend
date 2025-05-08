@@ -1,16 +1,24 @@
 "use client";
 
-
 import { InstituteBatchesSection } from "@/app/components/dashboard/InstituteBatchesSection";
 import { InstituteInsideBatch } from "@/app/components/institute/insideBatch/InstituteInsideBatch";
 import { Batch } from "@/app/components/institute/InstituteDashboard";
 import TeacherMobileNavbar, {
   TeacherTabs,
 } from "@/app/components/teacher/TeacherMobileNavbar";
-import { useAppSelector } from "@/app/redux/redux.hooks";
+import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
+import { setDetails } from "@/app/redux/slices/instituteSlice";
+import {
+  setTeacherDetails,
+  TeacherLogOut,
+} from "@/app/redux/slices/teacherSlice";
+import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+import { LogOut } from "@/axios/LocalStorageUtility";
 import { GetTeachersAllBatches } from "@/axios/teacher/TeacherGetApi";
 import { LoadingOverlay, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import { IconCircle0 } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Teacher = () => {
@@ -23,12 +31,44 @@ const Teacher = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>();
   const [batchId, setBatchId] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const navigation = useRouter();
 
   useEffect(() => {
     if (teacher) {
       getTechersBatches();
+
+      
     }
   }, [teacher]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    GetAccountByToken()
+      .then((x: any) => {
+        const { data, type } = x;
+        setIsLoading(false);
+
+        dispatch(
+          setTeacherDetails({
+            name: data.name,
+            _id: data._id,
+            phone: data.phoneNumber[0],
+            institute: data.instituteId._id,
+          })
+        );
+        const instituteDetails = {
+          name: data.instituteId.name,
+          _id: data.instituteId._id,
+          phoneNumber: "",
+          address: data.instituteId.address,
+        };
+        dispatch(setDetails(instituteDetails));
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, []);
 
   const getTechersBatches = () => {
     setIsLoading(true);
@@ -63,7 +103,7 @@ const Teacher = () => {
     >
       <LoadingOverlay visible={isLoading} />
       {batchId === null && (
-        <Stack w={"80%"} h={"100%"} mx={"auto"} p={20}>
+        <Stack w={!isMd ? "80%" : "100%"} h={"100%"} mx={"auto"} p={20}>
           <Text
             fz={22}
             fw={500}
@@ -145,14 +185,38 @@ const Teacher = () => {
         </Stack>
       )}
 
-      <TeacherMobileNavbar
+      {/* <TeacherMobileNavbar
         onClickCollapse={() => {
           // setIsCollapsed(!isCollapsed);
         }}
         onSelectTab={(val: TeacherTabs) => {
           // setSelectedTab(val);
         }}
-      />
+      /> */}
+      <Stack
+        style={{ cursor: "pointer" }}
+        my={10}
+        align={"center"}
+        gap={10}
+        onClick={() => {
+          LogOut();
+          dispatch(
+            setTeacherDetails({
+              name: "",
+              _id: "",
+              phone: "",
+              institute: "",
+            })
+          );
+          dispatch(TeacherLogOut(""));
+          navigation.push("/");
+        }}
+      >
+        <IconCircle0 size={36} style={{ color: "#FFFFFF" }} />
+        <Text fw={600} fz={15} c={"#FFFFFF"}>
+          Log out
+        </Text>
+      </Stack>
     </Stack>
   );
 };

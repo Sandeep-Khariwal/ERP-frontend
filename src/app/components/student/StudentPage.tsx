@@ -6,10 +6,11 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { StudentTabs } from "../institute/InstituteStudents";
 import FeeRecordSection from "../institute/student/fees/FeeRecord";
-import { GetStudentOverview } from "@/api/student/StudentGetApi";
 import StudentOverview from "./StudentOverview";
 import StudentAttendanceView from "./StudentAttendanceView";
 import { ChartOptions } from "chart.js";
+import { GetStudentOverview } from "@/axios/student/StudentGetApi";
+import { UserType } from "../dashboard/InstituteBatchesSection";
 
 export interface StudentOverView {
   _id: string;
@@ -50,6 +51,7 @@ const StudentPage = (props: {
   onClickBack: () => void;
   activeTab: StudentTabs;
   studentId: string;
+  userType:UserType
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [activeTab, setActiveTab] = useState<StudentTabs>(props.activeTab);
@@ -145,6 +147,9 @@ const StudentPage = (props: {
     <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
+        {
+          props.userType === UserType.STUDENT &&
+
         <Image
           onClick={() => props.onClickBack()}
           src={"/backArrow.png"}
@@ -153,6 +158,7 @@ const StudentPage = (props: {
           height={15}
           style={{ cursor: "pointer" }}
         />
+        }
         <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
           Students
         </Text>
@@ -168,13 +174,19 @@ const StudentPage = (props: {
                 mx={isMd ? 14 : 30}
                 c={activeTab === item ? "#1B1212" : "#2F4F4F"}
                 fw={600}
-                style={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                style={{
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  border: "none",
+                  borderBottom: "2px solid",
+                  borderColor: activeTab === item ? "#4B65F6" : "white",
+                }}
                 fz={16}
                 ff={"Roboto"}
                 w={"auto"}
               >
                 {item}
-                {activeTab === item && <hr color="#4B65F6" />}
+                {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
               </Text>
             );
           })}
@@ -194,10 +206,10 @@ const StudentPage = (props: {
       {StudentTabs.FEES === activeTab && (
         <Stack mt={10} w={"100%"} bg={"white"} p={10}>
           <FeeRecordSection
-            userType={"teacher"}
-            batchName={student.batchId.name}
+            userType={props.userType}
+            batchName={student.batchId?.name || ""}
             dateOfJoining={new Date(student.dateOfBirth)}
-            batch={student.batchId._id}
+            batch={student.batchId?._id || ""}
             studentId={student._id}
             onPaymentClick={() => {}}
             onClickBack={props.onClickBack}

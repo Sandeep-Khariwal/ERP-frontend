@@ -20,7 +20,7 @@ import {
   CreateBatchAndSubjects,
   GetAccountByToken,
   GetInstituteBatches,
-} from "@/api/institute/instituteSlice";
+} from "@/axios/institute/instituteSlice";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { EditCourseFeeModal } from "./EditCourseFeeModal";
 import { InstituteInsideBatch } from "./insideBatch/InstituteInsideBatch";
@@ -35,7 +35,7 @@ import {
 import {
   IconCaretDownFilled,
 } from "@tabler/icons-react";
-import { DeleteTheBatch, EditTheBatchName } from "@/api/batch/BatchPutApi";
+import { DeleteTheBatch, EditTheBatchName } from "@/axios/batch/BatchPutApi";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 
 export interface Batch {

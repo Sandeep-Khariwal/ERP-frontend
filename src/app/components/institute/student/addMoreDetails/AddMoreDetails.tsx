@@ -15,18 +15,19 @@ import StepOne from "./StepOne";
 import {
   CreateStudent,
   CreateStudentFeeRecords,
-} from "@/api/institute/InstitutePostApi";
+} from "@/axios/institute/InstitutePostApi";
 import AssignBatch from "./StepTwo";
 import {
   UpdateStudent,
   UpdateStudentBasicInfo,
-} from "@/api/institute/InstitutePutApi";
+} from "@/axios/institute/InstitutePutApi";
 import StepThree from "./StepThree";
 import { Installment } from "@/interfaces/batchInterface";
-import { GetStudent } from "@/api/institute/InstituteGetApi";
+import { GetStudent } from "@/axios/institute/InstituteGetApi";
 
 interface StudentFormValues {
   name: string;
+  email: string;
   phoneNumber: string[];
   parentName: string;
   dateOfBirth: Date | undefined;
@@ -60,6 +61,7 @@ export function AddMoreDetails(props: {
 
   const [formValues, setFormValues] = useState<StudentFormValues>({
     name: props.formData?.name || "",
+    email: props.formData?.email || "",
     parentName: props.formData?.parentName || "",
     phoneNumber: props.formData?.phoneNumber || [],
     dateOfBirth: props.formData?.dateOfBirth
@@ -103,6 +105,7 @@ export function AddMoreDetails(props: {
           const additionalPhoneNumbers = student.phoneNumber || [];
           const studentData = {
             name: student.name,
+            email: student.email,
             parentName: student.parentName,
             phoneNumber: [...student.phoneNumber],
             dateOfBirth: new Date(student.dateOfBirth),
@@ -306,7 +309,7 @@ export function AddMoreDetails(props: {
           >
             <StepThree
               batchName={props.batchName}
-              batchId={selectedBatch}
+              batchId={selectedBatch || selectedBatchId}
               setInstallments={setInstallments}
               setCustomOrBatch={setCustomOrBatch}
               setSelectedBatchId={setSelectedBatchId}

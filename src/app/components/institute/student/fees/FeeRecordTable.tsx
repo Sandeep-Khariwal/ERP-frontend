@@ -20,8 +20,8 @@ import {
 } from "@tabler/icons-react";
 import { Installment } from "@/interfaces/batchInterface";
 import { createReceiptPdf } from "./HtmlToPdf";
-import { GetStudentForPdf } from "@/api/student/StudentGetApi";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
+import { GetStudentForPdf } from "@/axios/student/StudentGetApi";
 
 export interface FeeRecord {
   _id: string;

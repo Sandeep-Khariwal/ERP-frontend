@@ -1,10 +1,10 @@
 "use client";
 
-import { GetStudentAttendance } from "@/api/student/StudentGetApi";
 import { Card, LoadingOverlay, Stack, Table, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { AttendanceStatus } from "../institute/insideBatch/AttendanceCard";
 import AttendanceCard from "./AttendanceCard";
+import { GetStudentAttendance } from "@/axios/student/StudentGetApi";
 
 export interface Attendance {
   date: string;

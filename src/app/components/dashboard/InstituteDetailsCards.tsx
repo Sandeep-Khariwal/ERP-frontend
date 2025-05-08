@@ -1,4 +1,4 @@
-import { GetInstituteOverview } from "@/api/institute/InstituteGetApi";
+import { GetInstituteOverview } from "@/axios/institute/InstituteGetApi";
 import { Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";

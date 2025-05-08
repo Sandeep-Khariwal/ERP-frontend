@@ -246,7 +246,7 @@ import { Screen } from "./insideBatch/InstituteInsideBatch";
             >
               Add More Details
             </Button>
-            <Flex justify="flex-end" pr={4}>
+            {/* <Flex justify="flex-end" pr={4}>
               <Button
                 id="cancel-btn"
                 onClick={() => {
@@ -309,7 +309,7 @@ import { Screen } from "./insideBatch/InstituteInsideBatch";
                   Next
                 </Text>
               </Button>
-            </Flex>
+            </Flex> */}
           </Stack>
         </Modal>
       </>

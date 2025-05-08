@@ -17,6 +17,7 @@ import PhoneInput from "react-phone-input-2";
 
 interface StudentFormValues {
   name: string;
+  email: string;
   phoneNumber: string[];
   parentName: string;
   dateOfBirth: Date | undefined;
@@ -58,6 +59,22 @@ const StepOne = (props: {
             value={props.formData.name}
             onChange={(event) =>
               handleInputChange("name", event.currentTarget.value)
+            }
+            styles={{ input: { borderWidth: 2 } }}
+          />
+        </Grid.Col>
+        <Grid.Col span={isMobile ? 12 : 6}>
+
+        <TextInput
+            ff={"Poppins"}
+            label="Email"
+            placeholder="Enter Email here!"
+            required
+            error={props.showError && "Email Required"}
+            radius={"md"}
+            value={props.formData.email}
+            onChange={(event) =>
+              handleInputChange("email", event.currentTarget.value)
             }
             styles={{ input: { borderWidth: 2 } }}
           />

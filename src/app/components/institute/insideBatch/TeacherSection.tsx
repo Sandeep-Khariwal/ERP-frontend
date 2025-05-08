@@ -1,6 +1,6 @@
 "use client";
 
-import { GetAllTeachersFromBatch } from "@/api/institute/InstituteGetApi";
+import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
 import {
   Button,
   Flex,
@@ -11,10 +11,9 @@ import {
   Table,
   Text,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
-import { RemoveStudentFromBatch } from "@/api/student/StudentDeleteApi";
+import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 
 const TeachersSection = (props: {
