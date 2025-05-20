@@ -47,7 +47,7 @@ const dashboard = () => {
         
         </Box>
         <Box
-          w={isCollapsed ? isMd ? "100%":"95%" : isMd ? "100%" : "85%"}
+          w={isCollapsed ? isMd ? "100%":"95%" : "100%"}
           mah={"100vh"}
           bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
           style={{ transition: "width 0.3s ease-in-out", overflowY: "scroll" }}

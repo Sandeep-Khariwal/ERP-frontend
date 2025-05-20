@@ -221,7 +221,7 @@ const FeeRecordTable = (props: {
           ? `${new Date(row.updatedAt || 0).toLocaleDateString()}`
           : "N/A"}
       </Table.Td>
-      {props.userType === UserType.TEACHER && (
+      {/* {props.userType === UserType.TEACHER && ( */}
         <>
           <Table.Td
             style={{
@@ -231,14 +231,12 @@ const FeeRecordTable = (props: {
               fontFamily: "sans-serif",
             }}
           >
-            {(row.amountPaid ?? 0) > 0 ? (
+            {(row.amountPaid ?? 0) > 0 && (
               <IconDownload
                 style={{ cursor: "pointer" }}
                 onClick={() => convertHtmlIntoPdf(row._id ||"")}
               />
-            ) : (
-              ""
-            )}
+            ) }
           </Table.Td>
           {/* <Table.Td style={{padding: isMd?"10px":"5px", textAlign: isMd?"center":"start" }}>
             {(row.amountPaid??0) > 0 ? (
@@ -250,14 +248,14 @@ const FeeRecordTable = (props: {
             )}
           </Table.Td> */}
         </>
-      )}
+       {/* )} */}
     </Table.Tr>
   ));
 
   return (
     <>
       <LoadingOverlay visible={isLoading} />
-      <Stack p={5} w={isMd ? "95%" : "100%"} mb={"1rem"}>
+      <Stack p={5} w={isMd ? "95%" : "100%"} mb={"1rem"} style={{overflowY:"scroll"}} >
         <Flex w={"100%"} justify="space-between" align="center">
           <Stack w={"50%"}>
             <Text fw={500}>{props.batchName}</Text>
@@ -294,7 +292,7 @@ const FeeRecordTable = (props: {
             overflowX: "hidden",
           }}
         >
-          <ScrollArea w={isMd ? "100%" : "100%"}>
+          <ScrollArea w={isMd ? "100%" : "100%"} py={20} >
             <Table horizontalSpacing="xl">
               <Table.Thead>
                 <Table.Tr style={{ border: "none" }}>
@@ -404,7 +402,7 @@ const FeeRecordTable = (props: {
               selectedFeeRecord?.payments?.map(
                 (singlePaymentRecord: any, index: number) => {
                   return (
-                    <tr>
+                    <tr key={index} >
                       <td>Payment {index + 1}</td>
                       <td>
                         {

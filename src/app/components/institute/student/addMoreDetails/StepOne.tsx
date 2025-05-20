@@ -43,8 +43,8 @@ const StepOne = (props: {
     props.onChangeInputValue(field, value);
   };
   return (
-    <Container h={isMobile?"90%":"100%"} w={isMobile ? "98%" : "100%"}>
-      <Text fz={"lg"} fw={500} ff={"Fira Sans"} c="#D3D3D3" my={10}>
+    <Container h={"100%"} w={isMobile ? "98%" : "100%"}>
+      <Text fz={"lg"} fw={500} ff={"Fira Sans"} c="#333333" my={10}>
         Student Information
       </Text>
       <Grid>

@@ -1,18 +1,25 @@
 "use client";
 
-import { LoadingOverlay, Stack, Text } from "@mantine/core";
+import {
+  BackgroundImage,
+  Box,
+  Button,
+  Flex,
+  LoadingOverlay,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "./redux/redux.hooks";
 import { useRouter } from "next/navigation";
-import {
-  ErrorNotification,
-} from "./helperFunction/Notification";
+import { ErrorNotification } from "./helperFunction/Notification";
 import { UserType } from "@/enums";
 import { setAdminDetails } from "./redux/slices/adminSlice";
 import { setTeacherDetails } from "./redux/slices/teacherSlice";
 import { setStudentDetails } from "./redux/slices/studentSlice";
 import { setDetails } from "./redux/slices/instituteSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+import Link from "next/link";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -89,9 +96,76 @@ export default function Home() {
       });
   }, []);
   return (
-    <Stack w={"100%"} h={"100vh"} align="center" justify="center" bg={"black"}>
+    <Stack
+      w={"100%"}
+      h={"100vh"}
+      align="center"
+      justify="center"
+      style={{
+        backgroundImage: "url(/heroImg.jpg)",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+        position: "relative",
+      }}
+    >
       <LoadingOverlay visible={isLoading} />
-      <Text c={"white"}>Welcome to ERP</Text>
+      <Flex
+        w={"100%"}
+        align={"center"}
+        justify={"flex-end"}
+        gap={20}
+        bg={"transparent"}
+        px={50}
+        py={30}
+        style={{ position: "fixed", top: 0, left: 0, zIndex: 2 }}
+      >
+        <Link
+          style={{ textDecoration: "none", color: "white" }}
+          href={"/about"}
+        >
+          About
+        </Link>
+        <Link
+          style={{ textDecoration: "none", color: "white" }}
+          href={"/about"}
+        >
+          Contact
+        </Link>
+        <Link
+          style={{ textDecoration: "none", color: "white" }}
+          href={"/about"}
+        >
+          Features
+        </Link>
+        <Button variant="outline" onClick={() => navigation.push("/auth")}>
+          Login
+        </Button>
+      </Flex>
+      <Text
+        fz={55}
+        px={20}
+        py={10}
+        style={{
+          textTransform: "uppercase",
+          textShadow: "2px 2px 5px gray",
+          position: "relative",
+          zIndex: 2,
+        }}
+        c={"white"}
+      >
+        Shiksha Pay
+      </Text>
+      <Box
+        style={{
+          backgroundImage:
+            "linear-gradient(to right bottom, #111111 , transparent)",
+          position: "absolute",
+          top: 0,
+        }}
+        h={"100vh"}
+        w={"100%"}
+      ></Box>
     </Stack>
   );
 }

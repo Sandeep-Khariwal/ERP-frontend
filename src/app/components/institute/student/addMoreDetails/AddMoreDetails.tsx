@@ -10,7 +10,7 @@ import {
   LoadingOverlay,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { IconArrowLeft} from "@tabler/icons-react";
+import { IconArrowLeft } from "@tabler/icons-react";
 import StepOne from "./StepOne";
 import {
   CreateStudent,
@@ -93,7 +93,7 @@ export function AddMoreDetails(props: {
       isDeleted: false,
     },
   ]);
-  const [customOrBatch, setCustomOrBatch] = useState<string>("");
+  const [customOrBatch, setCustomOrBatch] = useState<string>("0");
 
   useEffect(() => {
     if (props.selectedStudentId) {
@@ -168,6 +168,7 @@ export function AddMoreDetails(props: {
         gender: formValues.gender,
         instituteId: props.instituteId,
         batchId: props.batchId,
+        email:formValues.email
       };
       if (props.isEditableData) {
         UpdateStudentBasicInfo(studentId, studentPayload)
@@ -222,6 +223,17 @@ export function AddMoreDetails(props: {
           setIsLoading(false);
           setActive((current) => (current < 2 ? current + 1 : current));
           props.onClickBack();
+          setFormValues({
+            name: "",
+            email: "",
+            parentName: "",
+            phoneNumber: [],
+            dateOfBirth: new Date(),
+            address: "",
+            parentNumber: "",
+            gender: "",
+            dateOfJoining: new Date(),
+          });
         })
         .catch((e) => {
           console.log(e);
@@ -234,19 +246,18 @@ export function AddMoreDetails(props: {
     <>
       <LoadingOverlay visible={isLoading} />
       <Stack
-        w={isMd ? "100%" : "80%"}
+        w={"100%"}
         className="addMoreDetails"
         bg={"white"}
-        style={{ overflowY: "scroll" }}
+        style={{ overflowY: "scroll",borderRadius:"1rem" }}
         align="center"
-        mih={isMd ? "100vh" : "90vh"}
+        mih={"100%"}
         m={"auto"}
         my={isMd ? 0 : 20}
         p={10}
-        pb={isMd ? 130 : 0}
+        pb={isMd ? 130 : 10}
       >
-        <Flex w={"100%"} align={"center"} justify={"start"} gap={10}>
-       
+        <Flex w={"80%"} align={"center"} justify={"start"} gap={10}>
           <IconArrowLeft
             size={32}
             onClick={() => props.onClickBack()}
@@ -260,9 +271,10 @@ export function AddMoreDetails(props: {
           size="xs"
           iconSize={24}
           active={active}
-          w={isMd ? "100%" : "90%"}
+          w={isMd ? "100%" : "80%"}
         >
           <Stepper.Step
+          // w={"100%"}
             ff={"Roboto"}
             label="Basic Details"
             description="Create an account"
@@ -293,6 +305,7 @@ export function AddMoreDetails(props: {
               optionalSubjects={optionalSubjects}
               onChangeAssigningBatch={(val: string) => {
                 setSelectedBatch(val);
+                console.log("onChangeAssigningBatch : ", val);
               }}
               handleInputChange={(field: string, value: any) => {
                 handleInputChange(field, value);

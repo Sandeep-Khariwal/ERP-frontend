@@ -26,6 +26,7 @@ import { ChartData, StudentOverView } from "./StudentPage";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { AddStudentRollNumber } from "@/axios/student/StudentPut";
 import { useMediaQuery } from "@mantine/hooks";
+import { UserType } from "../dashboard/InstituteBatchesSection";
 
 ChartJS.register(
   CategoryScale,
@@ -39,13 +40,14 @@ const StudentOverview = (props: {
   student: StudentOverView;
   data: ChartData;
   options: ChartOptions<"line">;
+  userType: UserType;
   refreshStudents: () => void;
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [openAddRollNoModal, setOpenAddRollNoModal] = useState<boolean>(false);
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [rollNo, setRollNo] = useState<string>("");
-    const isMd = useMediaQuery(`(max-width: 968px)`);
+  const isMd = useMediaQuery(`(max-width: 968px)`);
 
   const addRollNumber = () => {
     setIsLoading(true);
@@ -84,8 +86,13 @@ const StudentOverview = (props: {
         </Flex>
       </Flex>
 
-      <Flex w={"100%"} direction={isMd?"column":"row"} align={"start"} justify={"space-between"}>
-        <Stack w={isMd?"50%":"15%"}>
+      <Flex
+        w={"100%"}
+        direction={isMd ? "column" : "row"}
+        align={"start"}
+        justify={"space-between"}
+      >
+        <Stack w={isMd ? "50%" : "15%"}>
           <Text fw={600} fz={20} ff={"Roboto"} c={"#333"} mt={10}>
             Basic Details
           </Text>
@@ -95,7 +102,7 @@ const StudentOverview = (props: {
             p={5}
           >
             <Flex justify={"start"} gap={10} align={"center"}>
-              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"}>
+              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"} style={{whiteSpace:"nowrap"}}>
                 Roll No :
               </Text>
               <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
@@ -104,17 +111,19 @@ const StudentOverview = (props: {
                   ? props.student.uniqueRoll
                   : "N/A"}{" "}
               </Text>
-              <IconEdit
-                size={20}
-                onClick={() => {
-                  setOpenAddRollNoModal(true);
-                  setSelectedStudentId(props.student._id);
-                }}
-                style={{ cursor: "pointer", color: "#2F4F4F" }}
-              />
+              {UserType.STUDENT !== props.userType && (
+                <IconEdit
+                  size={20}
+                  onClick={() => {
+                    setOpenAddRollNoModal(true);
+                    setSelectedStudentId(props.student._id);
+                  }}
+                  style={{ cursor: "pointer", color: "#2F4F4F" }}
+                />
+              )}
             </Flex>
             <Flex justify={"start"} gap={4} align={"center"}>
-              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"}>
+              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"} style={{whiteSpace:"nowrap"}} >
                 Name :
               </Text>
               <Text
@@ -130,7 +139,7 @@ const StudentOverview = (props: {
               {/* <IconEdit style={{ cursor: "pointer",color:"#2F4F4F" }} /> */}
             </Flex>
             <Flex justify={"strat"} gap={10} align={"center"}>
-              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"}>
+              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"} style={{whiteSpace:"nowrap"}}>
                 Father :{" "}
               </Text>
               <Text
@@ -181,7 +190,7 @@ const StudentOverview = (props: {
           </Stack>
         </Stack>
 
-        <Stack w={isMd?"80%":"20%"}>
+        <Stack w={isMd ? "80%" : "20%"}>
           <Text fw={600} fz={18} ff={"Roboto"} c={"#333"} mt={20}>
             Contacts{" "}
           </Text>
@@ -229,7 +238,7 @@ const StudentOverview = (props: {
           </Stack>
         </Stack>
 
-        <Stack w={isMd?"100%":"60%"}>
+        <Stack w={isMd ? "100%" : "60%"}>
           <Text mt={20} fw={500} fz={18} ff={"Poppins"} c={"#333"}>
             Progress
           </Text>

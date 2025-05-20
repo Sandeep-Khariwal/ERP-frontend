@@ -67,6 +67,7 @@ const Teacher = () => {
       })
       .catch((e) => {
         console.log(e);
+             setIsLoading(false);
       });
   }, []);
 

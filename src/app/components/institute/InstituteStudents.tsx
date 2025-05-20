@@ -51,6 +51,7 @@ export const InstituteStudents = () => {
 
   const admin = useAppSelector((state: any) => state.adminSlice.adminDetails);
 
+  
   useEffect(() => {
     if (admin.institute._id) {
       setIsLoading(true);
@@ -186,7 +187,7 @@ export const InstituteStudents = () => {
                       })
                     )}
                     value={selectedBatchId}
-                    onChange={(e: any) => setSelectedBatchId(e.target.value)}
+                    onChange={(value: any) => setSelectedBatchId(value)}
                   />
                   <Divider c={"gray"} w={"100%"} />
                   <Flex w={"100%"} px={5} py={10}>
@@ -301,7 +302,7 @@ export const InstituteStudents = () => {
                       })
                     )}
                     value={selectedBatchId}
-                    onChange={(e: any) => setSelectedBatchId(e.target.value)}
+                    onChange={(e: any) => setSelectedBatchId(e)}
                   />
                   <Divider c={"gray"} w={"100%"} />
                   <Flex w={"100%"} px={5} py={10}>

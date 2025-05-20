@@ -38,7 +38,7 @@ export const DesktopNavbar = (props: {
           bg={"linear-gradient(135deg, #9C27B0, #3F51B5)"}
         >
           <Text m={"auto"} fw={700} fz={"1.3rem"} my={10}>
-            School
+            SP
           </Text>
 
           <Divider size={2} color="gray" />

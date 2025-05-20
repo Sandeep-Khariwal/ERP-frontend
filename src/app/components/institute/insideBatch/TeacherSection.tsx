@@ -1,28 +1,40 @@
 "use client";
 
-import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
 import {
+  GetAllStudentsFromBatch,
+  GetAllTeachersFromBatch,
+} from "@/axios/institute/InstituteGetApi";
+import {
+  Box,
   Button,
   Flex,
   LoadingOverlay,
   Menu,
   Modal,
+  MultiSelect,
   Stack,
   Table,
   Text,
+  TextInput,
 } from "@mantine/core";
 import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
-import { SuccessNotification } from "@/app/helperFunction/Notification";
+import {
+  containsOnlyDigits,
+  SuccessNotification,
+} from "@/app/helperFunction/Notification";
+import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
+import { UpdateTeacher } from "@/axios/teacher/TeacherPutApi";
+import Image from "next/image";
 
 const TeachersSection = (props: {
   batchId: string;
   batchName: string;
-//   setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
-//   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
-//   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
-//   setStudents: React.Dispatch<React.SetStateAction<StudentsDataWithBatch[]>>;
+  //   setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
+  //   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
+  //   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
+  //   setStudents: React.Dispatch<React.SetStateAction<StudentsDataWithBatch[]>>;
 }) => {
   const [teachers, setTeachers] = useState<
     {
@@ -32,13 +44,40 @@ const TeachersSection = (props: {
     }[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [editTeacher, setEditTeacher] = useState<boolean>(false);
+  const [editTeacherId, setEditTeacherId] = useState<{
+    _id: string;
+    name: string;
+    phoneNumber: string;
+  }>({
+    _id: "",
+    name: "",
+    phoneNumber: "",
+  });
+  const [subjects, setSubjects] = useState<{ name: string; _id: string }[]>([]);
+  const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
+  const [teacherForm, setTeacherForm] = useState<{
+    name: string;
+    phone: string;
+  }>({ name: "", phone: "" });
 
   useEffect(() => {
     if (props.batchId) {
       setIsLoading(true);
       GetAllTeachersFromBatch(props.batchId)
         .then((x: any) => {
-          setIsLoading(false);
+          GetAllSubjectsFromBatch(props.batchId)
+            .then((x: any) => {
+              const { subjects } = x.subjects;
+              setSubjects(subjects);
+              console.log("x : ", x);
+              setIsLoading(false);
+            })
+            .catch((e) => {
+              console.log(e);
+              setIsLoading(false);
+            });
+
           const { teachers } = x.teachers;
           const teachersData = teachers.map((s: any) => {
             return {
@@ -53,12 +92,13 @@ const TeachersSection = (props: {
           //     label: s.name,
           //   };
           // });
-        //   props.setStudents(students);
-        setTeachers(teachersData)
-        //   setTeachers(studentData);
+          //   props.setStudents(students);
+          setTeachers(teachersData);
+          //   setTeachers(studentData);
         })
         .catch((e) => {
           console.log(e);
+          setIsLoading(false);
         });
     }
   }, [props.batchId]);
@@ -78,6 +118,25 @@ const TeachersSection = (props: {
       });
   };
 
+  const editTeacherData = () => {
+    setIsLoading(true);
+    UpdateTeacher(editTeacherId._id, {
+      name: editTeacherId.name,
+      phoneNumber: editTeacherId.phoneNumber,
+      subjects: selectedSubjectIds,
+    })
+      .then(() => {
+        SuccessNotification("Teacher updated!!");
+        setIsLoading(false);
+        setEditTeacher(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+        setEditTeacher(false);
+      });
+  };
+
   // const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
     <Stack>
@@ -89,8 +148,8 @@ const TeachersSection = (props: {
         bg={"white"}
         fz={18}
       >
-        <Table.Thead  bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}  >
-          <Table.Tr >
+        <Table.Thead bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}>
+          <Table.Tr>
             <Table.Th
               style={{
                 fontFamily: "Roboto",
@@ -101,26 +160,26 @@ const TeachersSection = (props: {
             >
               Name
             </Table.Th>
-              <Table.Th
-                style={{
-                  fontFamily: "Roboto",
-                  fontWeight: 600,
-                  color: "#2F4F4F",
-                  fontSize: 18,
-                }}
-              >
-                Phone Number
-              </Table.Th>
-              <Table.Th
-                style={{
-                  fontFamily: "Roboto",
-                  fontWeight: 600,
-                  color: "#2F4F4F",
-                  fontSize: 18,
-                }}
-              >
-                Message
-              </Table.Th>
+            <Table.Th
+              style={{
+                fontFamily: "Roboto",
+                fontWeight: 600,
+                color: "#2F4F4F",
+                fontSize: 18,
+              }}
+            >
+              Phone Number
+            </Table.Th>
+            <Table.Th
+              style={{
+                fontFamily: "Roboto",
+                fontWeight: 600,
+                color: "#2F4F4F",
+                fontSize: 18,
+              }}
+            >
+              Message
+            </Table.Th>
             <Table.Th
               style={{
                 fontFamily: "Roboto",
@@ -140,7 +199,6 @@ const TeachersSection = (props: {
                 style={
                   item.isInActive
                     ? {
-                       
                         textAlign: "center",
                         fontFamily: "Nunito",
                         padding: "1rem",
@@ -162,22 +220,22 @@ const TeachersSection = (props: {
                 >
                   {item.name}
                 </Table.Td>
-                  <Table.Td
-                    style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      fontWeight: 500,
-                    }}
-                    ta={"start"}
-                  >
-                    {item.phoneNumber[0]}
-                  </Table.Td>
-                  <Table.Td ta={"start"}>
-                    <a href={`sms:${item.phoneNumber[0]}?body=Hello!, `}>
-                      <div>
-                        <IconMessage cursor="pointer" color="#7D7D7D" />
-                      </div>
-                    </a>
-                  </Table.Td>
+                <Table.Td
+                  style={{
+                    color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                    fontWeight: 500,
+                  }}
+                  ta={"start"}
+                >
+                  {item.phoneNumber[0]}
+                </Table.Td>
+                <Table.Td ta={"start"}>
+                  <a href={`sms:${item.phoneNumber[0]}?body=Hello!, `}>
+                    <div>
+                      <IconMessage cursor="pointer" color="#7D7D7D" />
+                    </div>
+                  </a>
+                </Table.Td>
                 <Table.Td style={{ cursor: "pointer" }}>
                   <Menu>
                     <Menu.Target>
@@ -213,14 +271,60 @@ const TeachersSection = (props: {
                         {" "}
                         Edit Profile
                       </Menu.Item> */}
-                     
+
                       <Menu.Item
                         onClick={() => {
                           setShowWarning(true);
                           setDeletingStudentId(item._id);
                         }}
                       >
-                        Remove Teacher
+                        <Flex align="center">
+                          <Flex align="center">
+                            <Box mr={2}>
+                              <Image
+                                src={"/deleteImg.png"}
+                                alt="profile"
+                                width={20}
+                                height={20}
+                              />
+                            </Box>
+                          </Flex>
+                          <Text
+                            fz={16}
+                            fw={500}
+                            ml={10}
+                            style={{ fontFamily: "Roboto" }}
+                          >
+                            Remove Teacher
+                          </Text>
+                        </Flex>
+                      </Menu.Item>
+                      <Menu.Item
+                        onClick={() => {
+                          setEditTeacher(true);
+                          setEditTeacherId(item);
+                        }}
+                      >
+                        <Flex align="center">
+                          <Flex align="center">
+                            <Box mr={2}>
+                              <Image
+                                src={"/editImg.png"}
+                                alt="profile"
+                                width={20}
+                                height={20}
+                              />
+                            </Box>
+                          </Flex>
+                          <Text
+                            fz={16}
+                            fw={500}
+                            ml={10}
+                            style={{ fontFamily: "Roboto" }}
+                          >
+                            Edit Teacher
+                          </Text>
+                        </Flex>
                       </Menu.Item>
                     </Menu.Dropdown>
                   </Menu>
@@ -246,6 +350,56 @@ const TeachersSection = (props: {
             Yes
           </Button>
         </Flex>
+      </Modal>
+      <Modal
+        centered
+        title="Edit Teacher"
+        style={{ fontFamily: "sans-serif" }}
+        opened={editTeacher}
+        onClose={() => setEditTeacher(false)}
+      >
+        <TextInput
+          placeholder="Name"
+          title="Name"
+          label="Name"
+          value={editTeacherId.name}
+          onChange={(e) =>
+            setEditTeacherId({ ...editTeacherId, name: e.target.value })
+          }
+          required
+          mt={10}
+        />
+        <TextInput
+          title="Phone Number"
+          label="Phone Number"
+          placeholder="Enter Phone Number"
+          maxLength={10}
+          mt={10}
+          value={editTeacherId.phoneNumber}
+          onChange={(e) => {
+            if (containsOnlyDigits(e.currentTarget.value)) {
+              setEditTeacherId({
+                ...editTeacherId,
+                phoneNumber: e.target.value,
+              });
+            }
+          }}
+          required
+        />
+        <MultiSelect
+          data={subjects.map((subject) => ({
+            label: subject.name,
+            value: subject._id,
+          }))}
+          mt={10}
+          value={selectedSubjectIds}
+          onChange={(value: string[]) => setSelectedSubjectIds(value)}
+          placeholder="Select Subjects"
+          label="Select Subjects"
+        />
+        <Button mt={10} variant="outline" onClick={editTeacherData}>
+          Submit
+        </Button>
       </Modal>
     </Stack>
   );

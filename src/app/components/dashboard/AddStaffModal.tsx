@@ -18,7 +18,7 @@ import Image from "next/image";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
 import { CreateAdmin } from "@/axios/admin/adminSlice";
 import { CreateTeacher } from "@/axios/teacher/TeacherPostApi";
-import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { containsOnlyDigits, SuccessNotification } from "@/app/helperFunction/Notification";
 import { CreateUser } from "@/axios/user/UserPostApi";
 
 const AddStaffModal = (props: {
@@ -206,9 +206,9 @@ const AddStaffModal = (props: {
     }
     return false;
   }
-  function containsOnlyDigits(inputString: string) {
-    return /^\d+$/.test(inputString) || inputString === "";
-  }
+
+
+  
 
   function getRequiredImage(index: number) {
     if (index === 0) {

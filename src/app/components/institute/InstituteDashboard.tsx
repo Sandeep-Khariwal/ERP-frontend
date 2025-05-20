@@ -29,12 +29,8 @@ import {
   hasCommonUniqueElement,
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
-import {
-  Notifications,
-} from "@mantine/notifications";
-import {
-  IconCaretDownFilled,
-} from "@tabler/icons-react";
+import { Notifications } from "@mantine/notifications";
+import { IconCaretDownFilled } from "@tabler/icons-react";
 import { DeleteTheBatch, EditTheBatchName } from "@/axios/batch/BatchPutApi";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 
@@ -93,7 +89,7 @@ export const InstituteDashboard = () => {
 
   useEffect(() => {
     if (admin?.institute?._id!!) {
-      getAllInstituteBatches()
+      getAllInstituteBatches();
     }
   }, [admin?.institute?._id!!]);
 
@@ -117,31 +113,31 @@ export const InstituteDashboard = () => {
     { value: "Physical science", label: "Physical science" },
   ]);
 
-  const getAllInstituteBatches=()=>{
+  const getAllInstituteBatches = () => {
     setIsLoading(true);
     GetInstituteBatches(admin.institute._id)
-    .then((x: any) => {
-      const { batches } = x;
-      setIsLoading(false);
-      const allBatches = batches.map((b: any) => {
-        return {
-          id: b._id,
-          name: b.name,
-          subjects: b.subjects,
-          optionalSubjects: b.optionalSubjects,
-          noOfTeachers: b.teachers.length,
-          noOfStudents: b.students.length,
-          firstThreeTeachers: b.teachers.slice(0, 2),
-          firstThreeStudents: b.students.slice(0, 2),
-        };
+      .then((x: any) => {
+        const { batches } = x;
+        setIsLoading(false);
+        const allBatches = batches.map((b: any) => {
+          return {
+            id: b._id,
+            name: b.name,
+            subjects: b.subjects,
+            optionalSubjects: b.optionalSubjects,
+            noOfTeachers: b.teachers.length,
+            noOfStudents: b.students.length,
+            firstThreeTeachers: b.teachers.slice(0, 2),
+            firstThreeStudents: b.students.slice(0, 2),
+          };
+        });
+        setBatches(allBatches);
+      })
+      .catch((e) => {
+        setIsLoading(false);
+        console.log(e);
       });
-      setBatches(allBatches);
-    })
-    .catch((e) => {
-      setIsLoading(false);
-      console.log(e);
-    });
-  }
+  };
   const createBatch = () => {
     if (hasCommonUniqueElement(selectedSubjects, selectedOptionalSubjects)) {
       ErrorNotification("Subjects and optional subjects should not same!");
@@ -152,11 +148,14 @@ export const InstituteDashboard = () => {
       return;
     }
     // setIsLoading(true);
-    if(editBatchDetails){
-      console.log("edit batch data : ",selectedOptionalSubjects,selectedSubjects);
-      
+    if (editBatchDetails) {
+      console.log(
+        "edit batch data : ",
+        selectedOptionalSubjects,
+        selectedSubjects
+      );
     } else {
-      setIsLoading(true)
+      setIsLoading(true);
       CreateBatchAndSubjects({
         batchName,
         subjects: selectedSubjects,
@@ -164,23 +163,24 @@ export const InstituteDashboard = () => {
         instituteId: admin.institute._id,
       })
         .then((x: any) => {
-          SuccessNotification("Batch created!!")
-          const { batch } = x;
+          SuccessNotification("Batch created!!");
+          const { data } = x;
           const newBatch = {
-            id: batch._id,
-            name: batch.name,
-            subjects: batch.subjects,
-            noOfTeachers: batch.teachers.length,
-            noOfStudents: batch.students.length,
-            optionalSubjects: batch.optionalSubjects,
-            firstThreeTeachers: batch.teachers.splice(0, 3),
-            firstThreeStudents: batch.students.splice(0, 3),
+            id: data._id,
+            name: data.name,
+            subjects: data.subjects,
+            noOfTeachers: data.teachers.length,
+            noOfStudents: data.students.length,
+            optionalSubjects: data.optionalSubjects,
+            firstThreeTeachers: data.teachers.splice(0, 3),
+            firstThreeStudents: data.students.splice(0, 3),
           };
           setBatches((prevBatches) => [...prevBatches, newBatch]);
-
+          setBatchId(data._id)
           setOpenAddBatchModal(false);
           setOpenEditCourseFee(true);
           setIsLoading(false);
+          getAllInstituteBatches();
         })
         .catch((e) => {
           setOpenAddBatchModal(false);
@@ -212,15 +212,16 @@ export const InstituteDashboard = () => {
     EditTheBatchName(id, name)
       .then(() => {
         setIsLoading(false);
-        const updatedBatches = batches.map((batch)=>{
-          if(batch.id === id){
+        const updatedBatches = batches.map((batch) => {
+          if (batch.id === id) {
             return {
-              ...batch,name:name
-            }
+              ...batch,
+              name: name,
+            };
           }
           return batch;
-        })
-        setBatches(updatedBatches)
+        });
+        setBatches(updatedBatches);
         SuccessNotification("Batch name edited!!");
       })
       .catch((e) => {
@@ -229,13 +230,13 @@ export const InstituteDashboard = () => {
       });
   };
 
-  const editBatch = (batchId:string) =>{
-   const batch = batches.filter((b)=> b.id === batchId)
-   setBatchName(batch[0].name)
-   setSelectedBatch(batch[0])
-   setSelectedSubjects(batch[0].subjects.map((s)=>s.name))
-   setSelectedOptionalSubjects(batch[0].optionalSubjects.map((s)=>s.name))
-  }
+  const editBatch = (batchId: string) => {
+    const batch = batches.filter((b) => b.id === batchId);
+    setBatchName(batch[0].name);
+    setSelectedBatch(batch[0]);
+    setSelectedSubjects(batch[0].subjects.map((s) => s.name));
+    setSelectedOptionalSubjects(batch[0].optionalSubjects.map((s) => s.name));
+  };
 
   const handleCreateSubject = (newSubject: string) => {
     // setData((prevData) => [...prevData, newSubject]);
@@ -247,7 +248,7 @@ export const InstituteDashboard = () => {
       <Notifications />
       <LoadingOverlay visible={isLoading} />
       {(batchId === null || openEditCourseFee) && (
-        <Stack w={"100%"} h={"100%"}>
+        <Stack w={"100%"} mih={"100%"} py={20} >
           <InstituteDetailsCards instituteId={admin?.institute?._id || ""} />
           <InstituteProfile
             instituteId={admin?.institute?._id ?? ""}
@@ -331,9 +332,9 @@ export const InstituteDashboard = () => {
                   setOpenAddBatchModal(true);
                 }}
                 onEditBatchButtonClick={function (batchId: string): void {
-                  setEditBatchDetails(true)
-                  setOpenAddBatchModal(true)
-                  editBatch(batchId)
+                  setEditBatchDetails(true);
+                  setOpenAddBatchModal(true);
+                  editBatch(batchId);
                 }}
               />
             </SimpleGrid>
@@ -352,7 +353,7 @@ export const InstituteDashboard = () => {
             batchName={selectedBatch?.name!!}
             instituteId={admin?.institute?._id!!}
             onClickBack={() => {
-              getAllInstituteBatches()
+              getAllInstituteBatches();
               setBatchId(null);
             }}
           />

@@ -29,6 +29,7 @@ const StepThree = (props: {
   setCustomOrBatch: React.Dispatch<React.SetStateAction<string>>;
   setSelectedBatchId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+
   const [selectedBatchId, setSelectedBatchId] = useState<string>("");
   const [installments, setInstallments] = useState<Installment[]>([
     {
@@ -64,7 +65,7 @@ const StepThree = (props: {
       if (props.feeType !== "Batch" && props.isEditable) {
         setInstallments(props.studentInstallments);
       } else {
-        GetBatchFee(selectedBatchId)
+        GetBatchFee(props.batchId)
           .then((x: any) => {
             const { feeInstallments, feeType } = x.batchFee;
             const newMap = new Map(assignBatchInstallment);

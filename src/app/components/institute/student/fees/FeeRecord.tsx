@@ -146,18 +146,15 @@ const FeeRecordSection = (props: {
     }
   }, [props.studentId, openPaymentModel]);
 
-  console.log("props.userType : ", props.userType,UserType.OTHERS);
-  
-
   return (
     <>
       <LoadingOverlay visible={isLoading} />
       <Stack
-        w={isMd ? "100%" : "100%"}
-        style={{ backgroundColor: "#ffffff" }}
-        mih={isMd ? "100vh" : "90vh"}
+        w={ "100%"}
+        style={{ backgroundColor: "#ffffff",borderRadius:"1rem" }}
+        h={"100%"}
         m={"auto"}
-        my={isMd ? 0 : 20}
+        py={isMd ? 0 : 20}
       >
         {
           props.fromBatch && 

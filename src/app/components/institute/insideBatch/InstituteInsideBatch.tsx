@@ -75,7 +75,7 @@ export function InstituteInsideBatch(props: {
     <>
       <LoadingOverlay visible={isLoading} />
       {Screen.NONE === showSelectedScreen && (
-        <Stack w={isMd ? "95%" : "80%"} mt={20} mx={"auto"} h={"100%"}>
+        <Stack w={isMd ? "95%" : "90%"} mt={20} mx={"auto"} h={"100%"}>
           <Flex w={"100%"} align={"center"} justify={"start"} gap={10}>
             <Image
               onClick={() => props.onClickBack()}
@@ -258,9 +258,10 @@ export function InstituteInsideBatch(props: {
 
       {Screen.VIEWFEEDETAILS === showSelectedScreen && (
         <Stack
-          w={isMd ? "100%" : "80%"}
-          mih={isMd ? "100vh" : "90vh"}
-          mt={20}
+          w={"100%" }
+          mih={"100vh"}
+          pt={20}
+        
           mx={"auto"}
         >
           <FeeRecordSection

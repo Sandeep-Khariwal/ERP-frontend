@@ -21,11 +21,13 @@ import {
   Stack,
   Tabs,
   Modal,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import PinInput from "./OtpInput";
 import { StudentLogin, StudentOtpVarification, TeacherLogin } from "@/axios/teacher/TeacherPostApi";
+import Loadable from "next/dist/shared/lib/loadable.shared-runtime";
 
 export default function Login(props: { onCreateAccount: () => void }) {
   const [userType, setUserType] = useState<UserType>(UserType.STUDENT);
@@ -41,6 +43,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
   const dispatch = useAppDispatch();
   const navigation = useRouter();
   const [openOtpModal, setOpenOtpModal] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
@@ -52,9 +55,12 @@ export default function Login(props: { onCreateAccount: () => void }) {
 
   // LoginAdmin
   const onClickLogin = () => {
+    setIsLoading(true)
     if (userType === UserType.ADMIN) {
       LoginAdmin(loginData)
         .then((x: any) => {
+           setIsLoading(false)
+          SuccessNotification("Login Successfully!!")
           const { admin, token } = x;
           dispatch(
             setAdminDetails({
@@ -93,6 +99,8 @@ export default function Login(props: { onCreateAccount: () => void }) {
           setStudentEmail(email);
           setStudentId(studentId);
           setOpenOtpModal(true);
+            setIsLoading(false)
+          SuccessNotification("Login Successfully!!")
         })
         .catch((e: any) => {
           const { message } = e.response.data;
@@ -106,6 +114,8 @@ export default function Login(props: { onCreateAccount: () => void }) {
       TeacherLogin(loginData)
         .then((x: any) => {
           const { teacher, token } = x;
+            setIsLoading(false)
+          SuccessNotification("Login Successfully!!")
           dispatch(
             setTeacherDetails({
               name: teacher.name,
@@ -135,12 +145,14 @@ export default function Login(props: { onCreateAccount: () => void }) {
   };
 
   const varifyStudentOtp = (otp: string) => {
+     setIsLoading(true)
     StudentOtpVarification({
       studentId,
       otp,
     })
       .then((x: any) => {
         const { student, token } = x;
+          setIsLoading(false)
         dispatch(
           setStudentDetails({
             name: student.name,
@@ -165,11 +177,13 @@ export default function Login(props: { onCreateAccount: () => void }) {
         ErrorNotification(message);
         SuccessNotification("error found!!");
         console.log(e);
+         setIsLoading(false)
       });
   };
 
   return (
     <>
+    <LoadingOverlay visible={isLoading} />
       <Flex
         style={{
           height: "100vh",

@@ -46,6 +46,7 @@ const Student = () => {
         })
         .catch((e) => {
           console.log(e);
+               setIsLoading(false);
         });
     }, []);
   return (

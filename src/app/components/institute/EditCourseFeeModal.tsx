@@ -20,7 +20,9 @@ import {
   Installment,
 } from "@/interfaces/batchInterface";
 import { CreateBatchFee } from "@/axios/institute/instituteSlice";
-import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { getOneYearPast, SuccessNotification } from "@/app/helperFunction/Notification";
+import { GetBatchFee } from "@/axios/institute/InstituteGetApi";
+import { showNotification } from "@mantine/notifications";
 
 export function EditCourseFeeModal(props: {
   isCourseFeesEdit: boolean;
@@ -51,6 +53,9 @@ export function EditCourseFeeModal(props: {
   const [selectedFeeOption, setSelectedFeeOption] = useState<FeeOptions>(
     FeeOptions.MONTHLY
   );
+  const [existFeeOption, setExistFeeOption] = useState<FeeOptions>(
+    FeeOptions.MONTHLY
+  );
   const [quaterFees, setquarterFees] = useState<
     {
       date: Date;
@@ -72,6 +77,8 @@ export function EditCourseFeeModal(props: {
     dueDate: "",
     amount: 0,
   });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [installment, setInstallment] = useState<Installment>({
     name: "Installment 1",
@@ -107,6 +114,49 @@ export function EditCourseFeeModal(props: {
     setInstallments(newInstallments);
   };
 
+  useEffect(() => {
+    if (existFeeOption !== selectedFeeOption) {
+      return;
+    }
+    GetBatchFee(props.batchId)
+      .then((x: any) => {
+        const { feeInstallments, feeType } = x.batchFee;
+        const newInstallments = feeInstallments.map((f: any) => {
+          return {
+            name: f.name,
+            dueDate: new Date(f.dueDate).toISOString().split("T")[0],
+            amount: f.amount,
+          };
+        });
+
+        if (feeType === FeeOptions.MONTHLY) {
+          setMonthlyInstallments(newInstallments);
+          // setInstallments(newInstallments);
+          setExistFeeOption(FeeOptions.MONTHLY);
+          setSelectedFeeOption(FeeOptions.MONTHLY);
+        } else if (feeType === FeeOptions.QUARTERLY) {
+          setQuarterlyInstallments(newInstallments);
+          // setInstallments(newInstallments);
+          setExistFeeOption(FeeOptions.QUARTERLY);
+          setSelectedFeeOption(FeeOptions.QUARTERLY);
+        } else {
+          const startMonth = getOneYearPast(newInstallments[0].dueDate)
+          setSelectedMonth(new Date(startMonth))
+          setYearlyInstallments(newInstallments[0]);
+          setExistFeeOption(FeeOptions.YEARLY);
+          setSelectedFeeOption(FeeOptions.YEARLY);
+        }
+
+        // setInstallments(newInstallments);
+
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  }, [props.batchId, selectedFeeOption]);
+
   const onSubmitCreateBatchFee = (selectedFeeOption: FeeOptions) => {
     if (FeeOptions.YEARLY === selectedFeeOption) {
       CreateBatchFee({
@@ -116,25 +166,25 @@ export function EditCourseFeeModal(props: {
       })
         .then((x: any) => {
           SuccessNotification("Batch fee created!!");
-          props.setisCourseFeesEdit(null)
+          props.setisCourseFeesEdit(null);
         })
         .catch((e) => {
           console.log(e);
-          props.setisCourseFeesEdit(null)
+          props.setisCourseFeesEdit(null);
         });
     } else {
       CreateBatchFee({
         installments,
         batchId: props.batchId,
-        feeType: FeeOptions.YEARLY,
+        feeType: selectedFeeOption,
       })
         .then((x: any) => {
           SuccessNotification("Batch fee created!!");
-          props.setisCourseFeesEdit(null)
+          props.setisCourseFeesEdit(null);
         })
         .catch((e) => {
           console.log(e);
-          props.setisCourseFeesEdit(null)
+          props.setisCourseFeesEdit(null);
         });
     }
   };
@@ -172,9 +222,12 @@ export function EditCourseFeeModal(props: {
   };
 
   useEffect(() => {
+    console.log("inside useEffect", monthlyInstallments);
+
     let numberOfInstallments = 1;
     if (selectedFeeOption === FeeOptions.MONTHLY) {
-      if (!editFeeBatch || monthlyInstallments.length <= 1) {
+      if (monthlyInstallments.length <= 1) {
+        console.log("inside useEffect if", monthlyInstallments);
         numberOfInstallments = 12;
         const currentDate = new Date();
         const initialInstallments = Array.from(
@@ -194,12 +247,13 @@ export function EditCourseFeeModal(props: {
         );
         setInstallments(initialInstallments);
       } else {
+        console.log("inside useEffect else", monthlyInstallments);
         setInstallments(monthlyInstallments);
       }
       return;
     } else if (selectedFeeOption === FeeOptions.QUARTERLY) {
       let numberOfInstallments = 4;
-      if (!editFeeBatch || quarterlyInstallments.length <= 1) {
+      if (editFeeBatch || quarterlyInstallments.length <= 1) {
         const currentDate = new Date();
         const initialInstallments = Array.from(
           { length: numberOfInstallments },
@@ -247,16 +301,16 @@ export function EditCourseFeeModal(props: {
         );
       }
       if (!editFeeBatch) {
-        const data = {
-          name: `Installment`,
-          dueDate: dueDate.toISOString().split("T")[0],
-          amount: 0,
-        };
-        setYearlyInstallments(data);
-        setInstallment(data);
+      const data = {
+        name: `Installment`,
+        dueDate: dueDate.toISOString().split("T")[0],
+        amount: 0,
+      };
+      setYearlyInstallments(data);
+      setInstallment(data);
       }
     }
-  }, [selectedFeeOption, price, selectedMonth]);
+  }, [selectedFeeOption, price, monthlyInstallments]);
 
   useEffect(() => {
     if (selectedFeeOption === FeeOptions.QUARTERLY) {
@@ -379,7 +433,7 @@ export function EditCourseFeeModal(props: {
         // if (found) {
         //   setPrice(found.coursefees);
         // } else {
-          setPrice(defaultCoursePrice);
+        setPrice(defaultCoursePrice);
         // }
       } else {
         setDatesData(getThisAndNextYearMonths());
@@ -398,7 +452,7 @@ export function EditCourseFeeModal(props: {
         // if (found) {
         //   setPrice(found.coursefees);
         // } else {
-          setPrice(defaultCoursePrice);
+        setPrice(defaultCoursePrice);
         // }
       } else if (selectedFeeOption === FeeOptions.YEARLY) {
         const found = selectedClassYearlyFeeData.find((x) => {
@@ -710,7 +764,7 @@ export function EditCourseFeeModal(props: {
                       setSelectedMonth(date);
                     }
                   }}
-                ></Select>
+                />
               </Flex>
               <Text>
                 {months[selectedMonth?.getMonth() ?? 0]}{" "}
@@ -910,9 +964,9 @@ export function EditCourseFeeModal(props: {
             <Button
               onClick={() => {
                 if (!selectedMonth && selectedFeeOption === FeeOptions.YEARLY) {
-                  // showNotification({
-                  //   message:"Start month required!!"
-                  // })
+                  showNotification({
+                    message: "Start month required!!",
+                  });
                   return;
                 }
                 if (!props.isEditing) {

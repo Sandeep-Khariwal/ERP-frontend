@@ -37,6 +37,7 @@ const StudentSection = (props: {
       feeStatus: string;
     }[]
   >([]);
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -47,20 +48,28 @@ const StudentSection = (props: {
           setIsLoading(false);
           const { students } = x.students;
           const studentData = students.map((s: any) => {
+            const totals = s.feeRecords.reduce(
+              (acc: any, record: any) => {
+                acc.totalAmount += record.totalAmount;
+                acc.amountPaid += record.amountPaid;
+                return acc;
+              },
+              { totalAmount: 0, amountPaid: 0 }
+            );
+
             return {
               _id: s._id,
               name: s.name,
               phoneNumber: s.phoneNumber,
               parentName: s.parentName,
-              feeStatus: "Paid",
+              feeStatus:
+                totals.totalAmount === totals.amountPaid
+                  ? "Paid"
+                  : totals.amountPaid === 0
+                  ? "Not Paid"
+                  : "Partial Paid",
             };
           });
-          // const studentD = students.map((s: any) => {
-          //   return {
-          //     value: s._id,
-          //     label: s.name,
-          //   };
-          // });
           props.setStudents(students);
           setStudents(studentData);
         })
@@ -224,30 +233,7 @@ const StudentSection = (props: {
                 <Table.Td>
                   {" "}
                   <Badge
-                    // c={
-                    //   getColor(
-                    //     getStatus(
-                    //       findCurrentBatchFeeTotalFees(
-                    //         item.feeRecords
-                    //       ) ?? 0,
-                    //       findCurrentBatchFeePaidAmount(
-                    //         item.feeRecords
-                    //       ) ?? 0
-                    //     )
-                    //   )?.color
-                    // }
-                    // bg={
-                    //   getColor(
-                    //     getStatus(
-                    //       findCurrentBatchFeeTotalFees(
-                    //         item.feeRecords
-                    //       ) ?? 0,
-                    //       findCurrentBatchFeePaidAmount(
-                    //         item.feeRecords
-                    //       ) ?? 0
-                    //     )
-                    //   )?.backgroundColor
-                    // }
+                  bg={item.feeStatus === "Paid"?"green":item.feeStatus === "Partial Paid"?"blue":"red"}
                     size="lg"
                     radius="xs"
                   >

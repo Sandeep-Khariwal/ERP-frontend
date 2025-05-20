@@ -148,7 +148,7 @@ const StudentPage = (props: {
       <LoadingOverlay visible={isLoading} />
       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
         {
-          props.userType === UserType.STUDENT &&
+          props.userType !== UserType.STUDENT &&
 
         <Image
           onClick={() => props.onClickBack()}
@@ -200,6 +200,7 @@ const StudentPage = (props: {
             data={data!!}
             options={options!!}
             refreshStudents={() => getStudents()}
+            userType={props.userType}
           />
         </Stack>
       )}
