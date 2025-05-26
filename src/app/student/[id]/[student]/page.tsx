@@ -25,7 +25,7 @@ const Student = () => {
       setIsLoading(true);
       GetAccountByToken()
         .then((x: any) => {
-          const { data, type } = x;
+          const { data } = x;
           setIsLoading(false);
   
                dispatch(

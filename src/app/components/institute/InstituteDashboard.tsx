@@ -33,6 +33,8 @@ import { Notifications } from "@mantine/notifications";
 import { IconCaretDownFilled } from "@tabler/icons-react";
 import { DeleteTheBatch, EditTheBatchName } from "@/axios/batch/BatchPutApi";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
+import { UserType } from "@/enums";
+import { usePathname } from "next/navigation";
 
 export interface Batch {
   id: string;
@@ -45,7 +47,7 @@ export interface Batch {
   firstThreeStudents: string[];
 }
 
-export const InstituteDashboard = () => {
+export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const isLg = useMediaQuery(`(max-width: 1024px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -57,7 +59,8 @@ export const InstituteDashboard = () => {
   const [selectedOptionalSubjects, setSelectedOptionalSubjects] = useState<
     string[]
   >([]);
-  const admin = useAppSelector((state: any) => state.adminSlice.adminDetails);
+  const institute = useAppSelector((state: any) => state.instituteSlice.instituteDetails);
+
 
   const [batches, setBatches] = useState<Batch[]>([]);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>();
@@ -65,6 +68,15 @@ export const InstituteDashboard = () => {
   const [deleteBatchId, setDeleteBatchId] = useState<string>("");
   const [batchDeleteWarning, setBatchDeleteWarning] = useState<boolean>(false);
   const [editBatchDetails, setEditBatchDetails] = useState<boolean>(false);
+
+      const pathname = usePathname()
+      const prefix = pathname ? pathname.split('-')[0] : null;
+      const typ = prefix?.split("/")[2]
+    
+      var userType:UserType = UserType.ADMIN
+      if(typ?.startsWith("USER")){
+         userType = UserType.USER
+      }
 
   useEffect(() => {
     setIsLoading(true);
@@ -88,10 +100,10 @@ export const InstituteDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (admin?.institute?._id!!) {
+    if (institute?._id!!) {
       getAllInstituteBatches();
     }
-  }, [admin?.institute?._id!!]);
+  }, [institute]);
 
   const [data, setData] = useState<{ value: string; label: string }[]>([
     { value: "Hindi", label: "Hindi" },
@@ -115,7 +127,7 @@ export const InstituteDashboard = () => {
 
   const getAllInstituteBatches = () => {
     setIsLoading(true);
-    GetInstituteBatches(admin.institute._id)
+    GetInstituteBatches(institute._id)
       .then((x: any) => {
         const { batches } = x;
         setIsLoading(false);
@@ -160,7 +172,7 @@ export const InstituteDashboard = () => {
         batchName,
         subjects: selectedSubjects,
         optionalSubjects: selectedOptionalSubjects,
-        instituteId: admin.institute._id,
+        instituteId: institute._id,
       })
         .then((x: any) => {
           SuccessNotification("Batch created!!");
@@ -176,7 +188,7 @@ export const InstituteDashboard = () => {
             firstThreeStudents: data.students.splice(0, 3),
           };
           setBatches((prevBatches) => [...prevBatches, newBatch]);
-          setBatchId(data._id)
+          setBatchId(data._id);
           setOpenAddBatchModal(false);
           setOpenEditCourseFee(true);
           setIsLoading(false);
@@ -248,15 +260,18 @@ export const InstituteDashboard = () => {
       <Notifications />
       <LoadingOverlay visible={isLoading} />
       {(batchId === null || openEditCourseFee) && (
-        <Stack w={"100%"} mih={"100%"} py={20} >
-          <InstituteDetailsCards instituteId={admin?.institute?._id || ""} />
+        <Stack w={"100%"} mih={"100%"} py={20}>
+          {userType === UserType.ADMIN && (
+            <InstituteDetailsCards instituteId={institute?._id || ""} />
+          )}
           <InstituteProfile
-            instituteId={admin?.institute?._id ?? ""}
+            instituteId={institute?._id ?? ""}
             users={[].map((user: any) => ({
               id: user?._id || "",
               name: user?.name || "",
               role: user?.role || "",
             }))}
+            userType={userType}
             onreloadData={() => {
               // getInstituteInfo();
             }}
@@ -351,7 +366,7 @@ export const InstituteDashboard = () => {
           <InstituteInsideBatch
             batchId={batchId}
             batchName={selectedBatch?.name!!}
-            instituteId={admin?.institute?._id!!}
+            instituteId={institute?._id!!}
             onClickBack={() => {
               getAllInstituteBatches();
               setBatchId(null);

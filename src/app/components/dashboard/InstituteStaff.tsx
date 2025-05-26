@@ -16,6 +16,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import AddStaffModal from "./AddStaffModal";
+import { UserType } from "@/enums";
 
 interface InstituteProfileProps {
   users: {
@@ -23,6 +24,7 @@ interface InstituteProfileProps {
     name: string;
     role: string;
   }[];
+  userType: UserType;
   instituteId: string;
   onreloadData: () => void;
 }
@@ -133,6 +135,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
           <AddStaffModal
             instituteId={props?.instituteId}
             isOpen={isModalOpen}
+            userType={props.userType}
             onClose={() => {
               // setEditUserData(null);
               setIsModalOpen(false);

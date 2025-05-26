@@ -29,6 +29,7 @@ import { Installment } from "@/interfaces/batchInterface";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { UpdateMultipleFeeRecord } from "@/axios/student/StudentPut";
 import { GetStudentFeeInstallments } from "@/axios/student/StudentGetApi";
+import { useAppSelector } from "@/app/redux/redux.hooks";
 
 interface FormValues {
   paymentDate: Date;
@@ -50,6 +51,10 @@ const FeeRecordSection = (props: {
 
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [installments, setInstallments] = useState<Installment[]>([]);
+
+    const instituteDetails = useAppSelector(
+      (state: any) => state.instituteSlice.instituteDetails
+    );
 
   // const instituteDetails = useSelector<RootState, InstituteDetails | null>(
   //   (state) => state.instituteDetailsSlice.instituteDetails
@@ -106,7 +111,7 @@ const FeeRecordSection = (props: {
       return;
     }
     setIsLoading(true);
-    UpdateMultipleFeeRecord(feeRecordsMap)
+    UpdateMultipleFeeRecord(instituteDetails.institute._id,feeRecordsMap)
       .then((resp) => {
         // setisLoading(false);
 

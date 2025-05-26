@@ -18,12 +18,17 @@ import Image from "next/image";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
 import { CreateAdmin } from "@/axios/admin/adminSlice";
 import { CreateTeacher } from "@/axios/teacher/TeacherPostApi";
-import { containsOnlyDigits, SuccessNotification } from "@/app/helperFunction/Notification";
+import {
+  containsOnlyDigits,
+  SuccessNotification,
+} from "@/app/helperFunction/Notification";
 import { CreateUser } from "@/axios/user/UserPostApi";
+import { UserType } from "@/enums";
 
 const AddStaffModal = (props: {
   isOpen: boolean;
   onClose: () => void;
+  userType: UserType;
   instituteId: string;
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
@@ -207,9 +212,6 @@ const AddStaffModal = (props: {
     return false;
   }
 
-
-  
-
   function getRequiredImage(index: number) {
     if (index === 0) {
       return `/admin.png`;
@@ -221,6 +223,11 @@ const AddStaffModal = (props: {
       return `/teacher.png`;
     }
   }
+
+  const rolesToShow =
+    props.userType === UserType.ADMIN
+      ? ["ADMIN", "USER", "TEACHER"]
+      : ["", "USER", "TEACHER"];
 
   return (
     <Modal title="Add staff" opened={props.isOpen} onClose={props.onClose}>
@@ -235,41 +242,47 @@ const AddStaffModal = (props: {
               marginRight: "20px",
             }}
           >
-            {["ADMIN", "USER", "TEACHER"].map((role, index) => (
-              <Stack
-                key={index}
-                style={{
-                  border:
-                    selectedImageIndex === index
-                      ? "1px solid blue"
-                      : "1px solid #808080",
-                  backgroundColor:
-                    selectedImageIndex === -1
-                      ? "transparent"
-                      : selectedImageIndex === index
-                      ? "#EFF1FE"
-                      : "transparent",
-                  cursor: "pointer",
-                  borderRadius: "10px",
-                }}
-                onClick={() => handleImageSelect(role, index)}
-                align="center"
-                justify="center"
-                mr={15}
-                w="100px"
-                h="130px"
-              >
-                <Image
-                  src={getRequiredImage(index)!!}
-                  alt="Not found"
-                  width={40}
-                  height={40}
-                />
-                <Text>{role}</Text>
-              </Stack>
+            {rolesToShow.map((role, index) => (
+              <>
+                {role && (
+                  <Stack
+                    key={index}
+                    style={{
+                      border:
+                        selectedImageIndex === index
+                          ? "1px solid blue"
+                          : "1px solid #808080",
+                      backgroundColor:
+                        selectedImageIndex === -1
+                          ? "transparent"
+                          : selectedImageIndex === index
+                          ? "#EFF1FE"
+                          : "transparent",
+                      cursor: "pointer",
+                      borderRadius: "10px",
+                    }}
+                    onClick={() => handleImageSelect(role, index)}
+                    align="center"
+                    justify="center"
+                    mr={15}
+                    w="100px"
+                    h="130px"
+                  >
+                    <Image
+                      src={getRequiredImage(index)!!}
+                      alt="Not found"
+                      width={40}
+                      height={40}
+                    />
+
+                    <Text>{role}</Text>
+                  </Stack>
+                )}
+              </>
             ))}
           </SimpleGrid>
         )}
+
         {currentStep === 2 && (
           <>
             <TextInput

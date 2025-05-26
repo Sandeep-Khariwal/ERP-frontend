@@ -25,7 +25,7 @@ import {
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
-import { UpdateTeacher } from "@/axios/teacher/TeacherPutApi";
+import { RemoveTeacherFromBatch, UpdateTeacher } from "@/axios/teacher/TeacherPutApi";
 import Image from "next/image";
 
 const TeachersSection = (props: {
@@ -70,7 +70,6 @@ const TeachersSection = (props: {
             .then((x: any) => {
               const { subjects } = x.subjects;
               setSubjects(subjects);
-              console.log("x : ", x);
               setIsLoading(false);
             })
             .catch((e) => {
@@ -104,13 +103,13 @@ const TeachersSection = (props: {
   }, [props.batchId]);
 
   const [showWarning, setShowWarning] = useState<boolean>(false);
-  const [deletingStudentId, setDeletingStudentId] = useState<string>("");
+  const [deletingTeacherId, setDeletingTeacherId] = useState<string>("");
 
   const removeStudentFromBatch = () => {
-    RemoveStudentFromBatch(deletingStudentId, props.batchId)
+    RemoveTeacherFromBatch(deletingTeacherId, props.batchId)
       .then((x) => {
-        setTeachers((prev) => prev.filter((s) => s._id !== deletingStudentId));
-        SuccessNotification("Student removed from batch");
+        setTeachers((prev) => prev.filter((s) => s._id !== deletingTeacherId));
+        SuccessNotification("Teacher removed from batch");
         setShowWarning(false);
       })
       .catch((e) => {
@@ -275,7 +274,7 @@ const TeachersSection = (props: {
                       <Menu.Item
                         onClick={() => {
                           setShowWarning(true);
-                          setDeletingStudentId(item._id);
+                          setDeletingTeacherId(item._id);
                         }}
                       >
                         <Flex align="center">

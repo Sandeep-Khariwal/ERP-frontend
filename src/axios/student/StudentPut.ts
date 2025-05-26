@@ -2,11 +2,11 @@ import { FeeRecordData } from "@/app/components/institute/student/fees/FeeRecord
 import ApiHelper from "../../ApiHelper";
 
 
-export function UpdateMultipleFeeRecord(
+export function UpdateMultipleFeeRecord(instituteId:string,
   installments: Map<string, FeeRecordData>
 ) {
   const promises = Array.from(installments.entries()).map(([id, data]) => {
-    return UpdateFeeRecord(id, data);
+    return UpdateFeeRecord(id, instituteId,data);
   });
 
   return Promise.all(promises)
@@ -17,10 +17,10 @@ export function UpdateMultipleFeeRecord(
       return { success: false, error: error.message };
     });
 }
-export function UpdateFeeRecord(id: string, data: FeeRecordData) {
+export function UpdateFeeRecord(id: string,instituteId:string , data: FeeRecordData) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
-      `${process.env.URL}/api/v1/student/updateFeeRecord/${id}`,data)
+      `${process.env.URL}/api/v1/student/updateFeeRecord/${id}`,{data,instituteId})
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });

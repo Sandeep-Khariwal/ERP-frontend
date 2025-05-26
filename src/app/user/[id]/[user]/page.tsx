@@ -1,55 +1,51 @@
 "use client";
+
+import { Tabs } from "@/app/[institute]/[id]/dashboard/page";
 import { DesktopNavbar } from "@/app/components/institute/DesktopNavbar";
 import { InstituteDashboard } from "@/app/components/institute/InstituteDashboard";
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
 import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
-import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
-import { setAdminDetails } from "@/app/redux/slices/adminSlice";
+import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
+import { setUserDetails } from "@/app/redux/slices/userSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
-import { Box, Flex, LoadingOverlay } from "@mantine/core";
+import { Box, Flex, LoadingOverlay, Stack } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-export enum Tabs {
-  DASHBOARD = "dashboard",
-  STUDENT = "student",
-  TEACHER = "teacher",
-}
-
-const dashboard = () => {
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
-  const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
-  const isMd = useMediaQuery(`(max-width: 968px)`);
+function page() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const dispatch = useAppDispatch();
+    const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+    const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
+      const isMd = useMediaQuery(`(max-width: 968px)`);
+  
 
   useEffect(() => {
     setIsLoading(true);
-
+    
     GetAccountByToken()
       .then((x: any) => {
         const { data } = x;
         setIsLoading(false);
 
         dispatch(
-          setAdminDetails({
+          setUserDetails({
             name: data.name,
             _id: data._id,
             phone: "",
-            institute: data.institute._id,
+            institute: data.instituteId._id,
           })
         );
 
         const instituteDetails = {
-          name: data.institute.name,
-          _id: data.institute._id,
+          name: data.instituteId.name,
+          _id: data.instituteId._id,
           phoneNumber: "",
-          address: data.institute.address,
+          address: data.instituteId.address,
         };
-
+        
         dispatch(setDetails(instituteDetails));
       })
       .catch((e) => {
@@ -57,16 +53,13 @@ const dashboard = () => {
         setIsLoading(false);
       });
   }, []);
+
   return (
-    <>
-      <Flex w={"100%"} mih={"100vh"}>
+       <Flex w={"100%"} mih={"100vh"} >
         <LoadingOverlay visible={isLoading} />
         <Box
-          w={isCollapsed ? (isMd ? "100%" : "5%") : isMd ? "0%" : "15%"}
-          style={{
-            transition: "width 0.3s ease-in-out",
-            display: isMd ? "none" : "block",
-          }}
+          w={isCollapsed ? isMd ? "100%":"5%" : isMd ? "0%" : "15%"}
+          style={{ transition: "width 0.3s ease-in-out", display:isMd?"none":"block" }}
         >
           <DesktopNavbar
             isCollapsed={isCollapsed}
@@ -78,29 +71,30 @@ const dashboard = () => {
             }}
           />
         </Box>
-        <Box style={{ display: !isMd ? "none" : "block" }}>
-          <MobileNavbar
-            onClickCollapse={() => {
-              setIsCollapsed(!isCollapsed);
-            }}
-            onSelectTab={(val: Tabs) => {
-              setSelectedTab(val);
-            }}
-          />
+        <Box  style={{display:!isMd?"none":"block" }}>
+
+        <MobileNavbar
+          onClickCollapse={() => {
+            setIsCollapsed(!isCollapsed);
+          }}
+          onSelectTab={(val: Tabs) => {
+            setSelectedTab(val);
+          }}
+        />
+        
         </Box>
         <Box
-          w={isCollapsed ? (isMd ? "100%" : "95%") : "100%"}
+          w={isCollapsed ? isMd ? "100%":"95%" : "100%"}
           mah={"100vh"}
           bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
           style={{ transition: "width 0.3s ease-in-out", overflowY: "scroll" }}
         >
-          {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
+          {Tabs.DASHBOARD === selectedTab && <InstituteDashboard isShowTopCard={false} />}
           {Tabs.STUDENT === selectedTab && <InstituteStudents />}
           {Tabs.TEACHER === selectedTab && <InstituteTeachers />}
         </Box>
       </Flex>
-    </>
   );
-};
+}
 
-export default dashboard;
+export default page;

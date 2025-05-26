@@ -46,16 +46,29 @@ export const InstituteStudents = () => {
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [selectedBatchId, setSelectedBatchId] = useState<string>("");
   const [students, setStudents] = useState<StudentList[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<StudentList[]>([]);
   const [batchMap, setBatchMap] = useState<Map<string, string>>(new Map());
   const [activeTab, setActiveTab] = useState<StudentTabs>(StudentTabs.OTHER);
+  const [search, setSearch] = useState<string>("");
 
-  const admin = useAppSelector((state: any) => state.adminSlice.adminDetails);
+    const institute = useAppSelector((state: any) => state.instituteSlice.instituteDetails);
 
-  
   useEffect(() => {
-    if (admin.institute._id) {
+    if (search) {
+      const filteredData = students.filter(
+        (s) => s.name.trim().toLowerCase().startsWith(search.trim().toLowerCase())
+      );
+
+      setFilteredStudents(filteredData);
+    } else {
+      setFilteredStudents(students);
+    }
+  }, [search]);
+
+  useEffect(() => {
+    if (institute?._id) {
       setIsLoading(true);
-      GetInstituteBatches(admin.institute._id)
+      GetInstituteBatches(institute._id)
         .then((x: any) => {
           const { batches } = x;
 
@@ -76,7 +89,7 @@ export const InstituteStudents = () => {
           setIsLoading(false);
         });
     }
-  }, [admin]);
+  }, [institute]);
 
   useEffect(() => {
     if (selectedBatchId) {
@@ -99,6 +112,7 @@ export const InstituteStudents = () => {
             };
           });
           setStudents(studentData);
+          setFilteredStudents(studentData);
           setIsLoading(false);
         })
         .catch((e) => {
@@ -174,6 +188,7 @@ export const InstituteStudents = () => {
                   <TextInput
                     placeholder="search name or phone"
                     leftSection={<IconSearch />}
+                    onChange={(e) => setSearch(e.target.value)}
                   />
                   <Select
                     my={10}
@@ -245,7 +260,7 @@ export const InstituteStudents = () => {
                     </Flex>
                   </Flex>
                   {/* Show list of students and handle student click */}
-                  {students.map((s: StudentList) => (
+                  {filteredStudents.map((s: StudentList) => (
                     <StudentListCard
                       key={s._id}
                       student={s}
@@ -289,6 +304,7 @@ export const InstituteStudents = () => {
                   <TextInput
                     placeholder="search name or phone"
                     leftSection={<IconSearch />}
+                    onChange={(e) => setSearch(e.target.value)}
                   />
                   <Select
                     my={10}
@@ -359,7 +375,7 @@ export const InstituteStudents = () => {
                       </Text>
                     </Flex>
                   </Flex>
-                  {students.map((s: StudentList) => (
+                  {filteredStudents.map((s: StudentList) => (
                     <StudentListCard
                       key={s._id}
                       student={s}

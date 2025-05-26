@@ -56,6 +56,18 @@ const MobileNavbar = (props: {
           Student
         </Text>
       </Stack>
+      <Stack
+        style={{ cursor: "pointer" }}
+        my={10}
+        align={"center"}
+        gap={10}
+        onClick={() => props.onSelectTab(Tabs.TEACHER)}
+      >
+        <PiStudent size={36} style={{ color: "#FFFFFF" }} />
+        <Text fw={600} fz={15} c={"#FFFFFF"}>
+          Teacher
+        </Text>
+      </Stack>
       {/* <Stack
         style={{ cursor: "pointer" }}
         my={10}

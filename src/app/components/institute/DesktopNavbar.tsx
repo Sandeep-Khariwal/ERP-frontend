@@ -12,6 +12,7 @@ import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
+import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -93,7 +94,7 @@ export const DesktopNavbar = (props: {
                   </Text>
                 )}
               </Flex>
-              {/* <Flex
+              <Flex
                 style={{ cursor: "pointer" }}
                 my={10}
                 align={"center"}
@@ -107,7 +108,7 @@ export const DesktopNavbar = (props: {
                     Teacher
                   </Text>
                 )}
-              </Flex> */}
+              </Flex>
             </Box>
 
             <Box w={"100%"}>

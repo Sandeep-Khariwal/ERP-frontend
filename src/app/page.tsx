@@ -20,6 +20,7 @@ import { setStudentDetails } from "./redux/slices/studentSlice";
 import { setDetails } from "./redux/slices/instituteSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
 import Link from "next/link";
+import { setUserDetails } from "./redux/slices/userSlice";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -31,7 +32,7 @@ export default function Home() {
     GetAccountByToken()
       .then((x: any) => {
         const { data, type } = x;
-        setIsLoading(false);
+        // setIsLoading(false);
 
         // navigate on the basis of user type
         if (UserType.ADMIN === type) {
@@ -48,8 +49,23 @@ export default function Home() {
           );
         }
         if (UserType.USER === type) {
+          dispatch(
+            setUserDetails({
+              name: data.name,
+              _id: data._id,
+              phone: "",
+              institute: data.instituteId._id,
+            })
+          );
+          const instituteDetails = {
+            name: data.instituteId.name,
+            _id: data.instituteId._id,
+            phoneNumber: "",
+            address: data.instituteId.address,
+          };
+          dispatch(setDetails(instituteDetails));
           navigation.push(
-            `/${data.institute.name}/${data.institute._id}/dashboard`
+            `/${data.instituteId.name}/${data.instituteId._id}/dashboard`
           );
         }
         if (UserType.TEACHER === type) {
