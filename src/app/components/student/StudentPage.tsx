@@ -61,7 +61,7 @@ const StudentPage = (props: {
     name: "",
     uniqueRoll: "",
     phoneNumber: [],
-    profilePic: "https://randomuser.me/api/portraits/women/45.jpg",
+    profilePic: "/boyStudent.png",
     batchId: {
       _id: "",
       name: "",

@@ -111,9 +111,9 @@ const FeeRecordSection = (props: {
       return;
     }
     setIsLoading(true);
-    UpdateMultipleFeeRecord(instituteDetails.institute._id,feeRecordsMap)
+    UpdateMultipleFeeRecord(instituteDetails._id,feeRecordsMap)
       .then((resp) => {
-        // setisLoading(false);
+        setIsLoading(false);
 
         setOpenPaymentModel(false);
         setFeeRecordsMap(new Map());
@@ -121,6 +121,7 @@ const FeeRecordSection = (props: {
       })
       .catch((e) => {
         console.log(e);
+        setIsLoading(false);
       });
   };
 

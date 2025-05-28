@@ -87,7 +87,7 @@ export default function StudentProfilePage(props: {
     name: "",
     uniqueRoll: "",
     phoneNumber: [],
-    profilePic: "https://randomuser.me/api/portraits/women/45.jpg",
+    profilePic: "/boyStudent.png",
     batchId: {
       _id: "",
       name: "",
@@ -167,7 +167,7 @@ export default function StudentProfilePage(props: {
         <Avatar
           src={
             student?.profilePic ||
-            "https://randomuser.me/api/portraits/women/45.jpg"
+            "/boyStudent.png"
           }
           size={80}
           radius="xl"
@@ -185,7 +185,7 @@ export default function StudentProfilePage(props: {
         style={{ border: "1px solid #BFBFBF", borderRadius: "0.5rem" }}
         p={10}
       >
-        <Flex w={"100%"} align={"center"} justify={"space-between"}>
+        <Flex  w={"100%"} align={"center"} justify={"space-between"}>
           <Text>Basic details</Text>
           <Menu shadow="md" trigger="hover" width={150}>
             <Menu.Target>
@@ -220,15 +220,15 @@ export default function StudentProfilePage(props: {
               lh={0}
               fz={16}
               fw={600}
-              c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
+               c={"#4F4F4F"}
             >
               Gender
             </Text>
             <Text
               lh={0.5}
               fz={14}
-              c={"#4F4F4F"}
+           
+                c={"#BFBFBF"}
               style={{ fontFamily: "sans-serif" }}
             >
               {student.gender}
@@ -240,15 +240,16 @@ export default function StudentProfilePage(props: {
               lh={0}
               fz={16}
               fw={600}
-              c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
+               c={"#4F4F4F"}
+              // style={{ fontFamily: "sans-serif" }}
             >
               Date of Birth
             </Text>
             <Text
               lh={0.5}
               fz={14}
-              c={"#4F4F4F"}
+           
+                c={"#BFBFBF"}
               style={{ fontFamily: "sans-serif" }}
             >
               {student.dateOfBirth.split("T")[0]}
@@ -260,15 +261,16 @@ export default function StudentProfilePage(props: {
               lh={0}
               fz={16}
               fw={600}
-              c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
+                c={"#4F4F4F"}
+              // style={{ fontFamily: "sans-serif" }}
             >
               Number
             </Text>
             <Text
               lh={0.5}
               fz={14}
-              c={"#4F4F4F"}
+         
+                 c={"#BFBFBF"}
               style={{ fontFamily: "sans-serif" }}
             >
               {student.phoneNumber[0]}
@@ -281,12 +283,13 @@ export default function StudentProfilePage(props: {
               lh={0}
               fz={16}
               fw={600}
-              c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
+           
+              c={"#4F4F4F"}
+              // style={{ fontFamily: "sans-serif" }}
             >
               Address
             </Text>
-            <Text fz={14} c={"#4F4F4F"} style={{ fontFamily: "sans-serif" }}>
+            <Text fz={14}    c={"#BFBFBF"} style={{ fontFamily: "sans-serif" }}>
               {student.address}
             </Text>
           </Stack>
@@ -296,7 +299,8 @@ export default function StudentProfilePage(props: {
               lh={0}
               fz={16}
               fw={600}
-              c={"#BFBFBF"}
+               c={"#4F4F4F"}
+             
               style={{ fontFamily: "sans-serif" }}
             >
               Father
@@ -304,7 +308,7 @@ export default function StudentProfilePage(props: {
             <Text
               lh={0.5}
               fz={14}
-              c={"#4F4F4F"}
+              c={"#BFBFBF"}
               style={{ fontFamily: "sans-serif" }}
             >
               {student.parentName}
@@ -312,7 +316,7 @@ export default function StudentProfilePage(props: {
             <Text
               lh={0.5}
               fz={14}
-              c={"#4F4F4F"}
+              c={"#BFBFBF"}
               style={{ fontFamily: "sans-serif" }}
             >
               ({student.parentNumber})

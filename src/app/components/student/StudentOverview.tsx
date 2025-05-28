@@ -70,7 +70,7 @@ const StudentOverview = (props: {
         <Avatar
           src={
             props.student?.profilePic ||
-            "https://randomuser.me/api/portraits/women/45.jpg"
+            "/boyStudent.png"
           }
           size={100}
           radius="xl"
@@ -92,7 +92,7 @@ const StudentOverview = (props: {
         align={"start"}
         justify={"space-between"}
       >
-        <Stack w={isMd ? "50%" : "15%"}>
+        <Stack w={isMd ? "50%" : "20%"}>
           <Text fw={600} fz={20} ff={"Roboto"} c={"#333"} mt={10}>
             Basic Details
           </Text>
@@ -201,7 +201,7 @@ const StudentOverview = (props: {
           >
             <Flex justify={"strat"} gap={10} align={"center"}>
               <Text fw={600} fz={16} ff={"Roboto"} c={"#333"}>
-                Contact :
+                Self :
               </Text>
               <Text
                 fw={500}

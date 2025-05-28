@@ -186,7 +186,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
                   </Text>
                   <TextInput
                     label="Name"
-                    placeholder="Enter institute name"
+                    placeholder="Enter admin name"
                     required
                     name="name"
                     value={adminForm.name}
@@ -194,7 +194,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
                   />
                   <TextInput
                     label="Email"
-                    placeholder="Enter institute email"
+                    placeholder="Enter admin email"
                     required
                     name="email"
                     value={adminForm.email}
@@ -202,7 +202,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
                   />
                   <TextInput
                     label="Phone"
-                    placeholder="Enter phone number"
+                    placeholder="Enter admin number"
                     required
                     name="phone"
                     value={adminForm.phone}

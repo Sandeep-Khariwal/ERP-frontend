@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react";
 import {
   Stepper,
@@ -103,17 +105,22 @@ export function AddMoreDetails(props: {
           setSelectedBatch(student.batchId);
           setStudentId(student._id);
           const additionalPhoneNumbers = student.phoneNumber || [];
+          const val = new Date(student.dateOfBirth).setDate( new Date(student.dateOfBirth)!!.getDate()-1)
+              
           const studentData = {
             name: student.name,
             email: student.email,
             parentName: student.parentName,
             phoneNumber: [...student.phoneNumber],
-            dateOfBirth: new Date(student.dateOfBirth),
+            dateOfBirth: student.dateOfBirth?new Date(val):new Date(),
             address: student.address,
             parentNumber: student.parentNumber,
             gender: student.gender,
-            dateOfJoining: new Date(student.dateOfJoining),
+            dateOfJoining: student.dateOfJoining?new Date(student.dateOfJoining):new Date(),
           };
+
+          console.log("studentData : ",studentData);
+          
 
           const newInstallments = student.feeRecords.map((f: any) => {
             return {
@@ -139,8 +146,10 @@ export function AddMoreDetails(props: {
   }, [props.selectedStudentId]);
 
   const handleInputChange = (field: string, value: any) => {
+    console.log(value);
+    
     if (field === "dateOfBirth") {
-      setFormValues((p) => ({ ...p, dateOfBirth: value ? value : null }));
+      setFormValues((p) => ({ ...p, dateOfBirth: value ? value: null }));
     } else if (field === "dateOfJoining") {
       setFormValues((p) => ({ ...p, dateOfJoining: value ? value : null }));
     } else {
@@ -163,12 +172,16 @@ export function AddMoreDetails(props: {
           ...additionalPhoneNumbers,
         ].filter((phone, index, self) => self.indexOf(phone) === index),
         parentNumber: formValues.parentNumber || "",
-        dateOfBirth: new Date(formValues.dateOfBirth!!),
+        dateOfBirth: new Date(
+          new Date(formValues.dateOfBirth!!).setDate(
+            formValues.dateOfBirth!!!!.getDate() + 1
+          ) 
+        ),
         address: formValues.address,
         gender: formValues.gender,
         instituteId: props.instituteId,
         batchId: props.batchId,
-        email:formValues.email
+        email: formValues.email,
       };
       if (props.isEditableData) {
         UpdateStudentBasicInfo(studentId, studentPayload)
@@ -249,7 +262,7 @@ export function AddMoreDetails(props: {
         w={"100%"}
         className="addMoreDetails"
         bg={"white"}
-        style={{ overflowY: "scroll",borderRadius:"1rem" }}
+        style={{ overflowY: "scroll", borderRadius: "1rem" }}
         align="center"
         mih={"100%"}
         m={"auto"}
@@ -274,7 +287,7 @@ export function AddMoreDetails(props: {
           w={isMd ? "100%" : "80%"}
         >
           <Stepper.Step
-          // w={"100%"}
+            // w={"100%"}
             ff={"Roboto"}
             label="Basic Details"
             description="Create an account"
@@ -287,6 +300,7 @@ export function AddMoreDetails(props: {
               }}
               showError={showError}
               onChangeInputValue={(field: string, value: any) => {
+                 console.log("value 2 : ",field,value);
                 handleInputChange(field, value);
               }}
               setAdditionalPhoneNumbers={setAdditionalPhoneNumbers}

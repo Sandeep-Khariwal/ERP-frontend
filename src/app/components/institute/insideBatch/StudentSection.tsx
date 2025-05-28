@@ -184,6 +184,7 @@ const StudentSection = (props: {
           {students.map((item: any, index: number) => {
             return (
               <Table.Tr
+              key={index}
                 style={
                   item.isInActive
                     ? {

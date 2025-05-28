@@ -44,8 +44,8 @@ const OverView = (props: { batchId: string }) => {
           View your batch details here!
         </Text>
         <Flex c={"#BFBFBF "}>
-          {subjectNames.map((s) => (
-            <Text>{s + ", "} </Text>
+          {subjectNames.map((s,i:number) => (
+            <Text key={i} >{s + ", "} </Text>
           ))}
         </Flex>
       </Stack>
