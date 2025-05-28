@@ -68,15 +68,19 @@ export default function Login(props: { onCreateAccount: () => void }) {
           setIsLoading(false);
           SuccessNotification("Login Successfully!!");
           const { admin, token } = x;
+        
+          
           dispatch(
             setAdminDetails({
               name: admin.name,
               _id: admin._id,
               phone: admin.phone,
-              institute: admin.institute._id,
+              institute: admin.institute?._id || "",
             })
           );
           dispatch(saveToken(token));
+
+         
 
           const instituteDetails = {
             name: admin.institute.name,
