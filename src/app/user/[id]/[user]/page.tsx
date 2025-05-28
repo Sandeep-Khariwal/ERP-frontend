@@ -1,6 +1,5 @@
 "use client";
 
-import { Tabs } from "@/app/[institute]/[id]/dashboard/page";
 import { DesktopNavbar } from "@/app/components/institute/DesktopNavbar";
 import { InstituteDashboard } from "@/app/components/institute/InstituteDashboard";
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
@@ -10,6 +9,7 @@ import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { setUserDetails } from "@/app/redux/slices/userSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+import { Tabs } from "@/enums";
 import { Box, Flex, LoadingOverlay, Stack } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import React, { useEffect, useState } from "react";
@@ -17,14 +17,13 @@ import React, { useEffect, useState } from "react";
 function page() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-    const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
-    const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
-      const isMd = useMediaQuery(`(max-width: 968px)`);
-  
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+  const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
+  const isMd = useMediaQuery(`(max-width: 968px)`);
 
   useEffect(() => {
     setIsLoading(true);
-    
+
     GetAccountByToken()
       .then((x: any) => {
         const { data } = x;
@@ -45,7 +44,7 @@ function page() {
           phoneNumber: "",
           address: data.instituteId.address,
         };
-        
+
         dispatch(setDetails(instituteDetails));
       })
       .catch((e) => {
@@ -55,24 +54,26 @@ function page() {
   }, []);
 
   return (
-       <Flex w={"100%"} mih={"100vh"} >
-        <LoadingOverlay visible={isLoading} />
-        <Box
-          w={isCollapsed ? isMd ? "100%":"5%" : isMd ? "0%" : "15%"}
-          style={{ transition: "width 0.3s ease-in-out", display:isMd?"none":"block" }}
-        >
-          <DesktopNavbar
-            isCollapsed={isCollapsed}
-            onClickCollapse={() => {
-              setIsCollapsed(!isCollapsed);
-            }}
-            onSelectTab={(val: Tabs) => {
-              setSelectedTab(val);
-            }}
-          />
-        </Box>
-        <Box  style={{display:!isMd?"none":"block" }}>
-
+    <Flex w={"100%"} mih={"100vh"}>
+      <LoadingOverlay visible={isLoading} />
+      <Box
+        w={isCollapsed ? (isMd ? "100%" : "5%") : isMd ? "0%" : "15%"}
+        style={{
+          transition: "width 0.3s ease-in-out",
+          display: isMd ? "none" : "block",
+        }}
+      >
+        <DesktopNavbar
+          isCollapsed={isCollapsed}
+          onClickCollapse={() => {
+            setIsCollapsed(!isCollapsed);
+          }}
+          onSelectTab={(val: Tabs) => {
+            setSelectedTab(val);
+          }}
+        />
+      </Box>
+      <Box style={{ display: !isMd ? "none" : "block" }}>
         <MobileNavbar
           onClickCollapse={() => {
             setIsCollapsed(!isCollapsed);
@@ -81,19 +82,20 @@ function page() {
             setSelectedTab(val);
           }}
         />
-        
-        </Box>
-        <Box
-          w={isCollapsed ? isMd ? "100%":"95%" : "100%"}
-          mah={"100vh"}
-          bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
-          style={{ transition: "width 0.3s ease-in-out", overflowY: "scroll" }}
-        >
-          {Tabs.DASHBOARD === selectedTab && <InstituteDashboard isShowTopCard={false} />}
-          {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-          {Tabs.TEACHER === selectedTab && <InstituteTeachers />}
-        </Box>
-      </Flex>
+      </Box>
+      <Box
+        w={isCollapsed ? (isMd ? "100%" : "95%") : "100%"}
+        mah={"100vh"}
+        bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+        style={{ transition: "width 0.3s ease-in-out", overflowY: "scroll" }}
+      >
+        {Tabs.DASHBOARD === selectedTab && (
+          <InstituteDashboard isShowTopCard={false} />
+        )}
+        {Tabs.STUDENT === selectedTab && <InstituteStudents />}
+        {Tabs.TEACHER === selectedTab && <InstituteTeachers />}
+      </Box>
+    </Flex>
   );
 }
 

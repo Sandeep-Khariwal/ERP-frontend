@@ -4,19 +4,16 @@ import { InstituteDashboard } from "@/app/components/institute/InstituteDashboar
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
 import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
-import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
+import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+import { Tabs } from "@/enums";
 import { Box, Flex, LoadingOverlay } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 
-export enum Tabs {
-  DASHBOARD = "dashboard",
-  STUDENT = "student",
-  TEACHER = "teacher",
-}
+
 
 const dashboard = () => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);

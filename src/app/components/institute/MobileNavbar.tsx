@@ -1,6 +1,5 @@
 "use client";
 
-import { Tabs } from "@/app/[institute]/[id]/dashboard/page";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
@@ -9,6 +8,7 @@ import { IconCircle0, IconHome } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { PiStudent } from "react-icons/pi";
+import { Tabs } from "@/enums";
 
 const MobileNavbar = (props: {
   onClickCollapse: () => void;

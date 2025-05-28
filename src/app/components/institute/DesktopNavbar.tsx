@@ -6,13 +6,13 @@ import { PiStudent } from "react-icons/pi";
 import { IoSettingsOutline } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 import { FaBars } from "react-icons/fa";
-import { Tabs } from "@/app/[institute]/[id]/dashboard/page";
 import { useMediaQuery } from "@mantine/hooks";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
+import { Tabs } from "@/enums";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;

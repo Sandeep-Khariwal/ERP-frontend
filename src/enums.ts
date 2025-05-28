@@ -5,3 +5,9 @@ export enum UserType {
     STUDENT = "student",
     OTHER = "other"
    }
+
+   export enum Tabs {
+     DASHBOARD = "dashboard",
+     STUDENT = "student",
+     TEACHER = "teacher",
+   }
