@@ -86,7 +86,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(
-            `/${admin.institute.name}/${admin.institute._id}/dashboard`
+            `/institute/${admin.institute._id}/${admin.institute.name}`
           );
         })
         .catch((e) => {
