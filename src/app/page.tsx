@@ -45,7 +45,7 @@ export default function Home() {
             })
           );
           navigation.push(
-            `/${data.institute.name}/${data.institute._id}/dashboard`
+            `/institute/${data.institute._id}/${data.institute.name}`
           );
         }
         if (UserType.USER === type) {

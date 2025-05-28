@@ -91,6 +91,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
         })
         .catch((e) => {
           console.log(e);
+          setIsLoading(false);
         });
     }
 
@@ -151,6 +152,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
           ErrorNotification(message);
           SuccessNotification("error found!!");
           console.log(e);
+          setIsLoading(false);
         });
     }
     // for teacher login
@@ -184,6 +186,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
           ErrorNotification(message);
           SuccessNotification("error found!!");
           console.log(e);
+          setIsLoading(false);
         });
     }
   };
