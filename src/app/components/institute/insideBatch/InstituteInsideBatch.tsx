@@ -131,11 +131,16 @@ export function InstituteInsideBatch(props: {
                   c={"#111"}
                   style={{ borderColor: "#111" }}
                   onClick={() => {
-                    setOpenAddStudentModal(true);
+                    setShowSelectedScreen(Screen.ADDMORESCREEN)
+                    // setOpenAddStudentModal(true);
                   }}
                 >
                   + Add Student
                 </Button>
+                
+                {
+                  students.length > 0 &&
+                  <>
                 <Button
                   variant="outline"
                   c={"#111"}
@@ -146,6 +151,7 @@ export function InstituteInsideBatch(props: {
                 >
                   Attendance
                 </Button>
+
                 <Button
                   variant="outline"
                   c={"#111"}
@@ -156,6 +162,7 @@ export function InstituteInsideBatch(props: {
                 >
                   + Add Marks
                 </Button>
+                </>}
               </Flex>
               {takeAttendance ? (
                 <Stack>

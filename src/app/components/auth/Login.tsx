@@ -34,6 +34,7 @@ import {
 import Loadable from "next/dist/shared/lib/loadable.shared-runtime";
 import { LoginUser } from "@/axios/user/UserPostApi";
 import { setUserDetails } from "@/app/redux/slices/userSlice";
+import { Notifications, showNotification } from "@mantine/notifications";
 
 export default function Login(props: { onCreateAccount: () => void }) {
   const [userType, setUserType] = useState<UserType>(UserType.STUDENT);
@@ -66,7 +67,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
       LoginAdmin(loginData)
         .then((x: any) => {
           setIsLoading(false);
-          SuccessNotification("Login Successfully!!");
           const { admin, token } = x;
         
           
@@ -94,6 +94,9 @@ export default function Login(props: { onCreateAccount: () => void }) {
           );
         })
         .catch((e) => {
+            const { message } = e?.response?.data;
+            console.log(message);
+            ErrorNotification(message);
           console.log(e);
           setIsLoading(false);
         });
@@ -106,7 +109,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
         .then((x: any) => {
           const { user, token } = x;
           setIsLoading(false);
-          SuccessNotification("Login Successfully!!");
           dispatch(
             setUserDetails({
               name: user.name,
@@ -116,9 +118,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
             })
           );
           dispatch(saveToken(token));
-          console.log("working fine.....");
-
-          
 
           const instituteDetails = {
             name: user.instituteId.name,
@@ -132,9 +131,8 @@ export default function Login(props: { onCreateAccount: () => void }) {
         .catch((e) => {
           if(e?.response){
             const { message } = e?.response?.data;
-            console.log(message);
             ErrorNotification(message);
-            SuccessNotification("error found!!");
+            // SuccessNotification("error found!!");
           }
 
           setIsLoading(false);
@@ -149,12 +147,10 @@ export default function Login(props: { onCreateAccount: () => void }) {
           setStudentId(studentId);
           setOpenOtpModal(true);
           setIsLoading(false);
-          SuccessNotification("Login Successfully!!");
         })
         .catch((e: any) => {
           const { message } = e.response.data;
           ErrorNotification(message);
-          SuccessNotification("error found!!");
           console.log(e);
           setIsLoading(false);
         });
@@ -165,7 +161,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
         .then((x: any) => {
           const { teacher, token } = x;
           setIsLoading(false);
-          SuccessNotification("Login Successfully!!");
           dispatch(
             setTeacherDetails({
               name: teacher.name,
@@ -226,7 +221,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
       .catch((e: any) => {
         const { message } = e.response.data;
         ErrorNotification(message);
-        SuccessNotification("error found!!");
         console.log(e);
         setIsLoading(false);
       });
@@ -234,6 +228,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
 
   return (
     <>
+         <Notifications />
       <LoadingOverlay visible={isLoading} />
       <Flex
         style={{
@@ -392,6 +387,10 @@ export default function Login(props: { onCreateAccount: () => void }) {
                     />
                   </Tabs.Panel>
                 </Tabs>
+
+                {
+                 UserType.ADMIN === userType &&
+
                 <Text>
                   create institute account?{" "}
                   <span
@@ -405,6 +404,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                     Signup
                   </span>
                 </Text>
+                }
                 <Button
                   fullWidth
                   mt="md"

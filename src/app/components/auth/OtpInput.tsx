@@ -88,7 +88,7 @@ export const PinInput: React.FC<PinInputProps> = ({studentEmail, onComplete }) =
             height: "3rem",
             fontSize: "2rem",
             textAlign: "center",
-            margin: "0 0.5rem",
+            margin: "1rem 0.5rem",
             padding: "0.5rem",
             border: "1px solid #ccc",
             borderRadius: "4px",

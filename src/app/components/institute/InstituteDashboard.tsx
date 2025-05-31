@@ -59,8 +59,9 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [selectedOptionalSubjects, setSelectedOptionalSubjects] = useState<
     string[]
   >([]);
-  const institute = useAppSelector((state: any) => state.instituteSlice.instituteDetails);
-
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails
+  );
 
   const [batches, setBatches] = useState<Batch[]>([]);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>();
@@ -69,16 +70,16 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [batchDeleteWarning, setBatchDeleteWarning] = useState<boolean>(false);
   const [editBatchDetails, setEditBatchDetails] = useState<boolean>(false);
 
-      const pathname = usePathname()
-      const prefix = pathname ? pathname.split('-')[0] : null;
-      const typ = prefix?.split("/")[2]
-    
-      var userType:UserType = UserType.ADMIN
-      if(typ?.startsWith("USER")){
-         userType = UserType.USER
-      }
+  const pathname = usePathname();
+  const prefix = pathname ? pathname.split("-")[0] : null;
+  const typ = prefix?.split("/")[2];
 
-  useEffect(() => {
+  var userType: UserType = UserType.ADMIN;
+  if (typ?.startsWith("USER")) {
+    userType = UserType.USER;
+  }
+
+  const getAccountByToken = () => {
     setIsLoading(true);
     GetAccountByToken()
       .then((x: any) => {
@@ -97,6 +98,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         setIsLoading(false);
         console.log(e);
       });
+  };
+
+  useEffect(() => {
+    getAccountByToken();
   }, []);
 
   useEffect(() => {
@@ -273,6 +278,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             }))}
             userType={userType}
             onreloadData={() => {
+              getAccountByToken()
               // getInstituteInfo();
             }}
           />

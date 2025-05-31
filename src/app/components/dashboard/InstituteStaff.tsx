@@ -81,7 +81,9 @@ export function InstituteProfile(props: InstituteProfileProps) {
     featureAccess: any;
     batches: string[];
     role: string;
-  }) {}
+  }) {
+
+  }
 
   function updateTeacher(data: {
     email: string;
@@ -136,6 +138,9 @@ export function InstituteProfile(props: InstituteProfileProps) {
             instituteId={props?.instituteId}
             isOpen={isModalOpen}
             userType={props.userType}
+            onreloadData={()=>{
+              props.onreloadData()
+            }}
             onClose={() => {
               // setEditUserData(null);
               setIsModalOpen(false);

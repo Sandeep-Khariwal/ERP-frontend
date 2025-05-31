@@ -30,6 +30,7 @@ const AddStaffModal = (props: {
   onClose: () => void;
   userType: UserType;
   instituteId: string;
+  onreloadData: () => void;
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [currentStep, setCurrentStep] = useState(1);
@@ -129,9 +130,9 @@ const AddStaffModal = (props: {
           selectedBatches: selectedBatches,
         })
           .then((x: any) => {
-            console.log(x);
             setIsLoading(false);
             props.onClose();
+            props.onreloadData()
             SuccessNotification("Teacher Created Success!!");
           })
           .catch((e) => {

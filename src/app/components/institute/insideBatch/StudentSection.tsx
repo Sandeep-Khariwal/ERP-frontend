@@ -19,6 +19,7 @@ import { Screen } from "./InstituteInsideBatch";
 import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
+import Image from "next/image";
 
 const StudentSection = (props: {
   batchId: string;
@@ -96,16 +97,21 @@ const StudentSection = (props: {
 
   const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
-    <Stack>
+    <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
+      {
+        students.length > 0 ? 
+
       <Table
+        w={"100%"}
         mt={8}
         verticalSpacing="md"
         horizontalSpacing="xl"
         bg={"white"}
         fz={18}
+       
       >
-        <Table.Thead bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}>
+        <Table.Thead bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}  style={{border:"2px solid transparent",borderTopLeftRadius:"1rem",borderTopRightRadius:"1rem"}}>
           <Table.Tr>
             <Table.Th
               style={{
@@ -180,126 +186,133 @@ const StudentSection = (props: {
             </Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <tbody>
-          {students.map((item: any, index: number) => {
-            return (
-              <Table.Tr
-              key={index}
-                style={
-                  item.isInActive
-                    ? {
-                        backgroundColor: "#FAFCFF",
-                        textAlign: "center",
-                        fontFamily: "Nunito",
-                        padding: "1rem",
-                      }
-                    : {
-                        textAlign: "center",
-                        fontFamily: "Nunito",
-                        padding: "1rem",
-                      }
-                }
-              >
-                <Table.Td
-                  style={{
-                    color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                    fontWeight: 500,
-                    padding: "1rem",
-                  }}
+        <tbody style={{ width: "100%" }}>
+          {(
+            students.map((item: any, index: number) => {
+              return (
+                <Table.Tr
+                  key={index}
+                  style={
+                    item.isInActive
+                      ? {
+                          backgroundColor: "#FAFCFF",
+                          textAlign: "center",
+                          fontFamily: "Nunito",
+                          padding: "1rem",
+                        }
+                      : {
+                          textAlign: "center",
+                          fontFamily: "Nunito",
+                          padding: "1rem",
+                        }
+                  }
                 >
-                  {item.name}
-                </Table.Td>
-                {!isMd ? (
                   <Table.Td
                     style={{
                       color: item.isInActive ? "#bebebe" : "#7D7D7D",
                       fontWeight: 500,
+                      padding: "1rem",
                     }}
                   >
-                    {item.parentName}
+                    {item.name}
                   </Table.Td>
-                ) : (
-                  <></>
-                )}
-                {!isMd && (
-                  <Table.Td
-                    style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {item.phoneNumber[0]}
-                  </Table.Td>
-                )}
-                <Table.Td>
-                  {" "}
-                  <Badge
-                  bg={item.feeStatus === "Paid"?"green":item.feeStatus === "Partial Paid"?"blue":"red"}
-                    size="lg"
-                    radius="xs"
-                  >
-                    {item.feeStatus}
-                  </Badge>
-                </Table.Td>
-                {!isMd ? (
+                  {!isMd ? (
+                    <Table.Td
+                      style={{
+                        color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {item.parentName}
+                    </Table.Td>
+                  ) : (
+                    <></>
+                  )}
+                  {!isMd && (
+                    <Table.Td
+                      style={{
+                        color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {item.phoneNumber[0]}
+                    </Table.Td>
+                  )}
                   <Table.Td>
-                    <a href={`sms:${item.phoneNumber[0]}?body=Hello!, `}>
-                      <div>
-                        <IconMessage cursor="pointer" color="#7D7D7D" />
-                      </div>
-                    </a>
+                    {" "}
+                    <Badge
+                      bg={
+                        item.feeStatus === "Paid"
+                          ? "green"
+                          : item.feeStatus === "Partial Paid"
+                          ? "blue"
+                          : "red"
+                      }
+                      size="lg"
+                      radius="xs"
+                    >
+                      {item.feeStatus}
+                    </Badge>
                   </Table.Td>
-                ) : (
-                  <></>
-                )}
-                <Table.Td style={{ cursor: "pointer" }}>
-                  <Menu>
-                    <Menu.Target>
-                      <Flex
-                        align={"center"}
-                        justify={"center"}
-                        w={"2rem"}
-                        py={3}
-                        bg="#FFFFFF"
-                      >
-                        <IconDotsVertical />
-                      </Flex>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item
-                        onClick={() => {
-                          props.setSelectedStudentId(item._id);
-                          props.setShowSelectedScreen(Screen.VIEWPROFILE);
-                        }}
-                      >
-                        {" "}
-                        View Profile
-                      </Menu.Item>
-                      <Menu.Item
-                        onClick={() => {
-                          props.setSelectedStudentId(item._id);
-                          props.setEditStudentDetails(true);
-                          props.setShowSelectedScreen(Screen.ADDMORESCREEN);
-                          // setSelectedStudent(item);
-                          // setEditStudentFee(true);
-                        }}
-                      >
-                        {" "}
-                        Edit Profile
-                      </Menu.Item>
-                      <Menu.Item
-                        onClick={() => {
-                          // setSelectedStudent(item);
-                          // setStudentActiveTab("Fee Records");
-                          // setEditStudentFee(false);
-                          props.setSelectedStudentId(item._id);
-                          props.setShowSelectedScreen(Screen.VIEWFEEDETAILS);
-                        }}
-                      >
-                        {" "}
-                        View Fee Details
-                      </Menu.Item>
-                      {/* <Menu.Item
+                  {!isMd ? (
+                    <Table.Td>
+                      <a href={`sms:${item.phoneNumber[0]}?body=Hello!, `}>
+                        <div>
+                          <IconMessage cursor="pointer" color="#7D7D7D" />
+                        </div>
+                      </a>
+                    </Table.Td>
+                  ) : (
+                    <></>
+                  )}
+                  <Table.Td style={{ cursor: "pointer" }}>
+                    <Menu>
+                      <Menu.Target>
+                        <Flex
+                          align={"center"}
+                          justify={"center"}
+                          w={"2rem"}
+                          py={3}
+                          bg="#FFFFFF"
+                        >
+                          <IconDotsVertical />
+                        </Flex>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item
+                          onClick={() => {
+                            props.setSelectedStudentId(item._id);
+                            props.setShowSelectedScreen(Screen.VIEWPROFILE);
+                          }}
+                        >
+                          {" "}
+                          View Profile
+                        </Menu.Item>
+                        <Menu.Item
+                          onClick={() => {
+                            props.setSelectedStudentId(item._id);
+                            props.setEditStudentDetails(true);
+                            props.setShowSelectedScreen(Screen.ADDMORESCREEN);
+                            // setSelectedStudent(item);
+                            // setEditStudentFee(true);
+                          }}
+                        >
+                          {" "}
+                          Edit Profile
+                        </Menu.Item>
+                        <Menu.Item
+                          onClick={() => {
+                            // setSelectedStudent(item);
+                            // setStudentActiveTab("Fee Records");
+                            // setEditStudentFee(false);
+                            props.setSelectedStudentId(item._id);
+                            props.setShowSelectedScreen(Screen.VIEWFEEDETAILS);
+                          }}
+                        >
+                          {" "}
+                          View Fee Details
+                        </Menu.Item>
+                        {/* <Menu.Item
                                       onClick={() => {
                                         downloadBatchCombineFee(
                                           item._id,
@@ -310,22 +323,46 @@ const StudentSection = (props: {
                                     >
                                       Download Receipt
                                     </Menu.Item> */}
-                      <Menu.Item
-                        onClick={() => {
-                          setShowWarning(true);
-                          setDeletingStudentId(item._id);
-                        }}
-                      >
-                        Remove Student
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </Table.Td>
-              </Table.Tr>
-            );
-          })}
+                        <Menu.Item
+                          onClick={() => {
+                            setShowWarning(true);
+                            setDeletingStudentId(item._id);
+                          }}
+                        >
+                          Remove Student
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </Table.Td>
+                </Table.Tr>
+              );
+            })
+          )}
         </tbody>
       </Table>
+
+      : (
+            <Flex w={"100%"} bg={"white"} mih={"60vh"} align={"center"} >
+              <Stack
+                w={"auto"}
+                h={"100%"}
+                m={"auto"}
+                align={"center"}
+                justify={"center"}
+              >
+                <Image
+                  src={"/empty.png"}
+                  alt="empty image"
+                  width={150}
+                  height={140}
+                />
+                <Text  fw={600} c={"#4F4F4F"}>
+                  No student found
+                </Text>
+              </Stack>
+            </Flex>
+          )
+      }
       <Modal
         centered
         title="Warning"
