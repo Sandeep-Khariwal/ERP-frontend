@@ -23,6 +23,8 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { CreateInstitute } from "@/axios/institute/instituteSlice";
 
+const loginImage = "/loginImage.webp";
+
 export default function Signup(props: { onClickLogin: () => void }) {
   const [formData, setFormData] = useState<{
     name: string;
@@ -48,7 +50,9 @@ export default function Signup(props: { onClickLogin: () => void }) {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [adminScreen, setAdminScreen] = useState<boolean>(false);
-  const institute = useSelector((state: any) => state.instituteSlice.instituteDetails);
+  const institute = useSelector(
+    (state: any) => state.instituteSlice.instituteDetails
+  );
   const dispatch = useAppDispatch();
   const navigation = useRouter();
 
@@ -123,7 +127,8 @@ export default function Signup(props: { onClickLogin: () => void }) {
       <Flex
         style={{
           height: "100vh",
-          backgroundImage: `url('/LoginImage.jpeg')`,
+          backgroundImage: `url(${loginImage})`,
+          backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -143,7 +148,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
             h={"100%"}
             style={{
               flex: 1,
-              backgroundImage: `url('/LoginImage.jpeg')`,
+              backgroundImage: `url(${loginImage})`,
               backgroundSize: "cover",
               color: "white",
               flexDirection: "column",

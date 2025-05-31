@@ -34,7 +34,8 @@ import {
 import Loadable from "next/dist/shared/lib/loadable.shared-runtime";
 import { LoginUser } from "@/axios/user/UserPostApi";
 import { setUserDetails } from "@/app/redux/slices/userSlice";
-import { Notifications, showNotification } from "@mantine/notifications";
+import { Notifications } from "@mantine/notifications";
+const loginImage = "/loginImage.webp"
 
 export default function Login(props: { onCreateAccount: () => void }) {
   const [userType, setUserType] = useState<UserType>(UserType.STUDENT);
@@ -68,8 +69,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
         .then((x: any) => {
           setIsLoading(false);
           const { admin, token } = x;
-        
-          
+
           dispatch(
             setAdminDetails({
               name: admin.name,
@@ -79,8 +79,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
             })
           );
           dispatch(saveToken(token));
-
-         
 
           const instituteDetails = {
             name: admin.institute.name,
@@ -94,9 +92,9 @@ export default function Login(props: { onCreateAccount: () => void }) {
           );
         })
         .catch((e) => {
-            const { message } = e?.response?.data;
-            console.log(message);
-            ErrorNotification(message);
+          const { message } = e?.response?.data;
+          console.log(message);
+          ErrorNotification(message);
           console.log(e);
           setIsLoading(false);
         });
@@ -129,7 +127,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
           navigation.push(`/user/${user._id}/${user.name}`);
         })
         .catch((e) => {
-          if(e?.response){
+          if (e?.response) {
             const { message } = e?.response?.data;
             ErrorNotification(message);
             // SuccessNotification("error found!!");
@@ -183,7 +181,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
         .catch((e: any) => {
           const { message } = e.response.data;
           ErrorNotification(message);
-          SuccessNotification("error found!!");
+          // SuccessNotification("error found!!");
           console.log(e);
           setIsLoading(false);
         });
@@ -199,6 +197,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
       .then((x: any) => {
         const { student, token } = x;
         setIsLoading(false);
+        SuccessNotification("Login Successfully!!");
         dispatch(
           setStudentDetails({
             name: student.name,
@@ -228,12 +227,13 @@ export default function Login(props: { onCreateAccount: () => void }) {
 
   return (
     <>
-         <Notifications />
+      <Notifications />
       <LoadingOverlay visible={isLoading} />
       <Flex
         style={{
           height: "100vh",
-          backgroundImage: `url('/LoginImage.jpeg')`,
+          backgroundImage: `url(${loginImage})`,
+          backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -253,7 +253,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
             h={"100%"}
             style={{
               flex: 1,
-              backgroundImage: `url('/LoginImage.jpeg')`,
+              backgroundImage:  `url(${loginImage})`,
               backgroundSize: "cover",
               color: "white",
               flexDirection: "column",
@@ -388,23 +388,21 @@ export default function Login(props: { onCreateAccount: () => void }) {
                   </Tabs.Panel>
                 </Tabs>
 
-                {
-                 UserType.ADMIN === userType &&
-
-                <Text>
-                  create institute account?{" "}
-                  <span
-                    onClick={() => props.onCreateAccount()}
-                    style={{
-                      fontWeight: 600,
-                      color: "#9C27B0",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Signup
-                  </span>
-                </Text>
-                }
+                {UserType.ADMIN === userType && (
+                  <Text>
+                    create institute account?{" "}
+                    <span
+                      onClick={() => props.onCreateAccount()}
+                      style={{
+                        fontWeight: 600,
+                        color: "#9C27B0",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Signup
+                    </span>
+                  </Text>
+                )}
                 <Button
                   fullWidth
                   mt="md"
