@@ -25,12 +25,47 @@ import {
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
-import { RemoveTeacherFromBatch, UpdateTeacher } from "@/axios/teacher/TeacherPutApi";
+import {
+  DeleteTeacher,
+  RemoveTeacherFromBatch,
+  UpdateTeacher,
+} from "@/axios/teacher/TeacherPutApi";
 import Image from "next/image";
+import { GetAllTeacherStaff } from "@/axios/teacher/TeacherGetApi";
+import { Notifications } from "@mantine/notifications";
 
 const TeachersSection = (props: {
-  batchId: string;
-  batchName: string;
+  batchId?: string;
+  batchName?: string;
+  isTeacherDashboard?: boolean;
+  teachers?: {
+    _id: string;
+    name: string;
+    phoneNumber: string;
+  }[];
+  setOriginalArrayOfTeachers?: React.Dispatch<
+    React.SetStateAction<
+      {
+        _id: string;
+        name: string;
+        phoneNumber: string;
+        instituteBatches: string[];
+        subjects: string[];
+      }[]
+    >
+  >;
+  setTeachersInDashboard?: React.Dispatch<
+    React.SetStateAction<
+      {
+        _id: string;
+        name: string;
+        phoneNumber: string;
+        instituteBatches: string[];
+        subjects: string[];
+      }[]
+    >
+  >;
+
   //   setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
   //   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
   //   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
@@ -62,11 +97,17 @@ const TeachersSection = (props: {
   }>({ name: "", phone: "" });
 
   useEffect(() => {
+    if (props.isTeacherDashboard) {
+      setTeachers(props.teachers || []);
+    }
+  }, [props.teachers]);
+
+  useEffect(() => {
     if (props.batchId) {
       setIsLoading(true);
       GetAllTeachersFromBatch(props.batchId)
         .then((x: any) => {
-          GetAllSubjectsFromBatch(props.batchId)
+          GetAllSubjectsFromBatch(props.batchId || "")
             .then((x: any) => {
               const { subjects } = x.subjects;
               setSubjects(subjects);
@@ -77,7 +118,7 @@ const TeachersSection = (props: {
               setIsLoading(false);
             });
 
-          const { teachers } = x.teachers;
+          const { teachers } = x;
           const teachersData = teachers.map((s: any) => {
             return {
               _id: s._id,
@@ -105,8 +146,8 @@ const TeachersSection = (props: {
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [deletingTeacherId, setDeletingTeacherId] = useState<string>("");
 
-  const removeStudentFromBatch = () => {
-    RemoveTeacherFromBatch(deletingTeacherId, props.batchId)
+  const removeTeacherFromBatch = () => {
+    RemoveTeacherFromBatch(deletingTeacherId, props.batchId || "")
       .then((x) => {
         setTeachers((prev) => prev.filter((s) => s._id !== deletingTeacherId));
         SuccessNotification("Teacher removed from batch");
@@ -114,6 +155,35 @@ const TeachersSection = (props: {
       })
       .catch((e) => {
         console.log(e);
+      });
+  };
+
+  const deleteTeacher = () => {
+    console.log("deleted teacher : ");
+    setIsLoading(true);
+    DeleteTeacher(deletingTeacherId)
+      .then((x: any) => {
+        props.setOriginalArrayOfTeachers &&
+          props.setOriginalArrayOfTeachers((prev) => {
+            const filteredData = prev.filter(
+              (teach) => teach._id !== deletingTeacherId
+            );
+            return filteredData;
+          });
+        props.setTeachersInDashboard &&
+          props.setTeachersInDashboard((prev) => {
+            const filteredData = prev.filter(
+              (teach) => teach._id !== deletingTeacherId
+            );
+            return filteredData;
+          });
+        SuccessNotification("Teachere deleted!!");
+        setShowWarning(false);
+        setIsLoading(false);
+      })
+      .catch((e: any) => {
+        console.log(e);
+        setIsLoading(false);
       });
   };
 
@@ -138,7 +208,8 @@ const TeachersSection = (props: {
 
   // const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
-    <Stack>
+    <Stack mah={"70vh"} style={{ overflowY: "scroll" }}>
+      <Notifications />
       <LoadingOverlay visible={isLoading} />
       <Table
         mt={8}
@@ -147,7 +218,10 @@ const TeachersSection = (props: {
         bg={"white"}
         fz={18}
       >
-        <Table.Thead bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}>
+        <Table.Thead
+          bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}
+          style={{ position: "sticky", top: 0 }}
+        >
           <Table.Tr>
             <Table.Th
               style={{
@@ -340,12 +414,23 @@ const TeachersSection = (props: {
         opened={showWarning}
         onClose={() => setShowWarning(false)}
       >
-        <Text>Are you sure?. you want to remove teacher</Text>
+        <Text>
+          Are you sure?. you want to{" "}
+          {props.isTeacherDashboard
+            ? "delete teacher"
+            : `remove teacher from ${props.batchName}`}
+        </Text>
         <Flex w={"100%"} align={"center"} justify={"end"} gap={10} pt={20}>
           <Button variant="outline" onClick={() => setShowWarning(false)}>
             Cancel
           </Button>
-          <Button variant="filled" bg={"red"} onClick={removeStudentFromBatch}>
+          <Button
+            variant="filled"
+            bg={"red"}
+            onClick={
+              props.isTeacherDashboard ? deleteTeacher : removeTeacherFromBatch
+            }
+          >
             Yes
           </Button>
         </Flex>

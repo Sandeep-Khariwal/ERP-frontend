@@ -2,7 +2,7 @@ export function createReceiptPdf(
   studentName: string,
   date: Date,
   parentName: string,
-  totalPrice: number,
+  amountPaid: number,
   paymentRecords: {
     amountPaid: number;
     updatedAt: Date;
@@ -14,7 +14,7 @@ export function createReceiptPdf(
   receiptNo: string
 ) {
   const totalAmountInWords =
-    numberToWords(totalPrice).toUpperCase() + " RUPEES ONLY";
+    numberToWords(amountPaid).toUpperCase() + " RUPEES ONLY";
   const month = date.toLocaleString("default", { month: "long" });
 
   const installmentsHtml = paymentRecords
@@ -89,7 +89,7 @@ export function createReceiptPdf(
               <div class="header">INSTALLMENTS: RUPEES</div>
               ${installmentsHtml}
             </div>
-            <p class="total">Total Amount Paid: ${totalPrice}</p>
+            <p class="total">Total Amount Paid: ${amountPaid}</p>
             <div class="signature">Authorized Signature</div>
           </div>
         </body>

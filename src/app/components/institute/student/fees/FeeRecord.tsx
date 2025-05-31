@@ -14,14 +14,12 @@ import {
   NumberInput,
   Container,
   LoadingOverlay,
+  Box,
 } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { DateTimePicker } from "@mantine/dates";
-import {
-  IconArrowLeft,
-  IconCalendar,
-} from "@tabler/icons-react";
+import { IconArrowLeft, IconCalendar } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
 import FeeRecordTable from "./FeeRecordTable";
 import { StudentFeesCards } from "./StudentFeesCard";
@@ -46,15 +44,14 @@ const FeeRecordSection = (props: {
   studentId: string;
   onPaymentClick: () => void;
   onClickBack: () => void;
-  fromBatch:boolean
+  fromBatch: boolean;
 }) => {
-
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [installments, setInstallments] = useState<Installment[]>([]);
 
-    const instituteDetails = useAppSelector(
-      (state: any) => state.instituteSlice.instituteDetails
-    );
+  const instituteDetails = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails
+  );
 
   // const instituteDetails = useSelector<RootState, InstituteDetails | null>(
   //   (state) => state.instituteDetailsSlice.instituteDetails
@@ -111,7 +108,7 @@ const FeeRecordSection = (props: {
       return;
     }
     setIsLoading(true);
-    UpdateMultipleFeeRecord(instituteDetails._id,feeRecordsMap)
+    UpdateMultipleFeeRecord(instituteDetails._id, feeRecordsMap)
       .then((resp) => {
         setIsLoading(false);
 
@@ -156,26 +153,25 @@ const FeeRecordSection = (props: {
     <>
       <LoadingOverlay visible={isLoading} />
       <Stack
-        w={ "100%"}
-        style={{ backgroundColor: "#ffffff",borderRadius:"1rem" }}
-        h={"100%"}
+        w={"95%"}
+        style={{ backgroundColor: "#ffffff", borderRadius: "1rem" }}
+        mih={"100vh"}
         m={"auto"}
         py={isMd ? 0 : 20}
       >
-        {
-          props.fromBatch && 
+        {props.fromBatch && (
           <Flex w={"100%"} p={10} align={"center"} justify={"start"} gap={3}>
-          <IconArrowLeft
-            size={32}
-            style={{ cursor: "pointer" }}
-            onClick={() => props.onClickBack()}
-          />
-          <Text fw={500} style={{ fontFamily: "sans-serif" }}>
-            Back
-          </Text>
-        </Flex>
-        }
-        <Grid p={10}>
+            <IconArrowLeft
+              size={32}
+              style={{ cursor: "pointer" }}
+              onClick={() => props.onClickBack()}
+            />
+            <Text fw={500} style={{ fontFamily: "sans-serif" }}>
+              Back
+            </Text>
+          </Flex>
+        )}
+        <Grid p={10} style={{position:"sticky",top:50}}>
           <Grid.Col span={isMd ? 12 : 10}>
             <SimpleGrid
               cols={isMd ? 2 : 4}
@@ -190,12 +186,13 @@ const FeeRecordSection = (props: {
             </SimpleGrid>
           </Grid.Col>
         </Grid>
-        <Card shadow="sm">
-          <Flex justify={"space-between"} align={"center"}>
+        <Box p={10}>
+          <Flex justify={"space-between"} align={"center"} style={{position:"sticky",top:100}}>
             <Text size="sm" c="blue">
               Fee Records
             </Text>
-            {(props.userType == UserType.OTHERS || props.userType == UserType.TEACHER) && (
+            {(props.userType == UserType.OTHERS ||
+              props.userType == UserType.TEACHER) && (
               <Button
                 onClick={() => {
                   if (totalOverdue <= 0) {
@@ -213,71 +210,9 @@ const FeeRecordSection = (props: {
               </Button>
             )}
           </Flex>
-          <Modal
-            opened={openPaymentModel}
-            onClose={() => setOpenPaymentModel(false)}
-            title="Record Payment"
-            centered
-            size="sm"
-            zIndex={999}
-            styles={{
-              title: {
-                fontSize: 20,
-                fontWeight: 700,
-                fontFamily:"sans-serif"
-              },
-            }}
-          >
-            <Container style={{ width: "100%" }}>
-              <DateTimePicker
-                label="Payment Date"
-                required
-                placeholder="Select date"
-                leftSection={<IconCalendar size={16} />}
-                value={formValues.paymentDate}
-                onChange={(date) => handleChange("paymentDate", date)}
-              />
 
-              <Divider my="md" />
-
-              {installments.map((record: any) => {
-                return (
-                  <Flex key={record?._id} justify={"start"} align={"end"}>
-                    <NumberInput
-                      label={record.name}
-                      value={feeRecordsMap.get(record._id)?.amount || 0}
-                      onChange={(value) => {
-                        handleChange(record._id, value || 0);
-                      }}
-                      max={record.amount - record.amountPaid}
-                      min={0}
-                    />
-                    <Text fw={700} lh={1} ml={4} fz="sm" c="black" style={{ fontFamily:"sans-serif"}} >
-                      ₹{record.amount - record.amountPaid + " "}
-                      <span style={{ fontSize: "10px", color: "gray" }}>
-                        (Pending)
-                      </span>
-                    </Text>
-                  </Flex>
-                );
-              })}
-
-              <Group p="right" mt="md">
-                <Button
-                  onClick={() => setOpenPaymentModel(false)}
-                  radius={10}
-                  variant="outline"
-                >
-                  Cancel
-                </Button>
-                <Button radius={10} onClick={handleSubmit} type="submit">
-                  Payment
-                </Button>
-              </Group>
-            </Container>
-          </Modal>
           <Divider my="sm" />
-          <Flex w={"100%"} justify="space-between" align="center">
+          <Flex w={"100%"} justify="space-between" align="center" >
             <Text
               size="md"
               fw={700}
@@ -306,16 +241,87 @@ const FeeRecordSection = (props: {
               <Text></Text>
             </Flex>
           </Flex>
-          <Divider my="sm" />
-          <FeeRecordTable
-            data={installments}
-            dateOfJoining={props.dateOfJoining}
-            studentId={props.studentId}
-            userType={props.userType}
-            batchName={props.batchName}
-          />
-        </Card>
+        </Box>
+        <Divider my="sm" />
+        <FeeRecordTable
+          data={installments}
+          dateOfJoining={props.dateOfJoining}
+          studentId={props.studentId}
+          userType={props.userType}
+          batchName={props.batchName}
+        />
       </Stack>
+
+      <Modal
+        opened={openPaymentModel}
+        onClose={() => setOpenPaymentModel(false)}
+        title="Record Payment"
+        centered
+        size="sm"
+        zIndex={999}
+        styles={{
+          title: {
+            fontSize: 20,
+            fontWeight: 700,
+            fontFamily: "sans-serif",
+          },
+        }}
+      >
+        <Container style={{ width: "100%" }}>
+          <DateTimePicker
+            label="Payment Date"
+            required
+            placeholder="Select date"
+            leftSection={<IconCalendar size={16} />}
+            value={formValues.paymentDate}
+            onChange={(date) => handleChange("paymentDate", date)}
+          />
+
+          <Divider my="md" />
+
+          {installments.map((record: any) => {
+            return (
+              <Flex key={record?._id} justify={"start"} align={"end"}>
+                <NumberInput
+                  label={record.name}
+                  value={feeRecordsMap.get(record._id)?.amount || 0}
+                  onChange={(value) => {
+                    handleChange(record._id, value || 0);
+                  }}
+                  max={record.amount - record.amountPaid}
+                  min={0}
+                />
+                <Text
+                  fw={700}
+                  lh={1}
+                  ml={4}
+                  fz="sm"
+                  c="black"
+                  style={{ fontFamily: "sans-serif" }}
+                >
+                  ₹{record.amount - record.amountPaid + " "}
+                  <span style={{ fontSize: "10px", color: "gray" }}>
+                    (Pending)
+                  </span>
+                </Text>
+              </Flex>
+            );
+          })}
+
+          <Group p="right" mt="md">
+            <Button
+              onClick={() => setOpenPaymentModel(false)}
+              radius={10}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button radius={10} onClick={handleSubmit} type="submit">
+              Payment
+            </Button>
+          </Group>
+        </Container>
+      </Modal>
     </>
   );
 };

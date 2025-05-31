@@ -108,7 +108,6 @@ export default function Home() {
       .catch((e) => {
         setIsLoading(false);
         console.log(e);
-        ErrorNotification("Error");
       });
   }, []);
   return (

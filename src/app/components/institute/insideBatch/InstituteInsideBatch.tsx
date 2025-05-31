@@ -270,7 +270,6 @@ export function InstituteInsideBatch(props: {
           w={"100%" }
           mih={"100vh"}
           pt={20}
-        
           mx={"auto"}
         >
           <FeeRecordSection

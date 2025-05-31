@@ -88,15 +88,18 @@ const FeeRecordTable = (props: {
         const phoneNumber = instituteId.institutePhoneNumber;
         const receiptNo = "R-" + instituteId.receiptCount;
         let paymentRecords;
-        let totalPrice;
+        let amountPaid;
+
+        
+        
         if (id) {
           paymentRecords = feeRecords.filter(
             (f: any) => f._id === id
           );
-          totalPrice = paymentRecords[0].amountPaid;
+          amountPaid = paymentRecords[0].amountPaid;
         } else {
           paymentRecords = feeRecords;
-          totalPrice = feeRecords.reduce((sum: number, acc: any) => {
+          amountPaid = feeRecords.reduce((sum: number, acc: any) => {
             sum += acc.amountPaid;
             return sum;
           }, 0);
@@ -106,7 +109,7 @@ const FeeRecordTable = (props: {
           studentName,
           date,
           parentName,
-          totalPrice,
+          amountPaid,
           paymentRecords,
           InstituteName,
           address,
@@ -132,11 +135,13 @@ const FeeRecordTable = (props: {
     <Table.Tr
       style={{
         width: "100%",
+        height:"100%",
         border: "2px solid #F8F8F8",
         backgroundColor: "#F8F8F8",
         borderRadius: "1rem",
         overflowX: "auto",
         marginBottom: "10px",
+        // padding:"0px 5px"
       }}
       key={index}
     >
@@ -255,8 +260,8 @@ const FeeRecordTable = (props: {
   return (
     <>
       <LoadingOverlay visible={isLoading} />
-      <Stack p={5} w={isMd ? "95%" : "100%"} mb={"1rem"} style={{overflowY:"scroll"}} >
-        <Flex w={"100%"} justify="space-between" align="center">
+      <Stack  w={isMd ? "95%" : "100%"} mb={"1rem"} >
+        <Flex w={"100%"} p={5} justify="space-between" align="center">
           <Stack w={"50%"}>
             <Text fw={500}>{props.batchName}</Text>
             <Text size="sm" c="dimmed">
@@ -292,7 +297,7 @@ const FeeRecordTable = (props: {
             overflowX: "hidden",
           }}
         >
-          <ScrollArea w={isMd ? "100%" : "100%"} py={20} >
+          <Box w={isMd ? "100%" : "100%"} h={"100%"} py={20} >
             <Table horizontalSpacing="xl">
               <Table.Thead>
                 <Table.Tr style={{ border: "none" }}>
@@ -380,7 +385,7 @@ const FeeRecordTable = (props: {
               </Table.Thead>
               <Table.Tbody>{renderRows}</Table.Tbody>
             </Table>
-          </ScrollArea>
+          </Box>
         </Box>
       </Stack>
       <Modal
@@ -389,7 +394,7 @@ const FeeRecordTable = (props: {
           setSelectedFeeRecord(null);
         }}
       >
-        <Table>
+        <Table style={{padding:"5px"}} >
           <thead>
             <tr>
               <th>S No.</th>

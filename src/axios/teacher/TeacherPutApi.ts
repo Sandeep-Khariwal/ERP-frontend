@@ -24,3 +24,12 @@ export function RemoveTeacherFromBatch(
       .catch((error: any) => reject(error));
   });
 }
+export function DeleteTeacher(
+  teacherId: string,
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.delete(`${process.env.URL}/api/v1/teacher/delete/${teacherId}`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
