@@ -33,6 +33,7 @@ import {
 import Image from "next/image";
 import { GetAllTeacherStaff } from "@/axios/teacher/TeacherGetApi";
 import { Notifications } from "@mantine/notifications";
+import { FaUserCircle } from "react-icons/fa";
 
 const TeachersSection = (props: {
   batchId?: string;
@@ -65,10 +66,10 @@ const TeachersSection = (props: {
       }[]
     >
   >;
+  setSelectTeacherId?: React.Dispatch<React.SetStateAction<string>>;
 
   //   setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
   //   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
-  //   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
   //   setStudents: React.Dispatch<React.SetStateAction<StudentsDataWithBatch[]>>;
 }) => {
   const [teachers, setTeachers] = useState<
@@ -159,7 +160,6 @@ const TeachersSection = (props: {
   };
 
   const deleteTeacher = () => {
-    console.log("deleted teacher : ");
     setIsLoading(true);
     DeleteTeacher(deletingTeacherId)
       .then((x: any) => {
@@ -269,6 +269,7 @@ const TeachersSection = (props: {
           {teachers.map((item: any, index: number) => {
             return (
               <Table.Tr
+              key={index}
                 style={
                   item.isInActive
                     ? {
@@ -323,16 +324,19 @@ const TeachersSection = (props: {
                       </Flex>
                     </Menu.Target>
                     <Menu.Dropdown>
-                      {/* <Menu.Item
+                      <Menu.Item
                         onClick={() => {
-                        //   props.setSelectedStudentId(item._id);
-                        //   props.setShowSelectedScreen(Screen.VIEWPROFILE);
+                          props.setSelectTeacherId &&
+                            props.setSelectTeacherId(item._id);
+                          //   props.setShowSelectedScreen(Screen.VIEWPROFILE);
                         }}
                       >
-                        {" "}
-                        View Profile
+                        <Flex align={"center"} gap={10}>
+                          <FaUserCircle size={20} />
+                          <Text>View Profile</Text>
+                        </Flex>
                       </Menu.Item>
-                      <Menu.Item
+                      {/* <Menu.Item
                         onClick={() => {
                         //   props.setSelectedStudentId(item._id);
                         //   props.setEditStudentDetails(true);
@@ -363,8 +367,7 @@ const TeachersSection = (props: {
                             </Box>
                           </Flex>
                           <Text
-                            fz={16}
-                            fw={500}
+                            // fz={16}
                             ml={10}
                             style={{ fontFamily: "Roboto" }}
                           >
@@ -390,8 +393,7 @@ const TeachersSection = (props: {
                             </Box>
                           </Flex>
                           <Text
-                            fz={16}
-                            fw={500}
+                            // fz={16}
                             ml={10}
                             style={{ fontFamily: "Roboto" }}
                           >

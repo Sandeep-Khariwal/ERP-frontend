@@ -100,9 +100,9 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       });
   };
 
-  useEffect(() => {
-    getAccountByToken();
-  }, []);
+  // useEffect(() => {
+  //   getAccountByToken();
+  // }, []);
 
   useEffect(() => {
     if (institute?._id!!) {
@@ -216,6 +216,9 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       .then(() => {
         setBatchDeleteWarning(false);
         setIsLoading(false);
+        setBatches((prev) => {
+          return prev.filter((b) => b.id !== deleteBatchId);
+        });
         SuccessNotification("Batch deleted!!");
       })
       .catch((e) => {
@@ -278,7 +281,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             }))}
             userType={userType}
             onreloadData={() => {
-              getAccountByToken()
+              getAccountByToken();
               // getInstituteInfo();
             }}
           />
@@ -320,6 +323,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               mx={"auto"}
               spacing={20}
               verticalSpacing={20}
+              mb={isMd?100:0}
             >
               <InstituteBatchesSection
                 batches={batches.map((batch: any) => ({
@@ -331,6 +335,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                   firstThreeStudents: batch?.firstThreeStudents || [],
                   firstThreeTeachers: batch?.firstThreeTeachers || [],
                 }))}
+                showAddBatch={true}
                 userType={2}
                 setDeleteBatchId={(val: string) => {
                   setDeleteBatchId(val);
@@ -377,6 +382,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               getAllInstituteBatches();
               setBatchId(null);
             }}
+            fromInstituteTeacherSection={false}
           />
         </Stack>
       )}

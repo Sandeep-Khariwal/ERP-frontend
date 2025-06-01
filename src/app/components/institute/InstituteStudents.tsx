@@ -128,6 +128,7 @@ export const InstituteStudents = () => {
       mih={"100vh"}
       mx={"auto"}
       bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+      mb={isMd?100:0}
     >
       <LoadingOverlay visible={isLoading} />
 

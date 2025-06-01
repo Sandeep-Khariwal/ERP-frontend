@@ -4,6 +4,7 @@ import {  Divider, Flex, Stack, Text } from "@mantine/core";
 import { IconUserSquareRounded } from "@tabler/icons-react";
 import React, { useState } from "react";
 import { StudentList } from "../../InstituteStudents";
+import Image from "next/image";
 
 const StudentListCard = (props: {
   onClickStudent: (id: string) => void;
@@ -14,7 +15,7 @@ const StudentListCard = (props: {
   return (
     <Stack
       w={"100%"}
-      bg={props.id === props.selectedStudentId ? "#FAF5FA" : "white"}
+      bg={props.id === props.selectedStudentId ? "#F8F8F8" : "white"}
       px={5}
       style={{borderRadius:"0.5rem"}}
       opacity={50}
@@ -25,7 +26,8 @@ const StudentListCard = (props: {
     >
       <Flex w={"100%"} style={{ cursor: "pointer" }}>
         <Flex w={"10%"} align={"start"} justify={"start"}>
-          <IconUserSquareRounded />
+          <Image src={"/boyStudent.png"} alt="No image" width={25} height={25} />
+          {/* <IconUserSquareRounded /> */}
         </Flex>
         <Stack w={"50%"}>
           <Text
@@ -41,7 +43,7 @@ const StudentListCard = (props: {
             fz={12}
             style={{ fontFamily: "sans-serif" }}
             fw={500}
-            c={"#BFBFBF "}
+            c={"#AFAFAF"}
           >
             {props.student.batchId.name}
           </Text>

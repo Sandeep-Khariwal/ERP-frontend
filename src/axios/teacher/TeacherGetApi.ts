@@ -15,3 +15,10 @@ export function GetAllTeacherStaff(id:string) {
       .catch((error:any) => reject(error));
   });
 }
+export function GetTeacherById(id:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/teacher/${id}`)
+      .then((response) => resolve(response))
+      .catch((error:any) => reject(error));
+  });
+}

@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { CreateInstitute } from "@/axios/institute/instituteSlice";
+import { useMediaQuery } from "@mantine/hooks";
 
 const loginImage = "/loginImage.webp";
 
@@ -50,6 +51,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [adminScreen, setAdminScreen] = useState<boolean>(false);
+   const isMd = useMediaQuery(`(max-width: 968px)`);
   const institute = useSelector(
     (state: any) => state.instituteSlice.instituteDetails
   );
@@ -132,38 +134,43 @@ export default function Signup(props: { onClickLogin: () => void }) {
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-        p={20}
+        p={isMd?10:20}
       >
         <Flex
-          w={"80%"}
+          w={isMd?"100%":"80%"}
           mx={"auto"}
           align={"center"}
           justify={"center"}
-          bg={"white"}
-          p={10}
-          style={{ borderRadius: "1.5rem" }}
+          bg={isMd?"transparent":"white"}
+          p={isMd?0:10}
+          style={{ borderRadius: "1.5rem",  }}
         >
-          {/* Left Section */}
-          <Flex
-            h={"100%"}
-            style={{
-              flex: 1,
-              backgroundImage: `url(${loginImage})`,
-              backgroundSize: "cover",
-              color: "white",
-              flexDirection: "column",
-              justifyContent: "center",
-              borderRadius: "1.5rem",
-            }}
-            align={"center"}
-          >
-            <Text fz="3rem" fw={700}>
-              "Time is money"
-            </Text>
-            <Text fz="2rem">
-              Save Your <span style={{ fontWeight: 700 }}>Money</span>
-            </Text>
-          </Flex>
+            {
+               !isMd &&
+   
+             <Flex
+              w={isMd?"100%":"80%"}
+               h={"100%"}
+               style={{
+                 flex: 1,
+                 backgroundImage:  `url(${loginImage})`,
+                 backgroundSize: "cover",
+                 color: "white",
+                 flexDirection: "column",
+                 justifyContent: "center",
+                 borderRadius: "0.3rem",
+                 //  display:isMd?"none":"block"
+               }}
+               align={"center"}
+             >
+               <Text fz="3rem" m={"auto"} fw={700}>
+                 "Time is money"
+               </Text>
+               <Text fz="2rem" m={"auto"}>
+                 Save Your <span style={{ fontWeight: 700 }}>Money</span>
+               </Text>
+             </Flex>
+             }
 
           {/* Right Section */}
           {adminScreen ? (

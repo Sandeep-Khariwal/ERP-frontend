@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { PiStudent } from "react-icons/pi";
 import { Tabs } from "@/enums";
+import { AiOutlineLogout } from "react-icons/ai";
 
 const MobileNavbar = (props: {
   onClickCollapse: () => void;
@@ -95,13 +96,13 @@ const MobileNavbar = (props: {
               address: "",
             })
           );
-          dispatch(saveToken(""));
+          // dispatch(saveToken(""));
           navigation.push("/");
         }}
       >
-        <IconCircle0 size={36} style={{ color: "#FFFFFF" }} />
+        <AiOutlineLogout size={36} style={{ color: "#FFFFFF" }} />
         <Text fw={600} fz={15} c={"#FFFFFF"}>
-          Profile
+          Logout
         </Text>
       </Stack>
     </Flex>

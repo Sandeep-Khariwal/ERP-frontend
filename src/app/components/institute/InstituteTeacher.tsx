@@ -16,11 +16,15 @@ import { GetAllTeacherStaff } from "@/axios/teacher/TeacherGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
+import { IconFilterCheck } from "@tabler/icons-react";
+import TeacherProfile from "./teacher/TeacherProfile";
+import { useMediaQuery } from "@mantine/hooks";
 
 export const InstituteTeachers = () => {
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectTeacherId, setSelectTeacherId] = useState<string>("");
   const [originalArrayOfTeachers, setOriginalArrayOfTeachers] = useState<
     {
       _id: string;
@@ -41,6 +45,7 @@ export const InstituteTeachers = () => {
   >([]);
   const [batches, setBatches] = useState<{ _id: string; name: string }[]>([]);
   const [subjects, setSubjects] = useState<{ _id: string; name: string }[]>([]);
+   const isMd = useMediaQuery(`(max-width: 968px)`);
 
   const institute = useAppSelector(
     (state) => state.instituteSlice.instituteDetails
@@ -135,11 +140,12 @@ export const InstituteTeachers = () => {
       w={"100%"}
       h={"100vh"}
       bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+      mb={isMd?100:0}
     >
       <LoadingOverlay visible={isLoading} />
       <Flex
         w={"90%"}
-        style={{ borderRadius: "1rem" }}
+        style={{ borderRadius: "1rem" , position:"sticky",top:10 }}
         bg={"white"}
         align={"center"}
         justify={"space-between"}
@@ -154,68 +160,79 @@ export const InstituteTeachers = () => {
         <LiaChalkboardTeacherSolid size={30} />
       </Flex>
 
-      <Stack
-        w={"90%"}
-        style={{ borderRadius: "1rem" }}
-        bg={"white"}
-        p={10}
-        py={20}
-        mt={10}
-        mx={"auto"}
-      >
-        <Flex w={"100%"} align={"center"} gap={20}>
-          <Select
-            placeholder="Select Class"
-            label="Select Teacher by class"
-            value={selectedClass}
-            data={[{ _id: "", name: "Select Class" }, ...batches].map(
-              (batch) => ({
-                value: batch._id,
-                label: batch.name,
-              })
-            )}
-            onChange={(selectedValues) => {
-              setSelectedClass(selectedValues!!);
-            }}
-          />
-          {/* <Text>And</Text> */}
-          <Select
-            disabled={!selectedClass}
-            placeholder="Select Subject"
-            label="Select Teacher by Subject"
-            value={selectedSubject}
-            data={[{ _id: "", name: "Select Subject" }, ...subjects].map(
-              (subject) => ({
-                value: subject._id,
-                label: subject.name,
-              })
-            )}
-            defaultValue={selectedSubject}
-            onChange={(selectedValues) => {
-              setSelectedSubject(selectedValues!!);
-            }}
-          />
-          <Button
-            variant="outline"
-            style={{ alignSelf: "end" }}
-            onClick={() => {
-              setSelectedSubject("");
-              setSelectedClass("");
-            }}
-          >
-            Clear filter
-          </Button>
-        </Flex>
-        <Stack w={"100%"}>
-          <TeachersSection
-            teachers={teachers}
-            batchId={selectedClass}
-            isTeacherDashboard={true}
-            setOriginalArrayOfTeachers={setOriginalArrayOfTeachers}
-            setTeachersInDashboard={setTeachers}
-          />
+      {!selectTeacherId ? (
+        <Stack
+          w={"90%"}
+          style={{ borderRadius: "1rem" }}
+          bg={"white"}
+          p={10}
+          py={20}
+          mt={10}
+          mx={"auto"}
+        >
+          <Flex w={"100%"} align={"center"} gap={20}>
+            <Select
+              placeholder="Select Class"
+              label="Select Teacher by class"
+              value={selectedClass}
+              data={[{ _id: "", name: "Select Class" }, ...batches].map(
+                (batch) => ({
+                  value: batch._id,
+                  label: batch.name,
+                })
+              )}
+              onChange={(selectedValues) => {
+                setSelectedClass(selectedValues!!);
+              }}
+            />
+            {/* <Text>And</Text> */}
+            <Select
+              disabled={!selectedClass}
+              placeholder="Select Subject"
+              label="Select Teacher by Subject"
+              value={selectedSubject}
+              data={[{ _id: "", name: "Select Subject" }, ...subjects].map(
+                (subject) => ({
+                  value: subject._id,
+                  label: subject.name,
+                })
+              )}
+              defaultValue={selectedSubject}
+              onChange={(selectedValues) => {
+                setSelectedSubject(selectedValues!!);
+              }}
+            />
+            <Button
+              variant="outline"
+              style={{ alignSelf: "end" }}
+              onClick={() => {
+                setSelectedSubject("");
+                setSelectedClass("");
+              }}
+            >
+              <IconFilterCheck size={18} style={{ margin: "0px 4px" }} />
+              Clear filter
+            </Button>
+          </Flex>
+          <Stack w={"100%"}>
+            <TeachersSection
+              teachers={teachers}
+              batchId={selectedClass}
+              isTeacherDashboard={true}
+              setOriginalArrayOfTeachers={setOriginalArrayOfTeachers}
+              setTeachersInDashboard={setTeachers}
+              setSelectTeacherId={setSelectTeacherId}
+            />
+          </Stack>
         </Stack>
-      </Stack>
+      ) : (
+        <>
+          <TeacherProfile
+            teacherId={selectTeacherId}
+            onClickBack={() => setSelectTeacherId("")}
+          />
+        </>
+      )}
     </Stack>
   );
 };

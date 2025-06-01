@@ -32,6 +32,7 @@ export function SingleBatchCard(props: {
   noOfTeachers: number;
   firstThreeTeachers: string[];
   hasNextButton: boolean;
+  showVerticalIcon: boolean;
   onEditBatchButtonClick: () => void;
   setDeleteBatchId: (batchId: string) => void;
   setDeleteModal: (val: boolean) => void;
@@ -86,6 +87,9 @@ export function SingleBatchCard(props: {
           {
             <Menu>
               <Menu.Target>
+                {
+                  props.showVerticalIcon ?
+
                 <Flex
                   style={{ cursor: "pointer" }}
                   justify="center"
@@ -95,6 +99,8 @@ export function SingleBatchCard(props: {
                 >
                   <IconDotsVertical />
                 </Flex>
+                : <Text></Text>
+                }
               </Menu.Target>
               <Menu.Dropdown
                 mr={50}

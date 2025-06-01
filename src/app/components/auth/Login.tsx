@@ -35,6 +35,7 @@ import Loadable from "next/dist/shared/lib/loadable.shared-runtime";
 import { LoginUser } from "@/axios/user/UserPostApi";
 import { setUserDetails } from "@/app/redux/slices/userSlice";
 import { Notifications } from "@mantine/notifications";
+import { useMediaQuery } from "@mantine/hooks";
 const loginImage = "/loginImage.webp"
 
 export default function Login(props: { onCreateAccount: () => void }) {
@@ -48,6 +49,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
     email: "",
     password: "",
   });
+     const isMd = useMediaQuery(`(max-width: 968px)`);
   const dispatch = useAppDispatch();
   const navigation = useRouter();
   const [openOtpModal, setOpenOtpModal] = useState<boolean>(false);
@@ -237,19 +239,23 @@ export default function Login(props: { onCreateAccount: () => void }) {
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-        p={20}
+        p={isMd?10:20}
       >
         <Flex
-          w={"80%"}
+        w={isMd?"100%":"80%"}
           mx={"auto"}
           align={"center"}
           justify={"center"}
-          bg={"white"}
-          p={10}
+          bg={isMd?"transparent":"white"}
+          p={isMd?0:10}
           style={{ borderRadius: "0.3rem" }}
         >
           {/* Left Section */}
+          {
+            !isMd &&
+
           <Flex
+           w={isMd?"100%":"80%"}
             h={"100%"}
             style={{
               flex: 1,
@@ -259,23 +265,25 @@ export default function Login(props: { onCreateAccount: () => void }) {
               flexDirection: "column",
               justifyContent: "center",
               borderRadius: "0.3rem",
+              //  display:isMd?"none":"block"
             }}
             align={"center"}
           >
-            <Text fz="3rem" fw={700}>
+            <Text fz="3rem" m={"auto"} fw={700}>
               "Time is money"
             </Text>
-            <Text fz="2rem">
+            <Text fz="2rem" m={"auto"}>
               Save Your <span style={{ fontWeight: 700 }}>Money</span>
             </Text>
           </Flex>
+          }
 
           {/* Right Section */}
           <Flex
             style={{
               flex: 1,
               backgroundColor: "white",
-              padding: "2rem",
+              padding: isMd?5:"2rem",
               justifyContent: "center",
               alignItems: "center",
             }}

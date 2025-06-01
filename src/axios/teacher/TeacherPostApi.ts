@@ -47,3 +47,20 @@ export function StudentOtpVarification(data:{
       .catch((error:any) => reject(error));
   });
 }
+export function PayTeacherSallery(data:{
+  teacherId: string;
+  instituteId: string;
+  month: string;
+  salleryMode: string;
+  baseSalary: number;
+  pf: number;
+  netSalary: number;
+  amountPaid: number;
+  salleryDate?: Date;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(`${process.env.URL}/api/v1/teacher/createSallery`,{sallery:data})
+      .then((response) => resolve(response))
+      .catch((error:any) => reject(error));
+  });
+}

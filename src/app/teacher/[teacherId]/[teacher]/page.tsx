@@ -1,6 +1,6 @@
 "use client";
 
-import { InstituteBatchesSection } from "@/app/components/dashboard/InstituteBatchesSection";
+import { InstituteBatchesSection, UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { InstituteInsideBatch } from "@/app/components/institute/insideBatch/InstituteInsideBatch";
 import { Batch } from "@/app/components/institute/InstituteDashboard";
 import TeacherMobileNavbar, {
@@ -137,7 +137,7 @@ const Teacher = () => {
                   firstThreeStudents: batch?.firstThreeStudents || [],
                   firstThreeTeachers: batch?.firstThreeTeachers || [],
                 }))}
-                userType={1}
+                userType={UserType.TEACHER}
                 setDeleteBatchId={(val: string) => {
                   //  setDeleteBatchId(val);
                   //  setBatchDeleteWarning(true);
@@ -163,6 +163,7 @@ const Teacher = () => {
                   //  setOpenAddBatchModal(true)
                   //  editBatch(batchId)
                 }}
+                 showAddBatch={false}
               />
             </SimpleGrid>
           }
@@ -182,6 +183,7 @@ const Teacher = () => {
               getTechersBatches();
               setBatchId(null);
             }}
+            fromInstituteTeacherSection={false}
           />
         </Stack>
       )}

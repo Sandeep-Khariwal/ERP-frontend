@@ -1,7 +1,6 @@
 "use client";
 import { useMediaQuery } from "@mantine/hooks";
 import { AddCardWithButton, SingleBatchCard } from "./DashboardCards";
-import { useEffect } from "react";
 
 export enum UserType {
   STUDENT,
@@ -27,13 +26,14 @@ interface InstituteBatchesSectionProps {
   onEditBatchName: (id: string, val: string) => void;
   onbatchCardClick: (val: any) => void;
   onEditCourseFees: (val: any) => void;
+  showAddBatch:boolean
 }
 
 export function InstituteBatchesSection(props: InstituteBatchesSectionProps) {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
     <>
-      {props.userType == UserType.OTHERS && !isMd && (
+      {props.userType == UserType.OTHERS && !isMd && props.showAddBatch && (
         <AddCardWithButton
           onAddBatchButtonClick={props.onAddBatchButtonClick}
         />
@@ -72,6 +72,7 @@ export function InstituteBatchesSection(props: InstituteBatchesSectionProps) {
                 name: batch.name,
               });
             }}
+            showVerticalIcon={props.showAddBatch}
           />
         );
       })}

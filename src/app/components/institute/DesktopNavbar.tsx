@@ -1,9 +1,10 @@
 "use client";
 
-import { Box, Divider, Flex, Stack, Text } from "@mantine/core";
+import { Box, Divider, Flex, Stack, Text, Transition } from "@mantine/core";
 import { MdOutlineDashboard } from "react-icons/md";
 import { PiStudent } from "react-icons/pi";
 import { IoSettingsOutline } from "react-icons/io5";
+import { AiOutlineLogout } from "react-icons/ai";
 import { IoMdClose } from "react-icons/io";
 import { FaBars } from "react-icons/fa";
 import { useMediaQuery } from "@mantine/hooks";
@@ -13,6 +14,8 @@ import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { Tabs } from "@/enums";
+import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { Notifications } from "@mantine/notifications";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -21,9 +24,10 @@ export const DesktopNavbar = (props: {
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const navigation = useRouter();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   return (
     <>
+    <Notifications/>
       <Stack
         w={isMd ? "0px" : "100%"}
         c={"white"}
@@ -58,11 +62,21 @@ export const DesktopNavbar = (props: {
                 ) : (
                   <FaBars size={28} />
                 )}
-                {!props.isCollapsed && (
+                <Box
+                  style={{
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    transition:
+                      "width 0.3s ease, opacity 0.3s ease, margin 0.3s ease",
+                    width: props.isCollapsed ? 0 : "auto",
+                    opacity: props.isCollapsed ? 0 : 1,
+                    marginLeft: props.isCollapsed ? 0 : 6,
+                  }}
+                >
                   <Text fw={600} fz={20}>
                     Collapse
                   </Text>
-                )}
+                </Box>
               </Flex>
               <Flex
                 style={{ cursor: "pointer" }}
@@ -73,11 +87,21 @@ export const DesktopNavbar = (props: {
                 onClick={() => props.onSelectTab(Tabs.DASHBOARD)}
               >
                 <MdOutlineDashboard size={28} />
-                {!props.isCollapsed && (
+                <Box
+                  style={{
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    transition:
+                      "width 0.3s ease, opacity 0.3s ease, margin 0.3s ease",
+                    width: props.isCollapsed ? 0 : "auto",
+                    opacity: props.isCollapsed ? 0 : 1,
+                    marginLeft: props.isCollapsed ? 0 : 6,
+                  }}
+                >
                   <Text fw={600} fz={20}>
                     Dashboard
                   </Text>
-                )}
+                </Box>
               </Flex>
               <Flex
                 style={{ cursor: "pointer" }}
@@ -88,11 +112,21 @@ export const DesktopNavbar = (props: {
                 onClick={() => props.onSelectTab(Tabs.STUDENT)}
               >
                 <PiStudent size={28} />
-                {!props.isCollapsed && (
+                <Box
+                  style={{
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    transition:
+                      "width 0.3s ease, opacity 0.3s ease, margin 0.3s ease",
+                    width: props.isCollapsed ? 0 : "auto",
+                    opacity: props.isCollapsed ? 0 : 1,
+                    marginLeft: props.isCollapsed ? 0 : 6,
+                  }}
+                >
                   <Text fw={600} fz={20}>
                     Student
                   </Text>
-                )}
+                </Box>
               </Flex>
               <Flex
                 style={{ cursor: "pointer" }}
@@ -100,14 +134,24 @@ export const DesktopNavbar = (props: {
                 align={"center"}
                 justify={props.isCollapsed ? "center" : "start"}
                 gap={10}
-                onClick={()=>props.onSelectTab(Tabs.TEACHER)}
+                onClick={() => props.onSelectTab(Tabs.TEACHER)}
               >
-                <LiaChalkboardTeacherSolid size={28}  />
-                {!props.isCollapsed && (
+                <LiaChalkboardTeacherSolid size={28} />
+                <Box
+                  style={{
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    transition:
+                      "width 0.3s ease, opacity 0.3s ease, margin 0.3s ease",
+                    width: props.isCollapsed ? 0 : "auto",
+                    opacity: props.isCollapsed ? 0 : 1,
+                    marginLeft: props.isCollapsed ? 0 : 6,
+                  }}
+                >
                   <Text fw={600} fz={20}>
                     Teacher
                   </Text>
-                )}
+                </Box>
               </Flex>
             </Box>
 
@@ -133,21 +177,36 @@ export const DesktopNavbar = (props: {
                 justify={props.isCollapsed ? "center" : "start"}
                 gap={10}
               >
-                <IoSettingsOutline
+                <AiOutlineLogout
                   size={28}
                   onClick={() => {
+                    SuccessNotification("Log out!!")
                     LogOut();
-                     dispatch(setDetails({
-                      name: "",
-                      _id: "",
-                      phoneNumber: "",
-                      address: ""
-                    }));
-                    dispatch(saveToken(""))
+                    dispatch(
+                      setDetails({
+                        name: "",
+                        _id: "",
+                        phoneNumber: "",
+                        address: "",
+                      })
+                    );
+                    // dispatch(saveToken(""));
                     navigation.push("/");
                   }}
                 />
-                {!props.isCollapsed && <Text>sandeep khariwal</Text>}
+                <Box
+                  style={{
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    transition:
+                      "width 0.3s ease, opacity 0.3s ease, margin 0.3s ease",
+                    width: props.isCollapsed ? 0 : "auto",
+                    opacity: props.isCollapsed ? 0 : 1,
+                    marginLeft: props.isCollapsed ? 0 : 6,
+                  }}
+                >
+                  <Text>sandeep khariwal</Text>
+                </Box>
               </Flex>
             </Box>
           </Stack>
