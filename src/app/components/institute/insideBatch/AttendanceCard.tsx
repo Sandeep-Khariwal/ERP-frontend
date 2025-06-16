@@ -29,11 +29,12 @@ export function AttendanceCard(props: {
 }) {
   const [selectedStatus,setSelectedStatus] = useState<AttendanceStatus>(AttendanceStatus.ABSENT)
   useEffect(()=>{
+    
     props.setSingleAttendance({
       _id: "",
       studentId: props.studentId,
       batchId: props.batchId._id,
-      date: props.selectedDate,
+      date: new Date(props.selectedDate) ,
       status:AttendanceStatus.ABSENT
     } as AttendanceInterface);
   },[])

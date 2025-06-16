@@ -3,6 +3,8 @@
 import { InstituteBatchesSection, UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { InstituteInsideBatch } from "@/app/components/institute/insideBatch/InstituteInsideBatch";
 import { Batch } from "@/app/components/institute/InstituteDashboard";
+import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
+import TeacherProfile from "@/app/components/institute/teacher/TeacherProfile";
 import TeacherMobileNavbar, {
   TeacherTabs,
 } from "@/app/components/teacher/TeacherMobileNavbar";
@@ -33,11 +35,12 @@ const Teacher = () => {
   const [batchId, setBatchId] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const navigation = useRouter();
+  const [selectedTeacherId,setSelectedTeacherId] = useState<string>("")
 
   useEffect(() => {
     if (teacher) {
       getTechersBatches();
-
+setSelectedTeacherId(teacher._id)
       
     }
   }, [teacher]);
@@ -103,7 +106,12 @@ const Teacher = () => {
       bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
     >
       <LoadingOverlay visible={isLoading} />
-      {batchId === null && (
+             <TeacherProfile
+            teacherId={selectedTeacherId}
+            onClickBack={() => {}}
+            userType={UserType.TEACHER}
+          />
+      {/* {batchId === null && (
         <Stack w={!isMd ? "80%" : "100%"} h={"100%"} mx={"auto"} p={20}>
           <Text
             fz={22}
@@ -195,7 +203,7 @@ const Teacher = () => {
         onSelectTab={(val: TeacherTabs) => {
           // setSelectedTab(val);
         }}
-      /> */}
+      /> 
       <Stack
         style={{ cursor: "pointer" }}
         my={10}
@@ -219,7 +227,7 @@ const Teacher = () => {
         <Text fw={600} fz={15} c={"#FFFFFF"}>
           Log out
         </Text>
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 };

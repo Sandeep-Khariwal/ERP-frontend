@@ -6,7 +6,7 @@ export function CreateAttendance(batchId: string, data: AttendanceInterface[]) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
       `${process.env.URL}/api/v1/batch/updateAttendance/${batchId}`,
-      data
+      data.map((a)=>{return{...a,date: new Date(a.date).toISOString()}})
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));

@@ -24,6 +24,7 @@ import {
 } from "@/app/helperFunction/Notification";
 import { CreateUser } from "@/axios/user/UserPostApi";
 import { UserType } from "@/enums";
+import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 
 const AddStaffModal = (props: {
   isOpen: boolean;
@@ -56,7 +57,14 @@ const AddStaffModal = (props: {
       value: string;
     }[]
   >([]);
+  const [allSubjects, setAllSubjects] = useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([]);
   const [selectedBatches, setSelectedBatches] = useState<string[]>([]);
+  const [selectedSujects, setSelectedSubjects] = useState<string[]>([]);
 
   // useEffect(() => {
   //   if (initialFormData) {
@@ -340,6 +348,15 @@ const AddStaffModal = (props: {
                 label="Select Batches"
               />
             )}
+            {/* {selectedImageIndex === 2 && (
+              <MultiSelect
+                data={allBatches}
+                value={selectedBatches}
+                onChange={(value: string[]) => setSelectedBatches(value)}
+                placeholder="Select Subject"
+                label="Select Subject"
+              />
+            )} */}
           </>
         )}
       </Stack>

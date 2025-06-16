@@ -47,13 +47,14 @@ interface Teacher {
 const TeacherProfile = (props: {
   teacherId: string;
   onClickBack: () => void;
+  userType: UserType;
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const isLg = useMediaQuery(`(max-width: 1024px)`);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>();
   const [batchId, setBatchId] = useState<string | null>(null);
-  const [selectedTab,setSelectedTab] = useState<string>("")
+  const [selectedTab, setSelectedTab] = useState<string>("");
   const [teacher, setTeacher] = useState<Teacher>({
     _id: "tchr001",
     name: "John Doe",
@@ -78,6 +79,8 @@ const TeacherProfile = (props: {
       GetTeacherById(props.teacherId)
         .then((x: any) => {
           const { teacher } = x;
+          console.log("teacher : ",teacher);
+          
           setTeacher(teacher);
           console.log(x);
           setIsLoading(false);
@@ -89,20 +92,35 @@ const TeacherProfile = (props: {
     }
   }, [props.teacherId]);
 
+  console.log(UserType.OTHERS, props.userType);
+
   return (
-    <Stack w={"90%"} mx={"auto"} bg={"white"} mih={"100vh"} py={20}>
+    <Stack
+      w={UserType.OTHERS === props.userType ? "90%" : "100%"}
+      mx={"auto"}
+      bg={"white"}
+      mih={"100vh"}
+      py={20}
+    >
       <LoadingOverlay visible={isLoading} />
-      <Flex w={"100%"} p={10} align={"center"} justify={"start"} gap={3}>
-        <IconArrowLeft
-          size={32}
-          style={{ cursor: "pointer" }}
-          onClick={() => props.onClickBack()}
-        />
-        <Text fw={500} style={{ fontFamily: "sans-serif" }}>
-          Back
-        </Text>
-      </Flex>
-      <Box h={"100%"} w={"100%"} bg={"white"} style={{ margin: "0 auto", padding: "20px" }}>
+      {UserType.OTHERS === props.userType && (
+        <Flex w={"100%"} p={10} align={"center"} justify={"start"} gap={3}>
+          <IconArrowLeft
+            size={32}
+            style={{ cursor: "pointer" }}
+            onClick={() => props.onClickBack()}
+          />
+          <Text fw={500} style={{ fontFamily: "sans-serif" }}>
+            Back
+          </Text>
+        </Flex>
+      )}
+      <Box
+        h={"100%"}
+        w={UserType.OTHERS === props.userType ? "100%" : "90%"}
+        bg={"white"}
+        style={{ margin: "0 auto", padding: "20px" }}
+      >
         <Flex align="start" justify={"start"} gap="2rem" wrap="wrap">
           {/* Teacher Profile Picture */}
           <Box
@@ -171,30 +189,38 @@ const TeacherProfile = (props: {
           </Flex>
         </Flex>
       </Box>
-      <Stack mih={"100vh"} bg={"white"} w={"100%"} py={20}>
-        <Tabs w={"objectFit"} style={{ padding: "5px" }} allowTabDeactivation >
-          <Tabs.List>
-            <Tabs.Tab
-              value={"sallery"}
-              onClick={()=>setSelectedTab("sallery")}
-              leftSection={<RiMoneyRupeeCircleLine size={16} />}
-            >
-              Pay Sallery
-            </Tabs.Tab>
-            {/* <Tabs.Tab value="history" leftSection={<MdHistoryToggleOff size={16} />}>
+      <Stack
+        mih={"100vh"}
+        bg={"white"}
+        w={UserType.OTHERS === props.userType ? "100%" : "90%"}
+        mx={"auto"}
+        py={20}
+      >
+        {UserType.OTHERS === props.userType && (
+          <Tabs w={"objectFit"} style={{ padding: "5px" }} allowTabDeactivation>
+            <Tabs.List>
+              <Tabs.Tab
+                value={"sallery"}
+                onClick={() => setSelectedTab("sallery")}
+                leftSection={<RiMoneyRupeeCircleLine size={16} />}
+              >
+                Pay Sallery
+              </Tabs.Tab>
+              {/* <Tabs.Tab value="history" leftSection={<MdHistoryToggleOff size={16} />}>
           History 
         </Tabs.Tab> */}
-          </Tabs.List>
-          <Tabs.Panel value="sallery">
-            <PayTeacherPayment
-              teacherId={teacher._id}
-              instituteId={teacher.instituteId._id}
+            </Tabs.List>
+            <Tabs.Panel value="sallery">
+              <PayTeacherPayment
+                teacherId={teacher._id}
+                instituteId={teacher.instituteId._id}
                 setSelectedTab={setSelectedTab}
-            />
-          </Tabs.Panel>
+              />
+            </Tabs.Panel>
 
-          <Tabs.Panel value="history">history tab content</Tabs.Panel>
-        </Tabs>
+            <Tabs.Panel value="history">history tab content</Tabs.Panel>
+          </Tabs>
+        )}
         {batchId === null && (
           <Stack w={"100%"} h={"100%"} mx={"auto"} p={20}>
             <Text
@@ -221,13 +247,13 @@ const TeacherProfile = (props: {
               >
                 <InstituteBatchesSection
                   batches={teacher.instituteBatches.map((batch: any) => ({
-                    id: batch?.id || "",
+                    id: batch?._id || "",
                     name: batch?.name || "",
                     subjects: batch?.subjects || [],
-                    noOfTeachers: batch?.noOfTeachers || 0,
-                    noOfStudents: batch?.noOfStudents || 0,
-                    firstThreeStudents: batch?.firstThreeStudents || [],
-                    firstThreeTeachers: batch?.firstThreeTeachers || [],
+                    noOfTeachers: batch?.teachers.length || 0,
+                    noOfStudents: batch?.students.length || 0,
+                    firstThreeStudents: batch?.students.slice(0,3) || [],
+                    firstThreeTeachers: batch?.teachers.slice(0,3) || [],
                   }))}
                   userType={UserType.OTHERS}
                   setDeleteBatchId={(val: string) => {
@@ -239,6 +265,8 @@ const TeacherProfile = (props: {
                     //  updateTheBatchName(id, val);
                   }}
                   onbatchCardClick={(val) => {
+                    console.log("onbatchCardClick : ",val);
+                    
                     setBatchId(val.id);
                     setSelectedBatch(val);
                   }}
@@ -275,6 +303,7 @@ const TeacherProfile = (props: {
                 // getTechersBatches();
                 setBatchId(null);
               }}
+              userType={props.userType}
               fromInstituteTeacherSection={true}
             />
           </Stack>

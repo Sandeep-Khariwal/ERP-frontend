@@ -23,6 +23,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { CreateInstitute } from "@/axios/institute/instituteSlice";
 import { useMediaQuery } from "@mantine/hooks";
+import { LocalStorageKey } from "@/axios/LocalStorageUtility";
 
 const loginImage = "/loginImage.webp";
 
@@ -103,6 +104,8 @@ export default function Signup(props: { onClickLogin: () => void }) {
     CreateAdmin(adminForm)
       .then((x: any) => {
         const { admin, token } = x;
+             // dispatch(saveToken(token));
+                  localStorage.setItem(LocalStorageKey.Token,token)
         setIsLoading(false);
         SuccessNotification("Admin account created!!");
         dispatch(
@@ -114,7 +117,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
           })
         );
         dispatch(saveToken(token));
-        navigation.push(`/${institute.name}/${institute._id}/dashboard`);
+        navigation.push(`/pricing`); //institute/${institute._id}/${institute.name}
       })
       .catch((e) => {
         setIsLoading(false);

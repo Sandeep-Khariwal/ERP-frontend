@@ -18,6 +18,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import {
   CreateBatchAndSubjects,
+  EditBatchAndSubjects,
   GetAccountByToken,
   GetInstituteBatches,
 } from "@/axios/institute/instituteSlice";
@@ -34,7 +35,7 @@ import { IconCaretDownFilled } from "@tabler/icons-react";
 import { DeleteTheBatch, EditTheBatchName } from "@/axios/batch/BatchPutApi";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { UserType } from "@/enums";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export interface Batch {
   id: string;
@@ -69,6 +70,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [deleteBatchId, setDeleteBatchId] = useState<string>("");
   const [batchDeleteWarning, setBatchDeleteWarning] = useState<boolean>(false);
   const [editBatchDetails, setEditBatchDetails] = useState<boolean>(false);
+  const [editBatchId, setEditBatchId] = useState<string>("");
+    const navigation = useRouter();
 
   const pathname = usePathname();
   const prefix = pathname ? pathname.split("-")[0] : null;
@@ -153,6 +156,17 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       .catch((e) => {
         setIsLoading(false);
         console.log(e);
+                      if(e.status === 404){
+           navigation.push("/auth");
+          // window.location.reload()
+        }
+        if (e.status === 401) {
+          navigation.push("/auth");
+        }
+        if (e.status === 403) {
+          ErrorNotification("Subscription has been expired!!")
+          navigation.push("/pricing");
+        }
       });
   };
   const createBatch = () => {
@@ -165,12 +179,44 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       return;
     }
     // setIsLoading(true);
+
     if (editBatchDetails) {
       console.log(
+        editBatchId,
         "edit batch data : ",
         selectedOptionalSubjects,
         selectedSubjects
       );
+      setIsLoading(true);
+      EditBatchAndSubjects(editBatchId,{
+        batchName,
+        subjects: selectedSubjects,
+        optionalSubjects: selectedOptionalSubjects,
+      })
+        .then((x: any) => {
+          SuccessNotification("Batch updated!!");
+          const { data } = x;
+          const newBatch = {
+            id: data._id,
+            name: data.name,
+            subjects: data.subjects,
+            noOfTeachers: data.teachers.length,
+            noOfStudents: data.students.length,
+            optionalSubjects: data.optionalSubjects,
+            firstThreeTeachers: data.teachers.splice(0, 3),
+            firstThreeStudents: data.students.splice(0, 3),
+          };
+          const editedBatch = batches.filter((b) => b.id !== editBatchId);
+          setBatches([...editedBatch, newBatch]);
+          setOpenAddBatchModal(false);
+          setIsLoading(false);
+          getAllInstituteBatches();
+        })
+        .catch((e) => {
+          setOpenAddBatchModal(false);
+          setIsLoading(false);
+          console.log(e);
+        });
     } else {
       setIsLoading(true);
       CreateBatchAndSubjects({
@@ -323,7 +369,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               mx={"auto"}
               spacing={20}
               verticalSpacing={20}
-              mb={isMd?100:0}
+              mb={isMd ? 100 : 0}
             >
               <InstituteBatchesSection
                 batches={batches.map((batch: any) => ({
@@ -358,9 +404,12 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                   setOpenAddBatchModal(true);
                 }}
                 onEditBatchButtonClick={function (batchId: string): void {
-                  setEditBatchDetails(true);
-                  setOpenAddBatchModal(true);
-                  editBatch(batchId);
+
+                  // setEditBatchDetails(true);
+                  // setEditBatchId(batchId);
+                  // setOpenAddBatchModal(true);
+                  // editBatch(batchId);
+                  
                 }}
               />
             </SimpleGrid>

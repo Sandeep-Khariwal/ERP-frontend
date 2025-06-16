@@ -20,10 +20,12 @@ import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
 import Image from "next/image";
+import { UserType } from "../../dashboard/InstituteBatchesSection";
 
 const StudentSection = (props: {
   batchId: string;
   batchName: string;
+  userType: UserType;
   setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
@@ -99,31 +101,24 @@ const StudentSection = (props: {
   return (
     <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
-      {
-        students.length > 0 ? 
-
-      <Table
-        w={"100%"}
-        mt={8}
-        verticalSpacing="md"
-        horizontalSpacing="xl"
-        bg={"white"}
-        fz={18}
-       
-      >
-        <Table.Thead bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}  style={{border:"2px solid transparent",borderTopLeftRadius:"1rem",borderTopRightRadius:"1rem"}}>
-          <Table.Tr>
-            <Table.Th
-              style={{
-                fontFamily: "Roboto",
-                fontWeight: 700,
-                color: "#2F4F4F",
-                fontSize: 18,
-              }}
-            >
-              Name
-            </Table.Th>
-            {!isMd ? (
+      {students.length > 0 ? (
+        <Table
+          w={"100%"}
+          mt={8}
+          verticalSpacing="md"
+          horizontalSpacing="xl"
+          bg={"white"}
+          fz={18}
+        >
+          <Table.Thead
+            bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}
+            style={{
+              border: "2px solid transparent",
+              borderTopLeftRadius: "1rem",
+              borderTopRightRadius: "1rem",
+            }}
+          >
+            <Table.Tr>
               <Table.Th
                 style={{
                   fontFamily: "Roboto",
@@ -132,12 +127,59 @@ const StudentSection = (props: {
                   fontSize: 18,
                 }}
               >
-                Parent's Name
+                Name
               </Table.Th>
-            ) : (
-              <></>
-            )}
-            {!isMd && (
+              {!isMd ? (
+                <Table.Th
+                  style={{
+                    fontFamily: "Roboto",
+                    fontWeight: 700,
+                    color: "#2F4F4F",
+                    fontSize: 18,
+                  }}
+                >
+                  Parent's Name
+                </Table.Th>
+              ) : (
+                <></>
+              )}
+              {!isMd && (
+                <Table.Th
+                  style={{
+                    fontFamily: "Roboto",
+                    fontWeight: 600,
+                    color: "#2F4F4F",
+                    fontSize: 18,
+                  }}
+                >
+                  Phone Number
+                </Table.Th>
+              )}
+              <Table.Th
+                style={{
+                  fontFamily: "Roboto",
+                  fontWeight: 600,
+                  color: "#2F4F4F",
+                  fontSize: 18,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Fee Status
+              </Table.Th>
+              {!isMd ? (
+                <Table.Th
+                  style={{
+                    fontFamily: "Roboto",
+                    fontWeight: 600,
+                    color: "#2F4F4F",
+                    fontSize: 18,
+                  }}
+                >
+                  Message
+                </Table.Th>
+              ) : (
+                <></>
+              )}
               <Table.Th
                 style={{
                   fontFamily: "Roboto",
@@ -146,49 +188,12 @@ const StudentSection = (props: {
                   fontSize: 18,
                 }}
               >
-                Phone Number
+                Action
               </Table.Th>
-            )}
-            <Table.Th
-              style={{
-                fontFamily: "Roboto",
-                fontWeight: 600,
-                color: "#2F4F4F",
-                fontSize: 18,
-                whiteSpace: "nowrap",
-              }}
-            >
-              Fee Status
-            </Table.Th>
-            {!isMd ? (
-              <Table.Th
-                style={{
-                  fontFamily: "Roboto",
-                  fontWeight: 600,
-                  color: "#2F4F4F",
-                  fontSize: 18,
-                }}
-              >
-                Message
-              </Table.Th>
-            ) : (
-              <></>
-            )}
-            <Table.Th
-              style={{
-                fontFamily: "Roboto",
-                fontWeight: 600,
-                color: "#2F4F4F",
-                fontSize: 18,
-              }}
-            >
-              Action
-            </Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <tbody style={{ width: "100%" }}>
-          {(
-            students.map((item: any, index: number) => {
+            </Table.Tr>
+          </Table.Thead>
+          <tbody style={{ width: "100%" }}>
+            {students.map((item: any, index: number) => {
               return (
                 <Table.Tr
                   key={index}
@@ -300,18 +305,22 @@ const StudentSection = (props: {
                           {" "}
                           Edit Profile
                         </Menu.Item>
-                        <Menu.Item
-                          onClick={() => {
-                            // setSelectedStudent(item);
-                            // setStudentActiveTab("Fee Records");
-                            // setEditStudentFee(false);
-                            props.setSelectedStudentId(item._id);
-                            props.setShowSelectedScreen(Screen.VIEWFEEDETAILS);
-                          }}
-                        >
-                          {" "}
-                          View Fee Details
-                        </Menu.Item>
+                        {props.userType !== UserType.TEACHER && (
+                          <Menu.Item
+                            onClick={() => {
+                              // setSelectedStudent(item);
+                              // setStudentActiveTab("Fee Records");
+                              // setEditStudentFee(false);
+                              props.setSelectedStudentId(item._id);
+                              props.setShowSelectedScreen(
+                                Screen.VIEWFEEDETAILS
+                              );
+                            }}
+                          >
+                            {" "}
+                            View Fee Details
+                          </Menu.Item>
+                        )}
                         {/* <Menu.Item
                                       onClick={() => {
                                         downloadBatchCombineFee(
@@ -336,33 +345,30 @@ const StudentSection = (props: {
                   </Table.Td>
                 </Table.Tr>
               );
-            })
-          )}
-        </tbody>
-      </Table>
-
-      : (
-            <Flex w={"100%"} bg={"white"} mih={"60vh"} align={"center"} >
-              <Stack
-                w={"auto"}
-                h={"100%"}
-                m={"auto"}
-                align={"center"}
-                justify={"center"}
-              >
-                <Image
-                  src={"/empty.png"}
-                  alt="empty image"
-                  width={150}
-                  height={140}
-                />
-                <Text  fw={600} c={"#4F4F4F"}>
-                  No student found
-                </Text>
-              </Stack>
-            </Flex>
-          )
-      }
+            })}
+          </tbody>
+        </Table>
+      ) : (
+        <Flex w={"100%"} bg={"white"} mih={"60vh"} align={"center"}>
+          <Stack
+            w={"auto"}
+            h={"100%"}
+            m={"auto"}
+            align={"center"}
+            justify={"center"}
+          >
+            <Image
+              src={"/empty.png"}
+              alt="empty image"
+              width={150}
+              height={140}
+            />
+            <Text fw={600} c={"#4F4F4F"}>
+              No student found
+            </Text>
+          </Stack>
+        </Flex>
+      )}
       <Modal
         centered
         title="Warning"

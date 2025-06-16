@@ -68,7 +68,7 @@ const AssignBatch = (props: {
         Course Information
       </Text>
       <Grid>
-        <Grid.Col span={isMobile ? 12 : 6}>
+        {/* <Grid.Col span={isMobile ? 12 : 6}>
           <Select
             label="Assign Batches"
             ff={"Poppins"}
@@ -82,7 +82,7 @@ const AssignBatch = (props: {
               props.onChangeAssigningBatch(selectedValues!!);
             }}
           />
-        </Grid.Col>
+        </Grid.Col> */}
         <Grid.Col span={isMobile ? 12 : 6}>
           <DatePickerInput
             ff={"Poppins"}

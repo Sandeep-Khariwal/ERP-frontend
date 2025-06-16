@@ -4,16 +4,18 @@ import { InstituteDashboard } from "@/app/components/institute/InstituteDashboar
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
 import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
+import { ErrorNotification } from "@/app/helperFunction/Notification";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+import { LocalStorageKey } from "@/axios/LocalStorageUtility";
 import { Tabs } from "@/enums";
 import { Box, Flex, LoadingOverlay } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import { Notifications } from "@mantine/notifications";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-
 
 const dashboard = () => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
@@ -22,10 +24,10 @@ const dashboard = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
+  const navigation = useRouter();
 
   useEffect(() => {
     setIsLoading(true);
-
     GetAccountByToken()
       .then((x: any) => {
         const { data } = x;
@@ -51,11 +53,22 @@ const dashboard = () => {
       })
       .catch((e) => {
         console.log(e);
+        if (e.status === 404) {
+          window.location.reload();
+        }
+        if (e.status === 401) {
+          navigation.push("/auth");
+        }
+        if (e.status === 403) {
+          ErrorNotification("Subscription has been expired!!");
+          navigation.push("/pricing");
+        }
         setIsLoading(false);
       });
   }, []);
   return (
     <>
+      <Notifications />
       <Flex w={"100%"} mih={"100vh"}>
         <LoadingOverlay visible={isLoading} />
         <Box

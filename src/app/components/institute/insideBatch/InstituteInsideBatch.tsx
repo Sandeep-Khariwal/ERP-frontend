@@ -47,8 +47,10 @@ export function InstituteInsideBatch(props: {
   batchName: string;
   instituteId: string;
   onClickBack: () => void;
-  fromInstituteTeacherSection:boolean
+  fromInstituteTeacherSection:boolean;
+  userType:UserType
 }) {
+  
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [openAddStudentModal, setOpenAddStudentModal] =
     useState<boolean>(false);
@@ -188,6 +190,7 @@ export function InstituteInsideBatch(props: {
                   setSelectedStudentId={setSelectedStudentId}
                   batchName={props.batchName}
                   setStudents={setStudents}
+                  userType={props.userType}
                 />
               )}
             </Stack>
@@ -248,7 +251,7 @@ export function InstituteInsideBatch(props: {
               setSelectedStudentId("")
             }}
             studentId={selectedStudentId}
-            userType={UserType.OTHERS}
+            userType={props.userType}
             activeTab={StudentTabs.OVERVIEW}
           />
         </Stack>

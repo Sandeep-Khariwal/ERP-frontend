@@ -36,6 +36,21 @@ export function CreateBatchAndSubjects(data: {
       .catch((error: any) => reject(error));
   });
 }
+export function EditBatchAndSubjects(id:string,data: {
+  batchName: string;
+  subjects: string[];
+  optionalSubjects: string[];
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/institute/editBatchAndSubjects/${id}`,
+      data
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
 export function CreateBatchFee(data: {
   installments: Installment[];
   batchId: string;

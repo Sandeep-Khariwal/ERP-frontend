@@ -3,7 +3,6 @@
 import { Box, Divider, Flex, Stack, Text, Transition } from "@mantine/core";
 import { MdOutlineDashboard } from "react-icons/md";
 import { PiStudent } from "react-icons/pi";
-import { IoSettingsOutline } from "react-icons/io5";
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoMdClose } from "react-icons/io";
 import { FaBars } from "react-icons/fa";
@@ -11,11 +10,12 @@ import { useMediaQuery } from "@mantine/hooks";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
-import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
+import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { Tabs } from "@/enums";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { Notifications } from "@mantine/notifications";
+import { saveToken } from "@/app/redux/slices/adminSlice";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -182,16 +182,18 @@ export const DesktopNavbar = (props: {
                   onClick={() => {
                     SuccessNotification("Log out!!")
                     LogOut();
-                    dispatch(
-                      setDetails({
-                        name: "",
-                        _id: "",
-                        phoneNumber: "",
-                        address: "",
-                      })
-                    );
-                    // dispatch(saveToken(""));
-                    navigation.push("/");
+                    // dispatch(
+                    //   setDetails({
+                    //     name: "",
+                    //     _id: "",
+                    //     phoneNumber: "",
+                    //     address: "",
+                    //   })
+                    // );
+                    dispatch(saveToken(""));
+                    setTimeout(()=>{
+                      navigation.push("/");
+                    },2000)
                   }}
                 />
                 <Box

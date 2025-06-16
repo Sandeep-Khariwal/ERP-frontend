@@ -168,6 +168,10 @@ const StudentPage = (props: {
           .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
           .map((item: StudentTabs, i: number) => {
             return (
+              <>
+              {
+              !(item ===StudentTabs.FEES &&  UserType.TEACHER === props.userType) && 
+
               <Text
                 key={i}
                 onClick={() => setActiveTab(item)}
@@ -188,7 +192,8 @@ const StudentPage = (props: {
                 {item}
                 {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
               </Text>
-            );
+              }
+            </>);
           })}
       </Flex>
 
@@ -204,7 +209,7 @@ const StudentPage = (props: {
           />
         </Stack>
       )}
-      {StudentTabs.FEES === activeTab && (
+      {StudentTabs.FEES === activeTab &&  (
         <Stack mt={10} w={"100%"} bg={"white"} p={10}>
           <FeeRecordSection
             userType={props.userType}

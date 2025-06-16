@@ -12,11 +12,11 @@ interface InstituteBatchesSectionProps {
   batches: {
     id: string;
     name: string;
-    subjects: {_id:string,name:string}[];
+    subjects: { _id: string; name: string }[];
     noOfTeachers: number;
     noOfStudents: number;
     firstThreeStudents: string[];
-    firstThreeTeachers: string [];
+    firstThreeTeachers: string[];
   }[];
   userType: UserType;
   onAddBatchButtonClick: () => void;
@@ -26,11 +26,12 @@ interface InstituteBatchesSectionProps {
   onEditBatchName: (id: string, val: string) => void;
   onbatchCardClick: (val: any) => void;
   onEditCourseFees: (val: any) => void;
-  showAddBatch:boolean
+  showAddBatch: boolean;
 }
 
 export function InstituteBatchesSection(props: InstituteBatchesSectionProps) {
   const isMd = useMediaQuery(`(max-width: 968px)`);
+
   return (
     <>
       {props.userType == UserType.OTHERS && !isMd && props.showAddBatch && (
@@ -44,7 +45,7 @@ export function InstituteBatchesSection(props: InstituteBatchesSectionProps) {
             key={index}
             id={batch.id}
             name={batch.name}
-            subjects={batch.subjects.map((s)=> s.name)}
+            subjects={batch.subjects.map((s) => s.name)}
             userType={props.userType}
             noOfTeachers={batch.noOfTeachers}
             noOfStudents={batch.noOfStudents}
@@ -60,7 +61,7 @@ export function InstituteBatchesSection(props: InstituteBatchesSectionProps) {
             }
             setDeleteBatchId={props.setDeleteBatchId}
             setDeleteModal={props.setDeleteModal}
-            onEditBatchName={(val:any) => {
+            onEditBatchName={(val: any) => {
               props.onEditBatchName(batch.id, val);
             }}
             onbatchCardClick={() => {

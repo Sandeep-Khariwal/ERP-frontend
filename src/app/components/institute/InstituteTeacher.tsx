@@ -19,6 +19,7 @@ import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 import { IconFilterCheck } from "@tabler/icons-react";
 import TeacherProfile from "./teacher/TeacherProfile";
 import { useMediaQuery } from "@mantine/hooks";
+import { UserType } from "../dashboard/InstituteBatchesSection";
 
 export const InstituteTeachers = () => {
   const [selectedClass, setSelectedClass] = useState<string>("");
@@ -45,7 +46,7 @@ export const InstituteTeachers = () => {
   >([]);
   const [batches, setBatches] = useState<{ _id: string; name: string }[]>([]);
   const [subjects, setSubjects] = useState<{ _id: string; name: string }[]>([]);
-   const isMd = useMediaQuery(`(max-width: 968px)`);
+  const isMd = useMediaQuery(`(max-width: 968px)`);
 
   const institute = useAppSelector(
     (state) => state.instituteSlice.instituteDetails
@@ -140,12 +141,17 @@ export const InstituteTeachers = () => {
       w={"100%"}
       h={"100vh"}
       bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
-      mb={isMd?100:0}
+      mb={isMd ? 100 : 0}
     >
       <LoadingOverlay visible={isLoading} />
       <Flex
         w={"90%"}
-        style={{ borderRadius: "1rem" , position:"sticky",top:10 }}
+        style={{
+          borderRadius: "1rem",
+          position: "sticky",
+          top: 10,
+          zIndex: 123,
+        }}
         bg={"white"}
         align={"center"}
         justify={"space-between"}
@@ -154,7 +160,12 @@ export const InstituteTeachers = () => {
         mt={10}
         mx={"auto"}
       >
-        <Text fw={600} style={{ fontFamily: "sans-serif" }} fz={22}>
+        <Text
+          bg={"white"}
+          fw={600}
+          style={{ fontFamily: "sans-serif" }}
+          fz={22}
+        >
           Teacher
         </Text>
         <LiaChalkboardTeacherSolid size={30} />
@@ -230,6 +241,7 @@ export const InstituteTeachers = () => {
           <TeacherProfile
             teacherId={selectTeacherId}
             onClickBack={() => setSelectTeacherId("")}
+            userType={UserType.OTHERS}
           />
         </>
       )}

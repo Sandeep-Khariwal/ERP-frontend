@@ -254,6 +254,7 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
                     phone={student.phoneNumber[0]}
                     status={singleAttendance}
                     setSingleAttendance={(val: AttendanceInterface) => {
+
                       setCurrentDateAttendanceRecords((prevRecords) => {
                         const existingIndex = prevRecords.findIndex(
                           (record) => record.studentId === val.studentId

@@ -118,8 +118,6 @@ export function AddMoreDetails(props: {
             gender: student.gender,
             dateOfJoining: student.dateOfJoining?new Date(student.dateOfJoining):new Date(),
           };
-
-          console.log("studentData : ",studentData);
           
 
           const newInstallments = student.feeRecords.map((f: any) => {
@@ -212,7 +210,7 @@ export function AddMoreDetails(props: {
     if (active === 1) {
       setIsLoading(true);
       UpdateStudent(studentId, {
-        batchId: selectedBatch,
+        batchId: props.batchId,
         dateOfJoining: formValues.dateOfJoining,
         optionalSubjects: optionalSubjects,
       })

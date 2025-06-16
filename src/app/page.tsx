@@ -21,6 +21,8 @@ import { setDetails } from "./redux/slices/instituteSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
 import Link from "next/link";
 import { setUserDetails } from "./redux/slices/userSlice";
+import { LocalStorageKey } from "@/axios/LocalStorageUtility";
+import { Notifications } from "@mantine/notifications";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -28,11 +30,14 @@ export default function Home() {
   const navigation = useRouter();
 
   useEffect(() => {
+    const token = localStorage.getItem("shikshaPayToken"); //"shikshaPayToken"
+    
+    if (!token) return;
+
     setIsLoading(true);
     GetAccountByToken()
       .then((x: any) => {
         const { data, type } = x;
-        // setIsLoading(false);
 
         // navigate on the basis of user type
         if (UserType.ADMIN === type) {
@@ -65,7 +70,7 @@ export default function Home() {
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(
-            `/${data.instituteId.name}/${data.instituteId._id}/dashboard`
+            `/user/${data.instituteId._id}/${data.instituteId.name}`
           );
         }
         if (UserType.TEACHER === type) {
@@ -107,7 +112,17 @@ export default function Home() {
       })
       .catch((e) => {
         setIsLoading(false);
-        console.log(e);
+        console.log(e.status, e);
+        if(e.status === 404){
+           navigation.push("/auth");
+        }
+        if (e.status === 401) {
+          navigation.push("/auth");
+        }
+        if (e.status === 403) {
+          ErrorNotification("Subscription has been expired!!");
+          navigation.push("/pricing");
+        }
       });
   }, []);
   return (
@@ -124,6 +139,7 @@ export default function Home() {
         position: "relative",
       }}
     >
+      <Notifications />
       <LoadingOverlay visible={isLoading} />
       <Flex
         w={"100%"}

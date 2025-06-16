@@ -24,7 +24,7 @@ import {
   LoadingOverlay,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PinInput from "./OtpInput";
 import {
   StudentLogin,
@@ -36,7 +36,9 @@ import { LoginUser } from "@/axios/user/UserPostApi";
 import { setUserDetails } from "@/app/redux/slices/userSlice";
 import { Notifications } from "@mantine/notifications";
 import { useMediaQuery } from "@mantine/hooks";
-const loginImage = "/loginImage.webp"
+import { LocalStorageKey } from "@/axios/LocalStorageUtility";
+import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+const loginImage = "/loginImage.webp";
 
 export default function Login(props: { onCreateAccount: () => void }) {
   const [userType, setUserType] = useState<UserType>(UserType.STUDENT);
@@ -49,11 +51,61 @@ export default function Login(props: { onCreateAccount: () => void }) {
     email: "",
     password: "",
   });
-     const isMd = useMediaQuery(`(max-width: 968px)`);
+  const isMd = useMediaQuery(`(max-width: 968px)`);
   const dispatch = useAppDispatch();
   const navigation = useRouter();
   const [openOtpModal, setOpenOtpModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    // setIsLoading(true);
+      //  const token = window.localStorage.getItem(LocalStorageKey.Token)
+
+      //  if(token){
+      //   window
+      //  }
+
+    // GetAccountByToken()
+    //   .then((x: any) => {
+    //     const { data } = x;
+    //     setIsLoading(false);
+
+    //     dispatch(
+    //       setAdminDetails({
+    //         name: data.name,
+    //         _id: data._id,
+    //         phone: "",
+    //         institute: data.institute._id,
+    //       })
+    //     );
+
+    //     const instituteDetails = {
+    //       name: data.institute.name,
+    //       _id: data.institute._id,
+    //       phoneNumber: "",
+    //       address: data.institute.address,
+    //     };
+
+    //     dispatch(setDetails(instituteDetails));
+    //     navigation.push(
+    //       `/institute/${instituteDetails._id}/${instituteDetails.name}`
+    //     );
+    //   })
+    //   .catch((e) => {
+    //     console.log(e);
+    //       window.location.reload();
+    //     if (e.status === 404) {
+    //        navigation.push("/");
+    //     }
+    //     if (e.status === 401) {
+    //       navigation.push("/auth");
+    //     }
+    //            if (e.status === 403) {
+    //         navigation.push("/pricing");
+    //       }
+    //     setIsLoading(false);
+    //   });
+  }, []);
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
@@ -81,6 +133,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
             })
           );
           dispatch(saveToken(token));
+          localStorage.setItem(LocalStorageKey.Token, token);
 
           const instituteDetails = {
             name: admin.institute.name,
@@ -89,15 +142,19 @@ export default function Login(props: { onCreateAccount: () => void }) {
             address: admin.institute.address,
           };
           dispatch(setDetails(instituteDetails));
+          // window.location.reload();
           navigation.push(
-            `/institute/${admin.institute._id}/${admin.institute.name}`
+            `/institute/${instituteDetails._id}/${instituteDetails.name}`
           );
         })
         .catch((e) => {
-          const { message } = e?.response?.data;
-          console.log(message);
+          const { message } = e?.response?.data
           ErrorNotification(message);
           console.log(e);
+          if (e.status === 403) {
+            navigation.push("/pricing");
+          }
+
           setIsLoading(false);
         });
     }
@@ -239,51 +296,49 @@ export default function Login(props: { onCreateAccount: () => void }) {
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-        p={isMd?10:20}
+        p={isMd ? 10 : 20}
       >
         <Flex
-        w={isMd?"100%":"80%"}
+          w={isMd ? "100%" : "80%"}
           mx={"auto"}
           align={"center"}
           justify={"center"}
-          bg={isMd?"transparent":"white"}
-          p={isMd?0:10}
+          bg={isMd ? "transparent" : "white"}
+          p={isMd ? 0 : 10}
           style={{ borderRadius: "0.3rem" }}
         >
           {/* Left Section */}
-          {
-            !isMd &&
-
-          <Flex
-           w={isMd?"100%":"80%"}
-            h={"100%"}
-            style={{
-              flex: 1,
-              backgroundImage:  `url(${loginImage})`,
-              backgroundSize: "cover",
-              color: "white",
-              flexDirection: "column",
-              justifyContent: "center",
-              borderRadius: "0.3rem",
-              //  display:isMd?"none":"block"
-            }}
-            align={"center"}
-          >
-            <Text fz="3rem" m={"auto"} fw={700}>
-              "Time is money"
-            </Text>
-            <Text fz="2rem" m={"auto"}>
-              Save Your <span style={{ fontWeight: 700 }}>Money</span>
-            </Text>
-          </Flex>
-          }
+          {!isMd && (
+            <Flex
+              w={isMd ? "100%" : "80%"}
+              h={"100%"}
+              style={{
+                flex: 1,
+                backgroundImage: `url(${loginImage})`,
+                backgroundSize: "cover",
+                color: "white",
+                flexDirection: "column",
+                justifyContent: "center",
+                borderRadius: "0.3rem",
+                //  display:isMd?"none":"block"
+              }}
+              align={"center"}
+            >
+              <Text fz="3rem" m={"auto"} fw={700}>
+                "Time is money"
+              </Text>
+              <Text fz="2rem" m={"auto"}>
+                Save Your <span style={{ fontWeight: 700 }}>Money</span>
+              </Text>
+            </Flex>
+          )}
 
           {/* Right Section */}
           <Flex
             style={{
               flex: 1,
               backgroundColor: "white",
-              padding: isMd?5:"2rem",
+              padding: isMd ? 5 : "2rem",
               justifyContent: "center",
               alignItems: "center",
             }}
