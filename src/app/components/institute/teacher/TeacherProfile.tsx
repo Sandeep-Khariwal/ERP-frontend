@@ -79,10 +79,8 @@ const TeacherProfile = (props: {
       GetTeacherById(props.teacherId)
         .then((x: any) => {
           const { teacher } = x;
-          console.log("teacher : ",teacher);
           
           setTeacher(teacher);
-          console.log(x);
           setIsLoading(false);
         })
         .catch((e) => {
@@ -91,8 +89,6 @@ const TeacherProfile = (props: {
         });
     }
   }, [props.teacherId]);
-
-  console.log(UserType.OTHERS, props.userType);
 
   return (
     <Stack

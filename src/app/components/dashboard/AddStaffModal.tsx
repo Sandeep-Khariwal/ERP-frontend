@@ -23,13 +23,13 @@ import {
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
 import { CreateUser } from "@/axios/user/UserPostApi";
-import { UserType } from "@/enums";
+import { UserTypes } from "@/enums";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 
 const AddStaffModal = (props: {
   isOpen: boolean;
   onClose: () => void;
-  userType: UserType;
+  userType: UserTypes;
   instituteId: string;
   onreloadData: () => void;
 }) => {
@@ -234,7 +234,7 @@ const AddStaffModal = (props: {
   }
 
   const rolesToShow =
-    props.userType === UserType.ADMIN
+    props.userType === UserTypes.ADMIN
       ? ["ADMIN", "USER", "TEACHER"]
       : ["", "USER", "TEACHER"];
 

@@ -10,7 +10,7 @@ import { saveToken, setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { setStudentDetails } from "@/app/redux/slices/studentSlice";
 import { setTeacherDetails } from "@/app/redux/slices/teacherSlice";
-import { UserType } from "@/enums";
+import { UserTypes } from "@/enums";
 import {
   Flex,
   Paper,
@@ -41,7 +41,7 @@ import { GetAccountByToken } from "@/axios/institute/instituteSlice";
 const loginImage = "/loginImage.webp";
 
 export default function Login(props: { onCreateAccount: () => void }) {
-  const [userType, setUserType] = useState<UserType>(UserType.STUDENT);
+  const [userType, setUserType] = useState<UserTypes>(UserTypes.STUDENT);
   const [studentId, setStudentId] = useState<string>("");
   const [studentEmail, setStudentEmail] = useState<string>("");
   const [loginData, setLoginData] = useState<{
@@ -118,7 +118,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
   // LoginAdmin
   const onClickLogin = () => {
     setIsLoading(true);
-    if (userType === UserType.ADMIN) {
+    if (userType === UserTypes.ADMIN) {
       LoginAdmin(loginData)
         .then((x: any) => {
           setIsLoading(false);
@@ -160,7 +160,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
     }
 
     // for user login
-    if (userType === UserType.USER) {
+    if (userType === UserTypes.USER) {
       // LoginUser
       LoginUser(loginData)
         .then((x: any) => {
@@ -196,7 +196,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
         });
     }
     // for student login
-    if (userType === UserType.STUDENT) {
+    if (userType === UserTypes.STUDENT) {
       StudentLogin(loginData)
         .then((x: any) => {
           const { studentId, email } = x;
@@ -213,7 +213,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
         });
     }
     // for teacher login
-    if (userType === UserType.TEACHER) {
+    if (userType === UserTypes.TEACHER) {
       TeacherLogin(loginData)
         .then((x: any) => {
           const { teacher, token } = x;
@@ -359,31 +359,31 @@ export default function Login(props: { onCreateAccount: () => void }) {
                   <Tabs.List>
                     <Tabs.Tab
                       value="admin"
-                      onClick={() => setUserType(UserType.ADMIN)}
+                      onClick={() => setUserType(UserTypes.ADMIN)}
                     >
                       Admin
                     </Tabs.Tab>
                     <Tabs.Tab
                       value="user"
-                      onClick={() => setUserType(UserType.USER)}
+                      onClick={() => setUserType(UserTypes.USER)}
                     >
                       User
                     </Tabs.Tab>
                     <Tabs.Tab
                       value="teacher"
-                      onClick={() => setUserType(UserType.TEACHER)}
+                      onClick={() => setUserType(UserTypes.TEACHER)}
                     >
                       Teacher
                     </Tabs.Tab>
                     <Tabs.Tab
                       value="student"
-                      onClick={() => setUserType(UserType.STUDENT)}
+                      onClick={() => setUserType(UserTypes.STUDENT)}
                     >
                       Student
                     </Tabs.Tab>
                   </Tabs.List>
 
-                  <Tabs.Panel value={UserType.ADMIN} py={20}>
+                  <Tabs.Panel value={UserTypes.ADMIN} py={20}>
                     <TextInput
                       label="Email"
                       placeholder="Enter your email"
@@ -402,7 +402,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                     />
                   </Tabs.Panel>
 
-                  <Tabs.Panel value={UserType.USER} py={20}>
+                  <Tabs.Panel value={UserTypes.USER} py={20}>
                     <TextInput
                       label="Email"
                       placeholder="Enter your email"
@@ -421,7 +421,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                     />
                   </Tabs.Panel>
 
-                  <Tabs.Panel value={UserType.STUDENT} py={20}>
+                  <Tabs.Panel value={UserTypes.STUDENT} py={20}>
                     <TextInput
                       label="Email"
                       placeholder="Enter your email"
@@ -431,7 +431,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                       onChange={handleChange}
                     />
                   </Tabs.Panel>
-                  <Tabs.Panel value={UserType.TEACHER} py={20}>
+                  <Tabs.Panel value={UserTypes.TEACHER} py={20}>
                     <TextInput
                       label="Email"
                       placeholder="Enter your email"
@@ -451,7 +451,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                   </Tabs.Panel>
                 </Tabs>
 
-                {UserType.ADMIN === userType && (
+                {UserTypes.ADMIN === userType && (
                   <Text>
                     create institute account?{" "}
                     <span

@@ -26,6 +26,7 @@ import TeachersSection from "./TeacherSection";
 import AddMarksModal from "./AddMarksModal";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
 import { CreateStudent } from "@/axios/institute/InstitutePostApi";
+import TeacherProfile from "../teacher/TeacherProfile";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -47,11 +48,11 @@ export function InstituteInsideBatch(props: {
   batchName: string;
   instituteId: string;
   onClickBack: () => void;
-  fromInstituteTeacherSection:boolean;
-  userType:UserType
+  fromInstituteTeacherSection: boolean;
+  userType: UserType;
 }) {
-  
   const isMd = useMediaQuery(`(max-width: 968px)`);
+  const [selectedTeacherId, setSelectTeacherId] = useState<string>("");
   const [openAddStudentModal, setOpenAddStudentModal] =
     useState<boolean>(false);
   const [takeAttendance, setTakeAttandance] = useState<boolean>(false);
@@ -78,7 +79,12 @@ export function InstituteInsideBatch(props: {
     <>
       <LoadingOverlay visible={isLoading} />
       {Screen.NONE === showSelectedScreen && (
-        <Stack w={ isMd ? "95%" : props.fromInstituteTeacherSection ?"99%":"90%"} mt={20} mx={"auto"} h={"100%"}>
+        <Stack
+          w={isMd ? "95%" : props.fromInstituteTeacherSection ? "99%" : "90%"}
+          mt={20}
+          mx={"auto"}
+          h={"100%"}
+        >
           <Flex w={"100%"} align={"center"} justify={"start"} gap={10}>
             <Image
               onClick={() => props.onClickBack()}
@@ -129,47 +135,45 @@ export function InstituteInsideBatch(props: {
           {Tabs.STUDENT === activeTab && (
             <Stack w={"100%"}>
               <Flex w={"100%"} gap={10}>
-                {
-                  !props.fromInstituteTeacherSection &&
+                {!props.fromInstituteTeacherSection && (
+                  <Button
+                    variant="outline"
+                    c={"#111"}
+                    style={{ borderColor: "#111" }}
+                    onClick={() => {
+                      setShowSelectedScreen(Screen.ADDMORESCREEN);
+                      // setOpenAddStudentModal(true);
+                    }}
+                  >
+                    + Add Student
+                  </Button>
+                )}
 
-                <Button
-                  variant="outline"
-                  c={"#111"}
-                  style={{ borderColor: "#111" }}
-                  onClick={() => {
-                    setShowSelectedScreen(Screen.ADDMORESCREEN)
-                    // setOpenAddStudentModal(true);
-                  }}
-                >
-                  + Add Student
-                </Button>
-                }
-                
-                {
-                  students.length > 0 &&
+                {students.length > 0 && (
                   <>
-                <Button
-                  variant="outline"
-                  c={"#111"}
-                  style={{ borderColor: "#111" }}
-                  onClick={() => {
-                    setTakeAttandance(true);
-                  }}
-                >
-                  Attendance
-                </Button>
+                    <Button
+                      variant="outline"
+                      c={"#111"}
+                      style={{ borderColor: "#111" }}
+                      onClick={() => {
+                        setTakeAttandance(true);
+                      }}
+                    >
+                      Attendance
+                    </Button>
 
-                <Button
-                  variant="outline"
-                  c={"#111"}
-                  style={{ borderColor: "#111" }}
-                  onClick={() => {
-                    setOpenAddMarksModal(true);
-                  }}
-                >
-                  + Add Marks
-                </Button>
-                </>}
+                    <Button
+                      variant="outline"
+                      c={"#111"}
+                      style={{ borderColor: "#111" }}
+                      onClick={() => {
+                        setOpenAddMarksModal(true);
+                      }}
+                    >
+                      + Add Marks
+                    </Button>
+                  </>
+                )}
               </Flex>
               {takeAttendance ? (
                 <Stack>
@@ -205,10 +209,22 @@ export function InstituteInsideBatch(props: {
           )}
           {Tabs.TEACHER === activeTab && (
             <Stack w={"100%"} mt={20} mx={"auto"}>
-              <TeachersSection
-                batchId={props.batchId}
-                batchName={props.batchName}
-              />
+              {!selectedTeacherId ? (
+                <TeachersSection
+                  batchId={props.batchId}
+                  batchName={props.batchName}
+                  userType={props.userType}
+                  setSelectTeacherId={setSelectTeacherId}
+                />
+              ) : (
+                <TeacherProfile
+                  teacherId={selectedTeacherId}
+                  userType={UserType.OTHERS}
+                  onClickBack={() => {
+                    setSelectTeacherId("");
+                  }}
+                />
+              )}
             </Stack>
           )}
           {Tabs.STUDY_MATERIAL === activeTab && (
@@ -247,8 +263,8 @@ export function InstituteInsideBatch(props: {
           <StudentPage
             onClickBack={() => {
               setShowSelectedScreen(Screen.NONE);
-              
-              setSelectedStudentId("")
+
+              setSelectedStudentId("");
             }}
             studentId={selectedStudentId}
             userType={props.userType}
@@ -274,12 +290,7 @@ export function InstituteInsideBatch(props: {
       )}
 
       {Screen.VIEWFEEDETAILS === showSelectedScreen && (
-        <Stack
-          w={"100%" }
-          mih={"100vh"}
-          pt={20}
-          mx={"auto"}
-        >
+        <Stack w={"100%"} mih={"100vh"} pt={20} mx={"auto"}>
           <FeeRecordSection
             fromBatch={true}
             userType={UserType.TEACHER}
@@ -292,7 +303,7 @@ export function InstituteInsideBatch(props: {
               // getStudentnfo();
             }}
             onClickBack={() => {
-                setSelectedStudentId("")
+              setSelectedStudentId("");
               setShowSelectedScreen(Screen.NONE);
             }}
             batchName={props.batchName}

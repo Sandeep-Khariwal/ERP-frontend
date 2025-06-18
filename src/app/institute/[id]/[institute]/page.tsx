@@ -1,4 +1,5 @@
 "use client";
+import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { DesktopNavbar } from "@/app/components/institute/DesktopNavbar";
 import { InstituteDashboard } from "@/app/components/institute/InstituteDashboard";
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
@@ -106,7 +107,7 @@ const dashboard = () => {
         >
           {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
           {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-          {Tabs.TEACHER === selectedTab && <InstituteTeachers />}
+          {Tabs.TEACHER === selectedTab && <InstituteTeachers userType={UserType.OTHERS} />}
         </Box>
       </Flex>
     </>

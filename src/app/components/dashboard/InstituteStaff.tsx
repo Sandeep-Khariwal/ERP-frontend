@@ -16,7 +16,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import AddStaffModal from "./AddStaffModal";
-import { UserType } from "@/enums";
+import { UserTypes } from "@/enums";
 
 interface InstituteProfileProps {
   users: {
@@ -24,7 +24,7 @@ interface InstituteProfileProps {
     name: string;
     role: string;
   }[];
-  userType: UserType;
+  userType: UserTypes;
   instituteId: string;
   onreloadData: () => void;
 }

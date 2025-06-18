@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch } from "./redux/redux.hooks";
 import { useRouter } from "next/navigation";
 import { ErrorNotification } from "./helperFunction/Notification";
-import { UserType } from "@/enums";
+import { UserTypes } from "@/enums";
 import { setAdminDetails } from "./redux/slices/adminSlice";
 import { setTeacherDetails } from "./redux/slices/teacherSlice";
 import { setStudentDetails } from "./redux/slices/studentSlice";
@@ -40,7 +40,7 @@ export default function Home() {
         const { data, type } = x;
 
         // navigate on the basis of user type
-        if (UserType.ADMIN === type) {
+        if (UserTypes.ADMIN === type) {
           dispatch(
             setAdminDetails({
               name: data.name,
@@ -53,7 +53,7 @@ export default function Home() {
             `/institute/${data.institute._id}/${data.institute.name}`
           );
         }
-        if (UserType.USER === type) {
+        if (UserTypes.USER === type) {
           dispatch(
             setUserDetails({
               name: data.name,
@@ -73,7 +73,7 @@ export default function Home() {
             `/user/${data.instituteId._id}/${data.instituteId.name}`
           );
         }
-        if (UserType.TEACHER === type) {
+        if (UserTypes.TEACHER === type) {
           dispatch(
             setTeacherDetails({
               name: data.name,
@@ -91,7 +91,7 @@ export default function Home() {
           dispatch(setDetails(instituteDetails));
           navigation.push(`/teacher/${data._id}/${data.name}`);
         }
-        if (UserType.STUDENT === type) {
+        if (UserTypes.STUDENT === type) {
           dispatch(
             setStudentDetails({
               name: data.name,

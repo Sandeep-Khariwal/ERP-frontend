@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { InstituteProfile } from "../dashboard/InstituteStaff";
 import { InstituteDetailsCards } from "../dashboard/InstituteDetailsCards";
-import { InstituteBatchesSection } from "../dashboard/InstituteBatchesSection";
+import { InstituteBatchesSection, UserType } from "../dashboard/InstituteBatchesSection";
 import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import {
@@ -34,7 +34,7 @@ import { Notifications } from "@mantine/notifications";
 import { IconCaretDownFilled } from "@tabler/icons-react";
 import { DeleteTheBatch, EditTheBatchName } from "@/axios/batch/BatchPutApi";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
-import { UserType } from "@/enums";
+import { UserTypes } from "@/enums";
 import { usePathname, useRouter } from "next/navigation";
 
 export interface Batch {
@@ -77,9 +77,9 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const prefix = pathname ? pathname.split("-")[0] : null;
   const typ = prefix?.split("/")[2];
 
-  var userType: UserType = UserType.ADMIN;
+  var userType: UserTypes = UserTypes.ADMIN;
   if (typ?.startsWith("USER")) {
-    userType = UserType.USER;
+    userType = UserTypes.USER;
   }
 
   const getAccountByToken = () => {
@@ -315,7 +315,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       <LoadingOverlay visible={isLoading} />
       {(batchId === null || openEditCourseFee) && (
         <Stack w={"100%"} mih={"100%"} py={20}>
-          {userType === UserType.ADMIN && (
+          {userType === UserTypes.ADMIN && (
             <InstituteDetailsCards instituteId={institute?._id || ""} />
           )}
           <InstituteProfile
@@ -424,6 +424,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
           bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
         >
           <InstituteInsideBatch
+          userType={UserType.OTHERS}
             batchId={batchId}
             batchName={selectedBatch?.name!!}
             instituteId={institute?._id!!}

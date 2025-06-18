@@ -21,7 +21,7 @@ import TeacherProfile from "./teacher/TeacherProfile";
 import { useMediaQuery } from "@mantine/hooks";
 import { UserType } from "../dashboard/InstituteBatchesSection";
 
-export const InstituteTeachers = () => {
+export const InstituteTeachers = (props:{userType:UserType}) => {
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -32,7 +32,7 @@ export const InstituteTeachers = () => {
       name: string;
       phoneNumber: string;
       instituteBatches: string[];
-      subjects: string[];
+      subjects: {_id:string,name:string}[];
     }[]
   >([]);
   const [teachers, setTeachers] = useState<
@@ -41,7 +41,7 @@ export const InstituteTeachers = () => {
       name: string;
       phoneNumber: string;
       instituteBatches: string[];
-      subjects: string[];
+      subjects: {_id:string,name:string}[];
     }[]
   >([]);
   const [batches, setBatches] = useState<{ _id: string; name: string }[]>([]);
@@ -79,7 +79,7 @@ export const InstituteTeachers = () => {
   useEffect(() => {
     if (selectedSubject) {
       const teacherBySubjects = originalArrayOfTeachers.filter((teach) =>
-        teach.subjects.includes(selectedSubject)
+        teach.subjects.map((i)=>i._id).includes(selectedSubject)
       );
 
       setTeachers(teacherBySubjects);
@@ -227,6 +227,7 @@ export const InstituteTeachers = () => {
           </Flex>
           <Stack w={"100%"}>
             <TeachersSection
+            userType={props.userType}
               teachers={teachers}
               batchId={selectedClass}
               isTeacherDashboard={true}

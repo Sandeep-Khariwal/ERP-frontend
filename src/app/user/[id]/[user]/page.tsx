@@ -1,5 +1,6 @@
 "use client";
 
+import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { DesktopNavbar } from "@/app/components/institute/DesktopNavbar";
 import { InstituteDashboard } from "@/app/components/institute/InstituteDashboard";
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
@@ -93,7 +94,7 @@ function page() {
           <InstituteDashboard isShowTopCard={false} />
         )}
         {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-        {Tabs.TEACHER === selectedTab && <InstituteTeachers />}
+        {Tabs.TEACHER === selectedTab && <InstituteTeachers userType={UserType.OTHERS} />}
       </Box>
     </Flex>
   );

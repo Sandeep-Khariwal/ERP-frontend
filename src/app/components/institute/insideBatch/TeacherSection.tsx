@@ -34,6 +34,7 @@ import Image from "next/image";
 import { GetAllTeacherStaff } from "@/axios/teacher/TeacherGetApi";
 import { Notifications } from "@mantine/notifications";
 import { FaUserCircle } from "react-icons/fa";
+import { UserType } from "../../dashboard/InstituteBatchesSection";
 
 const TeachersSection = (props: {
   batchId?: string;
@@ -43,7 +44,9 @@ const TeachersSection = (props: {
     _id: string;
     name: string;
     phoneNumber: string;
+    subjects: { _id: string; name: string }[];
   }[];
+  userType: UserType;
   setOriginalArrayOfTeachers?: React.Dispatch<
     React.SetStateAction<
       {
@@ -51,7 +54,7 @@ const TeachersSection = (props: {
         name: string;
         phoneNumber: string;
         instituteBatches: string[];
-        subjects: string[];
+        subjects: { _id: string; name: string }[];
       }[]
     >
   >;
@@ -62,7 +65,7 @@ const TeachersSection = (props: {
         name: string;
         phoneNumber: string;
         instituteBatches: string[];
-        subjects: string[];
+        subjects: { _id: string; name: string }[];
       }[]
     >
   >;
@@ -77,6 +80,7 @@ const TeachersSection = (props: {
       _id: string;
       name: string;
       phoneNumber: string;
+      subjects: { _id: string; name: string }[];
     }[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -85,10 +89,12 @@ const TeachersSection = (props: {
     _id: string;
     name: string;
     phoneNumber: string;
+    subjects: { _id: string; name: string }[];
   }>({
     _id: "",
     name: "",
     phoneNumber: "",
+    subjects: [],
   });
   const [subjects, setSubjects] = useState<{ name: string; _id: string }[]>([]);
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
@@ -125,17 +131,11 @@ const TeachersSection = (props: {
               _id: s._id,
               name: s.name,
               phoneNumber: s.phoneNumber,
+              subjects:s.subjects
             };
           });
-          // const studentD = students.map((s: any) => {
-          //   return {
-          //     value: s._id,
-          //     label: s.name,
-          //   };
-          // });
-          //   props.setStudents(students);
+          
           setTeachers(teachersData);
-          //   setTeachers(studentData);
         })
         .catch((e) => {
           console.log(e);
@@ -253,23 +253,25 @@ const TeachersSection = (props: {
             >
               Message
             </Table.Th>
-            <Table.Th
-              style={{
-                fontFamily: "Roboto",
-                fontWeight: 600,
-                color: "#2F4F4F",
-                fontSize: 18,
-              }}
-            >
-              Action
-            </Table.Th>
+            {props.userType === UserType.OTHERS && (
+              <Table.Th
+                style={{
+                  fontFamily: "Roboto",
+                  fontWeight: 600,
+                  color: "#2F4F4F",
+                  fontSize: 18,
+                }}
+              >
+                Action
+              </Table.Th>
+            )}
           </Table.Tr>
         </Table.Thead>
         <tbody>
           {teachers.map((item: any, index: number) => {
             return (
               <Table.Tr
-              key={index}
+                key={index}
                 style={
                   item.isInActive
                     ? {
@@ -310,33 +312,34 @@ const TeachersSection = (props: {
                     </div>
                   </a>
                 </Table.Td>
-                <Table.Td style={{ cursor: "pointer" }}>
-                  <Menu>
-                    <Menu.Target>
-                      <Flex
-                        align={"center"}
-                        justify={"center"}
-                        w={"2rem"}
-                        py={3}
-                        bg="#FFFFFF"
-                      >
-                        <IconDotsVertical />
-                      </Flex>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item
-                        onClick={() => {
-                          props.setSelectTeacherId &&
-                            props.setSelectTeacherId(item._id);
-                          //   props.setShowSelectedScreen(Screen.VIEWPROFILE);
-                        }}
-                      >
-                        <Flex align={"center"} gap={10}>
-                          <FaUserCircle size={20} />
-                          <Text>View Profile</Text>
+                {props.userType === UserType.OTHERS && (
+                  <Table.Td style={{ cursor: "pointer" }}>
+                    <Menu>
+                      <Menu.Target>
+                        <Flex
+                          align={"center"}
+                          justify={"center"}
+                          w={"2rem"}
+                          py={3}
+                          bg="#FFFFFF"
+                        >
+                          <IconDotsVertical />
                         </Flex>
-                      </Menu.Item>
-                      {/* <Menu.Item
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item
+                          onClick={() => {
+                            props.setSelectTeacherId &&
+                              props.setSelectTeacherId(item._id);
+                            //   props.setShowSelectedScreen(Screen.VIEWPROFILE);
+                          }}
+                        >
+                          <Flex align={"center"} gap={10}>
+                            <FaUserCircle size={20} />
+                            <Text>View Profile</Text>
+                          </Flex>
+                        </Menu.Item>
+                        {/* <Menu.Item
                         onClick={() => {
                         //   props.setSelectedStudentId(item._id);
                         //   props.setEditStudentDetails(true);
@@ -349,61 +352,68 @@ const TeachersSection = (props: {
                         Edit Profile
                       </Menu.Item> */}
 
-                      <Menu.Item
-                        onClick={() => {
-                          setShowWarning(true);
-                          setDeletingTeacherId(item._id);
-                        }}
-                      >
-                        <Flex align="center">
+                        <Menu.Item
+                          onClick={() => {
+                            setShowWarning(true);
+                            setDeletingTeacherId(item._id);
+                          }}
+                        >
                           <Flex align="center">
-                            <Box mr={2}>
-                              <Image
-                                src={"/deleteImg.png"}
-                                alt="profile"
-                                width={20}
-                                height={20}
-                              />
-                            </Box>
+                            <Flex align="center">
+                              <Box mr={2}>
+                                <Image
+                                  src={"/deleteImg.png"}
+                                  alt="profile"
+                                  width={20}
+                                  height={20}
+                                />
+                              </Box>
+                            </Flex>
+                            <Text
+                              // fz={16}
+                              ml={10}
+                              style={{ fontFamily: "Roboto" }}
+                            >
+                              Remove Teacher
+                            </Text>
                           </Flex>
-                          <Text
-                            // fz={16}
-                            ml={10}
-                            style={{ fontFamily: "Roboto" }}
+                        </Menu.Item>
+                        {props.batchId && (
+                          <Menu.Item
+                            onClick={() => {
+                              setEditTeacher(true);
+                              setEditTeacherId(item);
+
+                              setSelectedSubjectIds(
+                                item.subjects.map((s: any) => s._id)
+                              );
+                            }}
                           >
-                            Remove Teacher
-                          </Text>
-                        </Flex>
-                      </Menu.Item>
-                      <Menu.Item
-                        onClick={() => {
-                          setEditTeacher(true);
-                          setEditTeacherId(item);
-                        }}
-                      >
-                        <Flex align="center">
-                          <Flex align="center">
-                            <Box mr={2}>
-                              <Image
-                                src={"/editImg.png"}
-                                alt="profile"
-                                width={20}
-                                height={20}
-                              />
-                            </Box>
-                          </Flex>
-                          <Text
-                            // fz={16}
-                            ml={10}
-                            style={{ fontFamily: "Roboto" }}
-                          >
-                            Edit Teacher
-                          </Text>
-                        </Flex>
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </Table.Td>
+                            <Flex align="center">
+                              <Flex align="center">
+                                <Box mr={2}>
+                                  <Image
+                                    src={"/editImg.png"}
+                                    alt="profile"
+                                    width={20}
+                                    height={20}
+                                  />
+                                </Box>
+                              </Flex>
+                              <Text
+                                // fz={16}
+                                ml={10}
+                                style={{ fontFamily: "Roboto" }}
+                              >
+                                Edit Teacher
+                              </Text>
+                            </Flex>
+                          </Menu.Item>
+                        )}
+                      </Menu.Dropdown>
+                    </Menu>
+                  </Table.Td>
+                )}
               </Table.Tr>
             );
           })}
@@ -478,7 +488,7 @@ const TeachersSection = (props: {
             value: subject._id,
           }))}
           mt={10}
-          value={selectedSubjectIds}
+          value={selectedSubjectIds || []}
           onChange={(value: string[]) => setSelectedSubjectIds(value)}
           placeholder="Select Subjects"
           label="Select Subjects"
