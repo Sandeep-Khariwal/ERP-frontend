@@ -18,6 +18,7 @@ import React, { useEffect, useState } from "react";
 const AssignBatch = (props: {
   formValues: any;
   instituteId: string;
+  batchId:string
   selectedBatch: string;
   optionalSubjects: string[];
   onChangeAssigningBatch: (val: string) => void;
@@ -35,10 +36,15 @@ const AssignBatch = (props: {
     GetInstituteBatches(props.instituteId)
       .then((x: any) => {
         setIsLoading(false);
+        var fetchBatchs
         if (!props.selectedBatch) {
-          props.onChangeAssigningBatch(x.batches[0]._id);
+          console.log("batches : ", x.batches);
+
+           fetchBatchs = x.batches.filter((b:any)=>b._id === props.batchId)
+          
+          props.onChangeAssigningBatch(fetchBatchs[0]._id);
         }
-        setBatches(x.batches);
+        setBatches(fetchBatchs);
       })
       .catch((e) => {
         console.log(e);
@@ -68,7 +74,7 @@ const AssignBatch = (props: {
         Course Information
       </Text>
       <Grid>
-        {/* <Grid.Col span={isMobile ? 12 : 6}>
+        <Grid.Col span={isMobile ? 12 : 6}>
           <Select
             label="Assign Batches"
             ff={"Poppins"}
@@ -82,7 +88,7 @@ const AssignBatch = (props: {
               props.onChangeAssigningBatch(selectedValues!!);
             }}
           />
-        </Grid.Col> */}
+        </Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
           <DatePickerInput
             ff={"Poppins"}

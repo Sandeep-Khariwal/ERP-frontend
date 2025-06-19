@@ -315,6 +315,7 @@ export function AddMoreDetails(props: {
               formValues={formValues}
               selectedBatch={selectedBatch}
               optionalSubjects={optionalSubjects}
+              batchId={props.batchId}
               onChangeAssigningBatch={(val: string) => {
                 setSelectedBatch(val);
                 console.log("onChangeAssigningBatch : ", val);

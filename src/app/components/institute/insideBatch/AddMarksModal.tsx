@@ -167,6 +167,7 @@ const AddMarksModal = (props: {
                 <Table.Td>
                   <NumberInput
                     hideControls
+                    max={maxMarks}
                     value={
                       marks.find((mark) => mark.studentId === s._id)?.marks || 0
                     }

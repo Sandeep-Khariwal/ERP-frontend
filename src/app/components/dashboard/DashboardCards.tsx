@@ -167,7 +167,7 @@ export function SingleBatchCard(props: {
                     </Flex>
                   </Menu.Item>
                 }
-                <Menu.Item
+                {/* <Menu.Item
                   onClick={(e) => {
                     e.stopPropagation();
                     props.onEditBatchButtonClick();
@@ -193,7 +193,7 @@ export function SingleBatchCard(props: {
                       Edit Batch
                     </Text>
                   </Flex>
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item
                   onClick={(e) => {
                     e.stopPropagation();

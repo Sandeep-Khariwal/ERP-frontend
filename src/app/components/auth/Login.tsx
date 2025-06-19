@@ -59,17 +59,14 @@ export default function Login(props: { onCreateAccount: () => void }) {
 
   useEffect(() => {
     // setIsLoading(true);
-      //  const token = window.localStorage.getItem(LocalStorageKey.Token)
-
-      //  if(token){
-      //   window
-      //  }
-
+    //  const token = window.localStorage.getItem(LocalStorageKey.Token)
+    //  if(token){
+    //   window
+    //  }
     // GetAccountByToken()
     //   .then((x: any) => {
     //     const { data } = x;
     //     setIsLoading(false);
-
     //     dispatch(
     //       setAdminDetails({
     //         name: data.name,
@@ -78,14 +75,12 @@ export default function Login(props: { onCreateAccount: () => void }) {
     //         institute: data.institute._id,
     //       })
     //     );
-
     //     const instituteDetails = {
     //       name: data.institute.name,
     //       _id: data.institute._id,
     //       phoneNumber: "",
     //       address: data.institute.address,
     //     };
-
     //     dispatch(setDetails(instituteDetails));
     //     navigation.push(
     //       `/institute/${instituteDetails._id}/${instituteDetails.name}`
@@ -122,6 +117,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
       LoginAdmin(loginData)
         .then((x: any) => {
           setIsLoading(false);
+          SuccessNotification("Login Successfully!!");
           const { admin, token } = x;
 
           dispatch(
@@ -148,7 +144,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
           );
         })
         .catch((e) => {
-          const { message } = e?.response?.data
+          const { message } = e?.response?.data;
           ErrorNotification(message);
           console.log(e);
           if (e.status === 403) {
@@ -164,6 +160,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
       // LoginUser
       LoginUser(loginData)
         .then((x: any) => {
+          SuccessNotification("Login Successfully!!");
           const { user, token } = x;
           setIsLoading(false);
           dispatch(
@@ -175,7 +172,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
             })
           );
           dispatch(saveToken(token));
-
+          localStorage.setItem(LocalStorageKey.Token, token);
           const instituteDetails = {
             name: user.instituteId.name,
             _id: user.instituteId._id,
@@ -216,6 +213,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
     if (userType === UserTypes.TEACHER) {
       TeacherLogin(loginData)
         .then((x: any) => {
+          SuccessNotification("Login Successfully!!");
           const { teacher, token } = x;
           setIsLoading(false);
           dispatch(

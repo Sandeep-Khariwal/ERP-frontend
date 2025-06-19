@@ -40,11 +40,12 @@ const TeachersSection = (props: {
   batchId?: string;
   batchName?: string;
   isTeacherDashboard?: boolean;
+  fromInstituteTeacherSection?: boolean;
   teachers?: {
     _id: string;
     name: string;
     phoneNumber: string;
-    subjects: { _id: string; name: string }[];
+    subjects: { _id: string; name: string; batchId: string }[];
   }[];
   userType: UserType;
   setOriginalArrayOfTeachers?: React.Dispatch<
@@ -54,7 +55,7 @@ const TeachersSection = (props: {
         name: string;
         phoneNumber: string;
         instituteBatches: string[];
-        subjects: { _id: string; name: string }[];
+        subjects: { _id: string; name: string; batchId: string }[];
       }[]
     >
   >;
@@ -65,7 +66,7 @@ const TeachersSection = (props: {
         name: string;
         phoneNumber: string;
         instituteBatches: string[];
-        subjects: { _id: string; name: string }[];
+        subjects: { _id: string; name: string; batchId: string }[];
       }[]
     >
   >;
@@ -80,7 +81,7 @@ const TeachersSection = (props: {
       _id: string;
       name: string;
       phoneNumber: string;
-      subjects: { _id: string; name: string }[];
+      subjects: { _id: string; name: string; batchId: string }[];
     }[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -131,10 +132,10 @@ const TeachersSection = (props: {
               _id: s._id,
               name: s.name,
               phoneNumber: s.phoneNumber,
-              subjects:s.subjects
+              subjects: s.subjects,
             };
           });
-          
+
           setTeachers(teachersData);
         })
         .catch((e) => {
@@ -327,18 +328,20 @@ const TeachersSection = (props: {
                         </Flex>
                       </Menu.Target>
                       <Menu.Dropdown>
-                        <Menu.Item
-                          onClick={() => {
-                            props.setSelectTeacherId &&
-                              props.setSelectTeacherId(item._id);
-                            //   props.setShowSelectedScreen(Screen.VIEWPROFILE);
-                          }}
-                        >
-                          <Flex align={"center"} gap={10}>
-                            <FaUserCircle size={20} />
-                            <Text>View Profile</Text>
-                          </Flex>
-                        </Menu.Item>
+                        {!props.fromInstituteTeacherSection && (
+                          <Menu.Item
+                            onClick={() => {
+                              props.setSelectTeacherId &&
+                                props.setSelectTeacherId(item._id);
+                              //   props.setShowSelectedScreen(Screen.VIEWPROFILE);
+                            }}
+                          >
+                            <Flex align={"center"} gap={10}>
+                              <FaUserCircle size={20} />
+                              <Text>View Profile</Text>
+                            </Flex>
+                          </Menu.Item>
+                        )}
                         {/* <Menu.Item
                         onClick={() => {
                         //   props.setSelectedStudentId(item._id);
@@ -383,9 +386,16 @@ const TeachersSection = (props: {
                             onClick={() => {
                               setEditTeacher(true);
                               setEditTeacherId(item);
-
+                              console.log(
+                                "batchId : ",
+                                item.subjects,
+                                props.batchId
+                              );
+                              const alreadyBatchAssigned = item.subjects.filter(
+                                (s: any) => s.batchId === props.batchId
+                              );
                               setSelectedSubjectIds(
-                                item.subjects.map((s: any) => s._id)
+                                alreadyBatchAssigned.map((s: any) => s._id)
                               );
                             }}
                           >

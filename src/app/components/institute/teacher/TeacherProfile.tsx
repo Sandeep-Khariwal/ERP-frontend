@@ -23,6 +23,12 @@ import {
 } from "../../dashboard/InstituteBatchesSection";
 import { InstituteInsideBatch } from "../insideBatch/InstituteInsideBatch";
 import PayTeacherPayment from "./PayTeacherPayment";
+import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { LogOut } from "@/axios/LocalStorageUtility";
+import { AiOutlineLogout } from "react-icons/ai";
+import { useAppDispatch } from "@/app/redux/redux.hooks";
+import { useRouter } from "next/navigation";
+import { saveToken } from "@/app/redux/slices/teacherSlice";
 
 interface Institute {
   _id: string;
@@ -55,6 +61,8 @@ const TeacherProfile = (props: {
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>();
   const [batchId, setBatchId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<string>("");
+  const dispatch = useAppDispatch();
+  const navigation = useRouter();
   const [teacher, setTeacher] = useState<Teacher>({
     _id: "tchr001",
     name: "John Doe",
@@ -79,7 +87,7 @@ const TeacherProfile = (props: {
       GetTeacherById(props.teacherId)
         .then((x: any) => {
           const { teacher } = x;
-          
+
           setTeacher(teacher);
           setIsLoading(false);
         })
@@ -219,20 +227,45 @@ const TeacherProfile = (props: {
         )}
         {batchId === null && (
           <Stack w={"100%"} h={"100%"} mx={"auto"} p={20}>
-            <Text
-              fz={22}
-              fw={500}
-              c={"#36431F"}
-              style={{
-                whiteSpace: "nowrap",
-                maxWidth: "70%",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                fontFamily: "Roboto",
-              }}
-            >
-              All Batches
-            </Text>
+            <Flex w={"100%"} align={"center"} justify={"space-between"} gap={20} >
+              <Text
+                fz={22}
+                fw={500}
+                c={"#36431F"}
+                style={{
+                  whiteSpace: "nowrap",
+                  maxWidth: "70%",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  fontFamily: "Roboto",
+                }}
+              >
+                All Batches
+              </Text>
+
+              {UserType.TEACHER === props.userType && (
+                <Flex
+                  style={{ cursor: "pointer" }}
+                  my={10}
+                  align={"center"}
+                  gap={10}
+                >
+                  <AiOutlineLogout
+                    size={20}
+                    onClick={() => {
+                      SuccessNotification("Log out!!");
+                      LogOut();
+                      dispatch(saveToken(""));
+                      setTimeout(() => {
+                        navigation.push("/");
+                      }, 2000);
+                    }}
+                  />
+                  <Text>Logout</Text>
+                </Flex>
+              )}
+            </Flex>
+
             {
               <SimpleGrid
                 cols={isMd ? 1 : isLg ? 2 : 4}
@@ -248,8 +281,8 @@ const TeacherProfile = (props: {
                     subjects: batch?.subjects || [],
                     noOfTeachers: batch?.teachers.length || 0,
                     noOfStudents: batch?.students.length || 0,
-                    firstThreeStudents: batch?.students.slice(0,3) || [],
-                    firstThreeTeachers: batch?.teachers.slice(0,3) || [],
+                    firstThreeStudents: batch?.students.slice(0, 3) || [],
+                    firstThreeTeachers: batch?.teachers.slice(0, 3) || [],
                   }))}
                   userType={UserType.OTHERS}
                   setDeleteBatchId={(val: string) => {
@@ -261,8 +294,8 @@ const TeacherProfile = (props: {
                     //  updateTheBatchName(id, val);
                   }}
                   onbatchCardClick={(val) => {
-                    console.log("onbatchCardClick : ",val);
-                    
+                    console.log("onbatchCardClick : ", val);
+
                     setBatchId(val.id);
                     setSelectedBatch(val);
                   }}

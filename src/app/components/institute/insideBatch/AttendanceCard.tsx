@@ -8,14 +8,12 @@ export enum AttendanceStatus {
   PRESENT = "PRESENT",
   ABSENT = "ABSENT",
   LATE = "LATE",
-  ONLINE = "ONLINE",
 }
 
 const attendanceData = [
   AttendanceStatus.PRESENT,
   AttendanceStatus.ABSENT,
   AttendanceStatus.LATE,
-  AttendanceStatus.ONLINE,
 ];
 export function AttendanceCard(props: {
   studentId: string;

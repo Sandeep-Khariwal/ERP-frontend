@@ -215,6 +215,7 @@ export function InstituteInsideBatch(props: {
                   batchName={props.batchName}
                   userType={props.userType}
                   setSelectTeacherId={setSelectTeacherId}
+                  fromInstituteTeacherSection={props.fromInstituteTeacherSection}
                 />
               ) : (
                 <TeacherProfile

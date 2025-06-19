@@ -1,12 +1,18 @@
 import { AttendanceInterface } from "@/interface/student.interface";
 import ApiHelper from "../../ApiHelper";
 
-
 export function CreateAttendance(batchId: string, data: AttendanceInterface[]) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
       `${process.env.URL}/api/v1/batch/updateAttendance/${batchId}`,
-      data.map((a)=>{return{...a,date: new Date(a.date).toISOString()}})
+      data.map((a) => {
+        const date = new Date(a.date);
+        date.setHours(0, 0, 0, 0); // sets time to 00:00:00.000
+        return {
+          ...a,
+          date: date.toISOString(),
+        };
+      })
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
