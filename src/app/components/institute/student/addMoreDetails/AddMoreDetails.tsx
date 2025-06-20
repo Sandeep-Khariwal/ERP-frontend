@@ -26,6 +26,7 @@ import {
 import StepThree from "./StepThree";
 import { Installment } from "@/interfaces/batchInterface";
 import { GetStudent } from "@/axios/institute/InstituteGetApi";
+import { ErrorNotification } from "@/app/helperFunction/Notification";
 
 interface StudentFormValues {
   name: string;
@@ -208,6 +209,10 @@ export function AddMoreDetails(props: {
     }
 
     if (active === 1) {
+      if(!selectedBatch){
+        ErrorNotification("Select a batch!!")
+        return
+      }
       setIsLoading(true);
       UpdateStudent(studentId, {
         batchId: props.batchId,
@@ -318,7 +323,6 @@ export function AddMoreDetails(props: {
               batchId={props.batchId}
               onChangeAssigningBatch={(val: string) => {
                 setSelectedBatch(val);
-                console.log("onChangeAssigningBatch : ", val);
               }}
               handleInputChange={(field: string, value: any) => {
                 handleInputChange(field, value);

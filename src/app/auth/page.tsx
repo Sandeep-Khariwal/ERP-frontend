@@ -5,13 +5,14 @@ import Signup from "../components/auth/Signup";
 import Login from "../components/auth/Login";
 
 export default function page() {
-  const [isLogin, setIsLogin] = useState<boolean>(false);
+  const [isLogin, setIsLogin] = useState<boolean>(true);
 
   return (
     <>
-      {!isLogin ? (
+      {isLogin ? (
         <Login
           onCreateAccount={() => {
+            
             setIsLogin(false);
           }}
         />
