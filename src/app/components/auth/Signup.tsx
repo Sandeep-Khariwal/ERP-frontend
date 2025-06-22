@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 import { CreateInstitute } from "@/axios/institute/instituteSlice";
 import { useMediaQuery } from "@mantine/hooks";
 import { LocalStorageKey } from "@/axios/LocalStorageUtility";
+import { Notifications } from "@mantine/notifications";
 
 const loginImage = "/loginImage.webp";
 
@@ -94,8 +95,9 @@ export default function Signup(props: { onClickLogin: () => void }) {
       })
       .catch((e) => {
         console.log(e);
+        const {message} = e.response.data
         setIsLoading(false);
-        ErrorNotification("Error on Institute create");
+        ErrorNotification(message);
       });
   };
 
@@ -129,6 +131,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
   return (
     <>
       <LoadingOverlay visible={isLoading} />
+      <Notifications/>
       <Flex
         style={{
           height: "100vh",

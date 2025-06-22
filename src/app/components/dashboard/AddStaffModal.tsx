@@ -20,11 +20,13 @@ import { CreateAdmin } from "@/axios/admin/adminSlice";
 import { CreateTeacher } from "@/axios/teacher/TeacherPostApi";
 import {
   containsOnlyDigits,
+  ErrorNotification,
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
 import { CreateUser } from "@/axios/user/UserPostApi";
 import { UserTypes } from "@/enums";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
+import { Notifications } from "@mantine/notifications";
 
 const AddStaffModal = (props: {
   isOpen: boolean;
@@ -105,7 +107,9 @@ const AddStaffModal = (props: {
             SuccessNotification("Admin Created Success!!");
           })
           .catch((e) => {
+            const { message } = e.response.data;
             console.log(e);
+            ErrorNotification(message);
             setIsLoading(false);
           });
       } else if (selectedImageIndex === 1) {
@@ -125,6 +129,8 @@ const AddStaffModal = (props: {
           })
           .catch((e) => {
             console.log(e);
+            const { message } = e.response.data;
+            ErrorNotification(message);
             setIsLoading(false);
           });
       } else {
@@ -140,12 +146,14 @@ const AddStaffModal = (props: {
           .then((x: any) => {
             setIsLoading(false);
             props.onClose();
-            props.onreloadData()
+            props.onreloadData();
             SuccessNotification("Teacher Created Success!!");
           })
           .catch((e) => {
             console.log(e);
             setIsLoading(false);
+            const { message } = e.response.data;
+            ErrorNotification(message);
           });
       }
     }
@@ -242,6 +250,7 @@ const AddStaffModal = (props: {
     <Modal title="Add staff" opened={props.isOpen} onClose={props.onClose}>
       <Stack>
         <LoadingOverlay visible={isLoading} />
+        <Notifications />
         {currentStep === 1 && (
           <SimpleGrid
             cols={3}

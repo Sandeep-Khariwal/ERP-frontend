@@ -29,6 +29,8 @@ import { AiOutlineLogout } from "react-icons/ai";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { useRouter } from "next/navigation";
 import { saveToken } from "@/app/redux/slices/teacherSlice";
+import { MdHistoryToggleOff } from "react-icons/md";
+import SalaryCard from "../../teacher/TeacherSaleryCard";
 
 interface Institute {
   _id: string;
@@ -64,7 +66,7 @@ const TeacherProfile = (props: {
   const dispatch = useAppDispatch();
   const navigation = useRouter();
   const [teacher, setTeacher] = useState<Teacher>({
-    _id: "tchr001",
+    _id: "",
     name: "John Doe",
     phoneNumber: ["+1 234 567 890", "+1 234 567 891"],
     profilePic: "https://randomuser.me/api/portraits/men/1.jpg", // Sample URL for profile image
@@ -200,9 +202,9 @@ const TeacherProfile = (props: {
         mx={"auto"}
         py={20}
       >
-        {UserType.OTHERS === props.userType && (
-          <Tabs w={"objectFit"} style={{ padding: "5px" }} allowTabDeactivation>
-            <Tabs.List>
+        <Tabs w={"objectFit"} style={{ padding: "5px" }} allowTabDeactivation>
+          <Tabs.List>
+            {UserType.OTHERS === props.userType && (
               <Tabs.Tab
                 value={"sallery"}
                 onClick={() => setSelectedTab("sallery")}
@@ -210,24 +212,37 @@ const TeacherProfile = (props: {
               >
                 Pay Sallery
               </Tabs.Tab>
-              {/* <Tabs.Tab value="history" leftSection={<MdHistoryToggleOff size={16} />}>
-          History 
-        </Tabs.Tab> */}
-            </Tabs.List>
-            <Tabs.Panel value="sallery">
-              <PayTeacherPayment
-                teacherId={teacher._id}
-                instituteId={teacher.instituteId._id}
-                setSelectedTab={setSelectedTab}
-              />
-            </Tabs.Panel>
+            )}
+            <Tabs.Tab
+              value="history"
+              leftSection={<MdHistoryToggleOff size={16} />}
+            >
+              History
+            </Tabs.Tab>
+          </Tabs.List>
 
-            <Tabs.Panel value="history">history tab content</Tabs.Panel>
-          </Tabs>
-        )}
+          <Tabs.Panel value="sallery">
+            <PayTeacherPayment
+              teacherId={teacher._id}
+              instituteId={teacher.instituteId._id}
+              setSelectedTab={setSelectedTab}
+            />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="history">
+            <Stack mt={10} >
+              <SalaryCard teacherId={teacher._id} />
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
         {batchId === null && (
           <Stack w={"100%"} h={"100%"} mx={"auto"} p={20}>
-            <Flex w={"100%"} align={"center"} justify={"space-between"} gap={20} >
+            <Flex
+              w={"100%"}
+              align={"center"}
+              justify={"space-between"}
+              gap={20}
+            >
               <Text
                 fz={22}
                 fw={500}

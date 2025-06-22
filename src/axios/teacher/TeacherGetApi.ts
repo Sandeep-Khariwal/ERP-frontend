@@ -22,3 +22,10 @@ export function GetTeacherById(id:string) {
       .catch((error:any) => reject(error));
   });
 }
+export function GetTeacherPaymentHistory(id:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/teacher/getPaymentHistory/${id}`)
+      .then((response) => resolve(response))
+      .catch((error:any) => reject(error));
+  });
+}

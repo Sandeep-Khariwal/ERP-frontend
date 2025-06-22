@@ -282,6 +282,7 @@ export function InstituteInsideBatch(props: {
             selectedStudentId={selectedStudentId}
             onClickBack={() => {
               setShowSelectedScreen(Screen.NONE);
+              setSelectedStudentId("")
             }}
             batchId={props.batchId}
             batchName={props.batchName}

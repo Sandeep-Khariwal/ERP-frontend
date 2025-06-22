@@ -32,7 +32,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
       name: string;
       phoneNumber: string;
       instituteBatches: string[];
-      subjects: { _id: string; name: string , batchId:string }[];
+      subjects: { _id: string; name: string; batchId: string }[];
     }[]
   >([]);
   const [teachers, setTeachers] = useState<
@@ -41,7 +41,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
       name: string;
       phoneNumber: string;
       instituteBatches: string[];
-      subjects: { _id: string; name: string,batchId:string }[];
+      subjects: { _id: string; name: string; batchId: string }[];
     }[]
   >([]);
   const [batches, setBatches] = useState<{ _id: string; name: string }[]>([]);
@@ -65,7 +65,6 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
           const { subjects } = x.subjects;
           setSubjects(subjects);
 
-          
           setTeachers(teacherByInstituteBatch);
           setIsLoading(false);
         })
@@ -75,6 +74,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
         });
     } else {
       setSelectedSubject("");
+      setTeachers(originalArrayOfTeachers);
     }
   }, [selectedClass]);
 
@@ -115,7 +115,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
             subjects: s.subjects,
           };
         });
-        
+
         setTeachers(teachersData);
         setOriginalArrayOfTeachers(teachersData);
         setIsLoading(false);
@@ -142,7 +142,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
   return (
     <Stack
       w={"100%"}
-      h={"100vh"}
+      mih={"100vh"}
       bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
       mb={isMd ? 100 : 0}
     >
@@ -220,7 +220,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
               variant="outline"
               style={{ alignSelf: "end" }}
               onClick={() => {
-                setSelectedSubject("");
+                // setSelectedSubject("");
                 setSelectedClass("");
               }}
             >

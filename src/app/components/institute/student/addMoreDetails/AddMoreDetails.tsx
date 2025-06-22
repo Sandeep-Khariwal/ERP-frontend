@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import {
@@ -106,20 +106,23 @@ export function AddMoreDetails(props: {
           setSelectedBatch(student.batchId);
           setStudentId(student._id);
           const additionalPhoneNumbers = student.phoneNumber || [];
-          const val = new Date(student.dateOfBirth).setDate( new Date(student.dateOfBirth)!!.getDate()-1)
-              
+          const val = new Date(student.dateOfBirth).setDate(
+            new Date(student.dateOfBirth)!!.getDate() - 1
+          );
+
           const studentData = {
             name: student.name,
             email: student.email,
             parentName: student.parentName,
             phoneNumber: [...student.phoneNumber],
-            dateOfBirth: student.dateOfBirth?new Date(val):new Date(),
+            dateOfBirth: student.dateOfBirth ? new Date(val) : new Date(),
             address: student.address,
             parentNumber: student.parentNumber,
             gender: student.gender,
-            dateOfJoining: student.dateOfJoining?new Date(student.dateOfJoining):new Date(),
+            dateOfJoining: student.dateOfJoining
+              ? new Date(student.dateOfJoining)
+              : new Date(),
           };
-          
 
           const newInstallments = student.feeRecords.map((f: any) => {
             return {
@@ -146,9 +149,9 @@ export function AddMoreDetails(props: {
 
   const handleInputChange = (field: string, value: any) => {
     console.log(value);
-    
+
     if (field === "dateOfBirth") {
-      setFormValues((p) => ({ ...p, dateOfBirth: value ? value: null }));
+      setFormValues((p) => ({ ...p, dateOfBirth: value ? value : null }));
     } else if (field === "dateOfJoining") {
       setFormValues((p) => ({ ...p, dateOfJoining: value ? value : null }));
     } else {
@@ -174,7 +177,7 @@ export function AddMoreDetails(props: {
         dateOfBirth: new Date(
           new Date(formValues.dateOfBirth!!).setDate(
             formValues.dateOfBirth!!!!.getDate() + 1
-          ) 
+          )
         ),
         address: formValues.address,
         gender: formValues.gender,
@@ -209,9 +212,9 @@ export function AddMoreDetails(props: {
     }
 
     if (active === 1) {
-      if(!selectedBatch){
-        ErrorNotification("Select a batch!!")
-        return
+      if (!selectedBatch) {
+        ErrorNotification("Select a batch!!");
+        return;
       }
       setIsLoading(true);
       UpdateStudent(studentId, {
@@ -276,7 +279,20 @@ export function AddMoreDetails(props: {
         <Flex w={"80%"} align={"center"} justify={"start"} gap={10}>
           <IconArrowLeft
             size={32}
-            onClick={() => props.onClickBack()}
+            onClick={() => {
+              props.onClickBack();
+              setFormValues({
+                name: "",
+                email: "",
+                parentName: "",
+                phoneNumber: [],
+                dateOfBirth: new Date(),
+                address: "",
+                parentNumber: "",
+                gender: "",
+                dateOfJoining: new Date(),
+              });
+            }}
             style={{ cursor: "pointer" }}
           />
           <Text fz={22} ff={"Poppins"}>
@@ -303,7 +319,6 @@ export function AddMoreDetails(props: {
               }}
               showError={showError}
               onChangeInputValue={(field: string, value: any) => {
-                 console.log("value 2 : ",field,value);
                 handleInputChange(field, value);
               }}
               setAdditionalPhoneNumbers={setAdditionalPhoneNumbers}

@@ -18,7 +18,7 @@ import React, { useEffect, useState } from "react";
 const AssignBatch = (props: {
   formValues: any;
   instituteId: string;
-  batchId:string
+  batchId: string;
   selectedBatch: string;
   optionalSubjects: string[];
   onChangeAssigningBatch: (val: string) => void;
@@ -36,15 +36,13 @@ const AssignBatch = (props: {
     GetInstituteBatches(props.instituteId)
       .then((x: any) => {
         setIsLoading(false);
-        var fetchBatchs
-        if (!props.selectedBatch) {
-          console.log("batches : ", x.batches);
-
-           fetchBatchs = x.batches.filter((b:any)=>b._id === props.batchId)
-          
-          props.onChangeAssigningBatch(fetchBatchs[0]._id);
+        var fetchBatchs;
+        // if (!props.selectedBatch) {
+        fetchBatchs = x.batches.filter((b: any) => b._id === props.batchId);
+        props.onChangeAssigningBatch(fetchBatchs[0]._id);
+        if (fetchBatchs) {
+          setBatches(fetchBatchs);
         }
-        setBatches(fetchBatchs);
       })
       .catch((e) => {
         console.log(e);
@@ -80,10 +78,14 @@ const AssignBatch = (props: {
             ff={"Poppins"}
             placeholder="Select"
             value={props.selectedBatch}
-            data={batches.map((batch) => ({
-              value: batch._id,
-              label: batch.name,
-            }))}
+            data={
+              batches.length > 0
+                ? batches.map((batch) => ({
+                    value: batch._id,
+                    label: batch.name,
+                  }))
+                : []
+            }
             onChange={(selectedValues) => {
               props.onChangeAssigningBatch(selectedValues!!);
             }}
