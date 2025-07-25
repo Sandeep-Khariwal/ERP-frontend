@@ -23,6 +23,11 @@ import Link from "next/link";
 import { setUserDetails } from "./redux/slices/userSlice";
 import { LocalStorageKey } from "@/axios/LocalStorageUtility";
 import { Notifications } from "@mantine/notifications";
+import Navbar from "./components/landingpage/Navbar";
+import HeroSection from "./components/landingpage/HeroSection";
+import Features from "./components/landingpage/Features";
+import WhyShouldUse from "./components/landingpage/WhyShouldUse";
+import Testimonials from "./components/landingpage/Testimonials";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -31,7 +36,7 @@ export default function Home() {
 
   useEffect(() => {
     const token = localStorage.getItem("shikshaPayToken"); //"shikshaPayToken"
-    
+
     if (!token) return;
 
     setIsLoading(true);
@@ -113,8 +118,8 @@ export default function Home() {
       .catch((e) => {
         setIsLoading(false);
         console.log(e.status, e);
-        if(e.status === 404){
-           navigation.push("/auth");
+        if (e.status === 404) {
+          navigation.push("/auth");
         }
         if (e.status === 401) {
           navigation.push("/auth");
@@ -126,77 +131,16 @@ export default function Home() {
       });
   }, []);
   return (
-    <Stack
-      w={"100%"}
-      h={"100vh"}
-      align="center"
-      justify="center"
-      style={{
-        backgroundImage: "url(/heroImg.jpg)",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-        position: "relative",
-      }}
-    >
+    <Stack>
+      <Box>
+        <Navbar />
+        <HeroSection />
+        <Features />
+        <WhyShouldUse />
+        <Testimonials />
+      </Box>
       <Notifications />
       <LoadingOverlay visible={isLoading} />
-      <Flex
-        w={"100%"}
-        align={"center"}
-        justify={"flex-end"}
-        gap={20}
-        bg={"transparent"}
-        px={50}
-        py={30}
-        style={{ position: "fixed", top: 0, left: 0, zIndex: 2 }}
-      >
-        <Link
-          style={{ textDecoration: "none", color: "white" }}
-          href={"/about"}
-        >
-          About
-        </Link>
-        <Link
-          style={{ textDecoration: "none", color: "white" }}
-          href={"/about"}
-        >
-          Contact
-        </Link>
-        <Link
-          style={{ textDecoration: "none", color: "white" }}
-          href={"/about"}
-        >
-          Features
-        </Link>
-        <Button variant="outline" onClick={() => navigation.push("/auth")}>
-          Login
-        </Button>
-      </Flex>
-      <Text
-        fz={55}
-        px={20}
-        py={10}
-        style={{
-          textTransform: "uppercase",
-          textShadow: "2px 2px 5px gray",
-          position: "relative",
-          zIndex: 2,
-        }}
-        c={"white"}
-      >
-        Shiksha Pay
-      </Text>
-      <Box
-        style={{
-          backgroundImage:
-            "linear-gradient(to right bottom, #111111 , transparent)",
-          position: "absolute",
-          top: 0,
-        }}
-        h={"100vh"}
-        w={"100%"}
-      ></Box>
     </Stack>
   );
 }
