@@ -84,7 +84,7 @@ const Team = () => {
         {teamMembers.map((member, idx) => (
           <Grid.Col key={member.name} span={{ base: 12, sm: 6, md: 4 }}>
             <Box
-              ref={(el) => (cardsRef.current[idx] = el)}
+              ref={(el) => { cardsRef.current[idx] = el; }}
               style={cardStyles}
               className="team-card"
               onMouseEnter={(e) =>
