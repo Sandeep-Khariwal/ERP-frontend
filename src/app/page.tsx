@@ -28,6 +28,10 @@ import HeroSection from "./components/landingpage/HeroSection";
 import Features from "./components/landingpage/Features";
 import WhyShouldUse from "./components/landingpage/WhyShouldUse";
 import Testimonials from "./components/landingpage/Testimonials";
+import Contact from "./components/landingpage/Contact";
+import Footer from "./components/landingpage/Footer";
+import FAQPage from "./components/landingpage/FAQ";
+import TeamSection from "./components/landingpage/TeamSection";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -138,6 +142,10 @@ export default function Home() {
         <Features />
         <WhyShouldUse />
         <Testimonials />
+        <FAQPage />
+        <Contact />
+        <TeamSection />
+        <Footer />
       </Box>
       <Notifications />
       <LoadingOverlay visible={isLoading} />

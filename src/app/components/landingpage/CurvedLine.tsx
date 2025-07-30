@@ -14,9 +14,6 @@ const CurvedLine = () => {
           strokeWidth="5"
           fill="none"
         />
-      </svg>
-    </div>
-  );
 };
 
 export default CurvedLine;
