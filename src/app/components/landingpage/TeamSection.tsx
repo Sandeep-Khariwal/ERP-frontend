@@ -1,5 +1,5 @@
 import { Box, Center, Grid, Text, Title, rem, Image } from "@mantine/core";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 const sandeep = "/Sandeep.jpg";
@@ -42,49 +42,80 @@ const cardStyles = {
   textAlign: "center" as const,
   fontFamily: "Poppins, sans-serif",
   transition: "transform 0.3s ease",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column" as const,
+  justifyContent: "space-between",
 };
 
 const Team = () => {
   const cardsRef = useRef<Array<HTMLDivElement | null>>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    cardsRef.current.forEach((card, index) => {
-      if (card) {
-        gsap.fromTo(
-          card,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: card,
-              start: "top 85%",
-            },
-            delay: index * 0.2,
-          }
-        );
-      }
-    });
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
+  useEffect(() => {
+    // Only run animations on larger screens
+    if (!isMobile) {
+      cardsRef.current.forEach((card, index) => {
+        if (card) {
+          gsap.fromTo(
+            card,
+            { opacity: 0, y: 50 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+              },
+              delay: index * 0.2,
+            }
+          );
+        }
+      });
+    } else {
+      // On mobile, ensure cards are visible immediately
+      cardsRef.current.forEach((card) => {
+        if (card) {
+          gsap.set(card, { opacity: 1, y: 0 });
+        }
+      });
+    }
+  }, [isMobile]);
+
   return (
-    <Box py="xl" px="md" style={{ overflow: "hidden" }}>
+    <Box py="xl" px="md" style={{ overflow: "hidden", minHeight: "70vh" }} >
       <Center mb="xl">
         <Title
           order={2}
           c="#0599FB"
-          style={{ fontFamily: "Poppins, sans-serif" }}
+          style={{
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
+          }}
         >
           Meet Our Team
         </Title>
       </Center>
-      <Grid gutter="xl" justify="center">
+      <Grid gutter="xl" justify="center" align="stretch">
         {teamMembers.map((member, idx) => (
-          <Grid.Col key={member.name} span={{ base: 12, sm: 6, md: 4 }}>
+          <Grid.Col
+            key={member.name}
+            span={{ base: 12, xs: 12, sm: 6, md: 4, lg: 4 }}
+          >
             <Box
-              ref={(el) => { cardsRef.current[idx] = el; }}
               style={cardStyles}
               className="team-card"
               onMouseEnter={(e) =>
@@ -94,34 +125,57 @@ const Team = () => {
                 (e.currentTarget.style.transform = "translateY(0)")
               }
             >
-              <Center>
-                <Image
-                  src={member.image}
-                  alt={member.name}
-                  width={80}
-                  height={80}
-                  radius={999}
-                  style={{
-                    objectFit: "cover",
-                    border: "3px solid #7cdacc",
-                    backgroundColor: "#fff",
-                    marginBottom: rem(16),
-                  }}
-                />
-              </Center>
-              <Text fw={600} size="lg" mb={4}>
-                {member.name}
-              </Text>
-              <Text fw={400} size="sm" mb={8}>
-                {member.role}
-              </Text>
-              <Text size="sm" style={{ lineHeight: 1.4 }}>
+              <Box>
+                <Center>
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    width={80}
+                    height={80}
+                    radius={999}
+                    style={{
+                      objectFit: "cover",
+                      border: "3px solid #7cdacc",
+                      backgroundColor: "#fff",
+                      marginBottom: rem(16),
+                    }}
+                  />
+                </Center>
+                <Text fw={600} size="lg" mb={4}>
+                  {member.name}
+                </Text>
+                <Text fw={400} size="sm" mb={8} style={{ color: "#7cdacc" }}>
+                  {member.role}
+                </Text>
+              </Box>
+              <Text size="sm" style={{ lineHeight: 1.4, marginTop: "auto" }}>
                 {member.description}
               </Text>
             </Box>
           </Grid.Col>
         ))}
       </Grid>
+
+      {/* Additional CSS for better mobile experience */}
+      <style jsx global>{`
+        @media (max-width: 576px) {
+          .team-card {
+            margin-bottom: 1.5rem !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .team-card {
+            min-height: 320px;
+          }
+        }
+
+        @media (min-width: 769px) and (max-width: 992px) {
+          .team-card {
+            min-height: 360px;
+          }
+        }
+      `}</style>
     </Box>
   );
 };

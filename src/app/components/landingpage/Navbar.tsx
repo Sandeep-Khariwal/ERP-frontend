@@ -10,9 +10,13 @@ import { useRouter } from "next/navigation";
 const Navbar: React.FC = () => {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const burgerRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const getStartedButtonRef = useRef<HTMLButtonElement>(null);
+  const navbarRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
     { label: "Features", href: "#Feature", isExternal: false },
@@ -20,6 +24,41 @@ const Navbar: React.FC = () => {
     { label: "Pricing", href: "/pricing", isExternal: true },
     { label: "Contact Us", href: "#Contact", isExternal: false },
   ];
+
+  // Scroll behavior - hide/show navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < 10) {
+        // Always show navbar at top
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down - hide navbar
+        setIsVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show navbar
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
+  // Animate navbar visibility
+  useEffect(() => {
+    if (navbarRef.current) {
+      gsap.to(navbarRef.current, {
+        y: isVisible ? 0 : -100,
+        opacity: isVisible ? 1 : 0,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    }
+  }, [isVisible]);
 
   // Disable/enable scroll when menu is open/closed
   useEffect(() => {
@@ -60,13 +99,6 @@ const Navbar: React.FC = () => {
           duration: 0.4,
           ease: "elastic.out(1, 0.75)",
         });
-        gsap.to(burgerRef.current, {
-          x: "+=5",
-          yoyo: true,
-          repeat: 2,
-          duration: 0.1,
-          ease: "power2.inOut",
-        });
       } else {
         gsap.to(burgerRef.current, {
           backgroundColor: "#ffffff",
@@ -75,13 +107,6 @@ const Navbar: React.FC = () => {
           boxShadow: "0 4px 8px rgba(70, 175, 250, 0.3)",
           duration: 0.4,
           ease: "power2.out",
-        });
-        gsap.to(burgerRef.current, {
-          x: "+=5",
-          yoyo: true,
-          repeat: 2,
-          duration: 0.1,
-          ease: "power2.inOut",
         });
       }
     };
@@ -96,8 +121,6 @@ const Navbar: React.FC = () => {
           backgroundColor: "#46affaff",
           duration: 0.3,
           ease: "power2.out",
-          repeat: 1,
-          yoyo: true,
         });
       }
     };
@@ -123,11 +146,10 @@ const Navbar: React.FC = () => {
     };
   }, [menuOpen]);
 
-  // Text, button, and mobile menu animations
+  // Text animations
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Animate text for nav links and logo
     const animateText = (selector: string) => {
       document.querySelectorAll(selector).forEach((element) => {
         const el = element as HTMLElement;
@@ -185,11 +207,6 @@ const Navbar: React.FC = () => {
 
           parent.addEventListener("mouseenter", handleMouseEnter);
           parent.addEventListener("mouseleave", handleMouseLeave);
-
-          return () => {
-            parent.removeEventListener("mouseenter", handleMouseEnter);
-            parent.removeEventListener("mouseleave", handleMouseLeave);
-          };
         }
       });
     };
@@ -222,11 +239,6 @@ const Navbar: React.FC = () => {
       };
       button.addEventListener("mouseenter", enter);
       button.addEventListener("mouseleave", leave);
-
-      return () => {
-        button.removeEventListener("mouseenter", enter);
-        button.removeEventListener("mouseleave", leave);
-      };
     });
 
     // Mobile menu animations
@@ -288,20 +300,29 @@ const Navbar: React.FC = () => {
 
   return (
     <Box
+      ref={navbarRef}
       style={{
-        position: "sticky",
-        top: 5,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
         zIndex: 100,
-        background: "white",
-        overflow: "hidden",
+        background: "rgba(255, 255, 255, 0.95)",
+        backdropFilter: "blur(10px)",
+        borderBottom: "1px solid rgba(70, 175, 250, 0.1)",
+        transition: "all 0.3s ease",
       }}
     >
       {/* Top bar */}
       <Group
-        m="1rem"
         justify="space-between"
         align="center"
-        style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "1rem",
+          minHeight: "70px",
+        }}
       >
         {/* Logo */}
         <Box className="hover-animate navbar-logo">
@@ -322,13 +343,12 @@ const Navbar: React.FC = () => {
 
         {/* Desktop Nav Links and Buttons */}
         <Group
-        w={"60%"}
           gap="xl"
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between"
           }}
+          className="desktop-nav-group"
         >
           <Box className="desktop-nav" style={{ display: "flex", gap: "2rem" }}>
             {navLinks.map(({ label, href, isExternal }) => (
@@ -340,9 +360,10 @@ const Navbar: React.FC = () => {
                 style={{
                   textDecoration: "none",
                   color: "black",
-                  fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+                  fontSize: "1rem",
                   position: "relative",
                   padding: "0.5rem",
+                  fontWeight: 500,
                 }}
               >
                 <span className="nav-link-text">{label}</span>
@@ -375,35 +396,35 @@ const Navbar: React.FC = () => {
               border: "2px solid transparent",
               backgroundClip: "padding-box",
               borderRadius: "5px",
+              marginLeft: "10rem",
             }}
           >
             Get Started
           </Button>
-
-          {/* Hamburger Icon */}
-          <ActionIcon
-            ref={burgerRef}
-            className="hamburger-icon"
-            onClick={() => setMenuOpen((prev) => !prev)}
-            variant="filled"
-            color="#46affaff"
-            size="lg"
-            radius="xl"
-            style={{
-              display: "none",
-              boxShadow: "0 4px 8px rgba(70, 175, 250, 0.3)",
-              border: "2px solid #284ffcff",
-              backgroundColor: "#ffffff",
-              marginRight: "1rem",
-            }}
-          >
-            {menuOpen ? (
-              <IconX size={24} color="#284ffcff" />
-            ) : (
-              <IconMenu2 size={24} color="#284ffcff" />
-            )}
-          </ActionIcon>
         </Group>
+
+        {/* Hamburger Icon */}
+        <ActionIcon
+          ref={burgerRef}
+          className="hamburger-icon"
+          onClick={() => setMenuOpen((prev) => !prev)}
+          variant="filled"
+          color="#46affaff"
+          size="lg"
+          radius="xl"
+          style={{
+            display: "none",
+            boxShadow: "0 4px 8px rgba(70, 175, 250, 0.3)",
+            border: "2px solid #284ffcff",
+            backgroundColor: "#ffffff",
+          }}
+        >
+          {menuOpen ? (
+            <IconX size={24} color="#284ffcff" />
+          ) : (
+            <IconMenu2 size={24} color="#284ffcff" />
+          )}
+        </ActionIcon>
       </Group>
 
       {/* Mobile Fullscreen Menu */}
@@ -508,11 +529,11 @@ const Navbar: React.FC = () => {
             variant="gradient"
             gradient={{ from: "#46affaff", to: "#284ffcff", deg: 60 }}
             radius="sm"
-            size="md"
+            size="lg"
             style={{
-              padding: "0.6rem 2rem",
+              padding: "0.8rem 2.5rem",
               fontSize: "1.2rem",
-              display: "block",
+              fontWeight: 600,
               transform: "scale(1)",
               boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
               zIndex: 9999,
@@ -545,21 +566,27 @@ const Navbar: React.FC = () => {
       {/* Consolidated CSS */}
       <style jsx global>{`
         @media (max-width: 768px) {
-          .desktop-nav {
-            display: none !important;
-          }
-          .navbar-button.get-started {
+          .desktop-nav-group {
             display: none !important;
           }
           .hamburger-icon {
             display: flex !important;
           }
-          .navbar-button.get-started-mobile {
-            display: block !important;
+        }
+
+        @media (min-width: 769px) {
+          .hamburger-icon {
+            display: none !important;
           }
         }
+
         .nav-link:hover .underline {
           width: 100% !important;
+        }
+
+        /* Add some spacing for body content to account for fixed navbar */
+        body {
+          padding-top: 70px;
         }
       `}</style>
     </Box>

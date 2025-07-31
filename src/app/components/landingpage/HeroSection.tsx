@@ -6,7 +6,7 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useRouter } from "next/navigation";
 
-const LandingPageImage = "/LandingPage.jpg";
+const LandingPageImage = "/dashboard.png";
 
 const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
