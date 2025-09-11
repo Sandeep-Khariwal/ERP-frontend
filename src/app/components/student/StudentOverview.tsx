@@ -11,7 +11,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -27,6 +27,9 @@ import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { AddStudentRollNumber } from "@/axios/student/StudentPut";
 import { useMediaQuery } from "@mantine/hooks";
 import { UserType } from "../dashboard/InstituteBatchesSection";
+import { GetVanLiveLocation } from "@/axios/student/StudentGetApi";
+import VanTracker from "./VanTracker";
+import { useAppSelector } from "@/app/redux/redux.hooks";
 
 ChartJS.register(
   CategoryScale,
@@ -35,6 +38,17 @@ ChartJS.register(
   LineElement,
   Tooltip
 );
+
+export interface Device {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  speed: number;
+  ignition: number;
+  device_time: string;
+  odometer: number;
+}
 
 const StudentOverview = (props: {
   student: StudentOverView;
@@ -48,6 +62,9 @@ const StudentOverview = (props: {
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [rollNo, setRollNo] = useState<string>("");
   const isMd = useMediaQuery(`(max-width: 968px)`);
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails
+  );
 
   const addRollNumber = () => {
     setIsLoading(true);
@@ -63,15 +80,30 @@ const StudentOverview = (props: {
         setIsLoading(false);
       });
   };
+  const [mapModal, setMapModal] = useState<boolean>(false);
+
   return (
     <Stack>
+      <Modal
+        opened={mapModal}
+        onClose={() => setMapModal(false)}
+        closeOnClickOutside
+        // fullScreen
+        // withCloseButton={false}
+        radius={0}
+        centered
+        transitionProps={{ transition: "fade", duration: 200 }}
+        styles={{
+          body: { padding: 0 },
+          content: { padding: 0, overflow: "hidden" },
+        }}
+      >
+        <VanTracker van={props?.student?.van} />
+      </Modal>
       <LoadingOverlay visible={isLoading} />
       <Flex justify={"start"} align="center" gap="md" mt={10}>
         <Avatar
-          src={
-            props.student?.profilePic ||
-            "/boyStudent.png"
-          }
+          src={props.student?.profilePic || "/boyStudent.png"}
           size={100}
           radius="xl"
         />
@@ -84,6 +116,15 @@ const StudentOverview = (props: {
             {props.student.uniqueRoll}
           </Text>
         </Flex>
+        {institute?.featureAccess?.transportManagement && props.student.van && (
+          <Button
+            onClick={() => {
+              setMapModal(true);
+            }}
+          >
+            check Live location
+          </Button>
+        )}
       </Flex>
 
       <Flex
@@ -102,7 +143,13 @@ const StudentOverview = (props: {
             p={5}
           >
             <Flex justify={"start"} gap={10} align={"center"}>
-              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"} style={{whiteSpace:"nowrap"}}>
+              <Text
+                fw={600}
+                fz={16}
+                ff={"Roboto"}
+                c={"#333"}
+                style={{ whiteSpace: "nowrap" }}
+              >
                 Roll No :
               </Text>
               <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
@@ -123,7 +170,13 @@ const StudentOverview = (props: {
               )}
             </Flex>
             <Flex justify={"start"} gap={4} align={"center"}>
-              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"} style={{whiteSpace:"nowrap"}} >
+              <Text
+                fw={600}
+                fz={16}
+                ff={"Roboto"}
+                c={"#333"}
+                style={{ whiteSpace: "nowrap" }}
+              >
                 Name :
               </Text>
               <Text
@@ -139,7 +192,13 @@ const StudentOverview = (props: {
               {/* <IconEdit style={{ cursor: "pointer",color:"#2F4F4F" }} /> */}
             </Flex>
             <Flex justify={"strat"} gap={10} align={"center"}>
-              <Text fw={600} fz={16} ff={"Roboto"} c={"#333"} style={{whiteSpace:"nowrap"}}>
+              <Text
+                fw={600}
+                fz={16}
+                ff={"Roboto"}
+                c={"#333"}
+                style={{ whiteSpace: "nowrap" }}
+              >
                 Father :{" "}
               </Text>
               <Text
@@ -279,6 +338,14 @@ const StudentOverview = (props: {
         opened={openAddRollNoModal}
         onClose={() => setOpenAddRollNoModal(false)}
         title="Add Student Roll No"
+        withCloseButton={false}
+        radius={0}
+        centered
+        transitionProps={{ transition: "fade", duration: 200 }}
+        styles={{
+          body: { padding: 0 },
+          content: { padding: 0, overflow: "hidden" },
+        }}
       >
         <Text
           ta={"center"}

@@ -5,8 +5,9 @@ import { InstituteDashboard } from "@/app/components/institute/InstituteDashboar
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
 import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
+import TransportPage from "@/app/components/institute/transport/TransportPage";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
-import { useAppDispatch } from "@/app/redux/redux.hooks";
+import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
@@ -23,6 +24,9 @@ const dashboard = () => {
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails
+  );
 
   const dispatch = useAppDispatch();
   const navigation = useRouter();
@@ -48,6 +52,7 @@ const dashboard = () => {
           _id: data.institute._id,
           phoneNumber: "",
           address: data.institute.address,
+          featureAccess: data.institute.accessFeatures,
         };
 
         dispatch(setDetails(instituteDetails));
@@ -107,7 +112,11 @@ const dashboard = () => {
         >
           {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
           {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-          {Tabs.TEACHER === selectedTab && <InstituteTeachers userType={UserType.OTHERS} />}
+          {Tabs.TEACHER === selectedTab && (
+            <InstituteTeachers userType={UserType.OTHERS} />
+          )}
+          {institute?.featureAccess?.transportManagement &&
+            Tabs.TRANSPORT === selectedTab && <TransportPage />}
         </Box>
       </Flex>
     </>

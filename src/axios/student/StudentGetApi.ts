@@ -33,3 +33,10 @@ export function GetStudentAttendance(id:string) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetVanLiveLocation() {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/student/getVanLocation`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

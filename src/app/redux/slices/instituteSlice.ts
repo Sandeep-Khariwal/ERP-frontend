@@ -6,6 +6,13 @@ export interface InstituteDetails {
   _id: string;
   phoneNumber: string;
   address: string;
+  featureAccess?: {
+    financeManagement: boolean;
+    aiChatBoat: boolean;
+    transportManagement: boolean;
+    onlineTestSchedule: boolean;
+    feesReminderMessage: boolean;
+  };
 }
 
 export interface instituteDetailsIntialState {
@@ -26,6 +33,13 @@ export const instituteDetails = createSlice({
           _id: string;
           phoneNumber: string;
           address: string;
+          featureAccess?: {
+            financeManagement: boolean;
+            aiChatBoat: boolean;
+            transportManagement: boolean;
+            onlineTestSchedule: boolean;
+            feesReminderMessage: boolean;
+          };
         };
       }
     ) {
@@ -33,9 +47,9 @@ export const instituteDetails = createSlice({
     },
     saveToken(state, actions) {
       const token = actions.payload;
-      SaveUserToken(token)
+      SaveUserToken(token);
     },
   },
 });
-export const { setDetails , saveToken } = instituteDetails.actions;
+export const { setDetails, saveToken } = instituteDetails.actions;
 export default instituteDetails.reducer;

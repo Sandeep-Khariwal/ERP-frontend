@@ -136,6 +136,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
             _id: admin.institute._id,
             phoneNumber: "",
             address: admin.institute.address,
+            featureAccess:admin.insititute.accessFeatures
           };
           dispatch(setDetails(instituteDetails));
           // window.location.reload();
@@ -178,6 +179,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
             _id: user.instituteId._id,
             phoneNumber: "",
             address: user.instituteId.address,
+            featureAccess:user.instituteId.accessFeatures
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/user/${user._id}/${user.name}`);
@@ -231,6 +233,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
             _id: teacher.instituteId._id,
             phoneNumber: "",
             address: teacher.instituteId.address,
+            featureAccess:teacher.instituteId.accessFeatures
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/teacher/${teacher._id}/${teacher.name}`);
@@ -270,6 +273,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
           _id: student.instituteId._id,
           phoneNumber: "",
           address: student.instituteId.address,
+          featureAccess:student.instituteId.accessFeatures
         };
         dispatch(setDetails(instituteDetails));
         navigation.push(`/student/${student._id}/${student.name}`);

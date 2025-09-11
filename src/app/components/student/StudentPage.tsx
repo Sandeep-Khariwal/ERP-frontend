@@ -1,6 +1,6 @@
 "use client";
 
-import { Divider, Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Box, Divider, Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -27,6 +27,7 @@ export interface StudentOverView {
   dateOfBirth: string;
   address: string;
   gender: string;
+  van: string;
   testReports: {
     name: string;
     subject: { _id: string; name: string };
@@ -71,6 +72,7 @@ const StudentPage = (props: {
     dateOfBirth: "",
     address: "",
     gender: "",
+    van: "",
     testReports: [
       { name: "", subject: { _id: "", name: "" }, marks: 0 },
       { name: "", subject: { _id: "", name: "" }, marks: 0 },
@@ -168,7 +170,7 @@ const StudentPage = (props: {
           .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
           .map((item: StudentTabs, i: number) => {
             return (
-              <>
+              <Box key={i} >
               {
               !(item ===StudentTabs.FEES &&  UserType.TEACHER === props.userType) && 
 
@@ -193,7 +195,7 @@ const StudentPage = (props: {
                 {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
               </Text>
               }
-            </>);
+            </Box>);
           })}
       </Flex>
 

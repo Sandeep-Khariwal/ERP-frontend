@@ -9,9 +9,13 @@ import { FaBars } from "react-icons/fa";
 import { useMediaQuery } from "@mantine/hooks";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/app/redux/redux.hooks";
+import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
-import { LiaChalkboardTeacherSolid } from "react-icons/lia";
+import {
+  LiaBusAltSolid,
+  LiaBusSolid,
+  LiaChalkboardTeacherSolid,
+} from "react-icons/lia";
 import { Tabs } from "@/enums";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { Notifications } from "@mantine/notifications";
@@ -25,9 +29,14 @@ export const DesktopNavbar = (props: {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const navigation = useRouter();
   const dispatch = useAppDispatch();
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails
+  );
+  console.log("institute dnav : ",institute);
+  
   return (
     <>
-    <Notifications/>
+      <Notifications />
       <Stack
         w={isMd ? "0px" : "100%"}
         c={"white"}
@@ -153,6 +162,34 @@ export const DesktopNavbar = (props: {
                   </Text>
                 </Box>
               </Flex>
+              {institute?.featureAccess
+?.transportManagement && (
+                <Flex
+                  style={{ cursor: "pointer" }}
+                  my={10}
+                  align={"center"}
+                  justify={props.isCollapsed ? "center" : "start"}
+                  gap={10}
+                  onClick={() => props.onSelectTab(Tabs.TRANSPORT)}
+                >
+                  <LiaBusAltSolid size={28} />
+                  <Box
+                    style={{
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      transition:
+                        "width 0.3s ease, opacity 0.3s ease, margin 0.3s ease",
+                      width: props.isCollapsed ? 0 : "auto",
+                      opacity: props.isCollapsed ? 0 : 1,
+                      marginLeft: props.isCollapsed ? 0 : 6,
+                    }}
+                  >
+                    <Text fw={600} fz={20}>
+                      Transport
+                    </Text>
+                  </Box>
+                </Flex>
+              )}
             </Box>
 
             <Box w={"100%"}>
@@ -180,7 +217,7 @@ export const DesktopNavbar = (props: {
                 <AiOutlineLogout
                   size={28}
                   onClick={() => {
-                    SuccessNotification("Log out!!")
+                    SuccessNotification("Log out!!");
                     LogOut();
                     // dispatch(
                     //   setDetails({
@@ -191,9 +228,9 @@ export const DesktopNavbar = (props: {
                     //   })
                     // );
                     dispatch(saveToken(""));
-                    setTimeout(()=>{
+                    setTimeout(() => {
                       navigation.push("/");
-                    },2000)
+                    }, 2000);
                   }}
                 />
                 <Box

@@ -38,6 +38,7 @@ interface StudentFormValues {
   gender: string;
   dateOfJoining: Date;
   parentNumber?: string;
+  van?: string;
 }
 
 export function AddMoreDetails(props: {
@@ -53,6 +54,7 @@ export function AddMoreDetails(props: {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [studentId, setStudentId] = useState<string>("");
   const [selectedBatch, setSelectedBatch] = useState<string>("");
+  const [selectedVan, setSelectedVan] = useState<string>("");
 
   const [showError, setShowError] = useState<boolean>(false);
   const isMd = useMediaQuery("(max-width: 980px)");
@@ -74,6 +76,7 @@ export function AddMoreDetails(props: {
     parentNumber: props.formData?.parentNumber || "",
     gender: props.formData?.gender || "",
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
+    van: props.formData.van,
   });
 
   const [studentInstallments, setStudentInstallments] = useState<Installment[]>(
@@ -110,6 +113,9 @@ export function AddMoreDetails(props: {
             new Date(student.dateOfBirth)!!.getDate() - 1
           );
 
+          console.log("student : ", student);
+          
+
           const studentData = {
             name: student.name,
             email: student.email,
@@ -122,6 +128,7 @@ export function AddMoreDetails(props: {
             dateOfJoining: student.dateOfJoining
               ? new Date(student.dateOfJoining)
               : new Date(),
+            van: student.van,
           };
 
           const newInstallments = student.feeRecords.map((f: any) => {
@@ -184,6 +191,7 @@ export function AddMoreDetails(props: {
         instituteId: props.instituteId,
         batchId: props.batchId,
         email: formValues.email,
+        van:formValues.van
       };
       if (props.isEditableData) {
         UpdateStudentBasicInfo(studentId, studentPayload)
@@ -221,6 +229,7 @@ export function AddMoreDetails(props: {
         batchId: props.batchId,
         dateOfJoining: formValues.dateOfJoining,
         optionalSubjects: optionalSubjects,
+        van:selectedVan
       })
         .then((x: any) => {
           setIsLoading(false);
@@ -334,10 +343,14 @@ export function AddMoreDetails(props: {
               instituteId={props.instituteId}
               formValues={formValues}
               selectedBatch={selectedBatch}
+              selectedVan={selectedVan || formValues.van!!}
               optionalSubjects={optionalSubjects}
               batchId={props.batchId}
               onChangeAssigningBatch={(val: string) => {
                 setSelectedBatch(val);
+              }}
+              onChangeAssigningVan={(val: string) => {
+                setSelectedVan(val);
               }}
               handleInputChange={(field: string, value: any) => {
                 handleInputChange(field, value);

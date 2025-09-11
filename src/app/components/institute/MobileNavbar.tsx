@@ -1,15 +1,16 @@
 "use client";
 
 import { LogOut } from "@/axios/LocalStorageUtility";
-import { useAppDispatch } from "@/app/redux/redux.hooks";
-import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
+import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
+import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { Flex, Stack, Text } from "@mantine/core";
-import { IconCircle0, IconHome } from "@tabler/icons-react";
+import {  IconHome } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { PiStudent } from "react-icons/pi";
 import { Tabs } from "@/enums";
 import { AiOutlineLogout } from "react-icons/ai";
+import { LiaBusAltSolid, LiaChalkboardTeacherSolid } from "react-icons/lia";
 
 const MobileNavbar = (props: {
   onClickCollapse: () => void;
@@ -17,6 +18,9 @@ const MobileNavbar = (props: {
 }) => {
   const navigation = useRouter();
   const dispatch = useAppDispatch();
+    const institute = useAppSelector(
+      (state: any) => state.instituteSlice.instituteDetails
+    );
   return (
     <Flex
       w={"96%"}
@@ -64,11 +68,27 @@ const MobileNavbar = (props: {
         gap={10}
         onClick={() => props.onSelectTab(Tabs.TEACHER)}
       >
-        <PiStudent size={36} style={{ color: "#FFFFFF" }} />
+        <LiaChalkboardTeacherSolid size={36} style={{ color: "#FFFFFF" }} />
         <Text fw={600} fz={15} c={"#FFFFFF"}>
           Teacher
         </Text>
       </Stack>
+      {
+        institute?.featureAccess
+?.transportManagement &&
+      <Stack
+        style={{ cursor: "pointer" }}
+        my={10}
+        align={"center"}
+        gap={10}
+        onClick={() => props.onSelectTab(Tabs.TRANSPORT)}
+      >
+        <LiaBusAltSolid size={36} style={{ color: "#FFFFFF" }} />
+        <Text fw={600} fz={15} c={"#FFFFFF"}>
+          Transport
+        </Text>
+      </Stack>
+      }
       {/* <Stack
         style={{ cursor: "pointer" }}
         my={10}
