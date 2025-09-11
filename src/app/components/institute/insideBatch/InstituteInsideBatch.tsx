@@ -1,16 +1,22 @@
 "use client";
 
 import {
+  Box,
   Button,
   Flex,
   LoadingOverlay,
   ScrollArea,
+  Select,
   Stack,
   Text,
+  TextInput,
+  NumberInput,
+  Modal,
+  Group,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AddNewStudentModal } from "../AddNewStudentModal";
 import { AddMoreDetails } from "../student/addMoreDetails/AddMoreDetails";
 import { StudentData } from "@/interfaces/batchInterface";
@@ -19,7 +25,7 @@ import FeeRecordSection from "../student/fees/FeeRecord";
 import OverView from "./OverView";
 import { TakeAttendanceView } from "./TakeAttendanceView";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
-import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { SuccessNotification, ErrorNotification } from "@/app/helperFunction/Notification";
 import StudentPage from "../../student/StudentPage";
 import { StudentTabs } from "../InstituteStudents";
 import TeachersSection from "./TeacherSection";
@@ -27,11 +33,17 @@ import AddMarksModal from "./AddMarksModal";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
 import { CreateStudent } from "@/axios/institute/InstitutePostApi";
 import TeacherProfile from "../teacher/TeacherProfile";
+import AddTestsModal from "./test/AddtestsModal";
+import TestDisplayModal from "./test/TestDisplayModal";
+import { DeleteTestById, RestoreTestById, GetAllTestsByBatchAndSubject } from "../../../../axios/tests/TestsGetApi";
+import dayjs from "dayjs";
+import Tests from "./test/Tests";
 
 enum Tabs {
   OVERVIEW = "Overview",
   STUDENT = "Students",
   TEACHER = "Teachers",
+  Test = "Tests",
   STUDY_MATERIAL = "Study Material",
   ASSIGNMENT = "Assignment",
 }
@@ -43,26 +55,85 @@ export enum Screen {
   NONE = "",
 }
 
+export interface Option {
+  _id: string;
+  name: string;
+  answer: boolean;
+}
+
+export interface Question {
+  _id: string;
+  question: string;
+  options: Option[];
+  correctAns: string;
+  explanation?: string;
+  isDeleted: boolean;
+  attempt: any[];
+  testId: string;
+  __v: number;
+}
+
+export interface Test {
+  _id: string;
+  batchId: string;
+  maxMarks: number;
+  name?: string;
+  testName?: string;
+  subjectId: string;
+  testTime?: number;
+  totalTime: number;
+  questions: Question[];
+  isDeleted: boolean;
+  startTime?: string;
+  endTime?: string;
+  accessWindow?: {
+    startTime: string;
+    endTime: string;
+  };
+  createdAt?: string;
+}
+
+interface EditTestModalProps {
+  opened: boolean;
+  test: Test | null;
+  onClose: () => void;
+  onTestUpdated: () => void;
+  batchId: string;
+  subjects?: { _id: string; name: string }[];
+}
+
 export function InstituteInsideBatch(props: {
   batchId: string;
   batchName: string;
   instituteId: string;
   onClickBack: () => void;
   fromInstituteTeacherSection: boolean;
+  subjects?: { _id: string, name: string }[];
   userType: UserType;
 }) {
+  console.log("inside batch subjects : ",props.subjects);
+  
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [selectedTeacherId, setSelectTeacherId] = useState<string>("");
-  const [openAddStudentModal, setOpenAddStudentModal] =
-    useState<boolean>(false);
+  const [openAddStudentModal, setOpenAddStudentModal] = useState<boolean>(false);
   const [takeAttendance, setTakeAttandance] = useState<boolean>(false);
   const [openAddMarksModal, setOpenAddMarksModal] = useState<boolean>(false);
-  const [showSelectedScreen, setShowSelectedScreen] = useState<Screen>(
-    Screen.NONE
-  );
+
+  const [showSelectedScreen, setShowSelectedScreen] = useState<Screen>(Screen.NONE);
   const [editStudentDetails, setEditStudentDetails] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>(Tabs.OVERVIEW);
+
+  const [deletingTestId, setDeletingTestId] = useState<string | null>(null);
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
+    isOpen: boolean;
+    testId: string | null;
+    testName: string;
+  }>({
+    isOpen: false,
+    testId: null,
+    testName: ""
+  });
 
   const [studentData, setStudentData] = useState<StudentData>({
     name: "",
@@ -75,6 +146,14 @@ export function InstituteInsideBatch(props: {
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [students, setStudents] = useState<StudentsDataWithBatch[]>([]);
+  const [selectedTest, setSelectedTest] = useState<Test | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editTestModalOpen, setEditTestModalOpen] = useState(false);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
+  const [tests, setTests] = useState<Test[]>([]);
+  const [subjectbyid, setSubjectbyId] = useState(new Map);
+
+
   return (
     <>
       <LoadingOverlay visible={isLoading} />
@@ -98,28 +177,39 @@ export function InstituteInsideBatch(props: {
               {props.batchName}
             </Text>
           </Flex>
+
           <ScrollArea type="hover" p={10}>
             <Flex mt={isMd ? 10 : 20}>
               {Object.values(Tabs).map((item: Tabs, i: number) => {
                 return (
-                  <Text
-                    key={i}
-                    onClick={() => setActiveTab(item)}
-                    mx={isMd ? 14 : 30}
-                    c={activeTab === item ? "#1B1212" : "#2F4F4F"}
-                    fw={600}
-                    style={{ cursor: "pointer", whiteSpace: "nowrap" }}
-                    fz={16}
-                    ff={"Roboto"}
-                    w={"auto"}
-                  >
-                    {item}
-                    {activeTab === item && <hr color="#4B65F6" />}
-                  </Text>
+                  <Box key={i} mx={isMd ? 14 : 30} style={{ cursor: "pointer" }} onClick={() => setActiveTab(item)}>
+                    <Text
+                      c={activeTab === item ? "#1B1212" : "#2F4F4F"}
+                      fw={600}
+                      style={{ whiteSpace: "nowrap" }}
+                      fz={16}
+                      ff={"Roboto"}
+                      w={"auto"}
+                    >
+                      {item}
+                    </Text>
+                    {activeTab === item && (
+                      <Box
+                        component="hr"
+                        style={{
+                          border: "none",
+                          height: 2,
+                          backgroundColor: "#4B65F6",
+                          marginTop: 4,
+                        }}
+                      />
+                    )}
+                  </Box>
                 );
               })}
             </Flex>
           </ScrollArea>
+
           <Flex
             w={"100%"}
             p={3}
@@ -132,6 +222,7 @@ export function InstituteInsideBatch(props: {
               <OverView batchId={props.batchId} />
             </Stack>
           )}
+
           {Tabs.STUDENT === activeTab && (
             <Stack w={"100%"}>
               <Flex w={"100%"} gap={10}>
@@ -142,7 +233,6 @@ export function InstituteInsideBatch(props: {
                     style={{ borderColor: "#111" }}
                     onClick={() => {
                       setShowSelectedScreen(Screen.ADDMORESCREEN);
-                      // setOpenAddStudentModal(true);
                     }}
                   >
                     + Add Student
@@ -199,6 +289,7 @@ export function InstituteInsideBatch(props: {
               )}
             </Stack>
           )}
+
           {openAddMarksModal && (
             <AddMarksModal
               opened={openAddMarksModal}
@@ -207,6 +298,7 @@ export function InstituteInsideBatch(props: {
               setOpenAddMarksModal={setOpenAddMarksModal}
             />
           )}
+
           {Tabs.TEACHER === activeTab && (
             <Stack w={"100%"} mt={20} mx={"auto"}>
               {!selectedTeacherId ? (
@@ -228,6 +320,12 @@ export function InstituteInsideBatch(props: {
               )}
             </Stack>
           )}
+
+          {Tabs.Test === activeTab && (
+            <Tests batchId={props.batchId} subjects={props.subjects ?? []} />
+          )}
+
+
           {Tabs.STUDY_MATERIAL === activeTab && (
             <Stack
               w={"100%"}
@@ -236,9 +334,10 @@ export function InstituteInsideBatch(props: {
               mt={20}
               mx={"auto"}
             >
-              <Text m={"auto"}>STUDY_MATERIAL comming soon</Text>
+              <Text m={"auto"}>STUDY_MATERIAL coming soon</Text>
             </Stack>
           )}
+
           {Tabs.ASSIGNMENT === activeTab && (
             <Stack
               w={"100%"}
@@ -247,7 +346,7 @@ export function InstituteInsideBatch(props: {
               mt={20}
               mx={"auto"}
             >
-              <Text m={"auto"}>ASSIGNMENT comming soon</Text>
+              <Text m={"auto"}>ASSIGNMENT coming soon</Text>
             </Stack>
           )}
         </Stack>
@@ -264,7 +363,6 @@ export function InstituteInsideBatch(props: {
           <StudentPage
             onClickBack={() => {
               setShowSelectedScreen(Screen.NONE);
-
               setSelectedStudentId("");
             }}
             studentId={selectedStudentId}
@@ -282,7 +380,7 @@ export function InstituteInsideBatch(props: {
             selectedStudentId={selectedStudentId}
             onClickBack={() => {
               setShowSelectedScreen(Screen.NONE);
-              setSelectedStudentId("")
+              setSelectedStudentId("");
             }}
             batchId={props.batchId}
             batchName={props.batchName}
@@ -301,8 +399,6 @@ export function InstituteInsideBatch(props: {
             studentId={selectedStudentId}
             onPaymentClick={() => {
               console.log("refreshing page");
-
-              // getStudentnfo();
             }}
             onClickBack={() => {
               setSelectedStudentId("");
@@ -317,7 +413,6 @@ export function InstituteInsideBatch(props: {
         <AddNewStudentModal
           isOpen={openAddStudentModal}
           onNextButtonClicked={(val) => {
-            // setShowAddMoreDetails(true);
             setIsLoading(true);
             CreateStudent(val)
               .then(() => {
@@ -327,6 +422,7 @@ export function InstituteInsideBatch(props: {
               })
               .catch((e) => {
                 console.log(e);
+                ErrorNotification("Failed to create student");
                 setIsLoading(false);
                 setOpenAddStudentModal(false);
               });

@@ -122,7 +122,7 @@ const AddMarksModal = (props: {
           ff={"Roboto"}
           w={"auto"}
         >
-          Add Test Marks
+          Add Test Marks 
         </Text>
         <Flex mt={20} align={"center"} justify={"space-between"}>
           <Select

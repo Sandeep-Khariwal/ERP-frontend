@@ -11,6 +11,8 @@ import StudentAttendanceView from "./StudentAttendanceView";
 import { ChartOptions } from "chart.js";
 import { GetStudentOverview } from "@/axios/student/StudentGetApi";
 import { UserType } from "../dashboard/InstituteBatchesSection";
+import StudentTestView from "./StudentTestView";
+import StudentTestCard from "./StudentTestCards";
 
 export interface StudentOverView {
   _id: string;
@@ -51,7 +53,7 @@ const StudentPage = (props: {
   onClickBack: () => void;
   activeTab: StudentTabs;
   studentId: string;
-  userType:UserType
+  userType: UserType
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [activeTab, setActiveTab] = useState<StudentTabs>(props.activeTab);
@@ -150,14 +152,14 @@ const StudentPage = (props: {
         {
           props.userType !== UserType.STUDENT &&
 
-        <Image
-          onClick={() => props.onClickBack()}
-          src={"/backArrow.png"}
-          alt="profile"
-          width={18}
-          height={15}
-          style={{ cursor: "pointer" }}
-        />
+          <Image
+            onClick={() => props.onClickBack()}
+            src={"/backArrow.png"}
+            alt="profile"
+            width={18}
+            height={15}
+            style={{ cursor: "pointer" }}
+          />
         }
         <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
           Students
@@ -169,31 +171,31 @@ const StudentPage = (props: {
           .map((item: StudentTabs, i: number) => {
             return (
               <>
-              {
-              !(item ===StudentTabs.FEES &&  UserType.TEACHER === props.userType) && 
+                {
+                  !(item === StudentTabs.FEES && UserType.TEACHER === props.userType) &&
 
-              <Text
-                key={i}
-                onClick={() => setActiveTab(item)}
-                mx={isMd ? 14 : 30}
-                c={activeTab === item ? "#1B1212" : "#2F4F4F"}
-                fw={600}
-                style={{
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  border: "none",
-                  borderBottom: "2px solid",
-                  borderColor: activeTab === item ? "#4B65F6" : "white",
-                }}
-                fz={16}
-                ff={"Roboto"}
-                w={"auto"}
-              >
-                {item}
-                {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
-              </Text>
-              }
-            </>);
+                  <Text
+                    key={i}
+                    onClick={() => setActiveTab(item)}
+                    mx={isMd ? 14 : 30}
+                    c={activeTab === item ? "#1B1212" : "#2F4F4F"}
+                    fw={600}
+                    style={{
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      border: "none",
+                      borderBottom: "2px solid",
+                      borderColor: activeTab === item ? "#4B65F6" : "white",
+                    }}
+                    fz={16}
+                    ff={"Roboto"}
+                    w={"auto"}
+                  >
+                    {item}
+                    {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
+                  </Text>
+                }
+              </>);
           })}
       </Flex>
 
@@ -209,7 +211,7 @@ const StudentPage = (props: {
           />
         </Stack>
       )}
-      {StudentTabs.FEES === activeTab &&  (
+      {StudentTabs.FEES === activeTab && (
         <Stack mt={10} w={"100%"} bg={"white"} p={10}>
           <FeeRecordSection
             userType={props.userType}
@@ -217,7 +219,7 @@ const StudentPage = (props: {
             dateOfJoining={new Date(student.dateOfBirth)}
             batch={student.batchId?._id || ""}
             studentId={student._id}
-            onPaymentClick={() => {}}
+            onPaymentClick={() => { }}
             onClickBack={props.onClickBack}
             fromBatch={false}
           />
@@ -226,6 +228,11 @@ const StudentPage = (props: {
       {StudentTabs.ATTENDANCE === activeTab && (
         <Stack mt={10} w={"100%"} bg={"white"} py={10} px={4}>
           <StudentAttendanceView studentId={student._id} />
+        </Stack>
+      )}
+      {StudentTabs.TEST === activeTab && (
+        <Stack mt={10} w={"100%"} bg={"white"} py={10} px={4}>
+          <StudentTestCard studentId={student._id} test={{}} batchId={"CLAS-5f381c76-91cc-48df-a099-a64901fb7594"} /> 
         </Stack>
       )}
     </Stack>

@@ -37,6 +37,7 @@ export enum StudentTabs {
   OVERVIEW = "Overview",
   FEES = "Fees Records",
   ATTENDANCE = "Attendance",
+   TEST = "TEST",
   OTHER = "Other",
 }
 

@@ -217,7 +217,7 @@ const StudentOverview = (props: {
             </Flex>
             <Flex justify={"strat"} gap={10} align={"center"}>
               <Text fw={600} fz={16} ff={"Roboto"} c={"#333"}>
-                Father :
+                parent  :
               </Text>
               <Text
                 fw={500}
