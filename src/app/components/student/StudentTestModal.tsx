@@ -65,33 +65,11 @@ const StudentTestPage = ({ testId, onClose, opened }: StudentTestPageProps) => {
   const handleModalClose = () => {
     if (testStarted && !submitted) {
       if (confirm("Are you sure you want to exit? Your test will be automatically submitted!")) {
-        handleAutoSubmit();
+        handleSubmitTest();
       }
     } else {
       onClose();
     }
-  };
-
-  // Auto submit test when trying to exit - converted to .then()
-  const handleAutoSubmit = () => {
-    if (!testId || submitted) return;
-    
-    setSubmitting(true);
-    SubmitTest({ testId })
-      .then(() => {
-        setSubmitted(true);
-        SuccessNotification("Test automatically submitted!");
-        setTimeout(() => {
-          onClose();
-        }, 2000);
-      })
-      .catch((error: unknown) => {
-        console.error("Auto submit error:", error);
-        ErrorNotification("Failed to submit test automatically");
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
   };
 
   // Prevent browser back/forward and page refresh
@@ -102,14 +80,14 @@ const StudentTestPage = ({ testId, onClose, opened }: StudentTestPageProps) => {
       if (!submitted) {
         e.preventDefault();
         e.returnValue = 'Test in progress. Are you sure you want to leave?';
-        handleAutoSubmit();
+        handleSubmitTest();
       }
     };
 
     const handlePopState = (e: PopStateEvent) => {
       if (!submitted) {
         e.preventDefault();
-        handleAutoSubmit();
+        handleSubmitTest();
         window.history.pushState(null, '', window.location.href);
       }
     };
@@ -154,7 +132,7 @@ const StudentTestPage = ({ testId, onClose, opened }: StudentTestPageProps) => {
     const handleVisibilityChange = () => {
       if (document.hidden && !submitted) {
         ErrorNotification("⚠️ Tab switching detected! Test will be auto-submitted!");
-        handleAutoSubmit();
+        handleSubmitTest();
       }
     };
 
@@ -198,7 +176,6 @@ const StudentTestPage = ({ testId, onClose, opened }: StudentTestPageProps) => {
       
       GetOnlineTest(testId)
         .then((res: any) => {
-          console.log("test data:", res);
           const testData = res.data || res;
           setTest(testData);
           setQuestions(testData?.questions || []);

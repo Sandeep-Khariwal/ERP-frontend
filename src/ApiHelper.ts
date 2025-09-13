@@ -7,19 +7,19 @@ class ApiHelper {
   constructor() {
     this.instance = axios.create({
       headers: {
-        authorization: "Bearer" +" "+GetUserToken(),
+        authorization: GetUserToken(),
       },
     });
   }
 
 
-  // public updateInstanceAfterGettingAuthtoken(authToken:string) {
-  //   this.instance = axios.create({
-  //     headers: {
-  //       authorization: authToken,
-  //     },
-  //   });
-  // }
+  public updateInstanceAfterGettingAuthtoken(authToken:string) {
+    this.instance = axios.create({
+      headers: {
+        authorization: authToken,
+      },
+    });
+  }
    
   async get<T>(url: string, config?: any): Promise<T> {
     try {

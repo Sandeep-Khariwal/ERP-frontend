@@ -1,6 +1,6 @@
 "use client";
 
-import { Divider, Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Box, Divider, Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -53,7 +53,7 @@ const StudentPage = (props: {
   onClickBack: () => void;
   activeTab: StudentTabs;
   studentId: string;
-  userType: UserType
+  userType: UserType;
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [activeTab, setActiveTab] = useState<StudentTabs>(props.activeTab);
@@ -149,9 +149,7 @@ const StudentPage = (props: {
     <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
-        {
-          props.userType !== UserType.STUDENT &&
-
+        {props.userType !== UserType.STUDENT && (
           <Image
             onClick={() => props.onClickBack()}
             src={"/backArrow.png"}
@@ -160,9 +158,9 @@ const StudentPage = (props: {
             height={15}
             style={{ cursor: "pointer" }}
           />
-        }
+        )}
         <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
-          Students
+          Student
         </Text>
       </Flex>
       <Flex mt={isMd ? 10 : 20}>
@@ -170,10 +168,11 @@ const StudentPage = (props: {
           .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
           .map((item: StudentTabs, i: number) => {
             return (
-              <>
-                {
-                  !(item === StudentTabs.FEES && UserType.TEACHER === props.userType) &&
-
+              <Box key={i}>
+                {!(
+                  item === StudentTabs.FEES &&
+                  UserType.TEACHER === props.userType
+                ) && (
                   <Text
                     key={i}
                     onClick={() => setActiveTab(item)}
@@ -194,8 +193,9 @@ const StudentPage = (props: {
                     {item}
                     {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
                   </Text>
-                }
-              </>);
+                )}
+              </Box>
+            );
           })}
       </Flex>
 
@@ -219,7 +219,7 @@ const StudentPage = (props: {
             dateOfJoining={new Date(student.dateOfBirth)}
             batch={student.batchId?._id || ""}
             studentId={student._id}
-            onPaymentClick={() => { }}
+            onPaymentClick={() => {}}
             onClickBack={props.onClickBack}
             fromBatch={false}
           />
@@ -231,8 +231,12 @@ const StudentPage = (props: {
         </Stack>
       )}
       {StudentTabs.TEST === activeTab && (
-        <Stack mt={10} w={"100%"} bg={"white"} py={10} px={4}>
-          <StudentTestCard studentId={student._id} test={{}} batchId={"CLAS-5f381c76-91cc-48df-a099-a64901fb7594"} /> 
+        <Stack mt={10} w={"100vw"} bg={"white"} py={10}>
+          <StudentTestCard
+            studentId={student._id}
+            test={{}}
+            batchId={student.batchId._id}
+          />
         </Stack>
       )}
     </Stack>
