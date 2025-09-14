@@ -29,6 +29,8 @@ export interface StudentOverView {
   dateOfBirth: string;
   address: string;
   gender: string;
+  email?: string;
+  van: string;
   testReports: {
     name: string;
     subject: { _id: string; name: string };
@@ -73,6 +75,7 @@ const StudentPage = (props: {
     dateOfBirth: "",
     address: "",
     gender: "",
+    van: "",
     testReports: [
       { name: "", subject: { _id: "", name: "" }, marks: 0 },
       { name: "", subject: { _id: "", name: "" }, marks: 0 },
@@ -149,53 +152,58 @@ const StudentPage = (props: {
     <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
-        {props.userType !== UserType.STUDENT && (
-          <Image
-            onClick={() => props.onClickBack()}
-            src={"/backArrow.png"}
-            alt="profile"
-            width={18}
-            height={15}
-            style={{ cursor: "pointer" }}
-          />
-        )}
+        {
+          props.userType !== UserType.STUDENT ?
+
+      ( <> <Image
+          onClick={() => props.onClickBack()}
+          src={"/backArrow.png"}
+          alt="profile"
+          width={18}
+          height={15}
+          style={{ cursor: "pointer" }}
+        />
         <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
+          Students
+        </Text> </>):
+        (<>
+          <Text fw={500} fz={24} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
           Student
         </Text>
+        </>)
+        }
       </Flex>
       <Flex mt={isMd ? 10 : 20}>
         {Object.values(StudentTabs)
           .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
           .map((item: StudentTabs, i: number) => {
             return (
-              <Box key={i}>
-                {!(
-                  item === StudentTabs.FEES &&
-                  UserType.TEACHER === props.userType
-                ) && (
-                  <Text
-                    key={i}
-                    onClick={() => setActiveTab(item)}
-                    mx={isMd ? 14 : 30}
-                    c={activeTab === item ? "#1B1212" : "#2F4F4F"}
-                    fw={600}
-                    style={{
-                      cursor: "pointer",
-                      whiteSpace: "nowrap",
-                      border: "none",
-                      borderBottom: "2px solid",
-                      borderColor: activeTab === item ? "#4B65F6" : "white",
-                    }}
-                    fz={16}
-                    ff={"Roboto"}
-                    w={"auto"}
-                  >
-                    {item}
-                    {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
-                  </Text>
-                )}
-              </Box>
-            );
+              <Box key={i} >
+              {
+              !(item ===StudentTabs.FEES &&  UserType.TEACHER === props.userType) && 
+
+              <Text
+                key={i}
+                onClick={() => setActiveTab(item)}
+                mx={isMd ? 14 : 30}
+                c={activeTab === item ? "#1B1212" : "#2F4F4F"}
+                fw={600}
+                style={{
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  border: "none",
+                  borderBottom: "2px solid",
+                  borderColor: activeTab === item ? "#4B65F6" : "white",
+                }}
+                fz={16}
+                ff={"Roboto"}
+                w={"auto"}
+              >
+                {item}
+                {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
+              </Text>
+              }
+            </Box>);
           })}
       </Flex>
 

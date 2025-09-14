@@ -6,7 +6,8 @@ import { InstituteDashboard } from "@/app/components/institute/InstituteDashboar
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
 import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
-import { useAppDispatch } from "@/app/redux/redux.hooks";
+import TransportPage from "@/app/components/institute/transport/TransportPage";
+import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { setUserDetails } from "@/app/redux/slices/userSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
@@ -21,6 +22,9 @@ function page() {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
   const isMd = useMediaQuery(`(max-width: 968px)`);
+    const institute = useAppSelector(
+      (state: any) => state.instituteSlice.instituteDetails
+    );
 
   useEffect(() => {
     setIsLoading(true);
@@ -44,6 +48,7 @@ function page() {
           _id: data.instituteId._id,
           phoneNumber: "",
           address: data.instituteId.address,
+          featureAccess: data.instituteId.accessFeatures,
         };
 
         dispatch(setDetails(instituteDetails));
@@ -94,7 +99,11 @@ function page() {
           <InstituteDashboard isShowTopCard={false} />
         )}
         {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-        {Tabs.TEACHER === selectedTab && <InstituteTeachers userType={UserType.OTHERS} />}
+        {Tabs.TEACHER === selectedTab && (
+          <InstituteTeachers userType={UserType.OTHERS} />
+        )}
+         {institute.featureAccess.transportManagement &&
+                    Tabs.TRANSPORT === selectedTab && <TransportPage />}
       </Box>
     </Flex>
   );

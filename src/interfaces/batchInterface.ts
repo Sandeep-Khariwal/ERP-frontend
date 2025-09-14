@@ -37,6 +37,7 @@ export interface Installment {
     parentName: string;
     dateOfBirth: Date;
     address: string;
+    van: string;
     phoneNumber: string[];
     additionalPhoneNumbers: string[];
   }

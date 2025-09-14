@@ -1,7 +1,9 @@
 "use client";
 
+import { useAppSelector } from "@/app/redux/redux.hooks";
 import { GetBatchOptionalSubjects } from "@/axios/institute/InstituteGetApi";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
+import { GetAllVans } from "@/axios/institute/transportApi";
 import {
   Container,
   Grid,
@@ -20,17 +22,24 @@ const AssignBatch = (props: {
   instituteId: string;
   batchId: string;
   selectedBatch: string;
+  selectedVan: string;
   optionalSubjects: string[];
   onChangeAssigningBatch: (val: string) => void;
+  onChangeAssigningVan: (val: string) => void;
   onChangeAssigningOptionalSubjects: (val: string[]) => void;
   handleInputChange: (val: string, date: any) => void;
 }) => {
   const isMobile = useMediaQuery("(max-width: 800px)");
   const [batches, setBatches] = useState<{ _id: string; name: string }[]>([]);
+  const [allVans, setAllVans] = useState<{ _id: string; name: string }[]>([]);
+
   const [optionalSubjects, setOptionalSubjects] = useState<
     { _id: string; name: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails
+  );
   useEffect(() => {
     setIsLoading(true);
     GetInstituteBatches(props.instituteId)
@@ -48,6 +57,19 @@ const AssignBatch = (props: {
         console.log(e);
         setIsLoading(false);
       });
+
+    if (institute?.featureAccess?.transportManagement) {
+      GetAllVans(props.instituteId)
+        .then((x: any) => {
+          const formateVans = x.data.map((v: any) => {
+            return { _id: v._id, name: "Van No " + v.vanNumber };
+          });
+          setAllVans(formateVans);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }, [props.instituteId]);
 
   useEffect(() => {
@@ -120,6 +142,27 @@ const AssignBatch = (props: {
             }}
           />
         </Grid.Col>
+        {institute?.featureAccess?.transportManagement && (
+          <Grid.Col span={isMobile ? 12 : 6}>
+            <Select
+              label="Assign Van "
+              ff={"Poppins"}
+              placeholder="Select"
+              value={props.selectedVan}
+              data={
+                allVans.length > 0
+                  ? allVans.map((van) => ({
+                      value: van._id,
+                      label: van.name,
+                    }))
+                  : []
+              }
+              onChange={(selectedValues) => {
+                props.onChangeAssigningVan(selectedValues!!);
+              }}
+            />
+          </Grid.Col>
+        )}
       </Grid>
       <Space h="md" />
     </Container>

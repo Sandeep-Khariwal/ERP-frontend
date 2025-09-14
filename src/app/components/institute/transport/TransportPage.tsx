@@ -1,249 +1,167 @@
 "use client";
 import {
-  ErrorNotification,
-  SuccessNotification,
-} from "@/app/helperFunction/Notification";
-import { useAppSelector } from "@/app/redux/redux.hooks";
-import {
   CreateDriver,
   CreateVan,
-  GetAllDrivers,
-  GetAllInstituteVans,
+  GetAllVans
 } from "@/axios/institute/transportApi";
+import { Van } from "@/interface/student.interface";
 import {
   Button,
   Flex,
   LoadingOverlay,
   Modal,
   NumberInput,
-  Select,
   Stack,
-  Table,
   Tabs,
   Text,
   TextInput,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
-import { IconUser } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
-import AllDrivers from "./AllDrivers";
-import AllVans from "./AllVans";
-import { UpdateGpsInfo } from "@/axios/institute/InstitutePutApi";
+import { useSelector } from "react-redux";
+import DriverPage from "./DriverPage";
+import VansPage from "./VansPage";
+import { useMediaQuery } from "@mantine/hooks";
+
 interface Driver {
   name: string;
   address: string;
   phone: string;
   van: string;
-  institute?: string;
 }
 
-interface Van {
-  vanNumber: number;
-  plateNumber: string;
-}
-
-const TransportPage = () => {
-  const isMd = useMediaQuery(`(max-width: 968px)`);
-  const [openedDriverModal, setOpenedDriverModal] = useState(false);
-  const [openedVanModal, setOpenedVanModal] = useState(false);
-  const [openedGpsModal, setOpenedGpsModal] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const [allVans, setAllVans] = useState<{ _id: string; name: string }[]>([]);
-  const institute = useAppSelector(
+function TransportPage() {
+  const institute = useSelector(
     (state: any) => state.instituteSlice.instituteDetails
   );
-
+  const [openDriverModal, setOpenDriverModal] = useState<boolean>(false);
+  const isMd = useMediaQuery(`(max-width: 968px)`);
+  const [openVanModal, setOpenVanModal] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [allVans, setAllVans] = useState<Van[]>([]);
   const [driverData, setDriverData] = useState<Driver>({
     name: "",
     address: "",
     phone: "",
     van: "",
   });
-  const [vanData, setVanData] = useState<Van>({
+  const [vanData, setVanData] = useState<{
+    vanNumber: number;
+    plateNumber: string;
+  }>({
     vanNumber: 0,
     plateNumber: "",
   });
-  const [gpsData, setGpsData] = useState<{ gpsUrl: string; gpsToken: string }>({
-    gpsUrl: "",
-    gpsToken: "",
-  });
 
   useEffect(() => {
-    setIsLoading(true);
-    if (institute._id) {
-      GetAllInstituteVans(institute._id)
-        .then((x: any) => {
-          const formateVans = x.data.filter((v:any)=> !v.driver).map((v: any) => {
-            return { _id: v._id, name: "Van No " + v.vanNumber };
-          });
-          setAllVans(formateVans);
-          setIsLoading(false);
-        })
-        .catch((e) => {
-          console.log(e);
-          setIsLoading(false);
-        });
-    }
-  }, [institute]);
-
-  const handleVanChange = (field: keyof Van, value: string | number) => {
-    setVanData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleVanSubmit = () => {
-    if (!vanData.vanNumber || !vanData.plateNumber) {
-      ErrorNotification("All fields are required!!");
-      return;
-    }
-    CreateVan({ ...vanData, institute: institute._id })
+    GetAllVans(institute._id)
       .then((x: any) => {
-        SuccessNotification("Van Add!!");
-        setOpenedVanModal(false);
+        setAllVans(x.data);
         setIsLoading(false);
       })
-      .catch((e) => {
+      .catch((e:any) => {
         console.log(e);
-        setOpenedVanModal(false);
-        const { message } = e.response.data;
         setIsLoading(false);
-        ErrorNotification(message);
       });
-  };
+  }, [institute]);
 
-  const handleChange = (field: keyof Driver, value: string) => {
+  const handleDriverChange = (field: keyof Driver, value: string) => {
     setDriverData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
-
-  const handleSubmit = () => {
-    if (!driverData.name || !driverData.phone || !driverData.address) {
-      ErrorNotification("All fields are required!!");
-      return;
-    }
+  const handleVanChange = (
+    field: keyof {
+      vanNumber: number;
+      plateNumber: string;
+    },
+    value: string | number
+  ) => {
+    setVanData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+  const handleDriverSubmit = () => {
+    setIsLoading(true);
+    CreateVan({ ...vanData, institute: institute._id })
+      .then((x: any) => {
+        console.log("van resp : ", x);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  };
+  const handleVanSubmit = () => {
     setIsLoading(true);
     CreateDriver({ ...driverData, institute: institute._id })
       .then((x: any) => {
-        SuccessNotification("Driver Add!!");
-        setOpenedDriverModal(false);
+        console.log("driver resp : ", x);
         setIsLoading(false);
       })
       .catch((e) => {
         console.log(e);
-        setOpenedDriverModal(false);
-        const { message } = e.response.data;
         setIsLoading(false);
-        ErrorNotification(message);
       });
   };
-
-  const handleGpsSubmit = () => {
-    if (!gpsData.gpsUrl || !gpsData.gpsToken) {
-      ErrorNotification("All fields are required!!");
-      return;
-    }
-    UpdateGpsInfo(institute._id, gpsData)
-      .then((x: any) => {
-        SuccessNotification("GPS info Add!!");
-        setOpenedGpsModal(false);
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        console.log(e);
-        setOpenedGpsModal(false);
-        const { message } = e.response.data;
-        setIsLoading(false);
-        ErrorNotification(message);
-      });
-  };
-
   return (
-    <Stack
-      w={"100%"}
-      mih={"100vh"}
-      bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
-      mb={isMd ? 100 : 0}
-      p={20}
-    >
+    <Stack w={"100%"} mih={"100vh"} p={"20px"}>
       <LoadingOverlay visible={isLoading} />
-      <Flex direction={isMd?"column":"row"} w={"100%"} align={"center"} justify={"space-between"}>
-        <Text fw={600} fz={isMd?24:32}>
+      <Flex
+        w={"80%"}
+        align={"center"}
+        direction={isMd ? "column" : "row"}
+        justify={"space-between"}
+      >
+        <Text fw={700} fz={isMd ? 22 : 26}>
           Transport Management
         </Text>
-        <Flex w={isMd?"100%":"50%"} gap={isMd?5:20} align={"center"} justify={"center"}>
+        <Flex
+          w={isMd ? "100%" : "50%"}
+          align={"center"}
+          justify={"flex-end"}
+          gap={20}
+          mt={isMd ? 20 : 0}
+        >
           <Button
-            onClick={() => setOpenedDriverModal(true)}
-            styles={{
-              root: {
-                backgroundColor: "#0f52ba",
-                color: "#ffffff", // White text for contrast
-                "&:hover": {
-                  backgroundColor: "#0c47a1", // Slightly darker on hover
-                },
-              },
-            }}
+            style={{ backgroundColor: "#305CDE" }}
+            onClick={() => setOpenDriverModal(true)}
           >
-            {
-                isMd?"+ Driver":"+ Add Driver"
-            }
-          
+            + Add Driver
           </Button>
           <Button
-            onClick={() => setOpenedVanModal(true)}
-            styles={{
-              root: {
-                backgroundColor: "#0f52ba",
-                color: "#ffffff",
-                "&:hover": {
-                  backgroundColor: "#0c47a1",
-                },
-              },
-            }}
+            style={{ backgroundColor: "#305CDE" }}
+            onClick={() => setOpenVanModal(true)}
           >
-           {isMd?"+ Van":"+ Add Van"}
-          </Button>
-          <Button
-            onClick={() => setOpenedGpsModal(true)}
-            styles={{
-              root: {
-                backgroundColor: "#0f52ba",
-                color: "#ffffff",
-                "&:hover": {
-                  backgroundColor: "#0c47a1",
-                },
-              },
-            }}
-          >
-          {isMd?"+ Gps":"+ Add Gps"}
+            + Add Van
           </Button>
         </Flex>
       </Flex>
 
-      <Tabs color="#0f52ba" defaultValue="driver">
-        <Tabs.List>
-          <Tabs.Tab value="driver">Driver</Tabs.Tab>
-          <Tabs.Tab value="van" color="blue">
-            Vans
-          </Tabs.Tab>
-        </Tabs.List>
+      <Stack w={"100%"}>
+        <Tabs color="teal" defaultValue="drivers">
+          <Tabs.List>
+            <Tabs.Tab value="drivers">Drivers</Tabs.Tab>
+            <Tabs.Tab value="vans" color="blue">
+              Vans
+            </Tabs.Tab>
+          </Tabs.List>
 
-        <Tabs.Panel value="driver" pt="xs">
-          <AllDrivers instituteId={institute._id} />
-        </Tabs.Panel>
+          <Tabs.Panel value="drivers" pt="xs" style={{ overflow: "auto" }}>
+            <DriverPage instituteId={institute._id ?? ""} />
+          </Tabs.Panel>
 
-        <Tabs.Panel value="van" pt="xs">
-          <AllVans instituteId={institute._id} />
-        </Tabs.Panel>
-      </Tabs>
+          <Tabs.Panel value="vans" pt="xs" style={{ overflow: "auto" }}>
+            <VansPage allVans={allVans} />
+          </Tabs.Panel>
+        </Tabs>
+      </Stack>
 
       <Modal
-        opened={openedDriverModal}
-        onClose={() => setOpenedDriverModal(false)}
+        opened={openDriverModal}
+        onClose={() => setOpenDriverModal(false)}
         title="Add New Driver"
         centered
         radius="lg"
@@ -253,65 +171,37 @@ const TransportPage = () => {
             label="Driver Name"
             placeholder="Enter driver name"
             value={driverData.name}
-            onChange={(e) => handleChange("name", e.currentTarget.value)}
+            onChange={(e) => handleDriverChange("name", e.currentTarget.value)}
           />
           <TextInput
             label="Address"
             placeholder="Enter address"
             value={driverData.address}
-            onChange={(e) => handleChange("address", e.currentTarget.value)}
+            onChange={(e) =>
+              handleDriverChange("address", e.currentTarget.value)
+            }
           />
           <TextInput
             label="Phone Number"
             placeholder="+91 XXXXX XXXXX"
             value={driverData.phone}
-            onChange={(e) => handleChange("phone", e.currentTarget.value)}
+            onChange={(e) => handleDriverChange("phone", e.currentTarget.value)}
           />
-          <Select
-            label="Assign Van "
-            ff={"Poppins"}
-            placeholder={`${allVans.length > 0?"Select Van No":"No van available"}`}
+          <TextInput
+            label="Van Number"
+            placeholder="Enter van number"
             value={driverData.van}
-            data={
-              allVans.length > 0
-                ? allVans.map((van) => ({
-                    value: van._id,
-                    label: van.name,
-                  }))
-                : []
-            }
-            onChange={(selectedValues) => {
-              setDriverData((prev: any) => {
-                return {
-                  ...prev,
-                  van: selectedValues,
-                };
-              });
-              // props.onChangeAssigningVan(selectedValues!!);
-            }}
+            onChange={(e) => handleDriverChange("van", e.currentTarget.value)}
           />
 
-          <Button
-            fullWidth
-            mt="md"
-            onClick={handleSubmit}
-            styles={{
-              root: {
-                backgroundColor: "#0f52ba",
-                color: "#ffffff", // White text for contrast
-                "&:hover": {
-                  backgroundColor: "#0c47a1", // Slightly darker on hover
-                },
-              },
-            }}
-          >
+          <Button fullWidth mt="md" onClick={handleDriverSubmit}>
             Save Driver
           </Button>
         </Stack>
       </Modal>
       <Modal
-        opened={openedVanModal}
-        onClose={() => setOpenedVanModal(false)}
+        opened={openVanModal}
+        onClose={() => setOpenVanModal(false)}
         title="Add New Van"
         centered
         radius="lg"
@@ -329,80 +219,17 @@ const TransportPage = () => {
             placeholder="Enter plate number"
             value={vanData.plateNumber}
             onChange={(e) =>
-              handleVanChange(
-                "plateNumber",
-                e.currentTarget.value.toUpperCase()
-              )
+              handleVanChange("plateNumber", e.currentTarget.value)
             }
           />
 
-          <Button
-            fullWidth
-            mt="md"
-            onClick={handleVanSubmit}
-            styles={{
-              root: {
-                backgroundColor: "#0f52ba",
-                color: "#ffffff", // White text for contrast
-                "&:hover": {
-                  backgroundColor: "#0c47a1", // Slightly darker on hover
-                },
-              },
-            }}
-          >
+          <Button fullWidth mt="md" onClick={handleVanSubmit}>
             Save Van
-          </Button>
-        </Stack>
-      </Modal>
-
-      <Modal opened={openedGpsModal} title={"Add Gps Info"} onClose={() => setOpenedGpsModal(false)}>
-        <Stack>
-          <TextInput
-            label="Enter API URL"
-            placeholder="Enter API Url"
-            value={gpsData.gpsUrl}
-            onChange={(e) =>
-              setGpsData((prev) => {
-                return {
-                  ...prev,
-                  gpsUrl: e.currentTarget.value,
-                };
-              })
-            }
-          />
-          <TextInput
-            label="Enter Token"
-            placeholder="Enter Token"
-            value={gpsData.gpsToken}
-            onChange={(e) =>
-              setGpsData((prev) => {
-                return {
-                  ...prev,
-                  gpsToken: e.currentTarget.value,
-                };
-              })
-            }
-          />
-          <Button
-            fullWidth
-            mt="md"
-            onClick={handleGpsSubmit}
-            styles={{
-              root: {
-                backgroundColor: "#0f52ba",
-                color: "#ffffff", // White text for contrast
-                "&:hover": {
-                  backgroundColor: "#0c47a1", // Slightly darker on hover
-                },
-              },
-            }}
-          >
-            Save gps info
           </Button>
         </Stack>
       </Modal>
     </Stack>
   );
-};
+}
 
 export default TransportPage;

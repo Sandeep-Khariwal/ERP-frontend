@@ -32,6 +32,7 @@ import Contact from "./components/landingpage/Contact";
 import Footer from "./components/landingpage/Footer";
 import FAQPage from "./components/landingpage/FAQ";
 import TeamSection from "./components/landingpage/TeamSection";
+// import SwiperSection from "./components/landingpage/Swiper";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -56,6 +57,7 @@ export default function Home() {
               _id: data._id,
               phone: data.phone,
               institute: data.institute,
+              
             })
           );
           navigation.push(
@@ -76,6 +78,7 @@ export default function Home() {
             _id: data.instituteId._id,
             phoneNumber: "",
             address: data.instituteId.address,
+            featureAccess:data.instituteId.accessFeatures
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(
@@ -96,6 +99,7 @@ export default function Home() {
             _id: data.instituteId._id,
             phoneNumber: "",
             address: data.instituteId.address,
+            featureAccess:data.instituteId.accessFeatures
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/teacher/${data._id}/${data.name}`);
@@ -114,6 +118,7 @@ export default function Home() {
             _id: data.instituteId._id,
             phoneNumber: "",
             address: data.instituteId.address,
+            featureAccess:data.instituteId.accessFeatures
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/student/${data._id}/${data.name}`);
@@ -140,8 +145,9 @@ export default function Home() {
         <Navbar />
         <HeroSection />
         <Features />
+        {/* <SwiperSection/> */}
         <WhyShouldUse />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <FAQPage />
         <Contact />
         <TeamSection />

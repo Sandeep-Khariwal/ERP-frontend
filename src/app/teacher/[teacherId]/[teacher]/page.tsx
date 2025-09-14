@@ -1,6 +1,9 @@
 "use client";
 
-import { InstituteBatchesSection, UserType } from "@/app/components/dashboard/InstituteBatchesSection";
+import {
+  InstituteBatchesSection,
+  UserType,
+} from "@/app/components/dashboard/InstituteBatchesSection";
 import { InstituteInsideBatch } from "@/app/components/institute/insideBatch/InstituteInsideBatch";
 import { Batch } from "@/app/components/institute/InstituteDashboard";
 import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
@@ -35,13 +38,12 @@ const Teacher = () => {
   const [batchId, setBatchId] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const navigation = useRouter();
-  const [selectedTeacherId,setSelectedTeacherId] = useState<string>("")
+  const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
 
   useEffect(() => {
     if (teacher) {
       getTechersBatches();
-setSelectedTeacherId(teacher._id)
-      
+      setSelectedTeacherId(teacher._id);
     }
   }, [teacher]);
 
@@ -65,12 +67,13 @@ setSelectedTeacherId(teacher._id)
           _id: data.instituteId._id,
           phoneNumber: "",
           address: data.instituteId.address,
+          featureAccess: data.instituteId.accessFeatures,
         };
         dispatch(setDetails(instituteDetails));
       })
       .catch((e) => {
         console.log(e);
-             setIsLoading(false);
+        setIsLoading(false);
       });
   }, []);
 
@@ -106,11 +109,11 @@ setSelectedTeacherId(teacher._id)
       bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
     >
       <LoadingOverlay visible={isLoading} />
-             <TeacherProfile
-            teacherId={selectedTeacherId}
-            onClickBack={() => {}}
-            userType={UserType.TEACHER}
-          />
+      <TeacherProfile
+        teacherId={selectedTeacherId}
+        onClickBack={() => {}}
+        userType={UserType.TEACHER}
+      />
       {/* {batchId === null && (
         <Stack w={!isMd ? "80%" : "100%"} h={"100%"} mx={"auto"} p={20}>
           <Text

@@ -3,7 +3,7 @@ import ApiHelper from "../../ApiHelper";
 
 export function UpdateStudent(
   studentId: string,
-  data: { batchId: string; dateOfJoining: Date; optionalSubjects: string[] }
+  data: { batchId: string; dateOfJoining: Date; optionalSubjects: string[] , van:string }
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
@@ -22,6 +22,19 @@ export function UpdateStudentBasicInfo(
   return new Promise((resolve, reject) => {
     ApiHelper.put(
       `${process.env.URL}/api/v1/institute/updateStudentBasicInfo/${studentId}`,
+      data
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+export function UpdateGpsInfo(
+  instituteId: string,
+  data:{ gpsUrl: string; gpsToken: string }
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/institute/updateGpsInfo/${instituteId}`,
       data
     )
       .then((response) => resolve(response))

@@ -140,6 +140,7 @@ export function InstituteInsideBatch(props: {
     parentName: "",
     dateOfBirth: new Date(),
     address: "",
+    van: "",
     phoneNumber: [],
     additionalPhoneNumbers: [],
   });

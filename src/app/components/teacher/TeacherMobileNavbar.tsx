@@ -2,7 +2,6 @@
 
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
-import { saveToken, setDetails } from "@/app/redux/slices/instituteSlice";
 import { setTeacherDetails, TeacherLogOut } from "@/app/redux/slices/teacherSlice";
 import { Flex, Stack, Text } from "@mantine/core";
 import { IconCircle0, IconHome } from "@tabler/icons-react";
