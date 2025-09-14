@@ -3,7 +3,7 @@
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { GetBatchOptionalSubjects } from "@/axios/institute/InstituteGetApi";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
-import { GetAllInstituteVans } from "@/axios/institute/transportApi";
+import { GetAllVans } from "@/axios/institute/transportApi";
 import {
   Container,
   Grid,
@@ -59,7 +59,7 @@ const AssignBatch = (props: {
       });
 
     if (institute?.featureAccess?.transportManagement) {
-      GetAllInstituteVans(props.instituteId)
+      GetAllVans(props.instituteId)
         .then((x: any) => {
           const formateVans = x.data.map((v: any) => {
             return { _id: v._id, name: "Van No " + v.vanNumber };

@@ -51,7 +51,7 @@ const Student = () => {
       });
   }, []);
   return (
-    <Stack w={"80%"} mx={"auto"} pt={30}>
+    <Stack w={"95%"} mx={"auto"} pt={30}>
       <LoadingOverlay visible={isLoading} />
       <StudentPage
         studentId={selectedStudentId}

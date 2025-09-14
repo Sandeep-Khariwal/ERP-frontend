@@ -32,7 +32,7 @@ import Contact from "./components/landingpage/Contact";
 import Footer from "./components/landingpage/Footer";
 import FAQPage from "./components/landingpage/FAQ";
 import TeamSection from "./components/landingpage/TeamSection";
-import SwiperSection from "./components/landingpage/Swiper";
+// import SwiperSection from "./components/landingpage/Swiper";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -145,7 +145,7 @@ export default function Home() {
         <Navbar />
         <HeroSection />
         <Features />
-        <SwiperSection/>
+        {/* <SwiperSection/> */}
         <WhyShouldUse />
         {/* <Testimonials /> */}
         <FAQPage />

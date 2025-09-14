@@ -51,3 +51,16 @@ export interface StudentsDataWithBatch {
     instituteBatches?: string[];
     additionalPhoneNumbers?: string[];
   }
+
+  export interface Van {
+  _id: string;
+  vanNumber: number;
+  driver: {
+    _id: string;
+    name: string;
+  };
+  conductor: string;
+  students: string[];
+  institute: string;
+  plateNumber: string;
+}

@@ -27,6 +27,7 @@ export interface StudentOverView {
   dateOfBirth: string;
   address: string;
   gender: string;
+  email?: string;
   van: string;
   testReports: {
     name: string;
@@ -150,9 +151,9 @@ const StudentPage = (props: {
       <LoadingOverlay visible={isLoading} />
       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
         {
-          props.userType !== UserType.STUDENT &&
+          props.userType !== UserType.STUDENT ?
 
-        <Image
+      ( <> <Image
           onClick={() => props.onClickBack()}
           src={"/backArrow.png"}
           alt="profile"
@@ -160,10 +161,15 @@ const StudentPage = (props: {
           height={15}
           style={{ cursor: "pointer" }}
         />
-        }
         <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
           Students
+        </Text> </>):
+        (<>
+          <Text fw={500} fz={24} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
+          Student
         </Text>
+        </>)
+        }
       </Flex>
       <Flex mt={isMd ? 10 : 20}>
         {Object.values(StudentTabs)

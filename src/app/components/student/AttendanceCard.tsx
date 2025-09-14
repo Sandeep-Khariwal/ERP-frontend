@@ -46,7 +46,9 @@ const AttendanceCard = (props: {
       shadow="sm"
       style={{ marginBottom: 20 }}
     >
-      <Flex w={"100%"} align={"center"} justify={"space-between"} bg={"linear-gradient(135deg, #D28BD9, #7585D8)"} p={5} style={{borderRadius:"0.5rem"}} >
+      <Flex w={"100%"} align={"center"} justify={"space-between"}
+       bg={"linear-gradient(135deg, #e6abebff 0%, #b0baefff) 100%"}
+       p={5} style={{borderRadius:"0.5rem"}} >
         <Text fz={24} ff={"Poppins"} fw={600}>
           {props.monthYear}
         </Text>
