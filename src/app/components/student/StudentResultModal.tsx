@@ -24,6 +24,7 @@ import { SuccessNotification, ErrorNotification } from "@/app/helperFunction/Not
 type TestResultModalProps = {
   opened: boolean;
   resultId: string | null;
+  studentId: string;
   onClose: () => void;
 };
 
@@ -67,17 +68,16 @@ interface TestResult {
   updatedAt: string;
 }
 
-const StudentResultModal = ({ opened, resultId, onClose }: TestResultModalProps) => {
+const StudentResultModal = ({ opened, resultId, studentId, onClose }: TestResultModalProps) => {
   const [loading, setLoading] = useState(false);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
+  
 
   useEffect(() => {
     if (opened && resultId) {
-      console.log("API Call - resultId:", resultId);
-      
       setLoading(true);
-      GetTestResult(resultId)
+      GetTestResult(resultId,studentId)
         .then((res: any) => {
           console.log("API Response:", res);
           const data = res.data || res;
@@ -85,14 +85,12 @@ const StudentResultModal = ({ opened, resultId, onClose }: TestResultModalProps)
           // Process the data to fix any inconsistencies
           const processedData = {
             ...data,
-            // Recalculate stats based on actual question attempts
             ...calculateStats(data.questions || [])
           };
-          
-          console.log("Processed Test Data:", processedData);
+
           setTestResult(processedData);
           setLoading(false);
-          SuccessNotification("Result loaded");
+          // SuccessNotification("Result loaded");
         })
         .catch((error) => {
           console.error("API Error:", error);
@@ -128,6 +126,8 @@ const StudentResultModal = ({ opened, resultId, onClose }: TestResultModalProps)
 
   // Calculate correct stats from actual question data
   const calculateStats = (questions: Question[]) => {
+    console.log("questions : ",questions);
+    
     let attemptedQuestions = 0;
     let correctAnswers = 0;
     let wrongAnswers = 0;

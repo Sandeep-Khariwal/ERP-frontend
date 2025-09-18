@@ -4,7 +4,7 @@ import ApiHelper from "@/ApiHelper";
 export function CreateTestMeta(data: {
   batchId: string;
   subjectId: string;
-  testName: string;
+  name: string;
   maxMarks: number;
   totalTime: number;
   startTime: string;

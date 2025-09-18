@@ -60,6 +60,8 @@ export function GetAllLiveTest(batchId: string) {
 
 export function GetOnlineTest(testId?: string): Promise<any> {
   return new Promise((resolve, reject) => {
+      console.log("batch id : ",testId);
+    
     ApiHelper.get(
       `${process.env.URL}/api/v1/onlinetest/getTest?testId=${testId}`
     )
@@ -107,10 +109,10 @@ export function GetTestById(testId: string) {
   });
 }
 
-export function GetTestResult(testId: string) {
+export function GetTestResult(testId: string , studentId:string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(
-      `${process.env.URL}/api/v1/onlinetestresult/getResultById/${testId}`
+      `${process.env.URL}/api/v1/onlinetestresult/getResultById?testId=${testId}&studentId=${studentId}`
     )
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));

@@ -124,7 +124,7 @@ const AddTestsModal = (props: {
     const payload = {
       batchId: props.batchId,
       subjectId: selectedSubject,
-      testName: testName,
+      name: testName,
       maxMarks: maxMarks,
       totalTime: testTime,
       startTime: startTime?.toISOString() || "",
@@ -134,8 +134,6 @@ const AddTestsModal = (props: {
       .then((x: any) => {
 
         const testId = x.data.test._id
-        console.log("response is : ", x);
-
         if (testId) {
           setTestId(testId);
           setPage(1);

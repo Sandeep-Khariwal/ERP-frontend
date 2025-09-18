@@ -67,7 +67,6 @@ export default function TestDisplayModal({ opened, onClose, test }: Props) {
 
     GetAllQuestionsByTestId(test._id)
       .then((res: any) => {
-        console.log("questions :", res.data.questions);
         const fetchedQuestions = res.data.questions || [];
         setAllQuestions(fetchedQuestions);
         setMaxMarks(fetchedQuestions.length); 

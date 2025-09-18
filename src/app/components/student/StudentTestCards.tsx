@@ -59,6 +59,8 @@ export default function StudentTestCard({
   // States for result modal
   const [resultModalOpened, setResultModalOpened] = useState(false);
   const [selectedResultId, setSelectedResultId] = useState<string | null>(null);
+   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
+console.log("studentId : ",studentId);
 
   const isMd = useMediaQuery("(max-width: 968px)");
 
@@ -70,7 +72,6 @@ export default function StudentTestCard({
     setLoading(true);
     GetAllLiveTest(batchId)
       .then((x: any) => {
-        console.log("testsdetails :", x);
         setTests(x.data || []);
         SuccessNotification("Tests loaded successfully");
       })
@@ -100,6 +101,7 @@ export default function StudentTestCard({
   const handleShowResult = (test: TestData) => {
     if (!studentId) {
       // If no studentId provided, take the first available result
+      
       if (test.resultId.length > 0) {
         setSelectedResultId(test.resultId);
         setResultModalOpened(true);
@@ -211,6 +213,7 @@ export default function StudentTestCard({
       <StudentResultModal
         opened={resultModalOpened}
         resultId={selectedResultId}
+        studentId={studentId!!}
         onClose={handleCloseResult}
       />
     </>
