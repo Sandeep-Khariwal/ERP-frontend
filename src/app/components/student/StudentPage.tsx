@@ -11,6 +11,8 @@ import StudentAttendanceView from "./StudentAttendanceView";
 import { ChartOptions } from "chart.js";
 import { GetStudentOverview } from "@/axios/student/StudentGetApi";
 import { UserType } from "../dashboard/InstituteBatchesSection";
+import StudentTestView from "./StudentTestView";
+import StudentTestCard from "./StudentTestCards";
 
 export interface StudentOverView {
   _id: string;
@@ -53,7 +55,7 @@ const StudentPage = (props: {
   onClickBack: () => void;
   activeTab: StudentTabs;
   studentId: string;
-  userType:UserType
+  userType: UserType;
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [activeTab, setActiveTab] = useState<StudentTabs>(props.activeTab);
@@ -217,7 +219,7 @@ const StudentPage = (props: {
           />
         </Stack>
       )}
-      {StudentTabs.FEES === activeTab &&  (
+      {StudentTabs.FEES === activeTab && (
         <Stack mt={10} w={"100%"} bg={"white"} p={10}>
           <FeeRecordSection
             userType={props.userType}
@@ -234,6 +236,15 @@ const StudentPage = (props: {
       {StudentTabs.ATTENDANCE === activeTab && (
         <Stack mt={10} w={"100%"} bg={"white"} py={10} px={4}>
           <StudentAttendanceView studentId={student._id} />
+        </Stack>
+      )}
+      {StudentTabs.TEST === activeTab && (
+        <Stack mt={10} w={"100vw"} bg={"white"} py={10}>
+          <StudentTestCard
+            studentId={student._id}
+            test={{}}
+            batchId={student.batchId._id}
+          />
         </Stack>
       )}
     </Stack>

@@ -20,7 +20,7 @@ class ApiHelper {
       },
     });
   }
-  
+   
   async get<T>(url: string, config?: any): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.instance.get(url, config);

@@ -37,7 +37,7 @@ const OverView = (props: { batchId: string }) => {
     }
   }, [props.batchId]);
   return (
-    <Stack w={"100%"} mt={20}>
+    <Stack w={"100%"} mt={20} p={15}>
       <LoadingOverlay visible={isLoading} />
       <Stack w={"100%"} bg={"white"} p={20} style={{ borderRadius: "1rem" }}>
         <Text fw={900} fz={isMd ? 18 : 24}>

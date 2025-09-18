@@ -102,11 +102,13 @@ const TeacherProfile = (props: {
 
   return (
     <Stack
-      w={UserType.OTHERS === props.userType ? "90%" : "100%"}
-      mx={"auto"}
+      w={UserType.OTHERS === props.userType ? "100%" : "100%"}
+      // mx={"auto"}
+      px={0}
       bg={"white"}
       mih={"100vh"}
       py={20}
+      
     >
       <LoadingOverlay visible={isLoading} />
       {UserType.OTHERS === props.userType && (
@@ -123,7 +125,7 @@ const TeacherProfile = (props: {
       )}
       <Box
         h={"100%"}
-        w={UserType.OTHERS === props.userType ? "100%" : "90%"}
+        w={UserType.OTHERS === props.userType ? "100%" : "100%"}
         bg={"white"}
         style={{ margin: "0 auto", padding: "20px" }}
       >
@@ -198,11 +200,11 @@ const TeacherProfile = (props: {
       <Stack
         mih={"100vh"}
         bg={"white"}
-        w={UserType.OTHERS === props.userType ? "100%" : "90%"}
+        w={UserType.OTHERS === props.userType ? "100%" : "100%"}
         mx={"auto"}
         py={20}
       >
-        <Tabs w={"objectFit"} style={{ padding: "5px" }} allowTabDeactivation>
+        <Tabs w={"objectFit"} style={{ padding: "0px" }} allowTabDeactivation>
           <Tabs.List>
             {UserType.OTHERS === props.userType && (
               <Tabs.Tab
@@ -236,7 +238,7 @@ const TeacherProfile = (props: {
           </Tabs.Panel>
         </Tabs>
         {batchId === null && (
-          <Stack w={"100%"} h={"100%"} mx={"auto"} p={20}>
+          <Stack w={"100%"} h={"100%"} mx={"auto"} p={isMd?5:20}>
             <Flex
               w={"100%"}
               align={"center"}
@@ -343,6 +345,7 @@ const TeacherProfile = (props: {
               batchId={batchId}
               batchName={selectedBatch?.name!!}
               instituteId={""}
+              subjects={teacher.subjects}
               onClickBack={() => {
                 // getTechersBatches();
                 setBatchId(null);

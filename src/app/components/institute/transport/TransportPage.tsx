@@ -2,7 +2,7 @@
 import {
   CreateDriver,
   CreateVan,
-  GetAllVans,
+  GetAllVans
 } from "@/axios/institute/transportApi";
 import { Van } from "@/interface/student.interface";
 import {
@@ -58,7 +58,7 @@ function TransportPage() {
         setAllVans(x.data);
         setIsLoading(false);
       })
-      .catch((e) => {
+      .catch((e:any) => {
         console.log(e);
         setIsLoading(false);
       });

@@ -99,7 +99,7 @@ const StudentSection = (props: {
 
   const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
-    <Stack w={"100%"}>
+    <Stack w={"100%"} >
       <LoadingOverlay visible={isLoading} />
       {students.length > 0 ? (
         <Table
