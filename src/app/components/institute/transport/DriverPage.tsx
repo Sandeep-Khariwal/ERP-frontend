@@ -23,6 +23,8 @@ function DriverPage(props: { instituteId: string }) {
   useEffect(() => {
     GetAllDrivers(props.instituteId)
       .then((x: any) => {
+        console.log("all drivers: ", x);
+        
         setAllDrivers(x.data);
         setIsLoading(false);
       })
@@ -36,8 +38,8 @@ function DriverPage(props: { instituteId: string }) {
     <Table.Tr key={driver._id}>
       <Table.Td>{driver.name}</Table.Td>
       <Table.Td>{driver.phone}</Table.Td>
-      <Table.Td>{driver.van.vanNumber}</Table.Td>
-      <Table.Td>{driver.van.plateNumber}</Table.Td>
+      <Table.Td>{driver.van?.vanNumber}</Table.Td>
+      <Table.Td>{driver.van?.plateNumber}</Table.Td>
     </Table.Tr>
   ));
   return (

@@ -241,7 +241,7 @@ const Tests = (props: {
                   backgroundColor: "#f9f9f9",
                 }}
               >
-                <Box w={isMd ? "100%" : "80%"}>
+                <Box w={isMd ? "100%" : "60%"}>
                   <Text fw={600} fz={18}>
                     {test.name || test.testName || "Untitled Test"}
                   </Text>
@@ -260,13 +260,16 @@ const Tests = (props: {
                 </Box>
 
                 <Flex
-                  w={isMd ? "100%" : "20%"}
-                  align={"flex-start"}
+                  w={isMd ? "100%" : "40%"}
+                  align={"center"}
+                  justify={"flex-end"}
                   mt={isMd ? 10 : 0}
                   gap={10}
                 >
                   <Button
                     size="xs"
+                    // p={10}
+                    // fullWidth
                     onClick={() => {
                       setSelectedTest(test);
                       setIsModalOpen(true);
@@ -277,6 +280,7 @@ const Tests = (props: {
                   <Button
                     size="xs"
                     color="blue"
+                  //  fullWidth
                     onClick={() => {
                       setSelectedTest(test);
                       setEditTestModalOpen(true);
@@ -286,6 +290,7 @@ const Tests = (props: {
                   </Button>
                   <Button
                     size="xs"
+                     
                     color="red"
                     onClick={() =>
                       setDeleteConfirmModal({
@@ -344,6 +349,9 @@ const Tests = (props: {
           batchId={props.batchId}
           students={[]}
           setOpenAddTestsModal={setOpenAddTestsModal}
+          onCreateTest={()=>{
+            fetchTests()
+          }}
         />
       )}
 

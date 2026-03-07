@@ -52,7 +52,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
     institute: "",
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [adminScreen, setAdminScreen] = useState<boolean>(false);
+  const [adminScreen, setAdminScreen] = useState<boolean>(true);
    const isMd = useMediaQuery(`(max-width: 968px)`);
   const institute = useSelector(
     (state: any) => state.instituteSlice.instituteDetails

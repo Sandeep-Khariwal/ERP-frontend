@@ -7,7 +7,7 @@ export function CreateInstitute(data: {
   email: string;
 }) {
   return new Promise((resolve, reject) => {
-    ApiHelper.post(`${process.env.URL}/api/v1/institute/create`, data)
+    ApiHelper.post(`http://localhost:8080/api/v1/institute/create`, data)
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });

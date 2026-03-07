@@ -244,7 +244,7 @@ export const DesktopNavbar = (props: {
                     marginLeft: props.isCollapsed ? 0 : 6,
                   }}
                 >
-                  <Text>sandeep khariwal</Text>
+                  <Text>{institute?.name}</Text>
                 </Box>
               </Flex>
             </Box>

@@ -295,8 +295,8 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
                 onClick={() => {
                   submitAttendance();
                 }}
-                style={{ backgroundColor: "#4B65F6" }}
-                px={100}
+                style={{ backgroundColor: "#4B65F6", marginBottom:"20px" }}
+                px={100} 
               >
                 Submit
               </Button>

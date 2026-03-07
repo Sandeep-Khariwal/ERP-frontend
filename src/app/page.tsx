@@ -40,6 +40,8 @@ export default function Home() {
   const navigation = useRouter();
 
   useEffect(() => {
+    console.log("process.env.URL : ",process.env.URL);
+    
     const token = localStorage.getItem("shikshaPayToken"); //"shikshaPayToken"
 
     if (!token) return;
