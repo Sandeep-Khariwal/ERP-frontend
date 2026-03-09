@@ -15,7 +15,10 @@ import {
   Tabs,
   Text,
   TextInput,
+
 } from "@mantine/core";
+import { Select } from "@mantine/core";
+
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import DriverPage from "./DriverPage";
@@ -43,6 +46,7 @@ function TransportPage() {
     address: "",
     phone: "",
     van: "",
+   
   });
   const [vanData, setVanData] = useState<{
     vanNumber: number;
@@ -84,10 +88,12 @@ function TransportPage() {
   };
   const handleDriverSubmit = () => {
     setIsLoading(true);
-    CreateVan({ ...vanData, institute: institute._id })
+  
+      CreateDriver({ ...driverData, institute: institute._id})
       .then((x: any) => {
         console.log("van resp : ", x);
         setIsLoading(false);
+        setOpenDriverModal(false);
       })
       .catch((e) => {
         console.log(e);
@@ -96,10 +102,12 @@ function TransportPage() {
   };
   const handleVanSubmit = () => {
     setIsLoading(true);
-    CreateDriver({ ...driverData, institute: institute._id })
+      CreateVan({...vanData,  institute: institute._id })
+  
       .then((x: any) => {
         console.log("driver resp : ", x);
         setIsLoading(false);
+        setOpenVanModal(false);
       })
       .catch((e) => {
         console.log(e);
@@ -185,14 +193,33 @@ function TransportPage() {
             label="Phone Number"
             placeholder="+91 XXXXX XXXXX"
             value={driverData.phone}
-            onChange={(e) => handleDriverChange("phone", e.currentTarget.value)}
+              maxLength={10}
+  inputMode="numeric"
+  pattern="[0-9]*"
+  onChange={(e) => {
+    const value = e.currentTarget.value.replace(/\D/g, ""); // sirf digits allow karega
+    if (value.length <= 10) {
+      handleDriverChange("phone", value);
+    }
+  }}
           />
-          <TextInput
+          {/* <TextInput
             label="Van Number"
             placeholder="Enter van number"
             value={driverData.van}
             onChange={(e) => handleDriverChange("van", e.currentTarget.value)}
-          />
+            
+          /> */}
+          <Select
+  label="Select Van Number"
+  placeholder="Choose van number"
+  data={allVans.map((van) => ({
+    value: van._id,          // backend me save hone ke liye
+   label: `Van ${van.vanNumber}` // dropdown me sirf number dikhega
+  }))}
+  value={driverData.van}
+  onChange={(value) => handleDriverChange("van", value || "")}
+/>
 
           <Button fullWidth mt="md" onClick={handleDriverSubmit}>
             Save Driver

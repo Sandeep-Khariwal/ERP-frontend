@@ -79,6 +79,13 @@ export function AddMoreDetails(props: {
     van: props.formData.van,
   });
 
+
+  useEffect(() => {
+    console.log("formValues.van  : ",formValues.van );
+    
+    setSelectedVan(formValues.van ?? "")
+  }, [formValues])
+
   const [studentInstallments, setStudentInstallments] = useState<Installment[]>(
     [
       {
@@ -114,7 +121,7 @@ export function AddMoreDetails(props: {
           );
 
           console.log("student : ", student);
-          
+
 
           const studentData = {
             name: student.name,
@@ -191,8 +198,10 @@ export function AddMoreDetails(props: {
         instituteId: props.instituteId,
         batchId: props.batchId,
         email: formValues.email,
-        van:formValues.van
+        van: selectedVan ?? formValues.van 
       };
+
+
       if (props.isEditableData) {
         UpdateStudentBasicInfo(studentId, studentPayload)
           .then((x: any) => {
@@ -229,7 +238,7 @@ export function AddMoreDetails(props: {
         batchId: props.batchId,
         dateOfJoining: formValues.dateOfJoining,
         optionalSubjects: optionalSubjects,
-        van:selectedVan
+        van: selectedVan ?? formValues.van 
       })
         .then((x: any) => {
           setIsLoading(false);
@@ -351,6 +360,7 @@ export function AddMoreDetails(props: {
               }}
               onChangeAssigningVan={(val: string) => {
                 setSelectedVan(val);
+                setFormValues((prev)=>({...prev,van:val}))
               }}
               handleInputChange={(field: string, value: any) => {
                 handleInputChange(field, value);

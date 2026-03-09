@@ -60,7 +60,6 @@ const StudentTestPage = ({ testId, onClose, opened }: StudentTestPageProps) => {
   const [startTime, setStartTime] = useState<number>(Date.now());
   
   const isMd = useMediaQuery("(max-width: 968px)");
-
   // Prevent modal close during active test
   const handleModalClose = () => {
     if (testStarted && !submitted) {
@@ -176,6 +175,8 @@ const StudentTestPage = ({ testId, onClose, opened }: StudentTestPageProps) => {
       
       GetOnlineTest(testId)
         .then((res: any) => {
+          console.log("res : ",res);
+          
           const testData = res.data || res;
           setTest(testData);
           setQuestions(testData?.questions || []);

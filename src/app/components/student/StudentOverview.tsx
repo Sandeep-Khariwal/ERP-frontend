@@ -87,6 +87,11 @@ const StudentOverview = (props: {
   };
   const [mapModal, setMapModal] = useState<boolean>(false);
 
+  // console.log("institute?.featureAccess? :" , institute?.featureAccess);
+  console.log(" props.student.van: ",  props.student.van);
+  
+  
+
   return (
 <Stack gap="lg" w={"100%"} >
       {/* Map Modal */}

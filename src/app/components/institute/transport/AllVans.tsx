@@ -1,4 +1,4 @@
-import { GetAllInstituteVans } from "@/axios/institute/transportApi";
+import { GetAllVans } from "@/axios/institute/transportApi";
 import { Flex, Menu, Stack, Table } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { IconDotsVertical } from "@tabler/icons-react";
@@ -18,7 +18,7 @@ const AllVans = (props: { instituteId: string }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   useEffect(() => {
     if (props.instituteId) {
-      GetAllInstituteVans(props.instituteId)
+      GetAllVans(props.instituteId)
         .then((x: any) => {
           const formateVans = x.data.map((v: any) => {
             return {
@@ -29,7 +29,7 @@ const AllVans = (props: { instituteId: string }) => {
           });
           setAllVans(formateVans);
         })
-        .catch((e) => {
+        .catch((e:any) => {
           console.log(e);
         });
     }

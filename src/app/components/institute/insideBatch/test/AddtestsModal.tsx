@@ -40,6 +40,7 @@ const AddTestsModal = (props: {
   batchId: string;
   students: StudentsDataWithBatch[];
   setOpenAddTestsModal: React.Dispatch<SetStateAction<boolean>>;
+  onCreateTest: () => void
 }) => {
   const [allSubjects, setAllSubjects] = useState<
     {
@@ -132,7 +133,7 @@ const AddTestsModal = (props: {
 
     CreateTestMeta(payload)
       .then((x: any) => {
-
+        props.onCreateTest()
         const testId = x.data.test._id
         if (testId) {
           setTestId(testId);
@@ -344,7 +345,7 @@ const AddTestsModal = (props: {
                   </Box>
 
                   <Box w="15rem">
-                  
+
                   </Box>
                 </Flex>
               </Flex>
@@ -523,9 +524,9 @@ const AddTestsModal = (props: {
             <Button
               onClick={() => {
                 if (page === 0) {
-                  handleNextFromStep1(); 
+                  handleNextFromStep1();
                 } else {
-                  setPage((prev) => prev + 1); 
+                  setPage((prev) => prev + 1);
                 }
               }}
             >
