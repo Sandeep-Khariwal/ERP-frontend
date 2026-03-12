@@ -10,7 +10,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
-import { setDetails } from "@/app/redux/slices/instituteSlice";
+import { instituteDetails, setDetails } from "@/app/redux/slices/instituteSlice";
 import {
   LiaBusAltSolid,
   LiaBusSolid,
@@ -244,7 +244,18 @@ export const DesktopNavbar = (props: {
                     marginLeft: props.isCollapsed ? 0 : 6,
                   }}
                 >
-                  <Text>sandeep khariwal</Text>
+                  <Text
+                     fw={600}
+                     fz={16}
+                     style={{
+                     maxWidth: "160px",   // sidebar width according to adjust kar sakda
+                     overflow: "hidden",
+                     whiteSpace: "nowrap",
+                     textOverflow: "ellipsis",
+                      }}
+                      >
+                     {institute?.name}
+                   </Text>
                 </Box>
               </Flex>
             </Box>

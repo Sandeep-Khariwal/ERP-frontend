@@ -39,7 +39,7 @@ export interface FeeRecord {
   createdAt: Date;
   updatedAt: Date;
   payments: {
-    receiptNumber: number;
+    receiptNumber: string;
     amount: number;
     paymentDate: Date;
   }[];
@@ -78,6 +78,10 @@ const FeeRecordTable = (props: {
         setisLoading(false);
         const { student } = x;
         const { feeRecords, instituteId } = student;
+
+        console.log("FULL instituteId:", instituteId);
+console.log("receiptCount:", instituteId?.receiptCount);
+console.log("Generated receiptNo:", "R-" + instituteId?.receiptCount);
         
         const studentName = student.name;
         const date = new Date();
@@ -89,6 +93,7 @@ const FeeRecordTable = (props: {
         const receiptNo = "R-" + instituteId.receiptCount;
         let paymentRecords;
         let amountPaid;
+        
 
         
         
@@ -114,7 +119,8 @@ const FeeRecordTable = (props: {
           InstituteName,
           address,
           phoneNumber,
-          receiptNo
+          receiptNo,
+          props.batchName 
         );
 
         const printWindow = window.open("", "_blank");
