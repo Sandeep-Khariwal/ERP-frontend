@@ -13,7 +13,10 @@ import {
 } from "@mantine/core";
 import { InstituteProfile } from "../dashboard/InstituteStaff";
 import { InstituteDetailsCards } from "../dashboard/InstituteDetailsCards";
-import { InstituteBatchesSection, UserType } from "../dashboard/InstituteBatchesSection";
+import {
+  InstituteBatchesSection,
+  UserType,
+} from "../dashboard/InstituteBatchesSection";
 import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import {
@@ -36,6 +39,7 @@ import { DeleteTheBatch, EditTheBatchName } from "@/axios/batch/BatchPutApi";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { UserTypes } from "@/enums";
 import { usePathname, useRouter } from "next/navigation";
+import NoticeBoard from "./notice/NoticeBoard";
 
 export interface Batch {
   id: string;
@@ -61,7 +65,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     string[]
   >([]);
   const institute = useAppSelector(
-    (state: any) => state.instituteSlice.instituteDetails
+    (state: any) => state.instituteSlice.instituteDetails,
   );
 
   const [batches, setBatches] = useState<Batch[]>([]);
@@ -71,16 +75,23 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [batchDeleteWarning, setBatchDeleteWarning] = useState<boolean>(false);
   const [editBatchDetails, setEditBatchDetails] = useState<boolean>(false);
   const [editBatchId, setEditBatchId] = useState<string>("");
-    const navigation = useRouter();
+  const navigation = useRouter();
 
   const pathname = usePathname();
   const prefix = pathname ? pathname.split("-")[0] : null;
   const typ = prefix?.split("/")[2];
 
-  var userType: UserTypes = UserTypes.ADMIN;
-  if (typ?.startsWith("USER")) {
-    userType = UserTypes.USER;
-  }
+  const adminDetails = useAppSelector(
+  (state: any) => state.adminSlice.adminDetails
+  );
+
+ const userType: UserTypes =
+  adminDetails?.role?.toLowerCase() === "user"
+    ? UserTypes.USER
+    : UserTypes.ADMIN;
+
+console.log("backend role:", adminDetails?.role);
+console.log("final userType:", userType);
 
   const getAccountByToken = () => {
     setIsLoading(true);
@@ -94,7 +105,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             _id: data._id,
             phone: data.phone,
             institute: data.institute,
-          })
+          }),
         );
       })
       .catch((e) => {
@@ -156,15 +167,15 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       .catch((e) => {
         setIsLoading(false);
         console.log(e);
-                      if(e.status === 404){
-           navigation.push("/auth");
+        if (e.status === 404) {
+          navigation.push("/auth");
           // window.location.reload()
         }
         if (e.status === 401) {
           navigation.push("/auth");
         }
         if (e.status === 403) {
-          ErrorNotification("Subscription has been expired!!")
+          ErrorNotification("Subscription has been expired!!");
           navigation.push("/pricing");
         }
       });
@@ -185,10 +196,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         editBatchId,
         "edit batch data : ",
         selectedOptionalSubjects,
-        selectedSubjects
+        selectedSubjects,
       );
       setIsLoading(true);
-      EditBatchAndSubjects(editBatchId,{
+      EditBatchAndSubjects(editBatchId, {
         batchName,
         subjects: selectedSubjects,
         optionalSubjects: selectedOptionalSubjects,
@@ -309,15 +320,17 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     // setSelectedSubjects((prevSubjects) => [...prevSubjects, newSubject]);
   };
 
+  // console.log("userType:", userType);
+
   return (
     <>
       <Notifications />
       <LoadingOverlay visible={isLoading} />
       {(batchId === null || openEditCourseFee) && (
         <Stack w={"100%"} mih={"100%"} py={20}>
-          {userType === UserTypes.ADMIN && (
-            <InstituteDetailsCards instituteId={institute?._id || ""} />
-          )}
+         {props.isShowTopCard !== false && (
+  <InstituteDetailsCards instituteId={institute?._id || ""} />
+)}
           <InstituteProfile
             instituteId={institute?._id ?? ""}
             users={[].map((user: any) => ({
@@ -404,16 +417,17 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                   setOpenAddBatchModal(true);
                 }}
                 onEditBatchButtonClick={function (batchId: string): void {
-
                   // setEditBatchDetails(true);
                   // setEditBatchId(batchId);
                   // setOpenAddBatchModal(true);
                   // editBatch(batchId);
-                  
                 }}
               />
             </SimpleGrid>
           }
+          <Flex w={"100%"} align="center" justify={"center"}>
+            <NoticeBoard userType={userType} />
+          </Flex>
         </Stack>
       )}
 
@@ -424,7 +438,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
           bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
         >
           <InstituteInsideBatch
-          userType={UserType.OTHERS}
+            userType={UserType.OTHERS}
             batchId={batchId}
             batchName={selectedBatch?.name!!}
             instituteId={institute?._id!!}
