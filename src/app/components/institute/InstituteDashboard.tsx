@@ -77,10 +77,17 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const prefix = pathname ? pathname.split("-")[0] : null;
   const typ = prefix?.split("/")[2];
 
-  var userType: UserTypes = UserTypes.ADMIN;
-  if (typ?.startsWith("USER")) {
-    userType = UserTypes.USER;
-  }
+  const adminDetails = useAppSelector(
+  (state: any) => state.adminSlice.adminDetails
+  );
+
+ const userType: UserTypes =
+  adminDetails?.role?.toLowerCase() === "user"
+    ? UserTypes.USER
+    : UserTypes.ADMIN;
+
+console.log("backend role:", adminDetails?.role);
+console.log("final userType:", userType);
 
   const getAccountByToken = () => {
     setIsLoading(true);
@@ -309,15 +316,17 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     // setSelectedSubjects((prevSubjects) => [...prevSubjects, newSubject]);
   };
 
+  // console.log("userType:", userType);
+
   return (
     <>
       <Notifications />
       <LoadingOverlay visible={isLoading} />
       {(batchId === null || openEditCourseFee) && (
         <Stack w={"100%"} mih={"100%"} py={20}>
-          {userType === UserTypes.ADMIN && (
-            <InstituteDetailsCards instituteId={institute?._id || ""} />
-          )}
+         {props.isShowTopCard !== false && (
+  <InstituteDetailsCards instituteId={institute?._id || ""} />
+)}
           <InstituteProfile
             instituteId={institute?._id ?? ""}
             users={[].map((user: any) => ({

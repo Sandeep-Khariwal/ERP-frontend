@@ -631,7 +631,7 @@ export default function SimpleEditTestModal({
           onClick={handleSaveTestDetails} 
           loading={loading}
           c="white"
-          style={{ backgroundColor: "#111" }}
+          style={{ backgroundColor: "#b60f0f" }}
         >
           Save Test Details
         </Button>

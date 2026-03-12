@@ -150,6 +150,8 @@ export default function StudentProfilePage(props: {
       setIsLoading(true);
       GetStudentOverview(props.selectedStudentId)
         .then((x: any) => {
+          console.log("studentoverview" , x);
+          
           setStudent(x.student);
           setIsLoading(false);
         })
