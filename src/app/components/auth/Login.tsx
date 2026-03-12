@@ -130,13 +130,13 @@ export default function Login(props: { onCreateAccount: () => void }) {
           );
           dispatch(saveToken(token));
           localStorage.setItem(LocalStorageKey.Token, token);
-
+    
           const instituteDetails = {
             name: admin.institute.name,
             _id: admin.institute._id,
             phoneNumber: "",
             address: admin.institute.address,
-            featureAccess:admin.insititute.accessFeatures
+            featureAccess:admin.institute.accessFeatures
           };
           dispatch(setDetails(instituteDetails));
           // window.location.reload();

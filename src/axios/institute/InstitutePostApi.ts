@@ -31,8 +31,6 @@ export function AddGps(data: {
   gpsUrl: string; 
   institute: string;
 }) {
-
-  
   return new Promise((resolve, reject) => {
     ApiHelper.post(`${process.env.URL}/api/v1/institute/gps/${data.institute}`, data)
       .then((response) => resolve(response))

@@ -78,10 +78,6 @@ const FeeRecordTable = (props: {
         setisLoading(false);
         const { student } = x;
         const { feeRecords, instituteId } = student;
-
-        console.log("FULL instituteId:", instituteId);
-console.log("receiptCount:", instituteId?.receiptCount);
-console.log("Generated receiptNo:", "R-" + instituteId?.receiptCount);
         
         const studentName = student.name;
         const date = new Date();
