@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 import DriverPage from "./DriverPage";
 import VansPage from "./VansPage";
 import { useMediaQuery } from "@mantine/hooks";
+import { AddGps } from "@/axios/institute/InstitutePostApi";
 
 interface Driver {
   name: string;
@@ -39,6 +40,8 @@ function TransportPage() {
   const [openDriverModal, setOpenDriverModal] = useState<boolean>(false);
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [openVanModal, setOpenVanModal] = useState<boolean>(false);
+    const [openGpsModal, setOpenGpsModal] = useState<boolean>(false);
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [allVans, setAllVans] = useState<Van[]>([]);
   const [driverData, setDriverData] = useState<Driver>({
@@ -55,6 +58,15 @@ function TransportPage() {
     vanNumber: 0,
     plateNumber: "",
   });
+
+   const [gpsData, setGpsData] = useState<{
+    gpsToken: string;
+    gpsUrl: string;
+  }>({
+    gpsToken: "",
+    gpsUrl: "",
+  });
+
 
   useEffect(() => {
     GetAllVans(institute._id)
@@ -86,6 +98,18 @@ function TransportPage() {
       [field]: value,
     }));
   };
+  const handleGpsChange = (
+    field: keyof {
+      gpsToken: string;
+    gpsUrl: string;
+    },
+    value: string | string
+  ) => {
+    setGpsData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
   const handleDriverSubmit = () => {
     setIsLoading(true);
   
@@ -108,6 +132,20 @@ function TransportPage() {
         console.log("driver resp : ", x);
         setIsLoading(false);
         setOpenVanModal(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  };
+  const handleGpsSubmit = () => {
+    // setIsLoading(true);
+      AddGps({...gpsData,  institute: institute._id })
+  
+      .then((x: any) => {
+        // console.log("driver resp : ", x);
+        setIsLoading(false);
+        setOpenGpsModal(false);
       })
       .catch((e) => {
         console.log(e);
@@ -145,6 +183,13 @@ function TransportPage() {
           >
             + Add Van
           </Button>
+           <Button
+            style={{ backgroundColor: "#305CDE" }}
+            onClick={() => setOpenGpsModal(true)}
+          >
+           + Api keys
+          </Button>
+
         </Flex>
       </Flex>
 
@@ -252,6 +297,34 @@ function TransportPage() {
 
           <Button fullWidth mt="md" onClick={handleVanSubmit}>
             Save Van
+          </Button>
+        </Stack>
+      </Modal>
+      <Modal
+        opened={openGpsModal}
+        onClose={() => setOpenGpsModal(false)}
+        title="Add GPS Data"
+        centered
+        radius="lg"
+      >
+        <Stack>
+          <TextInput
+            label="GPS Url"
+            placeholder="Enter GPS Url"
+            value={gpsData.gpsUrl}
+            onChange={(e) =>handleGpsChange("gpsUrl",e.currentTarget.value)}
+          />
+          <TextInput
+            label="GPS Token"
+            placeholder="Enter GPS Token"
+            value={gpsData.gpsToken}
+            onChange={(e) =>
+             handleGpsChange("gpsToken", e.currentTarget.value)
+            }
+          />
+
+          <Button fullWidth mt="md" onClick={handleGpsSubmit}>
+            Save GPS 
           </Button>
         </Stack>
       </Modal>
