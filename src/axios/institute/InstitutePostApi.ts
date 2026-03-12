@@ -19,8 +19,22 @@ export function CreateStudentFeeRecords(data: {
   return new Promise((resolve, reject) => {
     ApiHelper.post(
       `${process.env.URL}/api/v1/institute/createStudentFeeRecords/${data.studentId}`,
-      { batchId: data.batchId, installments: data.installments,type:data.type }
+      { batchId: data.batchId, installments: data.installments, type: data.type }
     )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function AddGps(data: {
+  gpsToken: string;
+  gpsUrl: string; 
+  institute: string;
+}) {
+
+  
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(`${process.env.URL}/api/v1/institute/gps/${data.institute}`, data)
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });

@@ -7,7 +7,7 @@ function VansPage(props: { allVans: Van[] }) {
     <Table.Tr key={van._id}>
       <Table.Td>{van.vanNumber}</Table.Td>
       <Table.Td>{van.plateNumber}</Table.Td>
-      <Table.Td>{van.driver.name}</Table.Td>
+      <Table.Td>{van.driver?.name}</Table.Td>
       <Table.Td>{van.students.length}</Table.Td>
     </Table.Tr>
   ));

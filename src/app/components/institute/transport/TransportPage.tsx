@@ -15,12 +15,16 @@ import {
   Tabs,
   Text,
   TextInput,
+
 } from "@mantine/core";
+import { Select } from "@mantine/core";
+
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import DriverPage from "./DriverPage";
 import VansPage from "./VansPage";
 import { useMediaQuery } from "@mantine/hooks";
+import { AddGps } from "@/axios/institute/InstitutePostApi";
 
 interface Driver {
   name: string;
@@ -36,6 +40,8 @@ function TransportPage() {
   const [openDriverModal, setOpenDriverModal] = useState<boolean>(false);
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [openVanModal, setOpenVanModal] = useState<boolean>(false);
+    const [openGpsModal, setOpenGpsModal] = useState<boolean>(false);
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [allVans, setAllVans] = useState<Van[]>([]);
   const [driverData, setDriverData] = useState<Driver>({
@@ -43,6 +49,7 @@ function TransportPage() {
     address: "",
     phone: "",
     van: "",
+   
   });
   const [vanData, setVanData] = useState<{
     vanNumber: number;
@@ -51,6 +58,15 @@ function TransportPage() {
     vanNumber: 0,
     plateNumber: "",
   });
+
+   const [gpsData, setGpsData] = useState<{
+    gpsToken: string;
+    gpsUrl: string;
+  }>({
+    gpsToken: "",
+    gpsUrl: "",
+  });
+
 
   useEffect(() => {
     GetAllVans(institute._id)
@@ -82,12 +98,26 @@ function TransportPage() {
       [field]: value,
     }));
   };
+  const handleGpsChange = (
+    field: keyof {
+      gpsToken: string;
+    gpsUrl: string;
+    },
+    value: string | string
+  ) => {
+    setGpsData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
   const handleDriverSubmit = () => {
     setIsLoading(true);
-    CreateVan({ ...vanData, institute: institute._id })
+  
+      CreateDriver({ ...driverData, institute: institute._id})
       .then((x: any) => {
         console.log("van resp : ", x);
         setIsLoading(false);
+        setOpenDriverModal(false);
       })
       .catch((e) => {
         console.log(e);
@@ -96,10 +126,26 @@ function TransportPage() {
   };
   const handleVanSubmit = () => {
     setIsLoading(true);
-    CreateDriver({ ...driverData, institute: institute._id })
+      CreateVan({...vanData,  institute: institute._id })
+  
       .then((x: any) => {
         console.log("driver resp : ", x);
         setIsLoading(false);
+        setOpenVanModal(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  };
+  const handleGpsSubmit = () => {
+    // setIsLoading(true);
+      AddGps({...gpsData,  institute: institute._id })
+  
+      .then((x: any) => {
+        // console.log("driver resp : ", x);
+        setIsLoading(false);
+        setOpenGpsModal(false);
       })
       .catch((e) => {
         console.log(e);
@@ -137,6 +183,13 @@ function TransportPage() {
           >
             + Add Van
           </Button>
+           <Button
+            style={{ backgroundColor: "#305CDE" }}
+            onClick={() => setOpenGpsModal(true)}
+          >
+           + Api keys
+          </Button>
+
         </Flex>
       </Flex>
 
@@ -185,14 +238,33 @@ function TransportPage() {
             label="Phone Number"
             placeholder="+91 XXXXX XXXXX"
             value={driverData.phone}
-            onChange={(e) => handleDriverChange("phone", e.currentTarget.value)}
+              maxLength={10}
+  inputMode="numeric"
+  pattern="[0-9]*"
+  onChange={(e) => {
+    const value = e.currentTarget.value.replace(/\D/g, ""); // sirf digits allow karega
+    if (value.length <= 10) {
+      handleDriverChange("phone", value);
+    }
+  }}
           />
-          <TextInput
+          {/* <TextInput
             label="Van Number"
             placeholder="Enter van number"
             value={driverData.van}
             onChange={(e) => handleDriverChange("van", e.currentTarget.value)}
-          />
+            
+          /> */}
+          <Select
+  label="Select Van Number"
+  placeholder="Choose van number"
+  data={allVans.map((van) => ({
+    value: van._id,          // backend me save hone ke liye
+   label: `Van ${van.vanNumber}` // dropdown me sirf number dikhega
+  }))}
+  value={driverData.van}
+  onChange={(value) => handleDriverChange("van", value || "")}
+/>
 
           <Button fullWidth mt="md" onClick={handleDriverSubmit}>
             Save Driver
@@ -225,6 +297,34 @@ function TransportPage() {
 
           <Button fullWidth mt="md" onClick={handleVanSubmit}>
             Save Van
+          </Button>
+        </Stack>
+      </Modal>
+      <Modal
+        opened={openGpsModal}
+        onClose={() => setOpenGpsModal(false)}
+        title="Add GPS Data"
+        centered
+        radius="lg"
+      >
+        <Stack>
+          <TextInput
+            label="GPS Url"
+            placeholder="Enter GPS Url"
+            value={gpsData.gpsUrl}
+            onChange={(e) =>handleGpsChange("gpsUrl",e.currentTarget.value)}
+          />
+          <TextInput
+            label="GPS Token"
+            placeholder="Enter GPS Token"
+            value={gpsData.gpsToken}
+            onChange={(e) =>
+             handleGpsChange("gpsToken", e.currentTarget.value)
+            }
+          />
+
+          <Button fullWidth mt="md" onClick={handleGpsSubmit}>
+            Save GPS 
           </Button>
         </Stack>
       </Modal>

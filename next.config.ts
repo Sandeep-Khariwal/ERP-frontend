@@ -7,11 +7,7 @@ const nextConfig: NextConfig = {
   //  URL : "http://13.201.44.176:8080",
    URL: "http://localhost:8080"
   },
-    eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
-  },
+  
 };
 
 export default nextConfig;

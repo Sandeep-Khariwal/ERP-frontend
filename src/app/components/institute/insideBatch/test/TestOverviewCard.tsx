@@ -563,7 +563,7 @@ export default function SimpleEditTestModal({
           <Button 
             onClick={handleSaveQuestion} 
             loading={loading}
-            c="#111"
+            c="#fff"
             style={{ backgroundColor: "#111" }}
           >
             {editingQuestion ? "Update Question" : "Add Question"}

@@ -19,7 +19,6 @@ import { setTeacherDetails } from "./redux/slices/teacherSlice";
 import { setStudentDetails } from "./redux/slices/studentSlice";
 import { setDetails } from "./redux/slices/instituteSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
-import Link from "next/link";
 import { setUserDetails } from "./redux/slices/userSlice";
 import { LocalStorageKey } from "@/axios/LocalStorageUtility";
 import { Notifications } from "@mantine/notifications";
@@ -40,6 +39,8 @@ export default function Home() {
   const navigation = useRouter();
 
   useEffect(() => {
+    console.log("process.env.URL : ",process.env.URL);
+    
     const token = localStorage.getItem("shikshaPayToken"); //"shikshaPayToken"
 
     if (!token) return;

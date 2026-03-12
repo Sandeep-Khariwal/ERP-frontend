@@ -38,6 +38,7 @@ interface TestData {
   student_time: any[];
   subjectId: Subject;
   totalTime: number;
+  expired?: boolean;
   __v: number;
 }
 
@@ -59,9 +60,7 @@ export default function StudentTestCard({
   // States for result modal
   const [resultModalOpened, setResultModalOpened] = useState(false);
   const [selectedResultId, setSelectedResultId] = useState<string | null>(null);
-   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
-console.log("studentId : ",studentId);
-
+  const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const isMd = useMediaQuery("(max-width: 968px)");
 
   useEffect(() => {
@@ -101,7 +100,7 @@ console.log("studentId : ",studentId);
   const handleShowResult = (test: TestData) => {
     if (!studentId) {
       // If no studentId provided, take the first available result
-      
+
       if (test.resultId.length > 0) {
         setSelectedResultId(test.resultId);
         setResultModalOpened(true);
@@ -129,7 +128,7 @@ console.log("studentId : ",studentId);
       <Stack w={"100vw"} mx="auto" p="md">
         <LoadingOverlay visible={loading} />
         <Stack w={"100%"}  >
-       
+
           <Text style={{ fontSize: "1.5rem", fontWeight: "bold" }}> Online Tests</Text>
 
           <Flex w={"100%"} align={"center"} justify={"flex-start"} gap={30} wrap={"wrap"} >
@@ -140,7 +139,7 @@ console.log("studentId : ",studentId);
                 padding="lg"
                 radius="md"
                 withBorder
-                miw={ isMd?"100%": 500}
+                miw={isMd ? "100%" : 500}
                 style={{
                   minHeight: "180px",
                 }}
@@ -184,16 +183,23 @@ console.log("studentId : ",studentId);
                     ) : test.isLiveNow ? (
                       <Button
                         size="sm"
-                        color="orange"
+                        color="green"
                         onClick={() => handleStartTest(test._id)}
                       >
-                        Start
+                        Start Test
                       </Button>
-                    ) : (
-                      <Button size="sm" color="orange" disabled>
-                        Expired
+                    ) : test.expired
+                      ? (
+                        <Button size="sm" color="orange" disabled>
+                          Expired
+                        </Button>
+                      ) :
+                      (<Button size="sm" color="yellow" >
+                        Start Soon
                       </Button>
-                    )}
+                      )
+
+                    }
                   </Flex>
                 </Stack>
               </Card>

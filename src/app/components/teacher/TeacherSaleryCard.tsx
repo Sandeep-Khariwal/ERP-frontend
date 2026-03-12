@@ -28,7 +28,7 @@ export default function SalaryCard(props: { teacherId: string }) {
         .then((x: any) => {
           const { sallery } = x;
           setSalary(sallery);
-          console.log(x);
+          console.log("TEACHER HISTORY = ", x);
         })
         .catch((e) => {
           console.log(e);
