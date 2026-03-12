@@ -59,6 +59,8 @@ function page() {
       });
   }, []);
 
+  
+
   return (
     <Flex w={"100%"} mih={"100vh"}>
       <LoadingOverlay visible={isLoading} />
@@ -102,7 +104,7 @@ function page() {
         {Tabs.TEACHER === selectedTab && (
           <InstituteTeachers userType={UserType.OTHERS} />
         )}
-         {institute.featureAccess.transportManagement &&
+         {institute?.featureAccess?.transportManagement &&
                     Tabs.TRANSPORT === selectedTab && <TransportPage />}
       </Box>
     </Flex>

@@ -11,7 +11,8 @@ export function createReceiptPdf(
   name: string,
   address: string,
   phoneNumber: string,
-  receiptNo: string
+  receiptNo: string,
+  batchName: string,
 ) {
   const totalAmountInWords =
     numberToWords(amountPaid).toUpperCase() + " RUPEES ONLY";
@@ -28,6 +29,7 @@ export function createReceiptPdf(
           </div>`
     )
     .join("");
+
 
   return `
       <html>
@@ -78,7 +80,7 @@ export function createReceiptPdf(
               </div>
               <div class="row">
                 <span>Batch:</span>
-                <span>Class 12</span>
+                <span>${batchName}</span>
               </div>
               <div class="row">
                 <span>Total Amount Paid (in words):</span>
