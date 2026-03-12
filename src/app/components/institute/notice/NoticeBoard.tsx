@@ -99,7 +99,7 @@ export default function NoticeBoard(props: { userType: string }) {
   };
 
   return (
-    <Stack w={"100%"} p="xl">
+    <Stack w={"85%"} p="xl">
       <LoadingOverlay visible={loading} />
       <Flex align={"center"} justify={"start"} gap={20}>
         <Title order={2}>Notice Board</Title>
