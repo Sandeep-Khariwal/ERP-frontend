@@ -19,6 +19,7 @@ export function LoginAdmin(data:{
   email:string,
   password:string,
 }) {
+  // console.log("admincaled : ", process.env.URL);
   return new Promise((resolve, reject) => {
     ApiHelper.post(`${process.env.URL}/api/v1/admin/login`,data)
       .then((response) => resolve(response))

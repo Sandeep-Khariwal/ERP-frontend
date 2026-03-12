@@ -25,6 +25,7 @@ export const DesktopNavbar = (props: {
   isCollapsed: boolean;
   onClickCollapse: () => void;
   onSelectTab: (val: Tabs) => void;
+  
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const navigation = useRouter();

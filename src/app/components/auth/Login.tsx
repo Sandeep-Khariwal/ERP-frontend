@@ -111,11 +111,14 @@ export default function Login(props: { onCreateAccount: () => void }) {
   };
 
   // LoginAdmin
-  const onClickLogin = () => {
+  const  onClickLogin = () => {
     setIsLoading(true);
     if (userType === UserTypes.ADMIN) {
+      
+
       LoginAdmin(loginData)
         .then((x: any) => {
+          
           setIsLoading(false);
           SuccessNotification("Login Successfully!!");
           const { admin, token } = x;
@@ -145,9 +148,9 @@ export default function Login(props: { onCreateAccount: () => void }) {
           );
         })
         .catch((e) => {
+          console.log("e: ", e);
           const { message } = e?.response?.data;
           ErrorNotification(message);
-          console.log(e);
           if (e.status === 403) {
             navigation.push("/pricing");
           }
