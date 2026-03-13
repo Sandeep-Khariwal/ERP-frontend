@@ -10,10 +10,9 @@ import { useMediaQuery } from "@mantine/hooks";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
-import { instituteDetails, setDetails } from "@/app/redux/slices/instituteSlice";
+
 import {
   LiaBusAltSolid,
-  LiaBusSolid,
   LiaChalkboardTeacherSolid,
 } from "react-icons/lia";
 import { Tabs } from "@/enums";
@@ -30,10 +29,8 @@ export const DesktopNavbar = (props: {
   const navigation = useRouter();
   const dispatch = useAppDispatch();
   const institute = useAppSelector(
-    (state: any) => state.instituteSlice.instituteDetails
+    (state: any) => state.instituteSlice.instituteDetails,
   );
-  console.log("institute dnav : ",institute);
-  
   return (
     <>
       <Notifications />
@@ -162,8 +159,7 @@ export const DesktopNavbar = (props: {
                   </Text>
                 </Box>
               </Flex>
-              {institute?.featureAccess
-?.transportManagement && (
+              {institute?.featureAccess?.transportManagement && (
                 <Flex
                   style={{ cursor: "pointer" }}
                   my={10}
@@ -245,17 +241,17 @@ export const DesktopNavbar = (props: {
                   }}
                 >
                   <Text
-                     fw={600}
-                     fz={16}
-                     style={{
-                     maxWidth: "160px",   // sidebar width according to adjust kar sakda
-                     overflow: "hidden",
-                     whiteSpace: "nowrap",
-                     textOverflow: "ellipsis",
-                      }}
-                      >
-                     {institute?.name}
-                   </Text>
+                    fw={600}
+                    fz={16}
+                    style={{
+                      maxWidth: "160px", // sidebar width according to adjust kar sakda
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {institute?.name}
+                  </Text>
                 </Box>
               </Flex>
             </Box>

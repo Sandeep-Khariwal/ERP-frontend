@@ -39,8 +39,8 @@ export default function Home() {
   const navigation = useRouter();
 
   useEffect(() => {
-    console.log("process.env.URL : ",process.env.URL);
-    
+    console.log("process.env.URL : ", process.env.URL);
+
     const token = localStorage.getItem("shikshaPayToken"); //"shikshaPayToken"
 
     if (!token) return;
@@ -58,11 +58,20 @@ export default function Home() {
               _id: data._id,
               phone: data.phone,
               institute: data.institute,
-              
-            })
+            }),
           );
+          console.log("admin data : ",data);
+          
+          const instituteDetails = {
+            name: data.institute.name,
+            _id: data.institute._id,
+            phoneNumber: "",
+            address: data.institute.address,
+            featureAccess: data.institute.accessFeatures,
+          };
+          dispatch(setDetails(instituteDetails));
           navigation.push(
-            `/institute/${data.institute._id}/${data.institute.name}`
+            `/institute/${data.institute._id}/${data.institute.name}`,
           );
         }
         if (UserTypes.USER === type) {
@@ -72,18 +81,18 @@ export default function Home() {
               _id: data._id,
               phone: "",
               institute: data.instituteId._id,
-            })
+            }),
           );
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
             phoneNumber: "",
             address: data.instituteId.address,
-            featureAccess:data.instituteId.accessFeatures
+            featureAccess: data.instituteId.accessFeatures,
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(
-            `/user/${data.instituteId._id}/${data.instituteId.name}`
+            `/user/${data.instituteId._id}/${data.instituteId.name}`,
           );
         }
         if (UserTypes.TEACHER === type) {
@@ -93,14 +102,14 @@ export default function Home() {
               _id: data._id,
               phone: data.phoneNumber[0],
               institute: data.instituteId._id,
-            })
+            }),
           );
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
             phoneNumber: "",
             address: data.instituteId.address,
-            featureAccess:data.instituteId.accessFeatures
+            featureAccess: data.instituteId.accessFeatures,
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/teacher/${data._id}/${data.name}`);
@@ -112,14 +121,14 @@ export default function Home() {
               _id: data._id,
               phone: data.phoneNumber[0],
               institute: data.instituteId._id,
-            })
+            }),
           );
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
             phoneNumber: "",
             address: data.instituteId.address,
-            featureAccess:data.instituteId.accessFeatures
+            featureAccess: data.instituteId.accessFeatures,
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/student/${data._id}/${data.name}`);
