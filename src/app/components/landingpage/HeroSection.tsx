@@ -6,6 +6,9 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useRouter } from "next/navigation";
 
+import { Carousel } from "@mantine/carousel";
+import Autoplay from "embla-carousel-autoplay";
+
 const LandingPageImage = "/dashboard.png";
 
 const HeroSection: React.FC = () => {
@@ -58,6 +61,7 @@ const HeroSection: React.FC = () => {
       leaveListeners[index] = onLeave;
     });
 
+
     return () => {
       buttons.forEach((button, index) => {
         button.removeEventListener("mouseenter", enterListeners[index]);
@@ -73,6 +77,10 @@ const HeroSection: React.FC = () => {
       contactSection.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  const autoplay = useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })
+  );
 
   return (
     <Box
@@ -133,19 +141,151 @@ const HeroSection: React.FC = () => {
         </Box>
 
         {/* Right Section */}
-        <Box w="45%" className="animate-item">
-          <Image
-            src={LandingPageImage}
-            alt="Landing Illustration"
-            width={500}
-            height={400}
-            style={{
-              maxWidth: "100%",
-              height: "auto",
-              objectFit: "cover",
-              borderRadius: "8px",
+        <Box
+          w="45%"
+          className="animate-item"
+          bg="linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%)"
+          p={4}
+          radius="2xl"
+          boxShadow="0 20px 40px -15px rgba(0,0,0,0.3), 0 8px 24px -6px rgba(0,0,0,0.1)"
+          style={{
+            border: "1px solid rgba(255,255,255,0.5)",
+            backdropFilter: "blur(4px)",
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-8px)";
+            e.currentTarget.style.boxShadow = "0 30px 50px -20px rgba(0,0,0,0.4), 0 10px 30px -8px rgba(0,0,0,0.2)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 20px 40px -15px rgba(0,0,0,0.3), 0 8px 24px -6px rgba(0,0,0,0.1)";
+          }}
+        >
+          <Carousel
+            align="start"
+            loop
+            withIndicators
+            withControls
+            slideGap="md"
+            plugins={[autoplay.current]}
+            styles={{
+              control: {
+                backgroundColor: 'rgba(255,255,255,0.8)',
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                color: '#1a1a1a',
+                '&:hover': {
+                  backgroundColor: 'white',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                }
+              },
+              indicator: {
+                width: '8px',
+                height: '8px',
+                transition: 'all 0.2s ease',
+                backgroundColor: 'rgba(59,130,246,0.3)',
+                '&[data-active]': {
+                  width: '24px',
+                  backgroundColor: '#3b82f6'
+                }
+              }
             }}
-          />
+          >
+            <Carousel.Slide>
+              <div
+                style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '12px',
+                  width: '100%',
+                  height: '100%'
+                }}
+              >
+                <Image
+                  src="/hero1.jpeg"
+                  alt="Landing Illustration"
+                  width={500}
+                  height={400}
+                  style={{
+                    maxWidth: "100%",
+                    height: "auto",
+                    objectFit: "cover",
+                    transition: "transform 0.5s ease",
+                    filter: "brightness(1.02) contrast(1.02)",
+                    display: 'block',
+                    width: '100%'
+                  }}
+                  onMouseEnter={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.transform = "scale(1.05)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.transform = "scale(1)";
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: "40%",
+                    background: "linear-gradient(to top, rgba(0,0,0,0.1), transparent)",
+                    pointerEvents: "none"
+                  }}
+                />
+              </div>
+            </Carousel.Slide>
+
+            <Carousel.Slide>
+              <div
+                style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '12px',
+                  width: '100%',
+                  height: '100%'
+                }}
+              >
+                <Image
+                  src="/hero2.jpeg"
+                  alt="Second Illustration"
+                  width={500}
+                  height={400}
+                  style={{
+                    maxWidth: "100%",
+                    height: "auto",
+                    objectFit: "cover",
+                    transition: "transform 0.5s ease",
+                    filter: "brightness(1.02) contrast(1.02)",
+                    display: 'block',
+                    width: '100%'
+                  }}
+                  onMouseEnter={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.transform = "scale(1.05)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.transform = "scale(1)";
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: "40%",
+                    background: "linear-gradient(to top, rgba(0,0,0,0.1), transparent)",
+                    pointerEvents: "none"
+                  }}
+                />
+              </div>
+            </Carousel.Slide>
+          </Carousel>
         </Box>
       </Group>
 

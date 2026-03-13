@@ -4,6 +4,7 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
 import 'leaflet/dist/leaflet.css';
+import "@mantine/carousel/styles.css";
 
 import { MantineProvider } from "@mantine/core";
 import { ReduxProvider } from "./redux/provider";
