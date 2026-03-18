@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { label: "Features", href: "#Feature", isExternal: false },
     { label: "About Us", href: "#About", isExternal: false },
-    { label: "Pricing", href: "/pricing", isExternal: true },
+    // { label: "Pricing", href: "/pricing", isExternal: true },
     { label: "Contact Us", href: "#Contact", isExternal: false },
   ];
 
