@@ -22,9 +22,9 @@ function page() {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
   const isMd = useMediaQuery(`(max-width: 968px)`);
-    const institute = useAppSelector(
-      (state: any) => state.instituteSlice.instituteDetails
-    );
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails,
+  );
 
   useEffect(() => {
     setIsLoading(true);
@@ -40,7 +40,7 @@ function page() {
             _id: data._id,
             phone: "",
             institute: data.instituteId._id,
-          })
+          }),
         );
 
         const instituteDetails = {
@@ -58,8 +58,6 @@ function page() {
         setIsLoading(false);
       });
   }, []);
-
-  
 
   return (
     <Flex w={"100%"} mih={"100vh"}>
@@ -79,6 +77,7 @@ function page() {
           onSelectTab={(val: Tabs) => {
             setSelectedTab(val);
           }}
+          activeTab={selectedTab}
         />
       </Box>
       <Box style={{ display: !isMd ? "none" : "block" }}>
@@ -104,8 +103,8 @@ function page() {
         {Tabs.TEACHER === selectedTab && (
           <InstituteTeachers userType={UserType.OTHERS} />
         )}
-         {institute?.featureAccess?.transportManagement &&
-                    Tabs.TRANSPORT === selectedTab && <TransportPage />}
+        {institute?.featureAccess?.transportManagement &&
+          Tabs.TRANSPORT === selectedTab && <TransportPage />}
       </Box>
     </Flex>
   );
