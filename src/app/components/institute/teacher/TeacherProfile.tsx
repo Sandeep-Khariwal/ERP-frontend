@@ -41,6 +41,7 @@ interface Institute {
 interface Teacher {
   _id: string;
   name: string;
+  email: string;   
   phoneNumber: string[];
   profilePic: string;
   subjects: { _id: string; name: string }[];
@@ -69,6 +70,7 @@ const TeacherProfile = (props: {
     _id: "",
     name: "John Doe",
     phoneNumber: ["+1 234 567 890", "+1 234 567 891"],
+     email: "john@example.com",
     profilePic: "https://randomuser.me/api/portraits/men/1.jpg", // Sample URL for profile image
     subjects: [{ _id: "h kjfdhkj", name: "science" }],
     instituteBatches: [],
@@ -89,7 +91,8 @@ const TeacherProfile = (props: {
       GetTeacherById(props.teacherId)
         .then((x: any) => {
           const { teacher } = x;
-
+            console.log("setTeacher :", teacher);
+            
           setTeacher(teacher);
           setIsLoading(false);
         })
@@ -102,12 +105,14 @@ const TeacherProfile = (props: {
 
   return (
     <Stack
-      w={UserType.OTHERS === props.userType ? "100%" : "100%"}
+      w={UserType.OTHERS === props.userType ? "90%" : "90%"}
       // mx={"auto"}
       px={0}
       bg={"white"}
       mih={"100vh"}
       py={20}
+      bgr={"20px"}
+     style={{borderRadius:"20px"}}
       
     >
       <LoadingOverlay visible={isLoading} />
@@ -161,12 +166,15 @@ const TeacherProfile = (props: {
             <Text size="sm" c="dimmed">
               Subjects: {teacher?.subjects.map((s) => s.name).join(", ")}
             </Text>
-            <Text size="sm" c="dimmed">
+            {/* <Text size="sm" c="dimmed">
               Date of Birth:{" "}
               {teacher?.dateOfBirth
                 ? new Date(teacher?.dateOfBirth).toLocaleDateString()
                 : ""}
-            </Text>
+            </Text> */}
+            <Text size="sm" c="dimmed">
+  Email: {teacher?.email}
+</Text>
           </Flex>
           <Divider orientation="vertical" />
           <Flex w={"25%"} direction="column" gap="sm" style={{ flexGrow: 1 }}>

@@ -74,11 +74,13 @@ const FeeRecordTable = (props: {
   const convertHtmlIntoPdf = (id:string) => {
     setisLoading(true);
     GetStudentForPdf(props.studentId)
-      .then((x: any) => {
-        setisLoading(false);
-        const { student } = x;
-        const { feeRecords, instituteId } = student;
-        
+    .then((x: any) => {
+      setisLoading(false);
+      const { student } = x;
+      const { feeRecords, instituteId } = student;
+      
+         console.log("instituteId : ",instituteId);
+      
         const studentName = student.name;
         const date = new Date();
         const parentName = student.parentName;
@@ -105,7 +107,7 @@ const FeeRecordTable = (props: {
             return sum;
           }, 0);
         }
-
+           
         const receiptHtml = createReceiptPdf(
           studentName,
           date,

@@ -32,10 +32,12 @@ export default function Signup(props: { onClickLogin: () => void }) {
   const [formData, setFormData] = useState<{
     name: string;
     address: string;
+    phone: string;
     email: string;
   }>({
     name: "",
     email: "",
+    phone: "",
     address: "",
   });
   const [adminForm, setAdminForm] = useState<{
@@ -52,7 +54,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
     institute: "",
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [adminScreen, setAdminScreen] = useState<boolean>(true);
+  const [adminScreen, setAdminScreen] = useState<boolean>(false);
    const isMd = useMediaQuery(`(max-width: 968px)`);
   const institute = useSelector(
     (state: any) => state.instituteSlice.instituteDetails
@@ -279,6 +281,16 @@ export default function Signup(props: { onClickLogin: () => void }) {
                     value={formData.name}
                     onChange={handleChange}
                   />
+                   <TextInput
+                    label="Phone"
+                    placeholder="Enter institute number"
+                    required
+                    name="phone"
+                    value={formData.phone}
+                     maxLength={10}
+                    onChange={handleChange}
+                  />
+
                   <TextInput
                     label="Email"
                     placeholder="Enter institute email"

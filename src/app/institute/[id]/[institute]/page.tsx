@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 const dashboard = () => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
+  
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const institute = useAppSelector(
@@ -92,6 +93,7 @@ const dashboard = () => {
             onSelectTab={(val: Tabs) => {
               setSelectedTab(val);
             }}
+             activeTab={selectedTab}  //  ye add kri highlight ke liye 
           />
         </Box>
         <Box style={{ display: !isMd ? "none" : "block" }}>
