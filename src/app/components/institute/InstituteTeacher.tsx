@@ -241,13 +241,13 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
           </Stack>
         </Stack>
       ) : (
-        <>
+        <Flex  w={"100%"} align={"center"} justify={"center"}>
           <TeacherProfile
             teacherId={selectTeacherId}
             onClickBack={() => setSelectTeacherId("")}
             userType={UserType.OTHERS}
           />
-        </>
+        </Flex>
       )}
     </Stack>
   );

@@ -139,7 +139,7 @@ function TransportPage() {
       });
   };
   const handleGpsSubmit = () => {
-    // setIsLoading(true);
+    setIsLoading(true);
       AddGps({...gpsData,  institute: institute._id })
   
       .then((x: any) => {

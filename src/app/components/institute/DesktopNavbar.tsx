@@ -24,6 +24,8 @@ export const DesktopNavbar = (props: {
   isCollapsed: boolean;
   onClickCollapse: () => void;
   onSelectTab: (val: Tabs) => void;
+  activeTab: Tabs;  // ye add kri highlight ke liye 
+  
 }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const navigation = useRouter();
@@ -56,8 +58,20 @@ export const DesktopNavbar = (props: {
           <Stack h={"90%"} align="center" justify="space-between">
             <Box w={"90%"}>
               <Flex
-                onClick={() => props.onClickCollapse()}
-                style={{ cursor: "pointer" }}
+                onClick={() => props.onClickCollapse()
+                    
+                }
+                style={{ cursor: "pointer", 
+                     
+                   background: props.isCollapsed ? "white" : "transparent",
+  color: props.isCollapsed ? "#3F51B5" : "white",
+  borderLeft: props.isCollapsed
+    ? "5px solid yellow"
+    : "5px solid transparent",
+  borderRadius: "8px",
+  padding: "3px",
+  transition: "all 0.2s",
+                 }}
                 my={10}
                 align={"center"}
                 justify={props.isCollapsed ? "center" : "start"}
@@ -85,7 +99,20 @@ export const DesktopNavbar = (props: {
                 </Box>
               </Flex>
               <Flex
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer",
+                     background:
+      props.activeTab === Tabs.DASHBOARD ? "white" : "transparent",
+    color:
+      props.activeTab === Tabs.DASHBOARD ? "#3F51B5" : "white",
+    borderLeft:
+      props.activeTab === Tabs.DASHBOARD
+        ? "5px solid yellow"
+        : "5px solid transparent",
+    borderRadius: "8px",
+    padding: "3px",
+    transition: "all 0.2s",
+
+                }}
                 my={10}
                 align={"center"}
                 justify={props.isCollapsed ? "center" : "start"}
@@ -110,7 +137,19 @@ export const DesktopNavbar = (props: {
                 </Box>
               </Flex>
               <Flex
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", 
+                    background:
+      props.activeTab === Tabs.STUDENT ? "white" : "transparent",
+    color:
+      props.activeTab === Tabs.STUDENT ? "#3F51B5" : "white",
+    borderLeft:
+      props.activeTab === Tabs.STUDENT
+        ? "5px solid yellow"
+        : "5px solid transparent",
+    borderRadius: "8px",
+    padding: "3px",
+    transition: "all 0.2s",
+                  }}
                 my={10}
                 align={"center"}
                 justify={props.isCollapsed ? "center" : "start"}
@@ -135,7 +174,19 @@ export const DesktopNavbar = (props: {
                 </Box>
               </Flex>
               <Flex
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", 
+                    background:
+      props.activeTab === Tabs.TEACHER ? "white" : "transparent",
+    color:
+      props.activeTab === Tabs.TEACHER ? "#3F51B5" : "white",
+    borderLeft:
+      props.activeTab === Tabs.TEACHER
+        ? "5px solid yellow"
+        : "5px solid transparent",
+    borderRadius: "8px",
+    padding: "3px",
+    transition: "all 0.2s",
+                }}
                 my={10}
                 align={"center"}
                 justify={props.isCollapsed ? "center" : "start"}
@@ -161,7 +212,19 @@ export const DesktopNavbar = (props: {
               </Flex>
               {institute?.featureAccess?.transportManagement && (
                 <Flex
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: "pointer",
+                      background:
+      props.activeTab === Tabs.TRANSPORT ? "white" : "transparent",
+    color:
+      props.activeTab === Tabs.TRANSPORT ? "#3F51B5" : "white",
+    borderLeft:
+      props.activeTab === Tabs.TRANSPORT
+        ? "5px solid yellow"
+        : "5px solid transparent",
+    borderRadius: "8px",
+    padding: "3px",
+    transition: "all 0.2s",
+                   }}
                   my={10}
                   align={"center"}
                   justify={props.isCollapsed ? "center" : "start"}

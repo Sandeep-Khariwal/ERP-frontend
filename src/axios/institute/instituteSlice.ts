@@ -5,7 +5,9 @@ export function CreateInstitute(data: {
   name: string;
   address: string;
   email: string;
+  phone: string;
 }) {
+ 
   return new Promise((resolve, reject) => {
     ApiHelper.post(`http://localhost:8080/api/v1/institute/create`, data)
       .then((response) => resolve(response))
