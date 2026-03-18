@@ -9,6 +9,7 @@ const Test_Records = "/Test_Records.webp";
 const Teacher_Salery_Management = "/Teacher_Salery_Management.webp";
 const Parents_access_test = "/Parents_access_test.webp";
 const Online_fee_recipt = "/Online_fee_recipt.webp";
+const quizicon = "/quizicon.webp";
 
 const Features: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -308,6 +309,30 @@ const Features: React.FC = () => {
             accessible.
           </Text>
         </Flex>
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          w={"30%"}
+          gap={"0.50rem"}
+        >
+          <Image src={quizicon} alt="Online Quiz System" w={250} />
+          <h4
+            style={{
+              fontSize: "1.25rem",
+            }}
+          >
+            Online Quiz & Assessment
+          </h4>
+          <Text
+            style={{
+              fontSize: "0.95rem",
+            }}
+          >
+            Students can participate in online quizzes and assessments directly from
+            the platform. Teachers can create quizzes, track results instantly, and
+            evaluate student performance with ease.
+          </Text>
+        </Flex>
       </Flex>
 
       {/* Features Grid - Mobile/Tablet */}
@@ -543,6 +568,44 @@ const Features: React.FC = () => {
             Students and parents can instantly download fee receipts online. No
             paperwork, no delays — all transactions are securely recorded and
             accessible.
+          </Text>
+        </Flex>
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          gap={"md"}
+          style={{
+            alignItems: "center",
+            textAlign: "center",
+          }}
+        >
+          <Image
+            src={quizicon}
+            alt="Mobile & Desktop Access"
+            style={{
+              maxWidth: "250px",
+              width: "100%",
+              height: "auto",
+            }}
+          />
+          <h4
+            style={{
+              fontSize: "1.25rem",
+              margin: 0,
+            }}
+          >
+            Online Quiz & Assessment
+          </h4>
+          <Text
+            style={{
+              fontSize: "0.95rem",
+              maxWidth: "90%",
+              lineHeight: 1.5,
+            }}
+          >
+            Students can participate in online quizzes and assessments directly from
+            the platform. Teachers can create quizzes, track results instantly, and
+            evaluate student performance with ease.
           </Text>
         </Flex>
       </Flex>
