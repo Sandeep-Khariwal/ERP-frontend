@@ -79,8 +79,26 @@ const HeroSection: React.FC = () => {
   };
 
   const autoplay = useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })
+    Autoplay({
+      delay: 3000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    })
   );
+
+
+
+  const emblaRef = useRef<any>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (emblaRef.current) {
+        emblaRef.current.scrollNext();
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Box
@@ -100,13 +118,13 @@ const HeroSection: React.FC = () => {
               className="animate-item"
               style={{ fontSize: "2.5rem", fontWeight: 700, color: "#1e3a8a" }}
             >
-              Simplify School Operations with One Powerful Platform
+              Simplify Institute Operations with One Powerful Platform
             </h2>
             <Text
               className="animate-item"
               style={{ fontSize: "1.125rem", color: "#444" }}
             >
-              Simplify school operations with a powerful all-in-one management
+              Simplify institute operations with a powerful all-in-one management
               platform. Easily handle admissions, attendance, exams, fees, and
               reports — all from a single dashboard.
             </Text>
@@ -146,9 +164,9 @@ const HeroSection: React.FC = () => {
           className="animate-item"
           bg="linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%)"
           p={4}
-          radius="2xl"
-          boxShadow="0 20px 40px -15px rgba(0,0,0,0.3), 0 8px 24px -6px rgba(0,0,0,0.1)"
           style={{
+            borderRadius: "16px",
+            boxShadow: "0 20px 40px -15px rgba(0,0,0,0.3), 0 8px 24px -6px rgba(0,0,0,0.1)",
             border: "1px solid rgba(255,255,255,0.5)",
             backdropFilter: "blur(4px)",
             transition: "transform 0.3s ease, box-shadow 0.3s ease",
@@ -163,33 +181,27 @@ const HeroSection: React.FC = () => {
           }}
         >
           <Carousel
-            align="start"
-            loop
+            slideSize="100%"
             withIndicators
             withControls
             slideGap="md"
-            plugins={[autoplay.current]}
+            emblaOptions={{ loop: true }}
+            getEmblaApi={(embla) => {
+              emblaRef.current = embla;
+            }}
             styles={{
               control: {
-                backgroundColor: 'rgba(255,255,255,0.8)',
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                color: '#1a1a1a',
-                '&:hover': {
-                  backgroundColor: 'white',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                }
+                backgroundColor: "rgba(255,255,255,0.8)",
+                border: "none",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                color: "#1a1a1a",
               },
               indicator: {
-                width: '8px',
-                height: '8px',
-                transition: 'all 0.2s ease',
-                backgroundColor: 'rgba(59,130,246,0.3)',
-                '&[data-active]': {
-                  width: '24px',
-                  backgroundColor: '#3b82f6'
-                }
-              }
+                width: "8px",
+                height: "8px",
+                transition: "all 0.2s ease",
+                backgroundColor: "rgba(59,130,246,0.3)",
+              },
             }}
           >
             <Carousel.Slide>
@@ -300,21 +312,143 @@ const HeroSection: React.FC = () => {
           }}
         >
           <Box
+            w={{ base: "100%", md: "80%", lg: "60%" }}
             className="animate-item"
-            style={{ width: "100%", maxWidth: "350px" }}
+            bg="linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%)"
+            p={{ base: 2, sm: 4 }}
+            style={{
+              borderRadius: "16px",
+              border: "1px solid rgba(255,255,255,0.5)",
+              boxShadow: "0 20px 40px -15px rgba(0,0,0,0.3), 0 8px 24px -6px rgba(0,0,0,0.1)",
+              backdropFilter: "blur(4px)",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = "0 30px 50px -20px rgba(0,0,0,0.4), 0 8px 30px -8px rgba(0,0,0,0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 20px 40px -15px rgba(0,0,0,0.3), 0 8px 24px -6px rgba(0,0,0,0.1)";
+            }}
           >
-            <Image
-              src={LandingPageImage}
-              alt="Landing Illustration"
-              width={350}
-              height={350}
-              style={{
-                width: "100%",
-                height: "auto",
-                objectFit: "cover",
-                borderRadius: "8px",
+            <Carousel
+              withIndicators
+              withControls
+              slideGap="md"
+              plugins={[autoplay.current]}
+              styles={{
+                control: {
+                  backgroundColor: "rgba(255,255,255,0.8)",
+                  border: "none",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  color: "#1a1a1a",
+                  width: "35px",
+                  height: "35px",
+                  minWidth: "35px",
+                },
+                indicator: {
+                  width: "8px",
+                  height: "8px",
+                  transition: "all 0.2s ease",
+                  backgroundColor: "rgba(59,130,246,0.3)",
+                },
               }}
-            />
+            >
+              <Carousel.Slide>
+                <Box
+                  style={{
+                    position: 'relative',
+                    overflow: 'hidden',
+                    borderRadius: '12px',
+                    width: '100%',
+                    aspectRatio: '16/9',
+                  }}
+                  h={{ base: 250, sm: 350, md: 450 }}
+                >
+                  <Image
+                    src="/hero1.jpeg"
+                    alt="Landing Illustration"
+                    width={1200}
+                    height={675}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      transition: "transform 0.5s ease",
+                      filter: "brightness(1.02) contrast(1.02)",
+                      display: 'block'
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.transform = "scale(1.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.transform = "scale(1)";
+                    }}
+                  />
+                  <Box
+                    pos="absolute"
+                    bottom={0}
+                    left={0}
+                    right={0}
+                    h={{ base: "30%", sm: "40%" }}
+                    style={{
+                      background: "linear-gradient(to top, rgba(0,0,0,0.2), transparent)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                </Box>
+              </Carousel.Slide>
+
+              <Carousel.Slide>
+                <Box
+                  style={{
+                    position: 'relative',
+                    overflow: 'hidden',
+                    borderRadius: '12px',
+                    width: '100%',
+                    aspectRatio: '16/9',
+                  }}
+                  h={{ base: 250, sm: 350, md: 450 }}
+                >
+                  <Image
+                    src="/hero2.jpeg"
+                    alt="Second Illustration"
+                    width={1200}
+                    height={675}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      transition: "transform 0.5s ease",
+                      filter: "brightness(1.02) contrast(1.02)",
+                      display: 'block'
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.transform = "scale(1.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.transform = "scale(1)";
+                    }}
+                  />
+                  <Box
+                    pos="absolute"
+                    bottom={0}
+                    left={0}
+                    right={0}
+                    h={{ base: "30%", sm: "40%" }}
+                    style={{
+                      background: "linear-gradient(to top, rgba(0,0,0,0.2), transparent)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                </Box>
+              </Carousel.Slide>
+            </Carousel>
           </Box>
 
           <h2
@@ -328,7 +462,7 @@ const HeroSection: React.FC = () => {
               padding: "0 1rem",
             }}
           >
-            Simplify School Operations with One Powerful Platform
+            Simplify Institute Operations with One Powerful Platform
           </h2>
 
           <Text
@@ -341,7 +475,7 @@ const HeroSection: React.FC = () => {
               maxWidth: "90%",
             }}
           >
-            Simplify school operations with a powerful all-in-one management
+            Simplify institute operations with a powerful all-in-one management
             platform. Easily handle admissions, attendance, exams, fees, and
             reports — all from a single dashboard.
           </Text>
