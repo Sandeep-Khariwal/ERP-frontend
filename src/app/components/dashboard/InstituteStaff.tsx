@@ -148,13 +148,15 @@ export function InstituteProfile(props: InstituteProfileProps) {
           </Text>
           <Flex
             gap="sm"
+            ml= "lg"
             // ml={35}
             // mt={10}
-            
-            direction={isMd ? "column" : "row"}
-            style={{ margin: "auto",
-              marginTop: "10px"
-             }} 
+             direction={isMd ? "column" : "row"}
+
+            style={{
+              // marginLeft: isMd ? 0 : "auto",
+              marginTop: isMd ? "10px" : 0,
+            }}
           >
             <Button
               onClick={handleOpenModal}
