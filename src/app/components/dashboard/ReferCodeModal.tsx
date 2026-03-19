@@ -10,22 +10,28 @@ const ReferCodeModal = (props: {
   onClose: () => void;
   referralCode: string;
 }) => {
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(props.referralCode);
-      notifications.show({
-        title: "Copied!",
-        message: "Referral code copied successfully 🎉",
-        color: "green",
-      });
-    } catch (err) {
-      notifications.show({
-        title: "Error",
-        message: "Failed to copy",
-        color: "red",
-      });
-    }
-  };
+ const isMd = window.innerWidth <= 768;
+
+const handleCopy = async () => {
+  try {
+    await navigator.clipboard.writeText(props.referralCode);
+
+    notifications.show({
+      title: "Copied!",
+      message: "Referral code copied successfully 🎉",
+      color: "green",
+      position: isMd ? "top-center" : "bottom-right", 
+    });
+
+  } catch (err) {
+    notifications.show({
+      title: "Error",
+      message: "Failed to copy",
+      color: "red",
+      position: isMd ? "top-center" : "bottom-right",
+    });
+  }
+};
 
   return (
     <Modal
