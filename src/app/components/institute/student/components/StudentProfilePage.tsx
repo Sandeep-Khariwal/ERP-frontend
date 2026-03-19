@@ -13,6 +13,7 @@ import {
   LoadingOverlay,
 } from "@mantine/core";
 import { Line } from "react-chartjs-2";
+import { Select } from "@mantine/core";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -109,41 +110,62 @@ export default function StudentProfilePage(props: {
 
   const [data, setData] = useState<ChartData | null>(null);
   const [options, setOptions] = useState<ChartOptions<"line"> | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+const [allSubjects, setAllSubjects] = useState<string[]>([]);
 
-  useEffect(() => {
-    const info: ChartData = {
-      labels: student.testReports.map((t) => t.subject.name),
-      datasets: [
-        {
-          label: "Progress",
-          data: student.testReports.map((t) => t.marks),
-          borderColor: "#ff6384",
-          backgroundColor: "rgba(255,99,132,0.2)",
-          fill: true,
-        },
-      ],
-    };
-    const options: ChartOptions<"line"> = {
-      scales: {
-        y: {
-          min: 0,
-          max: 100,
-          ticks: {
-            maxTicksLimit: 100,
-            stepSize: 10,
-            callback: function (value) {
-              return value + "%";
-            },
+
+useEffect(() => {
+  const subjects = Array.from(
+    new Set(student.testReports.map((t) => t.subject.name))
+  );
+
+  setAllSubjects(subjects);
+
+  if (subjects.length > 0 && !selectedSubject) {
+    setSelectedSubject(subjects[0]);
+  }
+}, [student]);
+
+useEffect(() => {
+  if (!selectedSubject) return;
+
+  const filteredReports = student.testReports.filter(
+    (t) => t.subject.name === selectedSubject
+  );
+
+  const info: ChartData = {
+    labels: filteredReports.map((_, i) => `Attempt ${i + 1}`),
+    datasets: [
+      {
+        label: selectedSubject + " Progress",
+        data: filteredReports.map((t) => t.marks),
+        borderColor: "#ff6384",
+        backgroundColor: "rgba(255,99,132,0.2)",
+        fill: true,
+      },
+    ],
+  };
+
+  const options: ChartOptions<"line"> = {
+    scales: {
+      y: {
+        min: 0,
+        max: 100,
+        ticks: {
+          stepSize: 10,
+          callback: function (value) {
+            return value + "%";
           },
         },
       },
-    };
+    },
+  };
 
-    if (info.labels.length > 0) {
-      setData(info);
-      setOptions(options);
-    }
-  }, [student]);
+  if (info.labels.length > 0) {
+    setData(info);
+    setOptions(options);
+  }
+}, [student, selectedSubject]);
 
   useEffect(() => {
     if (props.selectedStudentId) {
@@ -333,7 +355,22 @@ export default function StudentProfilePage(props: {
         p={10}
         mt={20}
       >
-        <Title order={4}>Progress</Title>
+        <Flex justify="space-between" align="center" mb="sm">
+  <Title order={4}>
+    {selectedSubject ? `${selectedSubject} Progress` : "Progress"}
+  </Title>
+
+  <Select
+    placeholder="Select subject"
+    data={allSubjects}
+    value={selectedSubject}
+    onChange={(value) => setSelectedSubject(value)}
+    size="xs"
+    w={180}
+    searchable
+    nothingFoundMessage="No subject found"
+  />
+</Flex>
         {data && <Line data={data} options={options!!} />}
       </Stack>
     </Card>

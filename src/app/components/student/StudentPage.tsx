@@ -90,43 +90,25 @@ const StudentPage = (props: {
     ],
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [testReportMap,setTestReportMap] = useState<Map<string,number[]>>(new Map())
+
   useEffect(() => {
-    const labels = student.testReports.map((t) => t.subject.name);
+    const newMap = new Map()
 
-    const data: ChartData = {
-      labels: labels,
-      datasets: [
-        {
-          label: "Progress",
-          data: student.testReports.map((t) => t.marks),
-          borderColor: "#ff6384",
-          backgroundColor: "rgba(255,99,132,0.2)",
-          fill: true,
-        },
-      ],
-    };
+     student.testReports.forEach((test)=>{
 
-    const options: ChartOptions<"line"> = {
-      scales: {
-        y: {
-          min: 0,
-          max: 100,
-          ticks: {
-            maxTicksLimit: 100,
-            stepSize: 10,
-            callback: function (value) {
-              return value + "%";
-            },
-          },
-        },
-      },
-    };
-
-    if (data.labels.length > 0) {
-      setData(data);
-      setOptions(options);
-    }
+      if(newMap.has(test.subject.name)){
+        const arr = newMap.get(test.subject.name)
+        arr.push(test.marks)
+      } else{
+          newMap.set(test.subject.name,[test.marks])
+      }
+     })
+     setTestReportMap(newMap)
   }, [student]);
+
+
   useEffect(() => {
     if (props.studentId) {
       getStudents();
@@ -146,8 +128,6 @@ const StudentPage = (props: {
       });
   };
 
-  const [data, setData] = useState<ChartData | null>(null);
-  const [options, setOptions] = useState<ChartOptions<"line"> | null>(null);
   return (
     <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
@@ -168,7 +148,7 @@ const StudentPage = (props: {
         </Text> </>):
         (<>
           <Text fw={500} fz={24} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
-          Student
+          Students
         </Text>
         </>)
         }
@@ -212,8 +192,8 @@ const StudentPage = (props: {
         <Stack mt={10} w={"100%"} bg={"white"} p={10}>
           <StudentOverview
             student={student}
-            data={data!!}
-            options={options!!}
+          
+            testReportMap={testReportMap}
             refreshStudents={() => getStudents()}
             userType={props.userType}
           />
