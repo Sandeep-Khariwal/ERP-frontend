@@ -15,7 +15,17 @@ import {
   TextInput,
   ThemeIcon,
 } from "@mantine/core";
-import { IconCalendar, IconEdit, IconGenderBigender, IconHome, IconId, IconPhone, IconPhoneCall, IconRecordMail, IconUser } from "@tabler/icons-react";
+import {
+  IconCalendar,
+  IconEdit,
+  IconGenderBigender,
+  IconHome,
+  IconId,
+  IconPhone,
+  IconPhoneCall,
+  IconRecordMail,
+  IconUser,
+} from "@tabler/icons-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { Select } from "@mantine/core";
@@ -42,7 +52,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
-  Tooltip
+  Tooltip,
 );
 
 export interface Device {
@@ -61,7 +71,7 @@ const StudentOverview = (props: {
   // data: ChartData;
   // options: ChartOptions<"line">;
   userType: UserType;
-  testReportMap: Map<string, number[]>
+  testReportMap: Map<string, number[]>;
   refreshStudents: () => void;
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -71,7 +81,7 @@ const StudentOverview = (props: {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [showSubjects, setShowSubjects] = useState(false);
   const institute = useAppSelector(
-    (state: any) => state.instituteSlice.instituteDetails
+    (state: any) => state.instituteSlice.instituteDetails,
   );
   const [data, setData] = useState<ChartData | null>(null);
   const [options, setOptions] = useState<ChartOptions<"line"> | null>(null);
@@ -91,56 +101,51 @@ const StudentOverview = (props: {
       });
   };
   const [mapModal, setMapModal] = useState<boolean>(false);
-  const [allsubjects, setAllSubjects] = useState<string[]>([])
-  const [selectedSubject, setSelectedSubject] = useState<string>("")
+  const [allsubjects, setAllSubjects] = useState<string[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
 
-useEffect(() => {
-  if (selectedSubject) {
-    const marksArray: number[] =
-      props.testReportMap.get(selectedSubject) ?? [];
+  useEffect(() => {
+    if (selectedSubject) {
+      const marksArray: number[] =
+        props.testReportMap.get(selectedSubject) ?? [];
 
-    const labels: string[] = [];
+      const labels: string[] = [];
 
-    for (let i = 0; i < marksArray.length; i++) {
-      labels.push(`Attempt ${i + 1}`);
+      for (let i = 0; i < marksArray.length; i++) {
+        labels.push(`Attempt ${i + 1}`);
+      }
+
+      const data: ChartData = {
+        labels: labels,
+        datasets: [
+          {
+            label: "Progress",
+            data: marksArray,
+            borderColor: "#ff6384",
+            backgroundColor: "rgba(255,99,132,0.2)",
+            fill: true,
+          },
+        ],
+      };
+
+      if (data.labels.length > 0) {
+        setData(data);
+      }
     }
-
-    const data: ChartData = {
-      labels: labels,
-      datasets: [
-        {
-          label: "Progress",
-          data: marksArray,
-          borderColor: "#ff6384",
-          backgroundColor: "rgba(255,99,132,0.2)",
-          fill: true,
-        },
-      ],
-    };
-
-    if (data.labels.length > 0) {
-      setData(data);
-    }
-  }
-}, [selectedSubject]);
+  }, [selectedSubject]);
 
   useEffect(() => {
     for (const x of props.testReportMap.keys()) {
       if (!selectedSubject) {
-        setSelectedSubject(x)
+        setSelectedSubject(x);
       }
       setAllSubjects((prev) => {
         if (prev.includes(x)) {
           return prev;
         }
         return [...prev, x];
-
-      })
+      });
     }
-
-    // console.log(" props.testReportMap : ",  props.testReportMap);
-    // const labels = student.testReports.map((t) => t.subject.name);
-
 
     const options: ChartOptions<"line"> = {
       scales: {
@@ -151,7 +156,7 @@ useEffect(() => {
             maxTicksLimit: 100,
             stepSize: 10,
             callback: function (value) {
-              return value + "%";
+              return value + " %";
             },
           },
         },
@@ -162,11 +167,10 @@ useEffect(() => {
     // if (data.labels.length > 0) {
     //   setData(data);
     // }
-  }, [props.testReportMap])
-
+  }, [props.testReportMap]);
 
   return (
-    <Stack gap="lg" w={"100%"} >
+    <Stack gap="lg" w={"100%"}>
       {/* Map Modal */}
       <Modal
         opened={mapModal}
@@ -177,13 +181,24 @@ useEffect(() => {
         transitionProps={{ transition: "fade", duration: 200 }}
         styles={{ body: { padding: 0 } }}
       >
-        <VanTracker van={props?.student?.van} instituteId={institute?._id ?? ""} />
+        <VanTracker
+          van={props?.student?.van}
+          instituteId={institute?._id ?? ""}
+        />
       </Modal>
 
       <LoadingOverlay visible={isLoading} />
 
       {/* Header Section */}
-      <Card withBorder radius="lg" shadow="sm" p="md" style={{ background: "linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%)", }}>
+      <Card
+        withBorder
+        radius="lg"
+        shadow="sm"
+        p="md"
+        style={{
+          background: "linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%)",
+        }}
+      >
         <Group align="center" gap="lg">
           <Avatar
             src={props.student?.profilePic || "/boyStudent.png"}
@@ -195,17 +210,22 @@ useEffect(() => {
               Welcome, {props.student?.name}
             </Text>
             <Text c="dimmed" fz="sm">
-              {props.student.batchId?.name} | Student Roll: {props.student.uniqueRoll}
+              {props.student.batchId?.name} | Student Roll:{" "}
+              {props.student.uniqueRoll}
             </Text>
           </Stack>
-          {institute?.featureAccess?.transportManagement && props.student.van && (
-            <Button onClick={() => setMapModal(true)} radius="md" style={{ backgroundColor: "#305CDE" }} >
-              Check Live Location
-            </Button>
-          )}
+          {institute?.featureAccess?.transportManagement &&
+            props.student.van && (
+              <Button
+                onClick={() => setMapModal(true)}
+                radius="md"
+                style={{ backgroundColor: "#305CDE" }}
+              >
+                Check Live Location
+              </Button>
+            )}
         </Group>
       </Card>
-
 
       <Grid gutter="lg">
         {/* 🎓 Basic Details */}
@@ -309,23 +329,30 @@ useEffect(() => {
         </Grid.Col>
       </Grid>
 
-<Select
-  label="Select Subject"
-  placeholder="Pick subject"
-  data={allsubjects} 
-  value={selectedSubject}
-  onChange={(value) => {
-    if (value) setSelectedSubject(value);
-  }}
-  mb="sm"
-/>
-
       {/* Progress Chart */}
-      <Flex w={"100%"} >
-        <Card withBorder radius="md" shadow="sm" p="md" w={isMd ? "100%" : "50%"}>
-          <Text fw={600} fz={18} mb="sm">
-            {selectedSubject} Progress
-          </Text>
+      <Flex w={"100%"}>
+        <Card
+          withBorder
+          radius="md"
+          shadow="sm"
+          p="md"
+          w={isMd ? "100%" : "50%"}
+        >
+          <Flex w={"100%"}  align={"center"} justify={"space-between"} >
+            <Text fw={600} fz={18} mb="sm">
+              {selectedSubject} Progress
+            </Text>
+            <Select
+              label="Select Subject"
+              placeholder="Pick subject"
+              data={allsubjects}
+              value={selectedSubject}
+              onChange={(value) => {
+                if (value) setSelectedSubject(value);
+              }}
+              mb="sm"
+            />
+          </Flex>
           <Divider mb="sm" />
           <Stack h={300}>
             {data && <Line data={data} options={options!!} />}
