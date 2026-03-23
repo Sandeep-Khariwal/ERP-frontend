@@ -31,7 +31,7 @@ const faqData = [
   {
     question: "Is SikshaPay free for students?",
     answer:
-      "Yes, SikshaPay is completely free for students. Schools or institutions cover the integration cost.",
+      "Yes, SikshaPay is completely free for students. Institute cover the integration cost.",
   },
 ];
 

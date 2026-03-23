@@ -152,7 +152,7 @@ const Testimonials = () => {
               lineHeight: "1.2",
             }}
           >
-            How Our Software Has Transformed Schools
+            How Our Software Has Transformed Institute
           </Text>
         </Flex>
 
