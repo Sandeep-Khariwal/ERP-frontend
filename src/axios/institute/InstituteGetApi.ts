@@ -59,3 +59,10 @@ export function GetAdminByGmail(gmail:string) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetInstituteSubjects(instituteId:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/subject/getAll?instituteId=${instituteId}`)
+      .then((response:any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

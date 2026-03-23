@@ -11,12 +11,16 @@ import {
   Text,
   Grid,
   Card,
+  TextInput,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import AddStaffModal from "./AddStaffModal";
 import { UserTypes } from "@/enums";
+import { AddInstituteSubjects } from "./AddInstituteSubjects";
+
+
 
 interface InstituteProfileProps {
   users: {
@@ -35,6 +39,11 @@ export function InstituteProfile(props: InstituteProfileProps) {
   const [userData, setUserData] = useState<{ [key: string]: string } | null>(
     null
   );
+  const [subjectModalOpen, setSubjectModalOpen] = useState(false);
+  
+
+  
+
   // const [editUserData, setEditUserData] = useState<{
   //   selectedImage: string;
   //   name: string;
@@ -59,6 +68,13 @@ export function InstituteProfile(props: InstituteProfileProps) {
     setIsModalOpen(true);
   };
 
+  const handleSubjectModal = () => {
+    setSubjectModalOpen(true);
+  }
+ 
+
+
+
   const handleCloseModal = () => {
     setIsUserModel(false);
     // setEditUserData(null);
@@ -73,7 +89,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
   const handleEditProfile = (userId: string) => {
     setIsModalOpen(true);
   };
-  function deleteProfile(deleteProfileId: string) {}
+  function deleteProfile(deleteProfileId: string) { }
   function addTeacher(data: {
     name: string;
     email: string;
@@ -132,13 +148,42 @@ export function InstituteProfile(props: InstituteProfileProps) {
           >
             + Add Staff
           </Button>
+
+          <Button
+            onClick={handleSubjectModal}
+            size="sm"
+            variant="default"
+            ml={16}
+            fw={700}
+            c={"#353935"}
+            ff={"Poppins"}
+            style={{
+              fontSize: "16px",
+              borderRadius: "24px",
+              borderColor: "##808080",
+              borderWidth: "1px",
+            }}
+          >
+            + Add Subjects
+          </Button>
         </Flex>
+
+        {subjectModalOpen && (
+          <AddInstituteSubjects
+            isOpen={subjectModalOpen}
+            onClose={() => {
+
+              setSubjectModalOpen(false);
+            }}
+          />
+
+        )}
         {isModalOpen && (
           <AddStaffModal
             instituteId={props?.instituteId}
             isOpen={isModalOpen}
             userType={props.userType}
-            onreloadData={()=>{
+            onreloadData={() => {
               props.onreloadData()
             }}
             onClose={() => {
@@ -233,7 +278,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
               // cols={isLg ? 2 : 4}
               w={"100%"}
               wrap="wrap"
-              // verticalSpacing={20}
+            // verticalSpacing={20}
             >
               {/* <InstituteUserCard
                 users={props.users.map((user) => ({
