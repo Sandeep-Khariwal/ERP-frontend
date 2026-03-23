@@ -19,7 +19,9 @@ import { useSelector } from "react-redux";
 import AddStaffModal from "./AddStaffModal";
 import { UserTypes } from "@/enums";
 import { AddInstituteSubjects } from "./AddInstituteSubjects";
-
+import ReferCodeModal from "./ReferCodeModal";
+import axios from "axios";
+import { GetReferalCode } from "@/axios/institute/InstituteGetApi";
 
 
 interface InstituteProfileProps {
@@ -35,6 +37,9 @@ interface InstituteProfileProps {
 
 export function InstituteProfile(props: InstituteProfileProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [openRefer, setOpenRefer] = useState(false);
+  const [refCode, setRefCode] = useState<string>("");
+  const [isFetchingRef, setIsFetchingRef] = useState(false);
   const [isUserModel, setIsUserModel] = useState(false);
   const [userData, setUserData] = useState<{ [key: string]: string } | null>(
     null
@@ -114,6 +119,30 @@ export function InstituteProfile(props: InstituteProfileProps) {
     setIsModalOpen(false);
   }
 
+
+  const handleReferClick = async () => {
+    try {
+      setIsFetchingRef(true);
+
+      GetReferalCode(props.instituteId)
+        .then((res: any) => {
+          setRefCode(res.data.couponCode);
+        })
+        .catch((e:any) => {
+          console.log(e);
+
+        })
+
+
+      setOpenRefer(true);
+
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsFetchingRef(false);
+    }
+  };
+
   return (
     <Card
       w={isMd ? "95%" : "80%"}
@@ -131,23 +160,18 @@ export function InstituteProfile(props: InstituteProfileProps) {
           <Text fz={18} fw={700} c={"#1B1212"} ff={"Roboto"}>
             Create/View Profile
           </Text>
-          <Button
-            onClick={handleOpenModal}
-            size="sm"
-            variant="default"
-            ml={16}
-            fw={700}
-            c={"#353935"}
-            ff={"Poppins"}
+          <Flex
+            gap="sm"
+            ml= "lg"
+            // ml={35}
+            // mt={10}
+             direction={isMd ? "column" : "row"}
+
             style={{
-              fontSize: "16px",
-              borderRadius: "24px",
-              borderColor: "##808080",
-              borderWidth: "1px",
+              // marginLeft: isMd ? 0 : "auto",
+              marginTop: isMd ? "10px" : 0,
             }}
           >
-            + Add Staff
-          </Button>
 
           <Button
             onClick={handleSubjectModal}
@@ -166,6 +190,41 @@ export function InstituteProfile(props: InstituteProfileProps) {
           >
             + Add Subjects
           </Button>
+            <Button
+              onClick={handleOpenModal}
+              size="sm"
+              variant="default"
+              fw={700}
+              style={{
+                fontSize: "16px",
+                borderRadius: "24px",
+              }}
+              w={isMd ? "100%" : "auto"}
+            >
+              + Add Staff
+            </Button>
+
+            <Button
+              onClick={handleReferClick}
+              loading={isFetchingRef}
+              size="sm"
+              variant="default"
+              fw={700}
+              style={{
+                fontSize: "16px",
+                borderRadius: "24px",
+              }}
+              w={isMd ? "100%" : "auto"}
+            >
+              Refer & Earn
+            </Button>
+          </Flex>
+          <ReferCodeModal
+            isOpen={openRefer}
+            onClose={() => setOpenRefer(false)}
+            referralCode={refCode}
+          />
+
         </Flex>
 
         {subjectModalOpen && (
@@ -192,6 +251,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
             }}
           />
         )}
+
         {isUserModel && userData && (
           <Modal
             opened={isUserModel}

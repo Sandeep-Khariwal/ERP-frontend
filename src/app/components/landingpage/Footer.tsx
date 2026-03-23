@@ -38,7 +38,7 @@ const Footer = () => {
     { label: "About", href: "#About" },
     { label: "Contact", href: "#Contact" },
     { label: "Features", href: "#Feature" },
-    { label: "Payments", href: "/pricing" },
+    // { label: "Payments", href: "/pricing" },
   ];
 
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
