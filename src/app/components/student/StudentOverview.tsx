@@ -29,6 +29,9 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { Select } from "@mantine/core";
+import { Bar } from "react-chartjs-2";
+import { BarElement } from "chart.js";
+import { ChartData as ChartJSData } from "chart.js";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -52,6 +55,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Tooltip,
 );
 
@@ -72,6 +76,7 @@ const StudentOverview = (props: {
   // options: ChartOptions<"line">;
   userType: UserType;
   testReportMap: Map<string, number[]>;
+  testOnlineMap: Map<string, number[]>;
   refreshStudents: () => void;
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -83,8 +88,8 @@ const StudentOverview = (props: {
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
-  const [data, setData] = useState<ChartData | null>(null);
-  const [options, setOptions] = useState<ChartOptions<"line"> | null>(null);
+  const [lineOptions, setLineOptions] = useState<ChartOptions<"line"> | null>(null);
+  const [barOptions, setBarOptions] = useState<ChartOptions<"bar"> | null>(null);
 
   const addRollNumber = () => {
     setIsLoading(true);
@@ -102,21 +107,21 @@ const StudentOverview = (props: {
   };
   const [mapModal, setMapModal] = useState<boolean>(false);
   const [allsubjects, setAllSubjects] = useState<string[]>([]);
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [quizAllSubjects, setquizAllSubjects] = useState<string[]>([]);
+  const [selectedSubjectLine, setSelectedSubjectLine] = useState<string>("");
+  const [selectedSubjectBar, setSelectedSubjectBar] = useState<string>("");
+
+  const [lineData, setLineData] = useState<ChartJSData<"line"> | null>(null);
+  const [barData, setBarData] = useState<ChartJSData<"bar"> | null>(null);
 
   useEffect(() => {
-    if (selectedSubject) {
-      const marksArray: number[] =
-        props.testReportMap.get(selectedSubject) ?? [];
+    if (selectedSubjectLine) {
+      const marksArray = props.testReportMap.get(selectedSubjectLine) ?? [];
 
-      const labels: string[] = [];
+      const labels = marksArray.map((_, i) => `Attempt ${i + 1}`);
 
-      for (let i = 0; i < marksArray.length; i++) {
-        labels.push(`Attempt ${i + 1}`);
-      }
-
-      const data: ChartData = {
-        labels: labels,
+      setLineData({
+        labels,
         datasets: [
           {
             label: "Progress",
@@ -126,18 +131,33 @@ const StudentOverview = (props: {
             fill: true,
           },
         ],
-      };
-
-      if (data.labels.length > 0) {
-        setData(data);
-      }
+      });
     }
-  }, [selectedSubject]);
+  }, [selectedSubjectLine]);
+
+
+  useEffect(() => {
+    if (selectedSubjectBar) {
+      const marksArray = props.testOnlineMap.get(selectedSubjectBar) ?? [];
+      const labels = marksArray.map((_, i) => `Attempt ${i + 1}`);
+
+      setBarData({
+        labels,
+        datasets: [
+          {
+            label: "Progress",
+            data: marksArray,
+            backgroundColor: "#36a2eb",
+          },
+        ],
+      });
+    }
+  }, [selectedSubjectBar]);
 
   useEffect(() => {
     for (const x of props.testReportMap.keys()) {
-      if (!selectedSubject) {
-        setSelectedSubject(x);
+      if (!selectedSubjectLine) {
+        setSelectedSubjectLine(x);
       }
       setAllSubjects((prev) => {
         if (prev.includes(x)) {
@@ -146,23 +166,39 @@ const StudentOverview = (props: {
         return [...prev, x];
       });
     }
+  },[props.testReportMap])
 
-    const options: ChartOptions<"line"> = {
+
+  useEffect(() => {
+    for (const x of props.testOnlineMap.keys()) {
+      if (!selectedSubjectBar) {
+        setSelectedSubjectBar(x);
+      }
+      setquizAllSubjects((prev) => {
+        if (prev.includes(x)) {
+          return prev;
+        }
+        return [...prev, x];
+      });
+    }
+
+    const commonOptions = {
       scales: {
         y: {
           min: 0,
           max: 100,
           ticks: {
-            maxTicksLimit: 100,
             stepSize: 10,
-            callback: function (value) {
+            callback: function (value: any) {
               return value + " %";
             },
           },
         },
       },
     };
-    setOptions(options);
+
+    setLineOptions(commonOptions);
+    setBarOptions(commonOptions);
 
     // if (data.labels.length > 0) {
     //   setData(data);
@@ -330,7 +366,8 @@ const StudentOverview = (props: {
       </Grid>
 
       {/* Progress Chart */}
-      <Flex w={"100%"}>
+      <Flex w={"100%"} gap="lg">
+        {/* ✅ LINE GRAPH */}
         <Card
           withBorder
           radius="md"
@@ -338,24 +375,59 @@ const StudentOverview = (props: {
           p="md"
           w={isMd ? "100%" : "50%"}
         >
-          <Flex w={"100%"}  align={"center"} justify={"space-between"} >
+          <Text c={"#575555"} fw={700} >Off-line Class Test</Text>
+          <Flex justify="space-between" align="center">
             <Text fw={600} fz={18} mb="sm">
-              {selectedSubject} Progress
+              {selectedSubjectLine} class Test Progress
             </Text>
+
             <Select
               label="Select Subject"
               placeholder="Pick subject"
               data={allsubjects}
-              value={selectedSubject}
-              onChange={(value) => {
-                if (value) setSelectedSubject(value);
-              }}
-              mb="sm"
+              value={selectedSubjectLine}
+              onChange={(value) => value && setSelectedSubjectLine(value)}
             />
           </Flex>
-          <Divider mb="sm" />
+
+          <Divider mb="sm" mt={10} />
+
           <Stack h={300}>
-            {data && <Line data={data} options={options!!} />}
+            {lineData && lineOptions && (
+              <Line data={lineData} options={lineOptions} />
+            )}
+          </Stack>
+        </Card>
+
+        {/* ✅ BAR GRAPH */}
+        <Card
+          withBorder
+          radius="md"
+          shadow="sm"
+          p="md"
+          w={isMd ? "100%" : "50%"}
+        >
+          <Text c={"#575555"} fw={700} >Online Quiz</Text>
+          <Flex justify="space-between" align="center">
+            <Text fw={600} fz={18} mb="sm">
+              {selectedSubjectBar} Progress
+            </Text>
+
+            <Select
+              label="Select Subject"
+              placeholder="Pick subject"
+              data={quizAllSubjects}
+              value={selectedSubjectBar}
+              onChange={(value) => value && setSelectedSubjectBar(value)}
+            />
+          </Flex>
+
+          <Divider mb="sm" mt={10}/>
+
+          <Stack h={300}>
+            {barData && barOptions && (
+              <Bar data={barData} options={barOptions} />
+            )}
           </Stack>
         </Card>
       </Flex>

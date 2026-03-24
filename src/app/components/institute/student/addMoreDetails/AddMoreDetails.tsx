@@ -39,6 +39,7 @@ interface StudentFormValues {
   dateOfJoining: Date;
   parentNumber?: string;
   van?: string;
+  rollNumber: number;
 }
 
 export function AddMoreDetails(props: {
@@ -77,12 +78,13 @@ export function AddMoreDetails(props: {
     gender: props.formData?.gender || "",
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
     van: props.formData.van,
+    rollNumber: props.formData?.rollNumber || 0,
   });
 
 
   useEffect(() => {
-    console.log("formValues.van  : ",formValues.van );
-    
+    console.log("formValues.van  : ", formValues.van);
+
     setSelectedVan(formValues.van ?? "")
   }, [formValues])
 
@@ -136,6 +138,7 @@ export function AddMoreDetails(props: {
               ? new Date(student.dateOfJoining)
               : new Date(),
             van: student.van,
+            rollNumber: student.rollNumber,
           };
 
           const newInstallments = student.feeRecords.map((f: any) => {
@@ -198,7 +201,8 @@ export function AddMoreDetails(props: {
         instituteId: props.instituteId,
         batchId: props.batchId,
         email: formValues.email,
-        van: selectedVan ?? formValues.van 
+        van: selectedVan ?? formValues.van,
+        rollNumber: formValues.rollNumber,
       };
 
 
@@ -238,7 +242,7 @@ export function AddMoreDetails(props: {
         batchId: props.batchId,
         dateOfJoining: formValues.dateOfJoining,
         optionalSubjects: optionalSubjects,
-        van: selectedVan ?? formValues.van 
+        van: selectedVan ?? formValues.van
       })
         .then((x: any) => {
           setIsLoading(false);
@@ -270,6 +274,7 @@ export function AddMoreDetails(props: {
             parentNumber: "",
             gender: "",
             dateOfJoining: new Date(),
+            rollNumber: 0,
           });
         })
         .catch((e) => {
@@ -309,6 +314,7 @@ export function AddMoreDetails(props: {
                 parentNumber: "",
                 gender: "",
                 dateOfJoining: new Date(),
+                rollNumber: 0,
               });
             }}
             style={{ cursor: "pointer" }}
@@ -360,7 +366,7 @@ export function AddMoreDetails(props: {
               }}
               onChangeAssigningVan={(val: string) => {
                 setSelectedVan(val);
-                setFormValues((prev)=>({...prev,van:val}))
+                setFormValues((prev) => ({ ...prev, van: val }))
               }}
               handleInputChange={(field: string, value: any) => {
                 handleInputChange(field, value);
