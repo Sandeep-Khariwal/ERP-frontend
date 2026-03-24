@@ -36,7 +36,13 @@ export interface StudentOverView {
     subject: { _id: string; name: string };
     marks: number;
   }[];
+   resultId: {
+    marks: number;
+    name: string;
+  }[];
 }
+
+
 
 interface Dataset {
   label: string;
@@ -88,13 +94,31 @@ const StudentPage = (props: {
         subject: { _id: "", name: "" },
       },
     ],
+     resultId:[{
+      marks: 0,
+      name: ""
+    }]
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [testReportMap,setTestReportMap] = useState<Map<string,number[]>>(new Map())
 
+  const [testOnlineMap,settestOnlineMap] = useState<Map<string,number[]>>(new Map())
+
   useEffect(() => {
     const newMap = new Map()
+    const newMap1 = new Map()
+
+     student.resultId.forEach((result)=>{
+
+      if(newMap1.has(result.name)){
+        const arr = newMap1.get(result.name)
+        arr.push(result.marks)
+      } else{
+          newMap1.set(result.name,[result.marks])
+      }
+     })
+     settestOnlineMap(newMap1)
 
      student.testReports.forEach((test)=>{
 
@@ -107,6 +131,7 @@ const StudentPage = (props: {
      })
      setTestReportMap(newMap)
   }, [student]);
+
 
 
   useEffect(() => {
@@ -194,6 +219,7 @@ const StudentPage = (props: {
             student={student}
           
             testReportMap={testReportMap}
+            testOnlineMap={testOnlineMap}
             refreshStudents={() => getStudents()}
             userType={props.userType}
           />

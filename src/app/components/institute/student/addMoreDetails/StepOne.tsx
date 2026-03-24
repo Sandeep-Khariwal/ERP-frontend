@@ -12,7 +12,7 @@ import {
 import { DatePickerInput } from "@mantine/dates";
 import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus, IconX } from "@tabler/icons-react";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 
 interface StudentFormValues {
@@ -25,6 +25,7 @@ interface StudentFormValues {
   gender: string;
   dateOfJoining: Date;
   parentNumber?: string;
+  rollNumber: number;
 }
 
 const StepOne = (props: {
@@ -65,7 +66,7 @@ const StepOne = (props: {
         </Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
 
-        <TextInput
+          <TextInput
             ff={"Poppins"}
             label="Email"
             placeholder="Enter Email here!"
@@ -88,6 +89,22 @@ const StepOne = (props: {
             radius={"md"}
             onChange={(event) =>
               handleInputChange("parentName", event.currentTarget.value)
+            }
+            styles={{ input: { borderWidth: 2 } }}
+          />
+        </Grid.Col>
+        <Grid.Col span={isMobile ? 12 : 6}>
+          <TextInput
+            ff={"Poppins"}
+            label="Roll Number"
+            placeholder="Enter roll number"
+            required
+            type="number"
+            error={props.showError && "Roll number required"}
+            radius={"md"}
+            value={props.formData.rollNumber || ""}
+            onChange={(event) =>
+              handleInputChange("rollNumber", Number(event.currentTarget.value))
             }
             styles={{ input: { borderWidth: 2 } }}
           />
@@ -166,7 +183,7 @@ const StepOne = (props: {
                   <IconX
                     cursor="pointer"
                     onClick={() => {
-                        props.additionalPhoneNumbers.splice(index, 1);
+                      props.additionalPhoneNumbers.splice(index, 1);
                       props.setAdditionalPhoneNumbers([
                         ...props.additionalPhoneNumbers,
                       ]);
