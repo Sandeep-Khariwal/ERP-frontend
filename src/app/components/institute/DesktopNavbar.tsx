@@ -10,6 +10,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
+import { FaRupeeSign } from "react-icons/fa";
 
 import { LiaBusAltSolid, LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { Tabs } from "@/enums";
@@ -205,7 +206,44 @@ export const DesktopNavbar = (props: {
                   <Text fw={600} fz={20}>
                     Teacher
                   </Text>
-                </Box>
+                  </Box>
+              </Flex>
+              <Flex
+                style={{
+                  cursor: "pointer",
+                  background:
+                    props.activeTab === Tabs.EXPENSE ? "white" : "transparent",
+                  color: props.activeTab === Tabs.EXPENSE ? "#3F51B5" : "white",
+                  borderLeft:
+                    props.activeTab === Tabs.EXPENSE
+                      ? "5px solid yellow"
+                      : "5px solid transparent",
+                  borderRadius: "8px",
+                  padding: "3px",
+                  transition: "all 0.2s",
+                }}
+                my={10}
+                align={"center"}
+                justify={props.isCollapsed ? "center" : "start"}
+                gap={10}
+                onClick={() => props.onSelectTab(Tabs.EXPENSE)}
+              >
+                <FaRupeeSign size={28} />
+                <Box
+                  style={{
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    transition:
+                      "width 0.3s ease, opacity 0.3s ease, margin 0.3s ease",
+                    width: props.isCollapsed ? 0 : "auto",
+                    opacity: props.isCollapsed ? 0 : 1,
+                    marginLeft: props.isCollapsed ? 0 : 6,
+                  }}
+                >
+                  <Text fw={600} fz={17}>
+                    Expanse
+                  </Text>
+                  </Box>
               </Flex>
               {institute?.featureAccess?.transportManagement && (
                 <Flex

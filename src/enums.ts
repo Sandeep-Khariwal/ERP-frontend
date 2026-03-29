@@ -10,6 +10,7 @@ export enum UserTypes {
      DASHBOARD = "dashboard",
      STUDENT = "student",
      TEACHER = "teacher",
-     TRANSPORT = "Transport"
+     TRANSPORT = "Transport",
+     EXPENSE = "expense",
     
    }
