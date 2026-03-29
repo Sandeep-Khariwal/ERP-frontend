@@ -40,6 +40,7 @@ import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { UserTypes } from "@/enums";
 import { usePathname, useRouter } from "next/navigation";
 import NoticeBoard from "./notice/NoticeBoard";
+import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi";//data fetch krne liye subject
 
 export interface Batch {
   id: string;
@@ -121,6 +122,7 @@ console.log("final userType:", userType);
   useEffect(() => {
     if (institute?._id!!) {
       getAllInstituteBatches();
+        getSubjects();   // subject fetch krne ke liye call kri 
     }
   }, [institute]);
 
@@ -143,6 +145,27 @@ console.log("final userType:", userType);
     { value: "History", label: "History" },
     { value: "Physical science", label: "Physical science" },
   ]);
+  //ye dynamic subjects ke liye subjects add kri 
+const [subjectOptions, setSubjectOptions] = useState<{ value: string; label: string }[]>([]);
+
+//subject fetch krne ke liye fun bnaya jisme api call kri get valo
+const getSubjects = () => {
+  if (!institute?._id) return;
+
+  GetInstituteSubjects(institute._id)
+    .then((res: any) => {
+      const formatted = (res.subjects || []).map((sub: any) => ({
+        value: sub.value,
+        label: sub.label,
+      }));
+
+      setSubjectOptions(formatted);
+    })
+    .catch((e) => console.log(e));
+};
+
+
+
 
   const getAllInstituteBatches = () => {
     setIsLoading(true);
@@ -469,7 +492,8 @@ console.log("final userType:", userType);
             label="Select subjects"
             placeholder="pic subjects"
             value={selectedSubjects}
-            data={data}
+            // data={data}
+            data={subjectOptions}
             onChange={onSelectSubjects}
             // creatable={true}
             // getCreateLabel={(query) => `+ Create ${query}`}
@@ -485,7 +509,8 @@ console.log("final userType:", userType);
           <MultiSelect
             label="Select optional subjects"
             placeholder="pic optional subjects"
-            data={data}
+            // data={data}
+             data={subjectOptions}
             value={selectedOptionalSubjects}
             onChange={(subjects: string[]) =>
               setSelectedOptionalSubjects(subjects)

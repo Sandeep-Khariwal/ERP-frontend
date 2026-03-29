@@ -41,3 +41,13 @@ export function UpdateGpsInfo(
       .catch((error: any) => reject(error));
   });
 }
+
+export function DeleteSubject(subjectId: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.delete(
+      `${process.env.URL}/api/v1/subject/delete/${subjectId}`
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
