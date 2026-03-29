@@ -5,6 +5,7 @@ import { InstituteDashboard } from "@/app/components/institute/InstituteDashboar
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
 import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
+import InstituteExpanse from "@/app/components/institute/student/expense/InstituteExpense";
 import TransportPage from "@/app/components/institute/transport/TransportPage";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
@@ -114,6 +115,7 @@ const dashboard = () => {
         >
           {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
           {Tabs.STUDENT === selectedTab && <InstituteStudents />}
+          {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
           {Tabs.TEACHER === selectedTab && (
             <InstituteTeachers userType={UserType.OTHERS} />
           )}
