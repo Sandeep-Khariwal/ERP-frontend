@@ -37,3 +37,16 @@ export function AddGps(data: {
       .catch((error: any) => reject(error));
   });
 }
+
+export function AddSubjects(data: {
+   _id: string;
+  value: string;
+  label: string;
+  instituteId: string;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(`${process.env.URL}/api/v1/subject/createorupdate`, data)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

@@ -11,12 +11,14 @@ import {
   Text,
   Grid,
   Card,
+  TextInput,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import AddStaffModal from "./AddStaffModal";
 import { UserTypes } from "@/enums";
+import { AddInstituteSubjects } from "./AddInstituteSubjects";
 import ReferCodeModal from "./ReferCodeModal";
 import axios from "axios";
 import { GetReferalCode } from "@/axios/institute/InstituteGetApi";
@@ -42,6 +44,11 @@ export function InstituteProfile(props: InstituteProfileProps) {
   const [userData, setUserData] = useState<{ [key: string]: string } | null>(
     null
   );
+  const [subjectModalOpen, setSubjectModalOpen] = useState(false);
+  
+
+  
+
   // const [editUserData, setEditUserData] = useState<{
   //   selectedImage: string;
   //   name: string;
@@ -65,6 +72,13 @@ export function InstituteProfile(props: InstituteProfileProps) {
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
+
+  const handleSubjectModal = () => {
+    setSubjectModalOpen(true);
+  }
+ 
+
+
 
   const handleCloseModal = () => {
     setIsUserModel(false);
@@ -114,7 +128,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
         .then((res: any) => {
           setRefCode(res.data.couponCode);
         })
-        .catch((e) => {
+        .catch((e:any) => {
           console.log(e);
 
         })
@@ -158,6 +172,24 @@ export function InstituteProfile(props: InstituteProfileProps) {
               marginTop: isMd ? "10px" : 0,
             }}
           >
+
+          <Button
+            onClick={handleSubjectModal}
+            size="sm"
+            variant="default"
+            ml={16}
+            fw={700}
+            c={"#353935"}
+            ff={"Poppins"}
+            style={{
+              fontSize: "16px",
+              borderRadius: "24px",
+              borderColor: "##808080",
+              borderWidth: "1px",
+            }}
+          >
+            + Add Subjects
+          </Button>
             <Button
               onClick={handleOpenModal}
               size="sm"
@@ -194,6 +226,17 @@ export function InstituteProfile(props: InstituteProfileProps) {
           />
 
         </Flex>
+
+        {subjectModalOpen && (
+          <AddInstituteSubjects
+            isOpen={subjectModalOpen}
+            onClose={() => {
+
+              setSubjectModalOpen(false);
+            }}
+          />
+
+        )}
         {isModalOpen && (
           <AddStaffModal
             instituteId={props?.instituteId}
