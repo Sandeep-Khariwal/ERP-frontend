@@ -74,3 +74,10 @@ export function GetReferalCode(id:string) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetBatAllMarksheet(id:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/marksheet/batchAll/${id}`)
+      .then((response:any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

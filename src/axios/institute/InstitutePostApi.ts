@@ -28,7 +28,7 @@ export function CreateStudentFeeRecords(data: {
 
 export function AddGps(data: {
   gpsToken: string;
-  gpsUrl: string; 
+  gpsUrl: string;
   institute: string;
 }) {
   return new Promise((resolve, reject) => {
@@ -39,13 +39,34 @@ export function AddGps(data: {
 }
 
 export function AddSubjects(data: {
-   _id: string;
+  _id: string;
   value: string;
   label: string;
   instituteId: string;
 }) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(`${process.env.URL}/api/v1/subject/createorupdate`, data)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+
+export function CreateExamMarksheet(data: {
+  name: string;
+  batch: string;
+  student: string;
+  marks: {
+    subjectName: string;
+    theory_marks: number;
+    practical_marks: number;
+    obtained_marks: number;
+    grade: string;
+  }[];
+  date: Date;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(`${process.env.URL}/api/v1/marksheet/create`, data)
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
