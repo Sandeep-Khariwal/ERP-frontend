@@ -1,5 +1,6 @@
 "use client";
 
+import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 import {
   Modal,
   Select,
@@ -11,26 +12,115 @@ import {
   Box,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
+import { DateInput } from "@mantine/dates";
+import { GetGrade } from "../helperFunctions";
+import { CreateExamMarksheet } from "@/axios/institute/InstitutePostApi";
+import { SuccessNotification } from "@/app/helperFunction/Notification";
+
 
 interface Props {
   opened: boolean;
   onClose: () => void;
-  subjects: { _id: string; name: string }[];
+  // subjects: { _id: string; name: string }[];
+  batchId: string;
+  batchStudents: {
+    _id: string;
+    name: string;
+    rollNumber: number;
+  }[]
 }
 
-const SingleStudentModal = ({ opened, onClose, subjects }: Props) => {
-  const [selectedExam, setSelectedExam] = useState<string | null>(null);
-  const [marksData, setMarksData] = useState<any[]>([]);
+const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) => {
+  const [selectedExam, setSelectedExam] = useState<string>("");
+  const [selectedStudent, setSelectedStudent] = useState<string>("");
+  const [marksData, setMarksData] = useState<{
+    name: string;
+    batch: string;
+    student: string;
+    marks: {
+      subjectName: string;
+      theory_marks: number;
+      practical_marks: number;
+      obtained_marks: number;
+      grade: string;
+    }[];
+    date: Date;
+  }>({
+    name: "",
+    batch: "",
+    student: "",
+    marks: [],
+    date: new Date()
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [subjects, setSubjects] = useState<{ _id: string, name: string }[]>([]);  //state me savee krvana batch student
+  const [resultDate, setResultDate] = useState<Date>(new Date());
   useEffect(() => {
-    console.log("Subjects inside modal 👉", subjects);
-  const formattedSubjects = subjects.map((sub) => ({
-    subjectName: sub.name,
-    theory: "",
-    practical: "",
-  }));
+    if (!batchId) return;
 
-  setMarksData(formattedSubjects);
-}, [subjects]);
+    setIsLoading(true);
+
+    GetAllSubjectsFromBatch(batchId)
+      .then((x: any) => {
+        const { subjects } = x.subjects;
+
+        const formatted = subjects.map((sub: any) => {
+          return {
+            _id: sub._id,
+            name: sub.name,
+
+          }
+        })
+
+        console.log("formatted: ", formatted);
+
+        setSubjects(formatted);
+
+        //  setTeachers(teacherByInstituteBatch);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  }, [batchId]);
+
+  const processMarks = (marksArray: any[]) => {
+    return marksArray.map((item) => {
+      const obtained = item.theory_marks + item.practical_marks;
+
+      return {
+        ...item,
+        obtained_marks: obtained,
+        grade: GetGrade(obtained),
+      };
+    });
+  };
+
+  const CreateSingleMarksheet = () => {
+    const updatedMarks = processMarks(marksData.marks);
+
+    const payload = {
+      ...marksData,
+      name: selectedExam,
+      batch: batchId,
+      student: selectedStudent,
+      date: resultDate,
+      marks: updatedMarks,
+
+    }
+
+    CreateExamMarksheet(payload)
+      .then((x: any) => {
+        console.log("Success ✅", x);
+        SuccessNotification("Marksheet Created Success!!")
+        onClose()
+      })
+      .catch((e: any) => {
+        console.log(e);
+        onClose()
+      });
+  }
 
   return (
     <Modal
@@ -43,14 +133,42 @@ const SingleStudentModal = ({ opened, onClose, subjects }: Props) => {
       <Stack>
 
         {/* 🔹 TOP SELECT */}
-        <Select
-          placeholder="Select Exam"
-          data={["Mid TERM Exam", "Annual TERM Exam"]}
-          value={selectedExam}
-          onChange={setSelectedExam}
-          w={200}
-        />
+        <Flex gap={20} align="flex-end">
+          <Select
+            placeholder="Select Exam"
+            label="Select Exam"
+            data={["Mid TERM Exam", "Annual TERM Exam"]}
+            value={selectedExam}
+            onChange={(value) => {
+              setSelectedExam(value ?? "")
+            }}
+            w={150}
+          />
 
+          <Select
+            placeholder="Select Student"
+            label="Select Student"
+            data={batchStudents.map((student) => ({
+              label: student.name,   // 👈 jo dikhega
+              value: student._id,    // 👈 jo select hoga
+            }))}
+            value={selectedStudent}
+            onChange={(value) => {
+              setSelectedStudent(value ?? "")
+            }}
+            w={150}
+          />
+          <DateInput
+            placeholder="Select Result Date"
+            value={resultDate}
+            onChange={(value) => {
+              setResultDate(value ?? new Date())
+            }}
+            label="Result Date"
+            w={150}
+          />
+
+        </Flex>
         {/* 🔹 INPUT HEADER */}
         <Flex gap={10} mt={20}>
           <Text fw={600} w="40%">
@@ -64,88 +182,71 @@ const SingleStudentModal = ({ opened, onClose, subjects }: Props) => {
           </Text>
         </Flex>
 
-        {/* 🔹 ROW 1
-        <Flex gap={10}>
-          <TextInput
-            placeholder="Subject Name"
-            style={{ width: "40%" }}
-          />
-          <TextInput
-            placeholder="Theory Marks"
-            style={{ width: "30%" }}
-          />
-          <TextInput
-            placeholder="Practical Marks"
-            style={{ width: "30%" }}
-          />
-        </Flex> */}
 
-        {marksData.map((item, index) => (
-  <Flex gap={10} key={index}>
-    
-    {/* SUBJECT NAME (TEXT ONLY) */}
-    <Text w="40%" mt={8}>
-      {item.subjectName}
-    </Text>
 
-    {/* THEORY INPUT */}
-    <TextInput
-      placeholder="Theory Marks"
-      style={{ width: "30%" }}
-      value={item.theory}
-      onChange={(e) => {
-        const updated = [...marksData];
-        updated[index].theory = e.target.value;
-        setMarksData(updated);
-      }}
-    />
+        {subjects.map((item, index) => (
+          <Flex gap={10} key={index}>
 
-    {/* PRACTICAL INPUT */}
-    <TextInput
-      placeholder="Practical Marks"
-      style={{ width: "30%" }}
-      value={item.practical}
-      onChange={(e) => {
-        const updated = [...marksData];
-        updated[index].practical = e.target.value;
-        setMarksData(updated);
-      }}
-    />
+            {/* SUBJECT NAME (TEXT ONLY) */}
+            <Text w="40%" mt={8}>
+              {item.name}
+            </Text>
 
-  </Flex>
-))}
+            {/* THEORY INPUT */}
+            <TextInput
+              placeholder="Theory Marks"
+              style={{ width: "30%" }}
+              value={marksData.marks[index]?.theory_marks ?? ""}
+              onChange={(e) => {
+                const value = e.target.value;
 
-        {/* 🔹 ROW 2 */}
-        {/* <Flex gap={10}>
-          <TextInput
-            placeholder="Subject Name"
-            style={{ width: "40%" }}
-          />
-          <TextInput
-            placeholder="Theory Marks"
-            style={{ width: "30%" }}
-          />
-          <TextInput
-            placeholder="Practical Marks"
-            style={{ width: "30%" }}
-          />
-        </Flex> */}
+                setMarksData((prev) => {
+                  const updatedMarks = [...prev.marks];
+                  //  subjectName: subjects[index]?.name,
 
-        {/* 🔹 ROW 3 */}
-        {/* <Flex gap={10}>
-          <TextInput
-            placeholder="Subject Name"
-            style={{ width: "40%" }}
-          />
-          <TextInput
-            placeholder="Theory Marks"
-            style={{ width: "30%" }}
-          />
-          <TextInput
-            placeholder="Practical Marks"
-            style={{ width: "30%" }}
-          />
-        </Flex> */}
+                  updatedMarks[index] = {
+                    ...updatedMarks[index],
+                    theory_marks: value === "" ? 0 : Number(value),
+                    subjectName: item.name
+
+                  };
+
+                  return {
+                    ...prev,
+                    marks: updatedMarks,
+                  };
+                });
+              }}
+            />
+
+            {/* PRACTICAL INPUT */}
+            <TextInput
+              placeholder="Practical Marks"
+              style={{ width: "30%" }}
+              value={marksData.marks[index]?.practical_marks ?? ""}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                setMarksData((prev) => {
+                  const updatedMarks = [...prev.marks];
+
+
+                  updatedMarks[index] = {
+                    ...updatedMarks[index],
+                    practical_marks: value === "" ? 0 : Number(value)
+                  };
+
+                  return {
+                    ...prev,
+                    marks: updatedMarks,
+                  };
+                });
+              }}
+            />
+
+          </Flex>
+        ))}
+
 
         {/* 🔹 BUTTON */}
         <Box mt={20}>
@@ -156,6 +257,8 @@ const SingleStudentModal = ({ opened, onClose, subjects }: Props) => {
               borderRadius: "10px",
               background: "linear-gradient(135deg, #4B65F6, #6A5ACD)",
             }}
+            onClick={() => CreateSingleMarksheet()}
+            disabled={!selectedExam || !selectedStudent || !marksData.marks.length}
           >
             Create Marksheet
           </Button>

@@ -18,7 +18,7 @@ const Marksheet = (props: {
   batchId: string;
   subjects: { _id: string; name: string }[];
 }) => {
-   console.log("Subjects from Marksheet 👉", props.subjects);
+  console.log("Subjects from Marksheet 👉", props.subjects);
 
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
   const [batchStudents, setBatchStudents] = useState<{ _id: string, name: string, rollNumber: number }[]>([]);  //state me savee krvana batch student
@@ -26,7 +26,7 @@ const Marksheet = (props: {
   const [file, setFile] = useState<File | null>(null);
   const [openSingleStudentModal, setOpenSingleStudentModal] = useState(false);
   const isMobile = useMediaQuery(`(max-width: 968px)`);
- const [resultDate, setResultDate] = useState<Date | null>(null);
+  const [resultDate, setResultDate] = useState<Date | null>(null);
   const [allMarksheet, setAllMarksheet] = useState<{
     name: string;
     batch: string;
@@ -166,14 +166,14 @@ const Marksheet = (props: {
           student: batchStudents.find((std: any) => std.name.toUpperCase() === name.toUpperCase() || Number(std.rollNumber) === Number(roll))?._id,
           marks: marks,
           // date: new Date(),
-          date:  resultDate,
+          date: resultDate,
           rollNumber: roll.toString(),
         };
 
       });
 
       console.log("studentsPayload : ", studentsPayload);
-      
+
 
 
       // 🔹 API CALL for each student
@@ -400,23 +400,23 @@ const Marksheet = (props: {
         size="lg"
       >
         <Stack>
-            <Flex gap={20} align="flex-end">
-          {/* 🔹 Select Exam */}
-          <Select
-            placeholder="Select Exam"
-            data={["Mid TERM Exam", "Annual TERM Exam"]}
-            value={selectedExam}
-            onChange={setSelectedExam}
-            w={200}
-          />
-          <DateInput
-  placeholder="Select Result Date"
-  value={resultDate}
-  onChange={setResultDate}
-  label="Result Date"
-  w={200}
-/>
-</Flex>
+          <Flex gap={20} align="flex-end">
+            {/* 🔹 Select Exam */}
+            <Select
+              placeholder="Select Exam"
+              data={["Mid TERM Exam", "Annual TERM Exam"]}
+              value={selectedExam}
+              onChange={setSelectedExam}
+              w={200}
+            />
+            <DateInput
+              placeholder="Select Result Date"
+              value={resultDate}
+              onChange={setResultDate}
+              label="Result Date"
+              w={200}
+            />
+          </Flex>
           <Box
           // mt={10}
           // p={20}
@@ -531,7 +531,9 @@ const Marksheet = (props: {
       <SingleStudentModal
         opened={openSingleStudentModal}
         onClose={() => setOpenSingleStudentModal(false)}
-        subjects={props.subjects ?? []}
+        // subjects={props.subjects ?? []}
+        batchId={props.batchId}
+        batchStudents={batchStudents}
       />
     </>
   );
