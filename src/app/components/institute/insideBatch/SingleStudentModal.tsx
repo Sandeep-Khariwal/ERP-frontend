@@ -16,6 +16,7 @@ import { DateInput } from "@mantine/dates";
 import { GetGrade } from "../helperFunctions";
 import { CreateExamMarksheet } from "@/axios/institute/InstitutePostApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { log } from "console";
 
 
 interface Props {
@@ -85,6 +86,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
       });
   }, [batchId]);
 
+
   const processMarks = (marksArray: any[]) => {
     return marksArray.map((item) => {
       const obtained = item.theory_marks + item.practical_marks;
@@ -97,9 +99,40 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
     });
   };
 
+  const calculateOverall = (marks: any[]) => {
+    let total = 0;
+
+    marks.forEach((m: any) => {
+      let obtained_marks = m.practical_marks + m.theory_marks
+      total += obtained_marks;
+
+    });
+
+    const percentage = total / marks.length;
+
+    // 👉 Grade (same function use kar sakta hai)
+    const overallGrade = GetGrade(percentage);
+
+    // 👉 Status logic (customize kar sakta hai)
+    const isFail = marks.some((m: any) => m.obtained_marks < 33);
+
+    const status = isFail ? "Fail" : "Pass";
+    console.log("percentage :", percentage, total);
+
+
+
+    return {
+      totalMarks: total,
+      percentage,
+      overallGrade,
+      status,
+    };
+  };
+
   const CreateSingleMarksheet = () => {
     const updatedMarks = processMarks(marksData.marks);
 
+    const overall = calculateOverall(marksData.marks);
     const payload = {
       ...marksData,
       name: selectedExam,
@@ -107,12 +140,16 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
       student: selectedStudent,
       date: resultDate,
       marks: updatedMarks,
+      ...overall
 
     }
 
+    console.log("payload : ", payload);
+
+
     CreateExamMarksheet(payload)
+
       .then((x: any) => {
-        console.log("Success ✅", x);
         SuccessNotification("Marksheet Created Success!!")
         onClose()
       })
@@ -259,6 +296,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
             }}
             onClick={() => CreateSingleMarksheet()}
             disabled={!selectedExam || !selectedStudent || !marksData.marks.length}
+
           >
             Create Marksheet
           </Button>

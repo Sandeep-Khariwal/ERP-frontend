@@ -10,16 +10,19 @@ import { Image, Group } from "@mantine/core";
 import SingleStudentModal from "./SingleStudentModal";
 import { useMediaQuery } from "@mantine/hooks";
 import * as XLSX from "xlsx";
-import { CreateExamMarksheet } from "@/axios/institute/InstitutePostApi";
+import { CreateExamMarksheet, CreateExamMarksheetForExcel } from "@/axios/institute/InstitutePostApi";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
 import { GetAllStudentsFromBatch, GetBatAllMarksheet } from "@/axios/institute/InstituteGetApi";
-import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
+import { GetGrade } from "../helperFunctions";
+import { useAppSelector } from "@/app/redux/redux.hooks";
 const Marksheet = (props: {
   batchId: string;
   subjects: { _id: string; name: string }[];
 }) => {
-  console.log("Subjects from Marksheet 👉", props.subjects);
-
+    const institute = useAppSelector(
+      (state: any) => state.instituteSlice.instituteDetails,
+    );
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
   const [batchStudents, setBatchStudents] = useState<{ _id: string, name: string, rollNumber: number }[]>([]);  //state me savee krvana batch student
   const [openUploadModal, setOpenUploadModal] = useState(false);
@@ -27,6 +30,8 @@ const Marksheet = (props: {
   const [openSingleStudentModal, setOpenSingleStudentModal] = useState(false);
   const isMobile = useMediaQuery(`(max-width: 968px)`);
   const [resultDate, setResultDate] = useState<Date | null>(null);
+
+  const [studentsPayload, setStudentsPayload] = useState<any[]>([]);
   const [allMarksheet, setAllMarksheet] = useState<{
     name: string;
     batch: string;
@@ -39,6 +44,10 @@ const Marksheet = (props: {
       grade: string;
     }[];
     date: Date;
+    totalMarks: number;
+    percentage: number;
+    overallGrade: string;
+    status: string;
   }[]>([])
   // 🔹 Dummy data (backend se replace karna hai)
   const students = [
@@ -62,7 +71,6 @@ const Marksheet = (props: {
           }
         })
         setBatchStudents(batchStudents);
-        console.log("batch students : ", batchStudents);
 
       })
       .catch((e: any) => {
@@ -70,54 +78,92 @@ const Marksheet = (props: {
 
       })
 
+    GetResult()
+
+
+  }, [])
+
+  const GetResult = () => {
     // get all marksheet
     GetBatAllMarksheet(props.batchId)
       .then((x: any) => {
-        console.log("marksheet data  : ", x);
-
-
+        console.log("marksheets  : ", x.marksheets);
+        setAllMarksheet(x.marksheets)
       })
       .catch((e: any) => {
         console.log(e);
 
       })
-  }, [])
+  }
 
 
-  const CreateMarksheet = () => {
-    if (!file) {
-      alert("Please upload file first");
-      return;
-    }
+  const processMarks = (marksArray: any[]) => {
+    return marksArray.map((item) => {
+      const obtained = item.theory_marks + item.practical_marks;
 
+      return {
+        ...item,
+        obtained_marks: obtained,
+        grade: GetGrade(obtained),
+      };
+    });
+  };
+
+  const calculateOverall = (marks: any[]) => {
+    let total = 0;
+
+    marks.forEach((m: any) => {
+       let obtained_marks = m.practical_marks + m.theory_marks
+      total += obtained_marks;
+    });
+
+    const percentage = total / marks.length;
+
+    // 👉 Grade (same function use kar sakta hai)
+    const overallGrade = GetGrade(percentage);
+
+    // 👉 Status logic (customize kar sakta hai)
+    const isFail = marks.some((m: any) => m.obtained_marks < 33);
+
+    const status = isFail ? "Fail" : "Pass";
+
+    return {
+      totalMarks: total,
+      percentage,
+      overallGrade,
+      status,
+    };
+  };
+
+  const handleFileUpload = (file: File) => {
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
       const data = e.target.result;
 
-      // 🔹 Excel read
       const workbook = XLSX.read(data, { type: "binary" });
-
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-      console.log("Excel Data 👉", jsonData);
+      let errorFound = false;
 
-      // 🔥 YAHI SE MAIN LOGIC START
-      const studentsPayload = jsonData.map((student: any) => {
-
+      const payload = jsonData.map((student: any, index: number) => {
         const name = student["Name"];
         const roll = student["Roll No"];
+
+        // ❌ VALIDATION 1: Roll number missing
+        if (!roll) {
+          errorFound = true;
+          // alert(`Row ${index + 2}: Roll Number missing`);
+          ErrorNotification("Roll Number missing!");
+          return null;
+        }
 
         const subjectMap: any = {};
 
         Object.keys(student).forEach((key) => {
-
           if (key === "Name" || key === "Roll No" || key === "__rowNum__") return;
 
-          // THEORY
           if (key.includes("(THEORY)")) {
             const subject = key.replace(" (THEORY)", "").trim();
 
@@ -126,15 +172,12 @@ const Marksheet = (props: {
                 subjectName: subject,
                 theory_marks: 0,
                 practical_marks: 0,
-                obtained_marks: 0,
-                grade: "A",
               };
             }
 
-            subjectMap[subject].theory_marks = student[key];
+            subjectMap[subject].theory_marks = student[key] || 0;
           }
 
-          // PRACTICAL
           if (key.includes("(PRACTICAL)")) {
             const subject = key.replace("(PRACTICAL)", "").trim();
 
@@ -143,59 +186,69 @@ const Marksheet = (props: {
                 subjectName: subject,
                 theory_marks: 0,
                 practical_marks: 0,
-                obtained_marks: 0,
-                grade: "A",
               };
             }
 
-            subjectMap[subject].practical_marks = student[key];
+            subjectMap[subject].practical_marks = student[key] || 0;
           }
-
         });
 
-        // 🔹 Convert to array
-        const marks = Object.values(subjectMap).map((sub: any) => ({
-          ...sub,
-          obtained_marks: sub.theory_marks + sub.practical_marks,
-        }));
+        const rawMarks = Object.values(subjectMap);
+        const overall = calculateOverall(rawMarks);
 
-        // 🔹 FINAL PAYLOAD
+        if (!rawMarks.length) {
+          return null;
+        }
+
+        const marks = processMarks(rawMarks);
+
         return {
           name: selectedExam,
-          batch: props.batchId, // 👈 apna batch id daal
-          student: batchStudents.find((std: any) => std.name.toUpperCase() === name.toUpperCase() || Number(std.rollNumber) === Number(roll))?._id,
-          marks: marks,
-          // date: new Date(),
+          batch: props.batchId,
+          student: batchStudents.find(
+            (std: any) =>
+              std.name.toUpperCase() === name?.toUpperCase() ||
+              Number(std.rollNumber) === Number(roll)
+          )?._id,
+          marks,
           date: resultDate,
           rollNumber: roll.toString(),
+          ...overall
         };
-
       });
 
-      console.log("studentsPayload : ", studentsPayload);
+      // null values hatao
+      const finalPayload = payload.filter((p: any) => p !== null);
 
+      setStudentsPayload(finalPayload);
 
-
-      // 🔹 API CALL for each student
-      studentsPayload.forEach((payload: any) => {
-        CreateExamMarksheet(payload)
-          .then((x: any) => {
-            console.log("Success ✅", x);
-            SuccessNotification("Marksheet Created Success!!")
-            setOpenUploadModal(false)
-          })
-          .catch((e: any) => {
-            console.log(e);
-            setOpenUploadModal(false)
-          });
-      });
-
-
-
+      if (!errorFound) {
+        SuccessNotification("File processed successfully ✅");
+      }
     };
 
     reader.readAsBinaryString(file);
   };
+
+  const CreateMarksheet = () => {
+    if (studentsPayload.length === 0) {
+      // alert("No valid data found!");
+      ErrorNotification("No valid data found!")
+      return;
+    }
+
+    CreateExamMarksheetForExcel(studentsPayload)
+      .then((x: any) => {
+        GetResult()
+        SuccessNotification("Marksheet Created Success!!")
+        setOpenUploadModal(false)
+      })
+      .catch((e: any) => {
+        console.log(e);
+        setOpenUploadModal(false)
+      });
+  };
+
   return (
     <>
       <Stack w={"100%"} mt={20}>
@@ -322,7 +375,7 @@ const Marksheet = (props: {
 
             {/* 🔹 Table Body */}
             <Table.Tbody style={{ width: "100%" }}>
-              {students.map((item: any, index) => (
+              {allMarksheet.map((item: any, index) => (
                 <Table.Tr key={index} style={
                   item.isInActive
                     ? {
@@ -346,7 +399,7 @@ const Marksheet = (props: {
 
                     }}
                   >
-                    {item.name}
+                    {item.student.name}
                   </Table.Td>
                   <Table.Td
                     ta="center"
@@ -354,7 +407,7 @@ const Marksheet = (props: {
                       color: item.isInActive ? "#bebebe" : "#7D7D7D",
                       fontWeight: 500,
                       padding: "1rem",
-                    }}>{item.roll}</Table.Td>
+                    }}>{item.student.rollNumber}</Table.Td>
                   <Table.Td
                     ta="center"
                     style={{
@@ -368,7 +421,7 @@ const Marksheet = (props: {
                       color: item.isInActive ? "#bebebe" : "#7D7D7D",
                       fontWeight: 500,
                       padding: "1rem",
-                    }}>{item.grade}</Table.Td>
+                    }}>{item.overallGrade}</Table.Td>
                   <Table.Td
                     ta="center"
                     style={{
@@ -404,6 +457,7 @@ const Marksheet = (props: {
             {/* 🔹 Select Exam */}
             <Select
               placeholder="Select Exam"
+              label="Select Exam"
               data={["Mid TERM Exam", "Annual TERM Exam"]}
               value={selectedExam}
               onChange={setSelectedExam}
@@ -476,8 +530,16 @@ const Marksheet = (props: {
                     type="file"
                     accept=".xlsx,.xls"
                     style={{ display: "none" }}
+                    // onChange={(e: any) => {
+                    //   setFile(e.target.files[0]);
+                    // }}
                     onChange={(e: any) => {
-                      setFile(e.target.files[0]);
+                      const selectedFile = e.target.files[0];
+                      setFile(selectedFile);
+
+                      if (selectedFile) {
+                        handleFileUpload(selectedFile); // 👈 YAHAN CALL
+                      }
                     }}
                     disabled={!selectedExam} // 👈 condition
                   />

@@ -64,10 +64,40 @@ export function CreateExamMarksheet(data: {
     grade: string;
   }[];
   date: Date;
+  totalMarks: number;
+  percentage: number;
+  overallGrade: string;
+  status: string;
 }) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(`${process.env.URL}/api/v1/marksheet/create`, data)
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
+}
+
+export async function CreateExamMarksheetForExcel(data: {
+  name: string;
+  batch: string;
+  student: string;
+  marks: {
+    subjectName: string;
+    theory_marks: number;
+    practical_marks: number;
+    obtained_marks: number;
+    grade: string;
+  }[];
+  date: Date;
+  totalMarks: number;
+  percentage: number;
+  overallGrade: string;
+  status: string;
+}[]) {
+
+  const allPromises = data.map((payload) =>
+    CreateExamMarksheet(payload)
+  );
+
+  return Promise.all(allPromises);
+
 }
