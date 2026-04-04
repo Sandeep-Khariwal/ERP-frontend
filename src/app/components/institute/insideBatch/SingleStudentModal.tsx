@@ -22,6 +22,7 @@ import { log } from "console";
 interface Props {
   opened: boolean;
   onClose: () => void;
+  refreshData: (data:any) => void;
   // subjects: { _id: string; name: string }[];
   batchId: string;
   batchStudents: {
@@ -31,7 +32,7 @@ interface Props {
   }[]
 }
 
-const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) => {
+const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshData }: Props) => {
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [selectedStudent, setSelectedStudent] = useState<string>("");
   const [marksData, setMarksData] = useState<{
@@ -56,6 +57,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [subjects, setSubjects] = useState<{ _id: string, name: string }[]>([]);  //state me savee krvana batch student
   const [resultDate, setResultDate] = useState<Date>(new Date());
+  const [session, setSession] = useState<string>("");
   useEffect(() => {
     if (!batchId) return;
 
@@ -140,6 +142,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
       student: selectedStudent,
       date: resultDate,
       marks: updatedMarks,
+       session: session,
       ...overall
 
     }
@@ -151,6 +154,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
 
       .then((x: any) => {
         SuccessNotification("Marksheet Created Success!!")
+         refreshData(x.marksheet); 
         onClose()
       })
       .catch((e: any) => {
@@ -204,7 +208,13 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
             label="Result Date"
             w={150}
           />
-
+            <TextInput
+  placeholder="Enter Session"
+  label="Session"
+  value={session}
+  onChange={(e) => setSession(e.target.value)}
+  w={150}
+/>
         </Flex>
         {/* 🔹 INPUT HEADER */}
         <Flex gap={10} mt={20}>
@@ -295,7 +305,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents }: Props) 
               background: "linear-gradient(135deg, #4B65F6, #6A5ACD)",
             }}
             onClick={() => CreateSingleMarksheet()}
-            disabled={!selectedExam || !selectedStudent || !marksData.marks.length}
+            disabled={!selectedExam || !selectedStudent || !marksData.marks.length || !session}
 
           >
             Create Marksheet

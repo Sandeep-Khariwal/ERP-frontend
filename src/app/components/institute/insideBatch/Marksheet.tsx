@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Box, Button, Center, Flex, Select, Stack, Table, Text, } from "@mantine/core";
+import { Box, Button, Center, Flex, Select, Stack, Table, Text, TextInput, } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useEffect, useState } from "react";
 import { FaFileDownload } from "react-icons/fa";
@@ -16,13 +16,14 @@ import { GetAllStudentsFromBatch, GetBatAllMarksheet } from "@/axios/institute/I
 import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
 import { GetGrade } from "../helperFunctions";
 import { useAppSelector } from "@/app/redux/redux.hooks";
+import { createMarksheetPdf } from "./CreateMarksheetPdf";
 const Marksheet = (props: {
   batchId: string;
   subjects: { _id: string; name: string }[];
 }) => {
-    const institute = useAppSelector(
-      (state: any) => state.instituteSlice.instituteDetails,
-    );
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails,
+  );
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
   const [batchStudents, setBatchStudents] = useState<{ _id: string, name: string, rollNumber: number }[]>([]);  //state me savee krvana batch student
   const [openUploadModal, setOpenUploadModal] = useState(false);
@@ -30,12 +31,18 @@ const Marksheet = (props: {
   const [openSingleStudentModal, setOpenSingleStudentModal] = useState(false);
   const isMobile = useMediaQuery(`(max-width: 968px)`);
   const [resultDate, setResultDate] = useState<Date | null>(null);
+  const [session, setSession] = useState<string>("");
 
   const [studentsPayload, setStudentsPayload] = useState<any[]>([]);
   const [allMarksheet, setAllMarksheet] = useState<{
     name: string;
     batch: string;
-    student: string;
+    student: {
+      enrollmentNo: string;
+      name: string;
+      rollNumber: string;
+      _id: string;
+    };
     marks: {
       subjectName: string;
       theory_marks: number;
@@ -49,15 +56,7 @@ const Marksheet = (props: {
     overallGrade: string;
     status: string;
   }[]>([])
-  // 🔹 Dummy data (backend se replace karna hai)
-  const students = [
-    {
-      name: "GURVEER",
-      roll: "101",
-      status: "Pass",
-      grade: "A",
-    },
-  ];
+ 
 
   useEffect(() => {
     //get all subjects
@@ -113,7 +112,7 @@ const Marksheet = (props: {
     let total = 0;
 
     marks.forEach((m: any) => {
-       let obtained_marks = m.practical_marks + m.theory_marks
+      let obtained_marks = m.practical_marks + m.theory_marks
       total += obtained_marks;
     });
 
@@ -211,8 +210,9 @@ const Marksheet = (props: {
               Number(std.rollNumber) === Number(roll)
           )?._id,
           marks,
-          date: resultDate,
+          date: resultDate ? resultDate.toISOString() : null,
           rollNumber: roll.toString(),
+           session: session,
           ...overall
         };
       });
@@ -296,13 +296,7 @@ const Marksheet = (props: {
 
         {/* 🔹 Table Container */}
         <Box
-          // mt={20}
-          // p={10}
-          // w="100%"
-          // style={{
-          //   border: "1px solid #ccc",
-          //   borderRadius: "8px",
-          // }}
+
           style={{ overflowX: "auto" }}
         >
           <Table w={"100%"}
@@ -377,23 +371,22 @@ const Marksheet = (props: {
             <Table.Tbody style={{ width: "100%" }}>
               {allMarksheet.map((item: any, index) => (
                 <Table.Tr key={index} style={
-                  item.isInActive
-                    ? {
-                      backgroundColor: "#FAFCFF",
-                      textAlign: "center",
-                      fontFamily: "Nunito",
-                      padding: "1rem",
-                    }
-                    : {
-                      // textAlign: "center",
-                      fontFamily: "Nunito",
-                      padding: "1rem",
-                    }
-                }>
+
+                  {
+                    backgroundColor: "#FAFCFF",
+                    textAlign: "center",
+                    fontFamily: "Nunito",
+                    padding: "1rem"
+                  }
+                }
+
+                >
+
                   <Table.Td
                     ta="left"
                     style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      color: "#000000",
                       fontWeight: 500,
                       padding: "1rem",
 
@@ -404,37 +397,77 @@ const Marksheet = (props: {
                   <Table.Td
                     ta="center"
                     style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      color: "#000000",
                       fontWeight: 500,
                       padding: "1rem",
                     }}>{item.student.rollNumber}</Table.Td>
                   <Table.Td
                     ta="center"
                     style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      color: "#000000",
                       fontWeight: 500,
                       padding: "1rem",
                     }}>{item.status}</Table.Td>
                   <Table.Td
                     ta="center"
                     style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      color: "#000000",
                       fontWeight: 500,
                       padding: "1rem",
                     }}>{item.overallGrade}</Table.Td>
                   <Table.Td
                     ta="center"
                     style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                      color: "#000000",
                       fontWeight: 500,
                       padding: "1rem",
                     }}>
-                    <FaFileDownload
+                    {/* <FaFileDownload
 
                       size={24}
                       style={{ cursor: "pointer" }}
                       onClick={() => {
                         console.log("Download clicked");
+                      }}
+                    /> */}
+                    <FaFileDownload
+                      size={24}
+                      style={{ cursor: "pointer", color: "#000000" }}
+                      onClick={() => {
+                        const html = createMarksheetPdf({
+                          instituteName: institute?.name,
+                          examName: item.name,
+                          batchName: item.batch.name,
+                          studentName: item.student.name,
+                          rollNumber: item.student.rollNumber,
+                          enrolment: item.student.enrollmentNo,
+                          marks: item.marks,
+                          totalMarks: item.totalMarks,
+                          percentage: item.percentage,
+                          overallGrade: item.overallGrade,
+                          status: item.status,
+                          allsubjecttotal: item.marks.length * 100,
+                          // date: new Date().toLocaleDateString(),
+                          date: new Date(item.date).toLocaleDateString("en-GB"),
+                           session: item.session,
+                        });
+
+                        const printWindow = window.open("", "_blank");
+
+                        if (printWindow) {
+                          printWindow.document.write(html);
+                          printWindow.document.close();
+                          // printWindow.print();
+                            printWindow.onload = () => {
+    setTimeout(() => {
+      printWindow.print();
+    }, 800); // 👈 thoda zyada delay safe hai
+  };
+                        }
                       }}
                     />
                   </Table.Td>
@@ -470,6 +503,13 @@ const Marksheet = (props: {
               label="Result Date"
               w={200}
             />
+            <TextInput
+  placeholder="Enter Session (e.g. 2024-2025)"
+  label="Session"
+  value={session}
+  onChange={(e) => setSession(e.target.value)}
+  w={200}
+/>
           </Flex>
           <Box
           // mt={10}
@@ -555,20 +595,12 @@ const Marksheet = (props: {
             style={{
               background: "linear-gradient(135deg, #4B65F6, #6A5ACD)",
             }}
-            disabled={!file || !selectedExam || !resultDate}
+            disabled={!file || !selectedExam || !resultDate  || !session}
             onClick={() => CreateMarksheet()}
           >
             Upload & Generate
           </Button>
-          {/* <Text ta="center"
-            mt={5}
-            style={{
-              fontSize: "14px",
-              color: "#6A5ACD",
-              fontWeight: 500,
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}>Download the sample excel file</Text> */}
+
           <a
             href="https://docs.google.com/uc?export=download&id=1NhUESVU2B8mEVI67KR2QrFr2jdmSD9lf"
             style={{ textDecoration: "none" }}
@@ -596,6 +628,9 @@ const Marksheet = (props: {
         // subjects={props.subjects ?? []}
         batchId={props.batchId}
         batchStudents={batchStudents}
+        refreshData={(data) => {
+          setAllMarksheet((prev) => [...prev, data])
+        }}
       />
     </>
   );
