@@ -32,11 +32,13 @@ import { UserType } from "../../dashboard/InstituteBatchesSection";
 import { CreateStudent } from "@/axios/institute/InstitutePostApi";
 import TeacherProfile from "../teacher/TeacherProfile";
 import Tests from "./test/Tests";
+import Marksheet from "./Marksheet";
 
 enum Tabs {
   OVERVIEW = "Overview",
   STUDENT = "Students",
   TEACHER = "Teachers",
+  MARKSHEET = "Marksheet",
   TEST = "Tests",
   STUDY_MATERIAL = "Study Material",
   ASSIGNMENT = "Assignment",
@@ -85,6 +87,7 @@ export interface Test {
 }
 
 export function InstituteInsideBatch(props: {
+  
   batchId: string;
   batchName: string;
   instituteId: string;
@@ -93,6 +96,7 @@ export function InstituteInsideBatch(props: {
   subjects?: { _id: string; name: string }[];
   userType: UserType;
 }) {
+   console.log("Subjects in InstituteInsideBatch 👉", props.subjects);  // undefined aa rha hai
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [selectedTeacherId, setSelectTeacherId] = useState<string>("");
   const [openAddStudentModal, setOpenAddStudentModal] =
@@ -146,7 +150,7 @@ export function InstituteInsideBatch(props: {
         </Flex>
 
         {/* 🔹 Tab Bar */}
-        <ScrollArea  p={10} mih={70} >
+        <ScrollArea p={10} mih={70} >
           <Flex mt={isMd ? 10 : 20}>
             {Object.values(Tabs).map((item: Tabs, i: number) => {
               return (
@@ -301,7 +305,7 @@ export function InstituteInsideBatch(props: {
                 dateOfJoining={new Date()}
                 batch={props?.batchId}
                 studentId={selectedStudentId}
-                onPaymentClick={() => {}}
+                onPaymentClick={() => { }}
                 onClickBack={() => {
                   setSelectedStudentId("");
                   setShowSelectedScreen(Screen.NONE);
@@ -342,6 +346,11 @@ export function InstituteInsideBatch(props: {
             )}
           </Stack>
         )}
+
+        {Tabs.MARKSHEET === activeTab && (
+          <Marksheet batchId={props.batchId} subjects={props.subjects ?? []}/>
+        )}
+
 
         {Tabs.TEST === activeTab && (
           <Tests batchId={props.batchId} subjects={props.subjects ?? []} />

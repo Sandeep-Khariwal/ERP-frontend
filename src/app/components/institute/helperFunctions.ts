@@ -158,3 +158,12 @@ export function formatNumberInK(value: number): number | string {
     return `${value / 1000}k`;
   }
 }
+
+ export const GetGrade = (marks: number) => {
+  if (marks >= 90) return "A+";
+  if (marks >= 75) return "A";
+  if (marks >= 60) return "B";
+  if (marks >= 50) return "C";
+  if (marks >= 40) return "D";
+  return "F";
+};

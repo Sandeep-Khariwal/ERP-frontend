@@ -3,6 +3,7 @@
 import React from "react";
 import { Modal, Stack, Text, Button, TextInput, Flex } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import { useMediaQuery } from "@mantine/hooks";
 
 
 const ReferCodeModal = (props: {
@@ -10,7 +11,7 @@ const ReferCodeModal = (props: {
   onClose: () => void;
   referralCode: string;
 }) => {
- const isMd = window.innerWidth <= 768;
+ const isMd =  useMediaQuery(`(max-width: 968px)`);
 
 const handleCopy = async () => {
   try {
