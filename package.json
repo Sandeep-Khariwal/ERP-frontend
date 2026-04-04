@@ -39,7 +39,8 @@
     "react-redux": "^9.2.0",
     "recharts": "^3.8.0",
     "socket.io-client": "^4.8.1",
-    "swiper": "^11.2.10"
+    "swiper": "^11.2.10",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
