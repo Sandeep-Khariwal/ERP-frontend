@@ -142,7 +142,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
       student: selectedStudent,
       date: resultDate,
       marks: updatedMarks,
-       session: session,
+      session: session,
       ...overall
 
     }
