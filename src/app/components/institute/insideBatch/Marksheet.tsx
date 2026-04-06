@@ -35,6 +35,7 @@ const Marksheet = (props: {
   const [allMarksheet, setAllMarksheet] = useState<{
     name: string;
     batch: string;
+    session: string;
     student: {
       enrollmentNo: string;
       name: string;
