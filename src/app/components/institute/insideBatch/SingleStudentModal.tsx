@@ -22,7 +22,7 @@ import { log } from "console";
 interface Props {
   opened: boolean;
   onClose: () => void;
-  refreshData: (data:any) => void;
+  refreshData: (data: any) => void;
   // subjects: { _id: string; name: string }[];
   batchId: string;
   batchStudents: {
@@ -154,7 +154,10 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
 
       .then((x: any) => {
         SuccessNotification("Marksheet Created Success!!")
-         refreshData(x.marksheet); 
+        refreshData(x.marksheet);
+        console.log("x.marksheet: ", x.marksheet);
+
+
         onClose()
       })
       .catch((e: any) => {
@@ -208,13 +211,13 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
             label="Result Date"
             w={150}
           />
-            <TextInput
-  placeholder="Enter Session"
-  label="Session"
-  value={session}
-  onChange={(e) => setSession(e.target.value)}
-  w={150}
-/>
+          <TextInput
+            placeholder="Enter Session"
+            label="Session"
+            value={session}
+            onChange={(e) => setSession(e.target.value)}
+            w={150}
+          />
         </Flex>
         {/* 🔹 INPUT HEADER */}
         <Flex gap={10} mt={20}>

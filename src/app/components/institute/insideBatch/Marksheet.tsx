@@ -1,17 +1,15 @@
-
 "use client";
 
 import { Box, Button, Center, Flex, Select, Stack, Table, Text, TextInput, } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useEffect, useState } from "react";
-import { FaFileDownload } from "react-icons/fa";
+import { IconDownload, IconArrowLeftFromArc, } from "@tabler/icons-react";
 import { Modal } from "@mantine/core";
 import { Image, Group } from "@mantine/core";
 import SingleStudentModal from "./SingleStudentModal";
 import { useMediaQuery } from "@mantine/hooks";
 import * as XLSX from "xlsx";
 import { CreateExamMarksheet, CreateExamMarksheetForExcel } from "@/axios/institute/InstitutePostApi";
-import { StudentsDataWithBatch } from "@/interface/student.interface";
 import { GetAllStudentsFromBatch, GetBatAllMarksheet } from "@/axios/institute/InstituteGetApi";
 import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
 import { GetGrade } from "../helperFunctions";
@@ -32,7 +30,7 @@ const Marksheet = (props: {
   const isMobile = useMediaQuery(`(max-width: 968px)`);
   const [resultDate, setResultDate] = useState<Date | null>(null);
   const [session, setSession] = useState<string>("");
-
+  const [filterExam, setFilterExam] = useState<string | null>(null);   //table me filter data ke liye 
   const [studentsPayload, setStudentsPayload] = useState<any[]>([]);
   const [allMarksheet, setAllMarksheet] = useState<{
     name: string;
@@ -57,7 +55,7 @@ const Marksheet = (props: {
     overallGrade: string;
     status: string;
   }[]>([])
- 
+
 
   useEffect(() => {
     //get all subjects
@@ -77,10 +75,7 @@ const Marksheet = (props: {
         console.log(e);
 
       })
-
     GetResult()
-
-
   }, [])
 
   const GetResult = () => {
@@ -95,7 +90,6 @@ const Marksheet = (props: {
 
       })
   }
-
 
   const processMarks = (marksArray: any[]) => {
     return marksArray.map((item) => {
@@ -213,7 +207,7 @@ const Marksheet = (props: {
           marks,
           date: resultDate ? resultDate.toISOString() : null,
           rollNumber: roll.toString(),
-           session: session,
+          session: session,
           ...overall
         };
       });
@@ -240,7 +234,13 @@ const Marksheet = (props: {
 
     CreateExamMarksheetForExcel(studentsPayload)
       .then((x: any) => {
-        GetResult()
+        console.log("x :",x);
+        // GetResult()
+        const newMarksheet = x.map((item: any) => item.marksheet);
+
+    // 👉 update state without API call
+    setAllMarksheet((prev) => [...prev, ...newMarksheet]);
+        
         SuccessNotification("Marksheet Created Success!!")
         setOpenUploadModal(false)
       })
@@ -249,6 +249,10 @@ const Marksheet = (props: {
         setOpenUploadModal(false)
       });
   };
+  //table me filter kiya data 
+  const filteredMarksheet = filterExam
+    ? allMarksheet.filter((item) => item.name === filterExam)
+    : [];
 
   return (
     <>
@@ -286,8 +290,8 @@ const Marksheet = (props: {
           <Select
             placeholder="Select Exam"
             data={["Mid TERM Exam", "Annual TERM Exam"]}
-            value={selectedExam}
-            onChange={setSelectedExam}
+            value={filterExam}
+            onChange={setFilterExam}
             // w={200}
             w={isMobile ? "100%" : 200}
 
@@ -370,7 +374,14 @@ const Marksheet = (props: {
 
             {/* 🔹 Table Body */}
             <Table.Tbody style={{ width: "100%" }}>
-              {allMarksheet.map((item: any, index) => (
+              {!filterExam && (
+                <Table.Tr>
+                  <Table.Td colSpan={5} ta="center">
+                    Please select exam to view results
+                  </Table.Td>
+                </Table.Tr>
+              )}
+              {filterExam && filteredMarksheet.map((item: any, index) => (
                 <Table.Tr key={index} style={
 
                   {
@@ -387,7 +398,7 @@ const Marksheet = (props: {
                     ta="left"
                     style={{
                       // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#000000",
+                      color: "#00000098",
                       fontWeight: 500,
                       padding: "1rem",
 
@@ -399,7 +410,7 @@ const Marksheet = (props: {
                     ta="center"
                     style={{
                       // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#000000",
+                      color: "#00000098",
                       fontWeight: 500,
                       padding: "1rem",
                     }}>{item.student.rollNumber}</Table.Td>
@@ -407,7 +418,7 @@ const Marksheet = (props: {
                     ta="center"
                     style={{
                       // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#000000",
+                      color: "#00000098",
                       fontWeight: 500,
                       padding: "1rem",
                     }}>{item.status}</Table.Td>
@@ -415,7 +426,7 @@ const Marksheet = (props: {
                     ta="center"
                     style={{
                       // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#000000",
+                      color: "#00000098",
                       fontWeight: 500,
                       padding: "1rem",
                     }}>{item.overallGrade}</Table.Td>
@@ -423,21 +434,14 @@ const Marksheet = (props: {
                     ta="center"
                     style={{
                       // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#000000",
+                      color: "#00000098",
                       fontWeight: 500,
                       padding: "1rem",
                     }}>
-                    {/* <FaFileDownload
-
+    
+                    <IconArrowLeftFromArc
                       size={24}
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        console.log("Download clicked");
-                      }}
-                    /> */}
-                    <FaFileDownload
-                      size={24}
-                      style={{ cursor: "pointer", color: "#000000" }}
+                      style={{ cursor: "pointer", color: "#00000098" }}
                       onClick={() => {
                         const html = createMarksheetPdf({
                           instituteName: institute?.name,
@@ -454,7 +458,7 @@ const Marksheet = (props: {
                           allsubjecttotal: item.marks.length * 100,
                           // date: new Date().toLocaleDateString(),
                           date: new Date(item.date).toLocaleDateString("en-GB"),
-                           session: item.session,
+                          session: item.session,
                         });
 
                         const printWindow = window.open("", "_blank");
@@ -463,11 +467,11 @@ const Marksheet = (props: {
                           printWindow.document.write(html);
                           printWindow.document.close();
                           // printWindow.print();
-                            printWindow.onload = () => {
-    setTimeout(() => {
-      printWindow.print();
-    }, 800); // 👈 thoda zyada delay safe hai
-  };
+                          printWindow.onload = () => {
+                            setTimeout(() => {
+                              printWindow.print();
+                            }, 800); // 👈 thoda zyada delay safe hai
+                          };
                         }
                       }}
                     />
@@ -505,21 +509,15 @@ const Marksheet = (props: {
               w={200}
             />
             <TextInput
-  placeholder="Enter Session (e.g. 2024-2025)"
-  label="Session"
-  value={session}
-  onChange={(e) => setSession(e.target.value)}
-  w={200}
-/>
+              placeholder="Enter Session (e.g. 2024-2025)"
+              label="Session"
+              value={session}
+              onChange={(e) => setSession(e.target.value)}
+              w={200}
+            />
           </Flex>
           <Box
-          // mt={10}
-          // p={20}
-          // style={{
-          //   border: "1px solid #eee",
-          //   borderRadius: "12px",
-          //   backgroundColor: "#fafafa",
-          // }}
+       
           >
             <Flex align="center" justify="space-between" gap={20}>
 
@@ -596,7 +594,7 @@ const Marksheet = (props: {
             style={{
               background: "linear-gradient(135deg, #4B65F6, #6A5ACD)",
             }}
-            disabled={!file || !selectedExam || !resultDate  || !session}
+            disabled={!file || !selectedExam || !resultDate || !session}
             onClick={() => CreateMarksheet()}
           >
             Upload & Generate
