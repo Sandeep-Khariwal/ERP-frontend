@@ -74,29 +74,24 @@ const dashboard = () => {
         setIsLoading(false);
       });
   }, []);
+
+  const [hovered, setHovered] = useState(false);
+  
   return (
     <>
       <Notifications />
-      <Flex w={"100%"} mih={"100vh"}>
+      <div style={{ width: "100%", minHeight: "100vh" }}>
         <LoadingOverlay visible={isLoading} />
-        <Box
-          w={isCollapsed ? (isMd ? "100%" : "5%") : isMd ? "0%" : "15%"}
-          style={{
-            transition: "width 0.3s ease-in-out",
-            display: isMd ? "none" : "block",
-          }}
-        >
-          <DesktopNavbar
-            isCollapsed={isCollapsed}
-            onClickCollapse={() => {
-              setIsCollapsed(!isCollapsed);
-            }}
-            onSelectTab={(val: Tabs) => {
-              setSelectedTab(val);
-            }}
-             activeTab={selectedTab}  //  ye add kri highlight ke liye 
-          />
-        </Box>
+
+         <DesktopNavbar
+  hovered={hovered}
+  setHovered={setHovered}
+  onSelectTab={(val: Tabs) => {
+    setSelectedTab(val);
+  }}
+  activeTab={selectedTab}
+/>
+
         <Box style={{ display: !isMd ? "none" : "block" }}>
           <MobileNavbar
             onClickCollapse={() => {
@@ -108,21 +103,24 @@ const dashboard = () => {
           />
         </Box>
         <Box
-          w={isCollapsed ? (isMd ? "100%" : "95%") : "100%"}
-          mah={"100vh"}
-          bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
-          style={{ transition: "width 0.3s ease-in-out", overflowY: "scroll" }}
-        >
-          {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
-          {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-          {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
-          {Tabs.TEACHER === selectedTab && (
-            <InstituteTeachers userType={UserType.OTHERS} />
-          )}
-          {institute?.featureAccess?.transportManagement &&
-            Tabs.TRANSPORT === selectedTab && <TransportPage />}
-        </Box>
-      </Flex>
+  style={{
+    marginLeft: isMd ? "0px" : hovered ? "250px" : "80px",
+    transition: "all 0.3s ease",
+    minHeight: "100vh",
+    overflowY: "auto",
+  }}
+  bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+>
+  {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
+  {Tabs.STUDENT === selectedTab && <InstituteStudents />}
+  {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
+  {Tabs.TEACHER === selectedTab && (
+    <InstituteTeachers userType={UserType.OTHERS} />
+  )}
+  {institute?.featureAccess?.transportManagement &&
+    Tabs.TRANSPORT === selectedTab && <TransportPage />}
+</Box>
+      </div>
     </>
   );
 };

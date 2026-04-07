@@ -12,5 +12,5 @@ export enum UserTypes {
      TEACHER = "teacher",
      TRANSPORT = "Transport",
      EXPENSE = "expense",
-    
+     EARNING = "earning",
    }
