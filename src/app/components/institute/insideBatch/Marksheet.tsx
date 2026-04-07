@@ -234,7 +234,13 @@ const Marksheet = (props: {
 
     CreateExamMarksheetForExcel(studentsPayload)
       .then((x: any) => {
-        GetResult()
+        console.log("x :",x);
+        // GetResult()
+        const newMarksheet = x.map((item: any) => item.marksheet);
+
+    // 👉 update state without API call
+    setAllMarksheet((prev) => [...prev, ...newMarksheet]);
+        
         SuccessNotification("Marksheet Created Success!!")
         setOpenUploadModal(false)
       })
