@@ -63,7 +63,7 @@ export default function InstituteExpanse() {
         <Container size="xl" py="md">
             <Group justify="space-between" mb="md">
                 <Title order={2}>Expense Analytics</Title>
-                <Button radius="xl">+ Add Expense</Button>
+                <Button radius="xl"  >+ Add Expense</Button>
             </Group>
 
             <Card shadow="sm" radius="xl" mb="md">
