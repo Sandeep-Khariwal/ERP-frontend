@@ -5,6 +5,7 @@ import { InstituteDashboard } from "@/app/components/institute/InstituteDashboar
 import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
 import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
+import InstituteEarnings from "@/app/components/institute/student/earnings/InstituteEarnings";
 import InstituteExpanse from "@/app/components/institute/student/expense/InstituteExpense";
 import TransportPage from "@/app/components/institute/transport/TransportPage";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
@@ -23,7 +24,7 @@ import { useEffect, useState } from "react";
 const dashboard = () => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
-  
+
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const institute = useAppSelector(
@@ -76,21 +77,21 @@ const dashboard = () => {
   }, []);
 
   const [hovered, setHovered] = useState(false);
-  
+
   return (
     <>
       <Notifications />
       <div style={{ width: "100%", minHeight: "100vh" }}>
         <LoadingOverlay visible={isLoading} />
 
-         <DesktopNavbar
-  hovered={hovered}
-  setHovered={setHovered}
-  onSelectTab={(val: Tabs) => {
-    setSelectedTab(val);
-  }}
-  activeTab={selectedTab}
-/>
+        <DesktopNavbar
+          hovered={hovered}
+          setHovered={setHovered}
+          onSelectTab={(val: Tabs) => {
+            setSelectedTab(val);
+          }}
+          activeTab={selectedTab}
+        />
 
         <Box style={{ display: !isMd ? "none" : "block" }}>
           <MobileNavbar
@@ -103,23 +104,25 @@ const dashboard = () => {
           />
         </Box>
         <Box
-  style={{
-    marginLeft: isMd ? "0px" : hovered ? "250px" : "80px",
-    transition: "all 0.3s ease",
-    minHeight: "100vh",
-    overflowY: "auto",
-  }}
-  bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
->
-  {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
-  {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-  {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
-  {Tabs.TEACHER === selectedTab && (
-    <InstituteTeachers userType={UserType.OTHERS} />
-  )}
-  {institute?.featureAccess?.transportManagement &&
-    Tabs.TRANSPORT === selectedTab && <TransportPage />}
-</Box>
+          style={{
+            marginLeft: isMd ? "0px" : hovered ? "250px" : "80px",
+            transition: "all 0.3s ease",
+            minHeight: "100vh",
+            overflowY: "auto",
+          }}
+          bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+        >
+          {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
+          {Tabs.STUDENT === selectedTab && <InstituteStudents />}
+          {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
+          {Tabs.EARNING === selectedTab && <InstituteEarnings />}
+           
+          {Tabs.TEACHER === selectedTab && (
+            <InstituteTeachers userType={UserType.OTHERS} />
+          )}
+          {institute?.featureAccess?.transportManagement &&
+            Tabs.TRANSPORT === selectedTab && <TransportPage />}
+        </Box>
       </div>
     </>
   );

@@ -81,3 +81,12 @@ export function GetBatAllMarksheet(id:string) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetAllEarnings(instituteId:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/institute/earnings/${instituteId}`)
+      .then((response:any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+
