@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Divider, Flex, Stack, Text, Transition } from "@mantine/core";
-import { MdOutlineDashboard } from "react-icons/md";
+import { MdKeyboardArrowDown, MdOutlineDashboard } from "react-icons/md";
 import { PiStudent } from "react-icons/pi";
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoMdClose } from "react-icons/io";
@@ -22,6 +22,7 @@ import { saveToken } from "@/app/redux/slices/adminSlice";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { MdBusiness } from "react-icons/md";
+import Image from "next/image";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -209,6 +210,7 @@ export const DesktopNavbar = (props: {
                   style={{
                     overflow: "hidden",   // 🔥 IMPORTANT
                     transform: hovered ? "translateX(0px)" : "translateX(-10px)",
+                    width: hovered ? "auto" : "0px",
                     opacity: hovered ? 1 : 0,
                     marginLeft: hovered ? 6 : 0,
                     transition: "all 0.3s ease",
@@ -424,7 +426,20 @@ export const DesktopNavbar = (props: {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  <Text fw={600} fz={17}>Business</Text>
+                    <Flex align="center" gap={4}>
+    
+    <Text fw={600} fz={17}>Business</Text>
+
+    {/* Arrow */}
+    <MdKeyboardArrowDown
+      size={20}
+      style={{
+        transition: "all 0.3s ease",
+        transform: openBusiness ? "rotate(180deg)" : "rotate(0deg)",
+      }}
+    />
+
+  </Flex>
                 </Box>
               </Flex>
 
@@ -449,7 +464,7 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EXPENSE)}
                   >
-                    <FaMoneyBillWave size={18} />
+                    <Image src="/expense.png" width={25} height={25} alt="not found" />
                     <Text fw={500}>Expanse</Text>
                   </Flex>
 
@@ -470,7 +485,7 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EARNING)}
                   >
-                    <MdOutlineAttachMoney size={20} />
+                    <Image src="/earnings.png" width={25} height={25} alt="not found" />
                     <Text fw={500}>Earning</Text>
                   </Flex>
 
@@ -573,28 +588,37 @@ export const DesktopNavbar = (props: {
                 style={{ cursor: "pointer" }}
                 my={10}
                 align={"center"}
-                gap={hovered ? 10 : 0} 
+                gap={hovered ? 12 : 0}
                 justify={!hovered ? "center" : "start"}
               >
-                <AiOutlineLogout
-                  size={28}
-                  onClick={() => {
-                    SuccessNotification("Log out!!");
-                    LogOut();
-                    // dispatch(
-                    //   setDetails({
-                    //     name: "",
-                    //     _id: "",
-                    //     phoneNumber: "",
-                    //     address: "",
-                    //   })
-                    // );
-                    dispatch(saveToken(""));
-                    setTimeout(() => {
-                      navigation.push("/");
-                    }, 2000);
+                <Box
+                  style={{
+                    minWidth: "40px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
-                />
+                >
+                  <AiOutlineLogout
+                    size={28}
+                    onClick={() => {
+                      SuccessNotification("Log out!!");
+                      LogOut();
+                      // dispatch(
+                      //   setDetails({
+                      //     name: "",
+                      //     _id: "",
+                      //     phoneNumber: "",
+                      //     address: "",
+                      //   })
+                      // );
+                      dispatch(saveToken(""));
+                      setTimeout(() => {
+                        navigation.push("/");
+                      }, 2000);
+                    }}
+                  />
+                </Box>
                 <Box
                   style={{
                     overflow: "hidden",
@@ -609,13 +633,10 @@ export const DesktopNavbar = (props: {
                     fw={600}
                     fz={16}
                     style={{
-                      maxWidth: "160px", // sidebar width according to adjust kar sakda
-                      transform: hovered ? "translateX(0px)" : "translateX(-10px)",
-                      opacity: hovered ? 1 : 0,
-                      marginLeft: hovered ? 6 : 0,
-                      transition: "all 0.3s ease",
+                      maxWidth: "160px",
                       whiteSpace: "nowrap",
                       textOverflow: "ellipsis",
+                      overflow: "hidden",
                     }}
                   >
                     {institute?.name}
