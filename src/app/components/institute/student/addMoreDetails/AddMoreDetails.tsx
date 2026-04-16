@@ -81,12 +81,11 @@ export function AddMoreDetails(props: {
     rollNumber: props.formData?.rollNumber || 0,
   });
 
-
   useEffect(() => {
     console.log("formValues.van  : ", formValues.van);
 
-    setSelectedVan(formValues.van ?? "")
-  }, [formValues])
+    setSelectedVan(formValues.van ?? "");
+  }, [formValues]);
 
   const [studentInstallments, setStudentInstallments] = useState<Installment[]>(
     [
@@ -97,7 +96,7 @@ export function AddMoreDetails(props: {
         amount: 0,
         isDeleted: false,
       },
-    ]
+    ],
   );
   const [installments, setInstallments] = useState<Installment[]>([
     {
@@ -119,11 +118,10 @@ export function AddMoreDetails(props: {
           setStudentId(student._id);
           const additionalPhoneNumbers = student.phoneNumber || [];
           const val = new Date(student.dateOfBirth).setDate(
-            new Date(student.dateOfBirth)!!.getDate() - 1
+            new Date(student.dateOfBirth)!!.getDate() - 1,
           );
 
           console.log("student : ", student);
-
 
           const studentData = {
             name: student.name,
@@ -193,8 +191,8 @@ export function AddMoreDetails(props: {
         parentNumber: formValues.parentNumber || "",
         dateOfBirth: new Date(
           new Date(formValues.dateOfBirth!!).setDate(
-            formValues.dateOfBirth!!!!.getDate() + 1
-          )
+            formValues.dateOfBirth!!!!.getDate() + 1,
+          ),
         ),
         address: formValues.address,
         gender: formValues.gender,
@@ -204,7 +202,6 @@ export function AddMoreDetails(props: {
         van: selectedVan ?? formValues.van,
         rollNumber: formValues.rollNumber,
       };
-
 
       if (props.isEditableData) {
         UpdateStudentBasicInfo(studentId, studentPayload)
@@ -242,7 +239,7 @@ export function AddMoreDetails(props: {
         batchId: props.batchId,
         dateOfJoining: formValues.dateOfJoining,
         optionalSubjects: optionalSubjects,
-        van: selectedVan ?? formValues.van
+        van: selectedVan ?? formValues.van,
       })
         .then((x: any) => {
           setIsLoading(false);
@@ -256,7 +253,10 @@ export function AddMoreDetails(props: {
     if (active === 2) {
       CreateStudentFeeRecords({
         studentId,
-        installments,
+        installments: installments.map((prevIns) => ({
+          ...prevIns,
+          instituteId: props?.instituteId,
+        })),
         batchId: selectedBatch || selectedBatchId,
         type: customOrBatch,
       })
@@ -366,7 +366,7 @@ export function AddMoreDetails(props: {
               }}
               onChangeAssigningVan={(val: string) => {
                 setSelectedVan(val);
-                setFormValues((prev) => ({ ...prev, van: val }))
+                setFormValues((prev) => ({ ...prev, van: val }));
               }}
               handleInputChange={(field: string, value: any) => {
                 handleInputChange(field, value);

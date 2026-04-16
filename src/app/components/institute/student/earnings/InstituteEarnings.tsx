@@ -84,7 +84,7 @@ const itemsPerPage = 10;
   const dueFees = apiData.dueFees || [];
   const overdueFees = apiData.overdueFees || [];
   const upcomingFees = apiData.upcomingFees || [];
-
+  
   // ================= CALCULATIONS =================
   const totalEarnings = allRecords.reduce(
     (sum: number, item: any) => sum + (item.amountPaid || 0),
