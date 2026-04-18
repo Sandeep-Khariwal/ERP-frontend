@@ -85,8 +85,10 @@ const dashboard = () => {
         <LoadingOverlay visible={isLoading} />
 
         <DesktopNavbar
-          hovered={hovered}
-          setHovered={setHovered}
+          isCollapsed={hovered}
+          onClickCollapse={()=>{
+            setHovered(!hovered)
+          }}
           onSelectTab={(val: Tabs) => {
             setSelectedTab(val);
           }}
