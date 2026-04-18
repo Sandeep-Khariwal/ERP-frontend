@@ -57,9 +57,9 @@ class ApiHelper {
     }
   }
 
-  async patch<T>(url: string): Promise<T> {
+  async patch<T>(url: string,data?: any): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await this.instance.patch(url);
+      const response: AxiosResponse<T> = await this.instance.patch(url,data);
       return response.data;
     } catch (error) {
       throw error;
