@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   env: {
   //  URL: "http://localhost:8080"
-   URL: "https://erp-backend-p5nc.onrender.com"
+   URL: "http://13.206.81.172:8080"
   },
   
 };
