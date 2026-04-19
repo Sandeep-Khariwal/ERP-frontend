@@ -114,7 +114,7 @@ export function useMetaPages() {
     setLoading(true);
     FetchConnectedPages()
       .then((res: any) => {
-        setPages(res.pages);
+        setPages(res.data);
         setLoading(false);
       })
       .catch((e) => {
