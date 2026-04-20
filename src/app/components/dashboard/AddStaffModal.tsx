@@ -134,6 +134,11 @@ const AddStaffModal = (props: {
             setIsLoading(false);
           });
       } else {
+        if (!selectedBatches.length) {
+          ErrorNotification("Select Batches!!");
+          setIsLoading(false);
+          return;
+        }
         // Add Teacher
         CreateTeacher({
           name: formData.name,
@@ -274,8 +279,8 @@ const AddStaffModal = (props: {
                         selectedImageIndex === -1
                           ? "transparent"
                           : selectedImageIndex === index
-                          ? "#EFF1FE"
-                          : "transparent",
+                            ? "#EFF1FE"
+                            : "transparent",
                       cursor: "pointer",
                       borderRadius: "10px",
                     }}
