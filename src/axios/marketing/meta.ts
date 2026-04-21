@@ -96,7 +96,7 @@ export async function updateLead(
 
 export async function addNote(leadId: string, text: string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.post(`${process.env.URL}/api/p1/leads/${leadId}/notes`, { text })
+    ApiHelper.post(`${process.env.URL}/api/v1/leads/${leadId}/notes`, { text })
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
   });
@@ -107,7 +107,7 @@ export async function addCallLog(
   data: { outcome: CallOutcome; durationSeconds?: number; note?: string },
 ) {
   return new Promise((resolve, reject) => {
-    ApiHelper.post(`${process.env.URL}/api/v1/leads/${leadId}/call-logs`, data)
+    ApiHelper.post(`${process.env.URL}/api/v1/leads/call-logs/${leadId}`, data)
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
   });
@@ -131,20 +131,9 @@ export function GetMetaConnectUrl() {
 }
 export function DisconnectMetaPage(pageId: string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/integrations/meta/pages/${pageId}`)
+    ApiHelper.delete(`${process.env.URL}/api/v1/oauth/meta/pages/${pageId}`)
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
   });
 }
 
-// export async function fetchConnectedPages(): Promise<{ pages: MetaPage[] }> {
-//   return api<{ pages: MetaPage[] }>("/api/v1/oauth/meta/pages");
-// }
-
-// export async function getMetaConnectUrl(): Promise<{ url: string }> {
-//   return api<{ url: string }>("/api/v1/oauth/meta/connect");
-// }
-
-// export async function disconnectMetaPage(pageId: string): Promise<void> {
-//   return api(`/api/integrations/meta/pages/${pageId}`, { method: "DELETE" });
-// }

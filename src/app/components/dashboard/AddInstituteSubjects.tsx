@@ -42,7 +42,6 @@ export function AddInstituteSubjects(Props: {
 
     const createSubjects = () => {
         if (!subjectInput) return;
-        console.log("setSelectedSubject :", selectedSubject);
         setIsLoading(true);
         AddSubjects({
             _id: isEditing ? selectedSubject._id : "",
@@ -118,8 +117,6 @@ export function AddInstituteSubjects(Props: {
 
         GetInstituteSubjects(institute._id)
             .then((x: any) => {
-                console.log("Subjects API:", x);
-
                 // assuming res.data me array aa rha hai
                 setSubjects(x.subjects || []);
                 setIsLoading(false);
@@ -223,7 +220,6 @@ export function AddInstituteSubjects(Props: {
                                             color="red"
                                             style={{ cursor: "pointer" }}
                                             onClick={() => {
-                                                console.log("Delete:", sub);
                                                 //    deleteSubject(sub._id);
 
                                                 setDeleteModalOpen(true);

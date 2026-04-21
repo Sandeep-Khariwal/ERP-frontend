@@ -39,7 +39,6 @@ export default function Home() {
   const navigation = useRouter();
 
   useEffect(() => {
-    console.log("process.env.URL : ", process.env.URL);
 
     const token = localStorage.getItem("shikshaPayToken"); //"shikshaPayToken"
 
@@ -60,7 +59,6 @@ export default function Home() {
               institute: data.institute,
             }),
           );
-          console.log("admin data : ",data);
           
           const instituteDetails = {
             name: data.institute.name,

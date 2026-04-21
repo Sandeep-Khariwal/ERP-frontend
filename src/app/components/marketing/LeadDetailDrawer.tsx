@@ -73,15 +73,6 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
         setSaving(false);
       });
 
-    // try {
-    //   const res = await updateLead(lead._id, { status: val as LeadStatus });
-    //   onUpdated(res.lead);
-    //   notifications.show({ color: "green", message: "Status updated" });
-    // } catch (e: any) {
-    //   notifications.show({ color: "red", message: e.message });
-    // } finally {
-    //   setSaving(false);
-    // }
   };
 
   // ── Update score ────────────────────────────────────────────────
@@ -114,19 +105,6 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
         notifications.show({ color: "red", message: e.message });
         setSaving(false);
       });
-    // try {
-    //   await addNote(lead._id, noteText.trim());
-
-    //   // Refresh lead
-    //   const res = await import("@/axios/marketing/meta").then((m) =>
-    //     m.fetchLeadById(lead._id)
-    //   );
-    //   onUpdated(res.lead);
-    // } catch (e: any) {
-    //   notifications.show({ color: "red", message: e.message });
-    // } finally {
-    //   setSaving(false);
-    // }
   };
 
   // ── Add call log ────────────────────────────────────────────────
@@ -145,30 +123,12 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
         setCallDuration("");
         notifications.show({ color: "green", message: "Call logged" });
         onUpdated(res.lead);
+        setSaving(false);
       })
       .catch((e: any) => {
         notifications.show({ color: "red", message: e.message });
         setSaving(false);
       });
-    // try {
-    //   await addCallLog(lead._id, {
-    //     outcome:         callOutcome as CallOutcome,
-    //     durationSeconds: callDuration ? parseInt(callDuration) : undefined,
-    //     note:            callNote || undefined,
-    //   });
-    //   setCallOutcome("");
-    //   setCallNote("");
-    //   setCallDuration("");
-    //   notifications.show({ color: "green", message: "Call logged" });
-    //   onUpdated(res.lead);
-    //   const res = await import("@/axios/marketing/meta").then((m) =>
-    //     m.fetchLeadById(lead._id)
-    //   );
-    // } catch (e: any) {
-    //   notifications.show({ color: "red", message: e.message });
-    // } finally {
-    //   setSaving(false);
-    // }
   };
 
   console.log("lead : ", lead);
@@ -374,6 +334,13 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
                     size="sm"
                     value={callNote}
                     onChange={(e) => setCallNote(e.currentTarget.value)}
+                    minRows={2}
+                  />
+                  <Textarea
+                    placeholder="Call Duration"
+                    size="sm"
+                    value={callNote}
+                    onChange={(e) => setCallDuration(e.currentTarget.value)}
                     minRows={2}
                   />
                   <Button

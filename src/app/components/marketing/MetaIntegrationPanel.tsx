@@ -55,6 +55,8 @@ export function MetaIntegrationPanel() {
 
   // ── Disconnect a page ───────────────────────────────────────────
   const handleDisconnect = (page: MetaPage) => {
+    console.log("pageSelecting : ");
+    
     modals.openConfirmModal({
       title: "Disconnect Facebook Page",
       children: (
@@ -174,7 +176,7 @@ export function MetaIntegrationPanel() {
           <PageCard
             key={page._id}
             page={page}
-            onDisconnect={() => handleDisconnect(page)}
+            onDisconnect={(pageSelecting) => handleDisconnect(pageSelecting)}
           />
         ))}
 
@@ -200,7 +202,7 @@ function PageCard({
   onDisconnect,
 }: {
   page: MetaPage;
-  onDisconnect: () => void;
+  onDisconnect: (page:MetaPage) => void;
 }) {
   const isExpiringSoon =
     page.tokenExpiresAt &&
@@ -260,7 +262,7 @@ function PageCard({
           )}
 
           <Tooltip label="Disconnect page">
-            <ActionIcon color="red" variant="subtle" onClick={onDisconnect}>
+            <ActionIcon color="red" variant="subtle" onClick={()=>onDisconnect(page)}>
               <IconPlugConnectedX size={16} />
             </ActionIcon>
           </Tooltip>

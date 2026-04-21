@@ -101,7 +101,6 @@ const AddStaffModal = (props: {
           institute: props.instituteId,
         })
           .then((x: any) => {
-            console.log(x);
             setIsLoading(false);
             props.onClose();
             SuccessNotification("Admin Created Success!!");
@@ -124,7 +123,6 @@ const AddStaffModal = (props: {
           .then((x: any) => {
             setIsLoading(false);
             props.onClose();
-            console.log(x);
             SuccessNotification("User Created Success!!");
           })
           .catch((e) => {
