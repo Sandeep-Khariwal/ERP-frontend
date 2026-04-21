@@ -27,7 +27,6 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
     address,
   } = data;
 
-  // --- DYNAMIC SESSION LOGIC ---
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
@@ -54,6 +53,9 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
     position: relative;
     border: 1px solid #e0e0e0;
     color: #333;
+    /* --- CRITICAL PDF COLOR FIXES --- */
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   ">
     
     <div style="
@@ -69,6 +71,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       font-weight: 900;
       box-shadow: 0 4px 10px rgba(0,0,0,0.25);
       letter-spacing: 1px;
+      -webkit-print-color-adjust: exact;
     ">
       ${session}
     </div>
@@ -82,6 +85,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       background: linear-gradient(135deg, ${primaryColor} 0%, #2c3e50 100%);
       clip-path: ellipse(120% 100% at 50% 0%);
       z-index: 1;
+      -webkit-print-color-adjust: exact;
     "></div>
 
     <div style="
@@ -127,6 +131,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
         box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         background: #f0f0f0;
         outline: 2px solid ${accentColor};
+        -webkit-print-color-adjust: exact;
       ">
         <img src="${window.location.origin}/pic.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
       </div>
@@ -144,6 +149,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
           font-size: 12px;
           font-weight: 700;
           margin-top: 5px;
+          -webkit-print-color-adjust: exact;
         ">
           STUDENT
         </div>
@@ -198,6 +204,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       padding: 0 20px;
       box-sizing: border-box;
       border-top: 1px solid #eee;
+      -webkit-print-color-adjust: exact;
     ">
        <div style="text-align: left;">
          <div style="font-size: 8px; color: ${primaryColor}; text-transform: uppercase; font-weight: 700;">School contact</div>
