@@ -91,9 +91,6 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     ? UserTypes.USER
     : UserTypes.ADMIN;
 
-console.log("backend role:", adminDetails?.role);
-console.log("final userType:", userType);
-
   const getAccountByToken = () => {
     setIsLoading(true);
     GetAccountByToken()
@@ -337,13 +334,6 @@ const getSubjects = () => {
     setSelectedSubjects(batch[0].subjects.map((s) => s.name));
     setSelectedOptionalSubjects(batch[0].optionalSubjects.map((s) => s.name));
   };
-
-  const handleCreateSubject = (newSubject: string) => {
-    // setData((prevData) => [...prevData, newSubject]);
-    // setSelectedSubjects((prevSubjects) => [...prevSubjects, newSubject]);
-  };
-
-  // console.log("userType:", userType);
 
   return (
     <>

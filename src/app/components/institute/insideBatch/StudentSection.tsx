@@ -21,6 +21,13 @@ import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
 import Image from "next/image";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
+import { generateIdCardHTML } from "./IDCardHtml";
+import { useAppSelector } from "@/app/redux/redux.hooks";
+import {
+  GetStudentForIdCard,
+  GetStudentForPdf,
+} from "@/axios/student/StudentGetApi";
+import { formatDate } from "../../marketing/utility/utils";
 
 const StudentSection = (props: {
   batchId: string;
@@ -31,6 +38,9 @@ const StudentSection = (props: {
   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
   setStudents: React.Dispatch<React.SetStateAction<StudentsDataWithBatch[]>>;
 }) => {
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails,
+  );
   const [students, setStudents] = useState<
     {
       _id: string;
@@ -57,7 +67,7 @@ const StudentSection = (props: {
                 acc.amountPaid += record.amountPaid;
                 return acc;
               },
-              { totalAmount: 0, amountPaid: 0 }
+              { totalAmount: 0, amountPaid: 0 },
             );
 
             return {
@@ -69,8 +79,8 @@ const StudentSection = (props: {
                 totals.totalAmount === totals.amountPaid
                   ? "Paid"
                   : totals.amountPaid === 0
-                  ? "Not Paid"
-                  : "Partial Paid",
+                    ? "Not Paid"
+                    : "Partial Paid",
             };
           });
           props.setStudents(students);
@@ -97,9 +107,46 @@ const StudentSection = (props: {
       });
   };
 
+  const downloadIdCard = (id: string) => {
+    console.log("id card : ", id);
+
+    GetStudentForIdCard(id)
+      .then((res: any) => {
+        const studentInfo = res.student;
+        const idCardhtml = generateIdCardHTML({
+          schoolName: studentInfo.instituteId.name,
+          schoolLogo: "https://yourdomain.com/logo.png",
+          schoolAddress: studentInfo.instituteId.address,
+          institutePhoneNumber: studentInfo.instituteId.institutePhoneNumber,
+
+          studentName: studentInfo.name,
+          studentPhoto: "https://yourdomain.com/student.jpg",
+          className: studentInfo.batchId.name,
+          rollNo: studentInfo.rollNumber,
+          entrollmentNum: studentInfo.enrollmentNo,
+
+          dob: formatDate(studentInfo.dateOfBirth),
+          phone: studentInfo.phoneNumber,
+          address: studentInfo.address,
+        });
+
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+          printWindow.document.write(idCardhtml);
+          printWindow.document.close();
+          printWindow.print();
+        } else {
+          console.error("Failed to open print window.");
+        }
+      })
+      .catch((e: any) => {
+        console.log(e);
+      });
+  };
+
   const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
-    <Stack w={"100%"} >
+    <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
       {students.length > 0 ? (
         <Table
@@ -250,8 +297,8 @@ const StudentSection = (props: {
                         item.feeStatus === "Paid"
                           ? "green"
                           : item.feeStatus === "Partial Paid"
-                          ? "blue"
-                          : "red"
+                            ? "blue"
+                            : "red"
                       }
                       size="lg"
                       radius="xs"
@@ -305,6 +352,16 @@ const StudentSection = (props: {
                           {" "}
                           Edit Profile
                         </Menu.Item>
+                        <Menu.Item
+                          onClick={() => {
+                            downloadIdCard(item._id);
+                            // setSelectedStudent(item);
+                            // setEditStudentFee(true);
+                          }}
+                        >
+                          {" "}
+                          Download ID Card
+                        </Menu.Item>
                         {props.userType !== UserType.TEACHER && (
                           <Menu.Item
                             onClick={() => {
@@ -313,7 +370,7 @@ const StudentSection = (props: {
                               // setEditStudentFee(false);
                               props.setSelectedStudentId(item._id);
                               props.setShowSelectedScreen(
-                                Screen.VIEWFEEDETAILS
+                                Screen.VIEWFEEDETAILS,
                               );
                             }}
                           >

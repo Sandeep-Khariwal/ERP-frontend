@@ -16,7 +16,6 @@ import { DateInput } from "@mantine/dates";
 import { GetGrade } from "../helperFunctions";
 import { CreateExamMarksheet } from "@/axios/institute/InstitutePostApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
-import { log } from "console";
 
 
 interface Props {
@@ -74,9 +73,6 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
 
           }
         })
-
-        console.log("formatted: ", formatted);
-
         setSubjects(formatted);
 
         //  setTeachers(teacherByInstituteBatch);
@@ -119,8 +115,6 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
     const isFail = marks.some((m: any) => m.obtained_marks < 33);
 
     const status = isFail ? "Fail" : "Pass";
-    console.log("percentage :", percentage, total);
-
 
 
     return {
@@ -146,18 +140,11 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
       ...overall
 
     }
-
-    console.log("payload : ", payload);
-
-
     CreateExamMarksheet(payload)
 
       .then((x: any) => {
         SuccessNotification("Marksheet Created Success!!")
         refreshData(x.marksheet);
-        console.log("x.marksheet: ", x.marksheet);
-
-
         onClose()
       })
       .catch((e: any) => {
