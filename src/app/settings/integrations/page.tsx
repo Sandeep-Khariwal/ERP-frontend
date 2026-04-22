@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Center, Loader } from "@mantine/core";
-import { IntegrationsCallbackContent } from "@/app/components/marketing/IntegrationCallbackContent";
+import { IntegrationsCallbackContent } from "@/app/components/marketing/meta/IntegrationCallbackContent";
 
 // useSearchParams() MUST be wrapped in Suspense in Next.js 14 App Router
 export default function SettingsIntegrationsPage() {

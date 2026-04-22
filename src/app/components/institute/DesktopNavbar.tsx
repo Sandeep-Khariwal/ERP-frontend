@@ -616,7 +616,26 @@ export const DesktopNavbar = (props: {
                     onClick={() => props.onSelectTab(Tabs.LEADS)}
                   >
                     <FaUsers  size={25}  />
-                    <Text fw={500}>Leads</Text>
+                    <Text fw={500}>Facebook Leads</Text>
+                  </Flex>
+                  <Flex
+                    style={{
+                      cursor: "pointer",
+                      background:
+                        props.activeTab === Tabs.WHATSAPPLEADS
+                          ? "rgba(255,255,255,0.08)"
+                          : "transparent",
+
+                      color: "white",
+                      borderRadius: "8px",
+                      padding: "6px",
+                    }}
+                    align="center"
+                    gap={10}
+                    onClick={() => props.onSelectTab(Tabs.WHATSAPPLEADS)}
+                  >
+                    <FaUsers  size={25}  />
+                    <Text fw={500}>Whatsapp Leads</Text>
                   </Flex>
 
                   {/* INTEGRATION */}

@@ -27,10 +27,12 @@ import {
 import { useState } from "react";
 import { notifications } from "@mantine/notifications";
 import { modals } from "@mantine/modals";
-import { timeAgo } from "./utility/utils";
-import { useMetaPages } from "./hooks/useLeads";
+// import { timeAgo } from "./utility/utils";
+// import { useMetaPages } from "./hooks/useLeads";
 import { MetaPage } from "@/types";
 import { DisconnectMetaPage, GetMetaConnectUrl } from "@/axios/marketing/meta";
+import { useMetaPages } from "../hooks/useLeads";
+import { timeAgo } from "../utility/utils";
 
 export function MetaIntegrationPanel() {
   const { pages, loading, error, refetch } = useMetaPages();

@@ -24,7 +24,7 @@ import {
 import { ScoreBadge, StatusBadge, SourceBadge } from "./LeadBadges";
 // import { getInitials, timeAgo } from "../utility/utils";
 import { Lead, PaginationType } from "@/types";
-import { getInitials, timeAgo } from "./utility/utils";
+import { getInitials, timeAgo } from "../utility/utils";
 
 interface Props {
   leads: Lead[];

@@ -7,6 +7,7 @@ import {
   IconBrandWhatsapp,
 } from "@tabler/icons-react";
 import { MetaIntegrationPanel } from "./MetaIntegrationPanel";
+import { WhatsAppIntegrationPanel } from "../whatsapp/WhatsAppIntegrationPanel";
 
 export default function IntegrationsPage() {
   return (
@@ -28,6 +29,13 @@ export default function IntegrationsPage() {
           >
             Facebook & Instagram
           </Tabs.Tab>
+           <Tabs.Tab
+            value="whatsapp"
+            leftSection={<IconBrandWhatsapp size={16} />}
+        
+          >
+            WhatsApp (coming soon)
+          </Tabs.Tab>
           <Tabs.Tab
             value="google"
             leftSection={<IconBrandGoogle size={16} />}
@@ -35,17 +43,14 @@ export default function IntegrationsPage() {
           >
             Google Ads (coming soon)
           </Tabs.Tab>
-          <Tabs.Tab
-            value="whatsapp"
-            leftSection={<IconBrandWhatsapp size={16} />}
-            disabled
-          >
-            WhatsApp (coming soon)
-          </Tabs.Tab>
+         
         </Tabs.List>
 
         <Tabs.Panel value="meta" pt="lg">
           <MetaIntegrationPanel />
+        </Tabs.Panel>
+        <Tabs.Panel value="whatsapp" pt="lg">
+          <WhatsAppIntegrationPanel />
         </Tabs.Panel>
       </Tabs>
     </Stack>

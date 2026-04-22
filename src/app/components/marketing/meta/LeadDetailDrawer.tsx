@@ -34,7 +34,7 @@ import {
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { ScoreBadge, StatusBadge, SourceBadge } from "./LeadBadges";
-import { formatDateTime, getInitials, timeAgo } from "./utility/utils";
+import { formatDateTime, getInitials, timeAgo } from "../utility/utils";
 import { notifications } from "@mantine/notifications";
 import { addCallLog, addNote, updateLead } from "@/axios/marketing/meta";
 import { CallOutcome, Lead, LeadScore, LeadStatus } from "@/types";
