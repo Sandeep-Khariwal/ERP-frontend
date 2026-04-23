@@ -29,6 +29,15 @@ export function connectWhatsApp(data: {
       .catch((error: any) => reject(error));
   });
 }
+export function getWaOAuthUrl(): Promise<WhatsAppConnection> {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/oauth/whatsapp/url`
+    )
+      .then((response: any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
 
 /** Disconnect a WhatsApp number */
 export function disconnectWhatsApp(

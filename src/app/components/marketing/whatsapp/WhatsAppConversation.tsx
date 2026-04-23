@@ -61,7 +61,7 @@ export function WhatsAppConversation({ leadId, leadName, phone }: Props) {
   // ── Send message ────────────────────────────────────────────────
   const handleSend = async () => {
     if (!message.trim()) return;
-    setSending(true);
+    // setSending(true);
     sendWaMessage({ leadId, toPhone: phone, message: message.trim() })
       .then(async(res: any) => {
         setMessage("");

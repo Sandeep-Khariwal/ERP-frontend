@@ -25,13 +25,6 @@ import {
   IconMessageCircle,
   IconSettings,
 } from "@tabler/icons-react";
-
-// import { fetchWaLeads }               from "@/lib/whatsapp.api";
-// import { Lead, LeadsResponse }        from "@/types";
-// import { WhatsAppIntegrationPanel }   from "@/components/integrations/whatsapp/WhatsAppIntegrationPanel";
-// import { WhatsAppConversation }       from "@/components/integrations/whatsapp/WhatsAppConversation";
-// import { getInitials, timeAgo }       from "@/lib/utils";
-// import { ScoreBadge, StatusBadge }    from "@/components/leads/LeadBadges";
 import { Drawer, Divider, ScrollArea } from "@mantine/core";
 import { Lead, LeadsResponse } from "@/types";
 import { fetchWaLeads } from "@/axios/marketing/whatsapp";
@@ -53,7 +46,7 @@ export default function WhatsAppPage() {
     setLoading(true);
     fetchWaLeads(page, 20)
       .then(async (res: any) => {
-        setData(res);
+        setData(res.data);
         setLoading(false);
       })
       .catch((e: any) => {
