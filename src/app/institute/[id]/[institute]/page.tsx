@@ -8,8 +8,9 @@ import MobileNavbar from "@/app/components/institute/MobileNavbar";
 import InstituteEarnings from "@/app/components/institute/student/earnings/InstituteEarnings";
 import InstituteExpanse from "@/app/components/institute/student/expense/InstituteExpense";
 import TransportPage from "@/app/components/institute/transport/TransportPage";
-import IntegrationsPage from "@/app/components/marketing/IntegrationPage";
-import LeadsPage from "@/app/components/marketing/LeadsDashboard";
+import IntegrationsPage from "@/app/components/marketing/meta/IntegrationPage";
+import LeadsPage from "@/app/components/marketing/meta/LeadsDashboard";
+import WhatsAppPage from "@/app/components/marketing/whatsapp/WhatsappLeads";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
@@ -121,6 +122,7 @@ const dashboard = () => {
           {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
           {Tabs.EARNING === selectedTab && <InstituteEarnings />}
           {Tabs.LEADS === selectedTab && <LeadsPage />}
+          {Tabs.WHATSAPPLEADS === selectedTab && <WhatsAppPage />}
           {Tabs.INTEGRATION === selectedTab && <IntegrationsPage />}
 
           {Tabs.TEACHER === selectedTab && (

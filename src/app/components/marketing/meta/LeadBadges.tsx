@@ -9,7 +9,7 @@ import {
   statusLabel,
   sourceColor,
   sourceLabel,
-} from "./utility/utils";
+} from "../utility/utils";
 import { LeadScore, LeadSource, LeadStatus } from "@/types";
 
 export function ScoreBadge({ score }: { score: LeadScore }) {

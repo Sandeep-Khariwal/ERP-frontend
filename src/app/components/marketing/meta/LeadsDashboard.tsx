@@ -13,13 +13,20 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useState, useCallback } from "react";
 import { IconPlus, IconTable, IconLayoutKanban } from "@tabler/icons-react";
-import { useLeads, useLeadStats } from "./hooks/useLeads";
 import { Lead, LeadFilters } from "@/types";
+import { useLeads, useLeadStats } from "../hooks/useLeads";
 import { StatsCards } from "./StatsCards";
 import { LeadFilterBar } from "./LeadFilterBar";
 import { LeadTable } from "./LeadTable";
 import { LeadDetailDrawer } from "./LeadDetailDrawer";
 import { CreateLeadModal } from "./CreateLeadModal";
+// import { useLeads, useLeadStats } from "./hooks/useLeads";
+// import { Lead, LeadFilters } from "@/types";
+// import { StatsCards } from "./StatsCards";
+// import { LeadFilterBar } from "./meta/LeadFilterBar";
+// import { LeadTable } from "./LeadTable";
+// import { LeadDetailDrawer } from "./meta/LeadDetailDrawer";
+// import { CreateLeadModal } from "./meta/CreateLeadModal";
 
 // import { StatsCards }      from "@/components/leads/StatsCards";
 // import { LeadFilterBar }   from "@/components/leads/LeadFilterBar";
