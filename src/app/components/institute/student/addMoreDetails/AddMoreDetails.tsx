@@ -40,6 +40,7 @@ interface StudentFormValues {
   parentNumber?: string;
   van?: string;
   rollNumber: number;
+  photo?: string
 }
 
 export function AddMoreDetails(props: {
@@ -79,6 +80,7 @@ export function AddMoreDetails(props: {
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
     van: props.formData.van,
     rollNumber: props.formData?.rollNumber || 0,
+    
   });
 
   useEffect(() => {
@@ -137,6 +139,7 @@ export function AddMoreDetails(props: {
               : new Date(),
             van: student.van,
             rollNumber: student.rollNumber,
+            
           };
 
           const newInstallments = student.feeRecords.map((f: any) => {
@@ -201,6 +204,7 @@ export function AddMoreDetails(props: {
         email: formValues.email,
         van: selectedVan ?? formValues.van,
         rollNumber: formValues.rollNumber,
+        photo: formValues.photo,
       };
 
       if (props.isEditableData) {

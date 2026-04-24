@@ -7,6 +7,7 @@ export function createReceiptPdf(
     amountPaid: number;
     updatedAt: Date;
     name: string;
+    totalAmount: number;
   }[],
   name: string,
   address: string,
@@ -18,17 +19,21 @@ export function createReceiptPdf(
     numberToWords(amountPaid).toUpperCase() + " RUPEES ONLY";
   const month = date.toLocaleString("default", { month: "long" });
 
-  const installmentsHtml = paymentRecords
-    .map(
-      (record) =>
-        `<div class="row">
-            <span>Tution Fee - ${record.name}, paid on: ${new Date(record.updatedAt)
-              .toISOString()
-              .slice(0, 10)}</span>
-            <span>${record.amountPaid}</span>
-          </div>`
-    )
-    .join("");
+const installmentsHtml = paymentRecords
+  .map((record) => {
+    const remaining = record.totalAmount - record.amountPaid;
+
+    return `
+      <div class="row">
+        <span>
+          Tution Fee - ${record.name} <br/>
+          Paid: ₹${record.amountPaid} | Remaining: ₹${remaining}
+        </span>
+        <span>₹${record.totalAmount}</span>
+      </div>
+    `;
+  })
+  .join("");
 
 
   return `

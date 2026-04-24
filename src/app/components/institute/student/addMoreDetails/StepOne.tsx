@@ -1,5 +1,7 @@
 "use client";
 
+import ApiHelper from "@/ApiHelper";
+import { UploadStudentImage } from "@/axios/student/StudentPut";
 import {
   Button,
   Container,
@@ -12,7 +14,7 @@ import {
 import { DatePickerInput } from "@mantine/dates";
 import { useMediaQuery } from "@mantine/hooks";
 import { IconPlus, IconX } from "@tabler/icons-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 
 interface StudentFormValues {
@@ -26,6 +28,7 @@ interface StudentFormValues {
   dateOfJoining: Date;
   parentNumber?: string;
   rollNumber: number;
+  photo?: string;
 }
 
 const StepOne = (props: {
@@ -43,6 +46,30 @@ const StepOne = (props: {
   const handleInputChange = (field: string, value: any) => {
     props.onChangeInputValue(field, value);
   };
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+useEffect(() => {
+  if (!imageFile) return;
+
+  UploadStudentImage(imageFile)
+    .then((res: any) => {
+      console.log("SUCCESS:", res);
+
+      const imageUrl = res?.data?.url; // ⚠️ yaha check karna
+
+      if (imageUrl) {
+        handleInputChange("photo", imageUrl);
+      }
+    })
+    .catch((err: any) => {
+      console.log("ERROR:", err);
+    });
+
+}, [imageFile]);
+
+const [preview, setPreview] = useState<string | null>(null);
+
   return (
     <Container h={"100%"} w={isMobile ? "98%" : "100%"}>
       <Text fz={"lg"} fw={500} ff={"Fira Sans"} c="#333333" my={10}>
@@ -64,6 +91,37 @@ const StepOne = (props: {
             styles={{ input: { borderWidth: 2 } }}
           />
         </Grid.Col>
+
+        <Grid.Col span={isMobile ? 12 : 6}>
+  <Text ff={"Poppins"} mb={5}>
+    Student Photo
+  </Text>
+
+<input
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setPreview(URL.createObjectURL(file)); // 👈 instant preview
+    }
+  }}
+/>
+
+{props.formData?.photo ? (
+  <img
+    src={props.formData.photo}
+    style={{ width: 100, marginTop: 10, borderRadius: 8 }}
+  />
+) : preview ? (
+  <img
+    src={preview}
+    style={{ width: 100, marginTop: 10, borderRadius: 8 }}
+  />
+) : null}
+
+</Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
 
           <TextInput
