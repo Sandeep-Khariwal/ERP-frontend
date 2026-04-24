@@ -99,6 +99,7 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
       .then((res: any) => {
         setSaving(false);
         setNoteText("");
+        onUpdated(res.lead);
         notifications.show({ color: "green", message: "Note added" });
       })
       .catch((e: any) => {
@@ -111,7 +112,6 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
   const handleAddCallLog = async () => {
     if (!callOutcome) return;
     setSaving(true);
-
     addCallLog(lead._id, {
       outcome: callOutcome as CallOutcome,
       durationSeconds: callDuration ? parseInt(callDuration) : undefined,

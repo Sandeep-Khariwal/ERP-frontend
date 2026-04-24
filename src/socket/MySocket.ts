@@ -5,8 +5,8 @@ class MySocket {
     public URL:string;
 
   constructor(){
-    // this.URL = "https://flickerchat-backend.onrender.com";
-    this.URL = "http://localhost:8080";
+    this.URL = "https://server.shikshapay.cloud";
+    // this.URL = "http://localhost:8080";
 
     this.socket = io(this.URL,{autoConnect:true})
 
