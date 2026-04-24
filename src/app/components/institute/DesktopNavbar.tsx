@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { FaRupeeSign } from "react-icons/fa";
 import { useState } from "react";
-import { FaArrowTrendUp, FaUsers } from "react-icons/fa6";
+import { FaArrowTrendUp, FaFacebook, FaUsers, FaWhatsapp } from "react-icons/fa6";
 
 import { LiaBusAltSolid, LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { Tabs } from "@/enums";
@@ -615,7 +615,7 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.LEADS)}
                   >
-                    <FaUsers  size={25}  />
+                       <FaFacebook  size={25}  />
                     <Text fw={500}>Facebook Leads</Text>
                   </Flex>
                   <Flex
@@ -634,7 +634,7 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.WHATSAPPLEADS)}
                   >
-                    <FaUsers  size={25}  />
+                    <FaWhatsapp  size={25}  />
                     <Text fw={500}>Whatsapp Leads</Text>
                   </Flex>
 
