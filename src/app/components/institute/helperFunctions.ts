@@ -1,3 +1,5 @@
+import * as XLSX from "xlsx";
+
 export const months = [
   "January",
   "February",
@@ -166,4 +168,24 @@ export function formatNumberInK(value: number): number | string {
   if (marks >= 50) return "C";
   if (marks >= 40) return "D";
   return "F";
+};
+
+export const parseExcelDate = (value: any) => {
+  if (!value) return undefined;
+
+  // ✅ If already a string (like "25-10-2001")
+  if (typeof value === "string") {
+    return new Date(value);
+  }
+
+  // ✅ If Excel number (serial)
+  if (typeof value === "number") {
+    const parsed = XLSX.SSF.parse_date_code(value);
+
+    if (!parsed) return undefined;
+
+    return new Date(parsed.y, parsed.m - 1, parsed.d);
+  }
+
+  return undefined;
 };
