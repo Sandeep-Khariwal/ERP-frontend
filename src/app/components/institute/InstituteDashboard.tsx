@@ -91,9 +91,6 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     ? UserTypes.USER
     : UserTypes.ADMIN;
 
-console.log("backend role:", adminDetails?.role);
-console.log("final userType:", userType);
-
   const getAccountByToken = () => {
     setIsLoading(true);
     GetAccountByToken()

@@ -96,7 +96,6 @@ export function InstituteInsideBatch(props: {
   subjects?: { _id: string; name: string }[];
   userType: UserType;
 }) {
-   console.log("Subjects in InstituteInsideBatch 👉", props.subjects);  // undefined aa rha hai
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [selectedTeacherId, setSelectTeacherId] = useState<string>("");
   const [openAddStudentModal, setOpenAddStudentModal] =

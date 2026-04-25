@@ -82,7 +82,6 @@ const Marksheet = (props: {
     // get all marksheet
     GetBatAllMarksheet(props.batchId)
       .then((x: any) => {
-        console.log("marksheets  : ", x.marksheets);
         setAllMarksheet(x.marksheets)
       })
       .catch((e: any) => {

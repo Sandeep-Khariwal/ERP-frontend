@@ -13,4 +13,7 @@ export enum UserTypes {
      TRANSPORT = "Transport",
      EXPENSE = "expense",
      EARNING = "earning",
+     LEADS = "leads",
+     WHATSAPPLEADS = "whatsappleads",
+     INTEGRATION = "integration",
    }

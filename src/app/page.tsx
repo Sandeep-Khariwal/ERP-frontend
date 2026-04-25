@@ -39,7 +39,6 @@ export default function Home() {
   const navigation = useRouter();
 
   useEffect(() => {
-    
 
     const token = localStorage.getItem("shikshaPayToken"); //"shikshaPayToken"
 
@@ -63,8 +62,7 @@ export default function Home() {
          
             }),
           );
-
-
+          
           const instituteDetails = {
             name: data.institute.name,
             _id: data.institute._id,
