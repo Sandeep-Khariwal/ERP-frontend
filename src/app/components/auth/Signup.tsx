@@ -88,6 +88,8 @@ export default function Signup(props: { onClickLogin: () => void }) {
           _id: institute._id,
           phoneNumber: "",
           address: institute.address,
+          email: institute.email,
+        
         };
         setAdminForm((prev) => ({ ...prev, institute: institute._id }));
         setIsLoading(false);
@@ -118,6 +120,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
             _id: admin._id,
             phone: admin.phone,
             institute: admin.institute,
+          
           })
         );
         dispatch(saveToken(token));

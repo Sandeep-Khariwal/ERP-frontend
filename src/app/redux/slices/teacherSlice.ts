@@ -26,6 +26,7 @@ export const teacherDetails = createSlice({
           _id: string;
           phone: string;
           institute: string;
+         
         };
       }
     ) {

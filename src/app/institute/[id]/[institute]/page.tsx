@@ -59,6 +59,7 @@ const dashboard = () => {
           phoneNumber: "",
           address: data.institute.address,
           featureAccess: data.institute.accessFeatures,
+               email: data.email,
         };
 
         dispatch(setDetails(instituteDetails));

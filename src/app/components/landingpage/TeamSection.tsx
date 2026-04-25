@@ -5,6 +5,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 const sandeep = "/Sandeep.jpg";
 const johnson = "/Johnson.png";
 const shubham = "/Shubham.png";
+const jagdeep = "/jagdeep.jpeg";
+const guri = "/guri.jpeg"
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,6 +31,20 @@ const teamMembers = [
     image: `${shubham}`,
     description:
       "Shubham architected and implemented the backend services with secure and scalable APIs, integrating MongoDB, authentication, and admin functionalities for smooth data flow.",
+  },
+  {
+    name: "jagdeep",
+    role: "FullStack Developer",
+    image: `${jagdeep}`,
+   description:
+  "Jagdeep is a passionate Full Stack Developer with expertise in building robust and scalable web applications. He excels in crafting responsive user interfaces and developing secure, high-performance backend systems. With hands-on experience in modern frameworks, API development, and database management, Jagdeep consistently delivers efficient and user-focused digital solutions."
+  },
+  {
+    name: "Guri",
+    role: "FullStack Developer",
+    image: `${guri}`,
+ description:
+  "Guri is a dedicated Full Stack Developer known for building clean, efficient, and scalable web applications. He has strong command over both frontend and backend technologies, creating smooth user experiences and reliable system architecture. With a problem-solving mindset and attention to detail, Guri focuses on delivering high-quality, performance-driven solutions."
   },
 ];
 

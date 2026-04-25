@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 export function AddInstituteSubjects(Props: {
     isOpen: boolean;
     onClose: () => void;
-      
+
 }) {
     const institute = useSelector(
         (state: any) => state.instituteSlice.instituteDetails
@@ -49,7 +49,7 @@ export function AddInstituteSubjects(Props: {
             label: subjectInput,
             instituteId: institute._id
         }).then((x: any) => {
-           
+
             if (isEditing) {
                 // subject with updated subject
                 // update existing subject in state

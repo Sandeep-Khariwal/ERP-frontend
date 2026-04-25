@@ -26,6 +26,7 @@ export const adminDetails = createSlice({
           _id: string;
           phone: string;
           institute: string;
+
         };
       }
     ) {
@@ -37,5 +38,5 @@ export const adminDetails = createSlice({
     },
   },
 });
-export const { setAdminDetails , saveToken } = adminDetails.actions;
+export const { setAdminDetails, saveToken } = adminDetails.actions;
 export default adminDetails.reducer;

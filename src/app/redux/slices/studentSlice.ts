@@ -6,6 +6,7 @@ interface Student {
   _id: string;
   phone: string;
   institute: string;
+ 
 }
 
 interface StudentIntialState {
@@ -26,6 +27,7 @@ export const studentDetails = createSlice({
           _id: string;
           phone: string;
           institute: string;
+         
         };
       }
     ) {
