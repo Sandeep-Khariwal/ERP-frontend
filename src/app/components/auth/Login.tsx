@@ -129,6 +129,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
               _id: admin._id,
               phone: admin.phone,
               institute: admin.institute?._id || "",
+              
             })
           );
           dispatch(saveToken(token));
@@ -139,7 +140,8 @@ export default function Login(props: { onCreateAccount: () => void }) {
             _id: admin.institute._id,
             phoneNumber: "",
             address: admin.institute.address,
-            featureAccess:admin.institute.accessFeatures
+            featureAccess:admin.institute.accessFeatures,
+             email: admin.instituteId.email
           };
           dispatch(setDetails(instituteDetails));
           // window.location.reload();
@@ -173,6 +175,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
               _id: user._id,
               phone: "",
               institute: user.instituteId._id,
+             
             })
           );
           dispatch(saveToken(token));
@@ -182,7 +185,8 @@ export default function Login(props: { onCreateAccount: () => void }) {
             _id: user.instituteId._id,
             phoneNumber: "",
             address: user.instituteId.address,
-            featureAccess:user.instituteId.accessFeatures
+            featureAccess:user.instituteId.accessFeatures,
+             email: user.instituteId.email
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/user/${user._id}/${user.name}`);
@@ -227,6 +231,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
               _id: teacher._id,
               phone: teacher.phoneNumber[0],
               institute: teacher.instituteId._id,
+              
             })
           );
           dispatch(saveToken(token));
@@ -236,7 +241,8 @@ export default function Login(props: { onCreateAccount: () => void }) {
             _id: teacher.instituteId._id,
             phoneNumber: "",
             address: teacher.instituteId.address,
-            featureAccess:teacher.instituteId.accessFeatures
+            featureAccess:teacher.instituteId.accessFeatures,
+             email: teacher.instituteId.email
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/teacher/${teacher._id}/${teacher.name}`);
@@ -276,7 +282,8 @@ export default function Login(props: { onCreateAccount: () => void }) {
           _id: student.instituteId._id,
           phoneNumber: "",
           address: student.instituteId.address,
-          featureAccess:student.instituteId.accessFeatures
+          featureAccess:student.instituteId.accessFeatures,
+         
         };
         dispatch(setDetails(instituteDetails));
         navigation.push(`/student/${student._id}/${student.name}`);

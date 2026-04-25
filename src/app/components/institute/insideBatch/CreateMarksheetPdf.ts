@@ -1,3 +1,6 @@
+import { GetStudentDetail } from "@/axios/institute/InstituteGetApi";
+import { useEffect, useState } from "react";
+
 export const createMarksheetPdf = (data: any) => {
 const getRemark = () => {
   if (data.status === "Fail") {
@@ -13,6 +16,7 @@ const getRemark = () => {
   
   return "Needs improvement. Focus more on studies.";
 };
+
   return `
 <!DOCTYPE html>
 <html>
@@ -55,9 +59,23 @@ const getRemark = () => {
                       
                         ${data.instituteName}
                     </h1>
-                    <div style="color:#ff6a00; font-weight:bold; margin-top:5px; text-align: center;">
-                        LEARN • GROW • SUCCEED
-                    </div>
+                     <div style="margin-top:8px; display:flex; flex-direction:column; gap:4px;">
+
+    <div style="color:#2e3f57; font-size:13px; font-weight:500; display:flex; align-items:flex-start;">
+        <span style="margin-right:6px;"></span>
+        <span style="line-height:1.4;">
+            ${data.instituteAdress || "N/A"}
+        </span>
+    </div>
+
+    <div style="color:#1f4e8c; font-size:13px; font-weight:600; display:flex; align-items:center;">
+        <span style="margin-right:6px;"></span>
+        <span>
+            ${data.institutePhone ? data.institutePhone : "N/A"}
+        </span>
+    </div>
+
+</div>
                 </div>
             </div>
 
@@ -75,41 +93,64 @@ const getRemark = () => {
 
     <div style="flex:1; padding-left:25px;">
         
-        <div style="display:flex; justify-content:space-between;">
+       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
 
-            <!-- LEFT SIDE -->
-            <div style="width:30%; ">
+  <!-- LEFT COLUMN -->
+  <div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2;  padding-bottom:5px; width: 40vw;" >
-                    <b style="color:#1f4e8c;">Name:</b><span style="color: #243854; font-weight: bolder; " >   ${data.studentName}</span>
-                </div>
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Name:</b>
+      <span style="font-weight:bold;"> ${data.studentName}</span>
+    </div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px; width: 15vw;">
-                    <b style="color:#1f4e8c;">Roll No:</b> <span style="color: #243854; font-weight: bolder; " > ${data.rollNumber} </span>
-                </div>
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Father Name:</b>
+      <span style="font-weight:bold;"> ${data.fName}</span>
+    </div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;  width: 15vw">
-                    <b style="color:#1f4e8c;">Class:</b><span style="color: #243854; font-weight: bolder; "> ${data.batchName}  </span>
-                </div>
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Roll No:</b>
+      <span style="font-weight:bold;"> ${data.rollNumber}</span>
+    </div>
 
-            </div>
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Class:</b>
+      <span style="font-weight:bold;"> ${data.batchName}</span>
+    </div>
 
-            <!-- RIGHT SIDE -->
-            <div style="width:70%; margin-top: 40px;" >
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">DOB:</b>
+      <span style="font-weight:bold;"> ${data.dob}</span>
+    </div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;  white-space: nowrap;  width: 20vw">
-                    <b style="color:#1f4e8c;">Enrollment No:</b> <span style="color: #243854; font-weight: bolder; ">  ${data.enrolment}</span>
-                </div>
+  </div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;  width: 20vw">
-                    <b style="color:#1f4e8c;">Session:</b> <span style="color: #243854; font-weight: bolder; ">  ${data.session}</span>
-                </div>
+  <!-- RIGHT COLUMN -->
+  <div>
 
-            </div>
-           
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Enrollment No:</b>
+      <span style="font-weight:bold;"> ${data.enrolment}</span>
+    </div>
 
-        </div>
-  
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Session:</b>
+      <span style="font-weight:bold;"> ${data.session}</span>
+    </div>
+
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Parent Mobile:</b>
+      <span style="font-weight:bold;"> ${data.parentNumber}</span>
+    </div>
+
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Address:</b>
+      <span style="font-weight:bold;">${data.address}</span>
+    </div>
+
+  </div>
+
+</div>
     </div>
 
 </div>
@@ -129,17 +170,18 @@ const getRemark = () => {
     <tr style="background:#1f4e8c; color:#fff;  -webkit-print-color-adjust: exact;">
         <th style="padding:px; border:1px solid #c3d3e2;">Subject</th>
         <th style="padding:10px; border:1px solid #c3d3e2;">Max Marks</th>
-        <th style="padding:10px; border:1px solid #c3d3e2;">Marks Obtained</th>
-        <th style="padding:10px; border:1px solid #c3d3e2;">Theory</th>
         <th style="padding:10px; border:1px solid #c3d3e2;">Practical</th>
+        <th style="padding:10px; border:1px solid #c3d3e2;">Theory</th>
+        <th style="padding:10px; border:1px solid #c3d3e2;">Marks Obtained</th>
     </tr>
           ${data.marks.map((m: any, i: number) => `
     <tr style="background:${(i+1)%2 === 0?"#ffffff":"#eaf3fb"}; -webkit-print-color-adjust: exact;">
         <td style="padding:10px; border:1px solid #c3d3e2;">${m.subjectName}</td>
         <td style="border:1px solid #c3d3e2;">100</td>
-        <td style="border:1px solid #c3d3e2;">${m.obtained_marks}</td>
-        <td style="border:1px solid #c3d3e2;">${m.theory_marks}</td>
         <td style="border:1px solid #c3d3e2;">${m.practical_marks}</td>
+        <td style="border:1px solid #c3d3e2;">${m.theory_marks}</td>
+        <td style="border:1px solid #c3d3e2;">${m.obtained_marks}</td>
+
     </tr>
 
       `).join("")}
