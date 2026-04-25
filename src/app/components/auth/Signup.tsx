@@ -120,7 +120,7 @@ export default function Signup(props: { onClickLogin: () => void }) {
             _id: admin._id,
             phone: admin.phone,
             institute: admin.institute,
-            email: admin.email,
+          
           })
         );
         dispatch(saveToken(token));
