@@ -26,6 +26,7 @@ export const userDetails = createSlice({
           _id: string;
           phone: string;
           institute: string;
+         
         };
       }
     ) {

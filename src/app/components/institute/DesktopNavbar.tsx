@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Divider, Flex, Stack, Text, Transition } from "@mantine/core";
+import { Box, Divider, Flex, Stack, Text, Textarea, TextInput, Transition } from "@mantine/core";
 import { MdKeyboardArrowDown, MdOutlineDashboard } from "react-icons/md";
 import { PiStudent } from "react-icons/pi";
 import { AiOutlineLogout } from "react-icons/ai";
@@ -11,11 +11,11 @@ import { LogOut } from "@/axios/LocalStorageUtility";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { FaRupeeSign } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { LiaBusAltSolid, LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { Tabs } from "@/enums";
-import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
 import { Notifications } from "@mantine/notifications";
 import { saveToken } from "@/app/redux/slices/adminSlice";
 
@@ -23,6 +23,12 @@ import { FaMoneyBillWave } from "react-icons/fa";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { MdBusiness } from "react-icons/md";
 import Image from "next/image";
+import { Modal, Button } from "@mantine/core";
+import { IoSettingsOutline } from "react-icons/io5";
+import { LogoModal } from "./LogoModal";
+import { updateschooldetails } from "@/axios/institute/InstitutePutApi";
+import { setDetails } from "@/app/redux/slices/instituteSlice";
+
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -36,14 +42,276 @@ export const DesktopNavbar = (props: {
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
+ 
+
+
 
   const [openBusiness, setOpenBusiness] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [settingsOpened, setSettingsOpened] = useState(false);
+  const [logoModalOpen, setLogoModalOpen] = useState(false);
+  const [activeSettingTab, setActiveSettingTab] = useState<"logo" | "info" | null>("info");
 
+  const [schoolName, setSchoolName] = useState( "");
+  const [email, setEmail] = useState( "");
+  const [phone, setPhone] = useState( "");
+  const [address, setAddress] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleUpdateSchool = () => {
+    // ❌ agar kuch bhi change nahi hua
+    if (
+      schoolName === institute?.name &&
+      email === institute?.email &&
+      phone === institute?.PhoneNumber &&
+      address === institute?.address
+    ) {
+      ErrorNotification("No changes made!");
+      return;
+    }
+
+    setIsLoading(true);
+
+    updateschooldetails(institute?._id, {
+      name: schoolName,
+      email: email,
+      PhoneNumber: phone,
+      address: address,
+    })
+      .then((res: any) => {
+        SuccessNotification("Changes Updated Successfully ✅");
+        dispatch(setDetails({
+          ...institute,
+          name: schoolName,
+          email: email,
+          phoneNumber: phone,
+          address: address
+        }));
+
+    
+
+
+        setIsLoading(false);
+        setSettingsOpened(false); // modal close
+      })
+      .catch((err: any) => {
+        console.log(err);
+        ErrorNotification("Something went wrong ❌");
+        setIsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (institute) {
+      console.log("instituteus:", institute.email);
+      
+      setSchoolName(institute.name || "");
+      setEmail(institute.email || "");
+      setPhone(institute.PhoneNumber || "");
+      setAddress(institute.address || "");
+    }
+  }, [institute]);
 
   return (
     <>
       <Notifications />
+      <Modal
+        opened={settingsOpened}
+        onClose={() => setSettingsOpened(false)}
+        centered
+        size="xl"
+        withCloseButton={false}
+      >
+        {/* HEADER */}
+        <Flex align="center" justify="space-between" mb="md">
+          <Flex align="center" gap={10}>
+            <Box
+              style={{
+                background: "#f3e8ff",
+                borderRadius: "50%",
+                padding: "8px",
+              }}
+            >
+              <IoSettingsOutline size={20} color="#7c3aed" />
+            </Box>
+
+            <Box>
+              <Text fw={700} fz="lg">Settings</Text>
+              <Text size="xs" c="dimmed">
+                Manage your school profile and preferences.
+              </Text>
+            </Box>
+          </Flex>
+
+          <IoMdClose
+            size={22}
+            style={{ cursor: "pointer" }}
+            onClick={() => setSettingsOpened(false)}
+          />
+        </Flex>
+
+        <Divider mb="md" />
+
+        <Flex>
+
+          {/* LEFT SIDE */}
+          <Stack
+            w="220px"
+            p="sm"
+            style={{
+              borderRight: "1px solid #eee",
+            }}
+          >
+            {/* CHANGE INFO */}
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                background: activeSettingTab === "info" ? "#f3e8ff" : "transparent",
+              }}
+              onClick={() => setActiveSettingTab("info")}
+            >
+              <IoSettingsOutline size={18} />
+              <Text size="sm" fw={500}>
+                Change School Information
+              </Text>
+            </Flex>
+
+            {/* ADD LOGO */}
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                background: activeSettingTab === "logo" ? "#f3e8ff" : "transparent",
+              }}
+              onClick={() => {
+                setSettingsOpened(false);
+                setLogoModalOpen(true);
+              }}
+            >
+              <IoSettingsOutline size={18} />
+              <Text size="sm" fw={500}>
+                Add School Logo
+              </Text>
+            </Flex>
+          </Stack>
+
+          {/* RIGHT SIDE */}
+          <Box flex={1} pl="md">
+
+            {activeSettingTab === "info" && (
+              <Stack
+                p="lg"
+                style={{
+                  border: "1px solid #eee",
+                  borderRadius: "12px",
+                  background: "white",
+                }}
+              >
+                <Text fw={700} fz="lg">
+                  School Profile
+                </Text>
+
+                <Text size="sm" c="dimmed">
+                  Update your school information and logo.
+                </Text>
+
+                {/* LOGO SECTION */}
+                <Flex
+                  justify="space-between"
+                  align="center"
+                  p="md"
+                  style={{
+                    border: "1px dashed #c084fc",
+                    borderRadius: "10px",
+                    background: "#faf5ff",
+                  }}
+                >
+                  <Box>
+                    <Text fw={500}>School Logo</Text>
+                    <Text size="xs" c="dimmed">
+                      Recommended size 512x512px
+                    </Text>
+                  </Box>
+
+                  <Button
+                    variant="outline"
+                    color="violet"
+                    onClick={() => {
+                      setSettingsOpened(false);
+                      setLogoModalOpen(true);
+                    }}
+                  >
+                    Add Logo
+                  </Button>
+                </Flex>
+
+                {/* FORM */}
+                <TextInput
+                  label="Change School Name"
+                  placeholder="Enter school name"
+                  value={schoolName}
+                  radius="md"
+                  onChange={(e) => setSchoolName(e.currentTarget.value)}
+                />
+
+                <TextInput
+                  label="Change Email"
+                  placeholder="Enter school email"
+                  value={email}
+                  radius="md"
+                  onChange={(e) => setEmail(e.currentTarget.value)}
+                />
+
+                <TextInput
+                  label="Change Phone Number"
+                  placeholder="Enter phone number"
+                  value={phone}
+                  radius="md"
+                  onChange={(e) => setPhone(e.currentTarget.value)}
+                />
+
+                <Textarea
+                  label="Change Address"
+                  placeholder="Enter school address"
+                  radius="md"
+                  value={address}
+                  onChange={(e) => setAddress(e.currentTarget.value)}
+                />
+
+                {/* ACTION BUTTONS */}
+                <Flex justify="flex-end" gap="sm" mt="md">
+                  <Button
+                    variant="default"
+                    onClick={() => setSettingsOpened(false)}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button color="violet" loading={isLoading} onClick={handleUpdateSchool}>
+                    Save Changes
+                  </Button>
+                </Flex>
+              </Stack>
+            )}
+
+          </Box>
+
+        </Flex>
+      </Modal>
+
+      <LogoModal
+        opened={logoModalOpen}
+        onClose={() => setLogoModalOpen(false)}
+        institute={institute}
+      />
+
       <Stack
         w={isMd ? "0px" : hovered ? "250px" : "80px"}
         h={"100vh"}
@@ -426,20 +694,20 @@ export const DesktopNavbar = (props: {
                     whiteSpace: "nowrap",
                   }}
                 >
-                    <Flex align="center" gap={4}>
-    
-    <Text fw={600} fz={17}>Business</Text>
+                  <Flex align="center" gap={4}>
 
-    {/* Arrow */}
-    <MdKeyboardArrowDown
-      size={20}
-      style={{
-        transition: "all 0.3s ease",
-        transform: openBusiness ? "rotate(180deg)" : "rotate(0deg)",
-      }}
-    />
+                    <Text fw={600} fz={17}>Business</Text>
 
-  </Flex>
+                    {/* Arrow */}
+                    <MdKeyboardArrowDown
+                      size={20}
+                      style={{
+                        transition: "all 0.3s ease",
+                        transform: openBusiness ? "rotate(180deg)" : "rotate(0deg)",
+                      }}
+                    />
+
+                  </Flex>
                 </Box>
               </Flex>
 
@@ -584,6 +852,43 @@ export const DesktopNavbar = (props: {
                   </Text>
                 )}
               </Flex> */}
+              <Flex
+                style={{
+                  cursor: "pointer",
+                }}
+                my={10}
+                align={"center"}
+                gap={hovered ? 12 : 0}
+                justify={!hovered ? "center" : "start"}
+                onClick={() => setSettingsOpened(true)}
+              >
+                <Box
+                  style={{
+                    minWidth: "40px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <IoSettingsOutline size={28} />
+                </Box>
+
+                <Box
+                  style={{
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    transition: "all 0.3s ease",
+                    width: hovered ? "auto" : "0px",
+                    opacity: hovered ? 1 : 0,
+                    marginLeft: hovered ? 6 : 0,
+                  }}
+                >
+                  <Text fw={600} fz={16}>
+                    Settings
+                  </Text>
+                </Box>
+              </Flex>
+
               <Flex
                 style={{ cursor: "pointer" }}
                 my={10}

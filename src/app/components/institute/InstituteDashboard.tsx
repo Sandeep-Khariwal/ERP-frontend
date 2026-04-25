@@ -345,6 +345,10 @@ const getSubjects = () => {
 
   // console.log("userType:", userType);
 
+  const filteredOptionalSubjects = subjectOptions.filter(
+  (sub) => !selectedSubjects.includes(sub.value)
+);
+
   return (
     <>
       <Notifications />
@@ -510,7 +514,8 @@ const getSubjects = () => {
             label="Select optional subjects"
             placeholder="pic optional subjects"
             // data={data}
-             data={subjectOptions}
+            //  data={subjectOptions}
+            data={filteredOptionalSubjects}
             value={selectedOptionalSubjects}
             onChange={(subjects: string[]) =>
               setSelectedOptionalSubjects(subjects)

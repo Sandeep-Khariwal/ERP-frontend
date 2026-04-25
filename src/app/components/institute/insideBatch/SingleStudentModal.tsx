@@ -212,7 +212,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
             w={150}
           />
           <TextInput
-            placeholder="Enter Session"
+            placeholder="2026-2027"
             label="Session"
             value={session}
             onChange={(e) => setSession(e.target.value)}
