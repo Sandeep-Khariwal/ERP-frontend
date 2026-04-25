@@ -86,10 +86,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     (state: any) => state.adminSlice.adminDetails,
   );
 
-  const userType: UserTypes =
-    adminDetails?.role?.toLowerCase() === "user"
-      ? UserTypes.USER
-      : UserTypes.ADMIN;
+ const userType: UserTypes =
+  adminDetails?.role?.toLowerCase() === "user"
+    ? UserTypes.USER
+    : UserTypes.ADMIN;
 
   const getAccountByToken = () => {
     setIsLoading(true);
@@ -338,13 +338,6 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     setSelectedSubjects(batch[0].subjects.map((s) => s.name));
     setSelectedOptionalSubjects(batch[0].optionalSubjects.map((s) => s.name));
   };
-
-  const handleCreateSubject = (newSubject: string) => {
-    // setData((prevData) => [...prevData, newSubject]);
-    // setSelectedSubjects((prevSubjects) => [...prevSubjects, newSubject]);
-  };
-
-  // console.log("userType:", userType);
 
   return (
     <>

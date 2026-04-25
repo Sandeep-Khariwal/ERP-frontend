@@ -190,7 +190,6 @@ export function EditCourseFeeModal(props: {
   };
 
   const onSubmitEditData = (selectedFeeOption: FeeOptions) => {
-    console.log("selectedFeeOption : ", selectedFeeOption);
 
     //   !showarning &&
     //     EditBatchFee({
@@ -222,12 +221,9 @@ export function EditCourseFeeModal(props: {
   };
 
   useEffect(() => {
-    console.log("inside useEffect", monthlyInstallments);
-
     let numberOfInstallments = 1;
     if (selectedFeeOption === FeeOptions.MONTHLY) {
       if (monthlyInstallments.length <= 1) {
-        console.log("inside useEffect if", monthlyInstallments);
         numberOfInstallments = 12;
         const currentDate = new Date();
         const initialInstallments = Array.from(

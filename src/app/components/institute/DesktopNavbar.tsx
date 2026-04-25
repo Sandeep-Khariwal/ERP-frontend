@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { FaRupeeSign } from "react-icons/fa";
 import { useState } from "react";
+import { FaArrowTrendUp, FaFacebook, FaUsers, FaWhatsapp } from "react-icons/fa6";
 
 import { LiaBusAltSolid, LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { Tabs } from "@/enums";
@@ -23,6 +24,15 @@ import { FaMoneyBillWave } from "react-icons/fa";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { MdBusiness } from "react-icons/md";
 import Image from "next/image";
+// import {
+//   IconUsers,
+//   IconPlugConnected,
+//   IconLayoutDashboard,
+//   IconMoon,
+//   IconSun,
+//   IconBuildingSkyscraper,
+// } from "@tabler/icons-react";
+import { TbPlugConnected } from "react-icons/tb";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -38,6 +48,7 @@ export const DesktopNavbar = (props: {
   );
 
   const [openBusiness, setOpenBusiness] = useState(false);
+  const [openMarketing, setOpenMarketing] = useState(false);
   const [hovered, setHovered] = useState(false);
 
 
@@ -51,7 +62,7 @@ export const DesktopNavbar = (props: {
           position: "fixed",
           left: 0,
           top: 0,
-          zIndex: 1000,   // 🔥 ADD THIS
+          zIndex: 1000, // 🔥 ADD THIS
           transition: "width 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
         onMouseEnter={() => setHovered(true)}
@@ -175,7 +186,8 @@ export const DesktopNavbar = (props: {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                  e.currentTarget.style.boxShadow = "0 0 8px rgba(255,255,255,0.3)";
+                  e.currentTarget.style.boxShadow =
+                    "0 0 8px rgba(255,255,255,0.3)";
                 }}
                 onMouseLeave={(e) => {
                   if (props.activeTab !== Tabs.DASHBOARD) {
@@ -208,8 +220,10 @@ export const DesktopNavbar = (props: {
 
                 <Box
                   style={{
-                    overflow: "hidden",   // 🔥 IMPORTANT
-                    transform: hovered ? "translateX(0px)" : "translateX(-10px)",
+                    overflow: "hidden", // 🔥 IMPORTANT
+                    transform: hovered
+                      ? "translateX(0px)"
+                      : "translateX(-10px)",
                     width: hovered ? "auto" : "0px",
                     opacity: hovered ? 1 : 0,
                     marginLeft: hovered ? 6 : 0,
@@ -217,7 +231,9 @@ export const DesktopNavbar = (props: {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  <Text fw={600} fz={20}>Dashboard</Text>
+                  <Text fw={600} fz={20}>
+                    Dashboard
+                  </Text>
                 </Box>
               </Flex>
               <Flex
@@ -249,7 +265,8 @@ export const DesktopNavbar = (props: {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                  e.currentTarget.style.boxShadow = "0 0 8px rgba(255,255,255,0.3)";
+                  e.currentTarget.style.boxShadow =
+                    "0 0 8px rgba(255,255,255,0.3)";
                 }}
                 onMouseLeave={(e) => {
                   if (props.activeTab !== Tabs.STUDENT) {
@@ -276,22 +293,26 @@ export const DesktopNavbar = (props: {
                     style={{
                       transition: "all 0.3s ease",
                       transform: hovered ? "scale(1.08)" : "scale(1.1)",
-                    }} />
-
+                    }}
+                  />
                 </Box>
 
                 <Box
                   style={{
                     overflow: "hidden",
                     width: hovered ? "auto" : "0px",
-                    transform: hovered ? "translateX(0px)" : "translateX(-10px)",
+                    transform: hovered
+                      ? "translateX(0px)"
+                      : "translateX(-10px)",
                     opacity: hovered ? 1 : 0,
                     marginLeft: hovered ? 6 : 0,
                     transition: "all 0.3s ease",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  <Text fw={600} fz={20}>Student</Text>
+                  <Text fw={600} fz={20}>
+                    Student
+                  </Text>
                 </Box>
               </Flex>
               <Flex
@@ -323,7 +344,8 @@ export const DesktopNavbar = (props: {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                  e.currentTarget.style.boxShadow = "0 0 8px rgba(255,255,255,0.3)";
+                  e.currentTarget.style.boxShadow =
+                    "0 0 8px rgba(255,255,255,0.3)";
                 }}
                 onMouseLeave={(e) => {
                   if (props.activeTab !== Tabs.TEACHER) {
@@ -358,14 +380,18 @@ export const DesktopNavbar = (props: {
                   style={{
                     overflow: "hidden",
                     width: hovered ? "auto" : "0px",
-                    transform: hovered ? "translateX(0px)" : "translateX(-10px)",
+                    transform: hovered
+                      ? "translateX(0px)"
+                      : "translateX(-10px)",
                     opacity: hovered ? 1 : 0,
                     marginLeft: hovered ? 6 : 0,
                     transition: "all 0.3s ease",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  <Text fw={600} fz={20}>Teacher</Text>
+                  <Text fw={600} fz={20}>
+                    Teacher
+                  </Text>
                 </Box>
               </Flex>
               {/* BUSINESS MAIN */}
@@ -419,35 +445,39 @@ export const DesktopNavbar = (props: {
                   style={{
                     overflow: "hidden",
                     width: hovered ? "auto" : "0px",
-                    transform: hovered ? "translateX(0px)" : "translateX(-10px)",
+                    transform: hovered
+                      ? "translateX(0px)"
+                      : "translateX(-10px)",
                     opacity: hovered ? 1 : 0,
                     marginLeft: hovered ? 6 : 0,
                     transition: "all 0.3s ease",
                     whiteSpace: "nowrap",
                   }}
                 >
-                    <Flex align="center" gap={4}>
-    
-    <Text fw={600} fz={17}>Business</Text>
+                  <Flex align="center" gap={4}>
+                    <Text fw={600} fz={17}>
+                      Business
+                    </Text>
 
-    {/* Arrow */}
-    <MdKeyboardArrowDown
-      size={20}
-      style={{
-        transition: "all 0.3s ease",
-        transform: openBusiness ? "rotate(180deg)" : "rotate(0deg)",
-      }}
-    />
-
-  </Flex>
+                    {/* Arrow */}
+                    <MdKeyboardArrowDown
+                      size={20}
+                      style={{
+                        transition: "all 0.3s ease",
+                        transform: openBusiness
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                      }}
+                    />
+                  </Flex>
                 </Box>
               </Flex>
 
+              
               {/* DROPDOWN ITEMS */}
               {openBusiness && hovered && (
                 <Stack pl={30} gap={5}>
-
-                  {/* EXPANSE */}
+                  {/* LEads */}
                   <Flex
                     style={{
                       cursor: "pointer",
@@ -464,11 +494,11 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EXPENSE)}
                   >
-                    <Image src="/expense.png" width={25} height={25} alt="not found" />
+                     <Image src="/expense.png" width={25} height={25} alt="not found" />
                     <Text fw={500}>Expanse</Text>
                   </Flex>
 
-                  {/* EARNING */}
+                  {/* INTEGRATION */}
                   <Flex
                     style={{
                       cursor: "pointer",
@@ -485,10 +515,149 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EARNING)}
                   >
-                    <Image src="/earnings.png" width={25} height={25} alt="not found" />
-                    <Text fw={500}>Earning</Text>
+                     <Image src="/earnings.png" width={25} height={25} alt="not found" />
+                    <Text fw={500}>Earnings</Text>
+                  </Flex>
+                </Stack>
+              )}
+
+              {/* Marketing MAIN */}
+              <Flex
+                style={{
+                  cursor: "pointer",
+
+                  background: openMarketing
+                    ? "rgba(255,255,255,0.08)"
+                    : "transparent",
+
+                  border: openMarketing
+                    ? "1px solid rgba(255,255,255,0.2)"
+                    : "1px solid transparent",
+
+                  boxShadow: openMarketing
+                    ? "0 0 12px rgba(255,215,0,0.6)"
+                    : "none",
+
+                  backdropFilter: openMarketing ? "blur(10px)" : "none",
+
+                  color: "white",
+                  borderRadius: "12px",
+                  padding: "8px",
+                  transition: "all 0.3s ease",
+                }}
+                my={10}
+                align={"center"}
+                justify={!hovered ? "center" : "start"}
+                gap={hovered ? 12 : 0}
+                onClick={() => setOpenMarketing(!openMarketing)}
+                // direction={"column"}
+              >
+                <Box
+                  style={{
+                    minWidth: "40px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <FaArrowTrendUp size={25}  />
+                  
+                </Box>
+
+                <Box
+                  style={{
+                    overflow: "hidden",
+                    width: hovered ? "auto" : "0px",
+                    transform: hovered
+                      ? "translateX(0px)"
+                      : "translateX(-10px)",
+                    opacity: hovered ? 1 : 0,
+                    marginLeft: hovered ? 6 : 0,
+                    transition: "all 0.3s ease",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <Flex align="center" gap={4}>
+                    <Text fw={600} fz={17}>
+                      Marketing
+                    </Text>
+                       {/* Arrow */}
+                    <MdKeyboardArrowDown
+                      size={20}
+                      style={{
+                        transition: "all 0.3s ease",
+                        transform: openMarketing
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                      }}
+                    />
+                  </Flex>
+                </Box>
+              </Flex>
+
+              {/* DROPDOWN ITEMS */}
+              {openMarketing && hovered && (
+                <Stack pl={30} gap={5}>
+                  {/* LEads */}
+                  <Flex
+                    style={{
+                      cursor: "pointer",
+                      background:
+                        props.activeTab === Tabs.LEADS
+                          ? "rgba(255,255,255,0.08)"
+                          : "transparent",
+
+                      color: "white",
+                      borderRadius: "8px",
+                      padding: "6px",
+                    }}
+                    align="center"
+                    gap={10}
+                    onClick={() => props.onSelectTab(Tabs.LEADS)}
+                  >
+                       <FaFacebook  size={25}  />
+                    <Text fw={500}>Facebook Leads</Text>
+                  </Flex>
+                  <Flex
+                    style={{
+                      cursor: "pointer",
+                      background:
+                        props.activeTab === Tabs.WHATSAPPLEADS
+                          ? "rgba(255,255,255,0.08)"
+                          : "transparent",
+
+                      color: "white",
+                      borderRadius: "8px",
+                      padding: "6px",
+                    }}
+                    align="center"
+                    gap={10}
+                    onClick={() => props.onSelectTab(Tabs.WHATSAPPLEADS)}
+                  >
+                    <FaWhatsapp  size={25}  />
+                    <Text fw={500}>Whatsapp Leads</Text>
                   </Flex>
 
+                  {/* INTEGRATION */}
+                  <Flex
+                    style={{
+                      cursor: "pointer",
+                      background:
+                        props.activeTab === Tabs.INTEGRATION
+                          ? "rgba(255,255,255,0.08)"
+                          : "transparent",
+
+                      color: "white",
+                      borderRadius: "8px",
+                      padding: "6px",
+                    }}
+                    align="center"
+                    gap={10}
+                    onClick={() => props.onSelectTab(Tabs.INTEGRATION)}
+                  >
+                   <TbPlugConnected  size={25}  />
+                    <Text fw={500}>Integration</Text>
+                  </Flex>
                 </Stack>
               )}
               {institute?.featureAccess?.transportManagement && (
@@ -512,7 +681,9 @@ export const DesktopNavbar = (props: {
                         : "none",
 
                     backdropFilter:
-                      props.activeTab === Tabs.TRANSPORT ? "blur(10px)" : "none",
+                      props.activeTab === Tabs.TRANSPORT
+                        ? "blur(10px)"
+                        : "none",
 
                     color: "white",
                     borderRadius: "12px",
@@ -521,7 +692,8 @@ export const DesktopNavbar = (props: {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                    e.currentTarget.style.boxShadow = "0 0 8px rgba(255,255,255,0.3)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 8px rgba(255,255,255,0.3)";
                   }}
                   onMouseLeave={(e) => {
                     if (props.activeTab !== Tabs.TRANSPORT) {
@@ -556,14 +728,18 @@ export const DesktopNavbar = (props: {
                     style={{
                       overflow: "hidden",
                       width: hovered ? "auto" : "0px",
-                      transform: hovered ? "translateX(0px)" : "translateX(-10px)",
+                      transform: hovered
+                        ? "translateX(0px)"
+                        : "translateX(-10px)",
                       opacity: hovered ? 1 : 0,
                       marginLeft: hovered ? 6 : 0,
                       transition: "all 0.3s ease",
                       whiteSpace: "nowrap",
                     }}
                   >
-                    <Text fw={600} fz={20}>Transport</Text>
+                    <Text fw={600} fz={20}>
+                      Transport
+                    </Text>
                   </Box>
                 </Flex>
               )}
@@ -624,7 +800,7 @@ export const DesktopNavbar = (props: {
                     overflow: "hidden",
                     whiteSpace: "nowrap",
                     transition: "all 0.3s ease",
-                    width: hovered ? "auto" : "0px",   // 🔥 FIX
+                    width: hovered ? "auto" : "0px", // 🔥 FIX
                     opacity: hovered ? 1 : 0,
                     marginLeft: hovered ? 6 : 0,
                   }}
