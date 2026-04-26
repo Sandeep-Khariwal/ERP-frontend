@@ -125,19 +125,18 @@ const StudentSection = (props: {
   };
 
   const downloadIdCard = (id: string) => {
-    console.log("id card : ", id);
 
     GetStudentForIdCard(id)
       .then((res: any) => {
         const studentInfo = res.student;
         const idCardhtml = generateIdCardHTML({
           schoolName: studentInfo.instituteId.name,
-          schoolLogo: "https://yourdomain.com/logo.png",
+          schoolLogo: studentInfo.instituteId.logo,
           schoolAddress: studentInfo.instituteId.address,
           institutePhoneNumber: studentInfo.instituteId.institutePhoneNumber,
 
           studentName: studentInfo.name,
-          studentPhoto: "https://yourdomain.com/student.jpg",
+          studentPhoto: studentInfo.profilePic,
           className: studentInfo.batchId.name,
           rollNo: studentInfo.rollNumber,
           entrollmentNum: studentInfo.enrollmentNo,

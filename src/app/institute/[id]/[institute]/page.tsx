@@ -48,7 +48,7 @@ const dashboard = () => {
           setAdminDetails({
             name: data.name,
             _id: data._id,
-            phone: "",
+            phone: data.institute.institutePhoneNumber,
             institute: data.institute._id,
           }),
         );
@@ -56,10 +56,10 @@ const dashboard = () => {
         const instituteDetails = {
           name: data.institute.name,
           _id: data.institute._id,
-          phoneNumber: "",
+          phoneNumber: data.institute.institutePhoneNumber,
           address: data.institute.address,
           featureAccess: data.institute.accessFeatures,
-               email: data.email,
+          email: data.email,
         };
 
         dispatch(setDetails(instituteDetails));

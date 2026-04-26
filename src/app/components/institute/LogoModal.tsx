@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Modal,
-  Button,
-  Text,
-  Stack,
-  Group,
-  Box,
-  Center,
-} from "@mantine/core";
+import { Modal, Button, Text, Stack, Group, Box, Center, LoadingOverlay } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import { IconUpload, IconPhoto, IconTrash } from "@tabler/icons-react";
 import { Uploadlogo } from "@/axios/institute/InstitutePostApi";
@@ -16,13 +8,14 @@ import { Uploadlogo } from "@/axios/institute/InstitutePostApi";
 type Props = {
   opened: boolean;
   onClose: () => void;
-   institute: any;
+  institute: any;
 };
 
 export const LogoModal = ({ opened, onClose, institute }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // HANDLE FILE
   const handleFile = (selected: File) => {
@@ -37,55 +30,55 @@ export const LogoModal = ({ opened, onClose, institute }: Props) => {
     if (droppedFile) handleFile(droppedFile);
   };
 
-
   useEffect(() => {
-  // ❌ agar file ya institute id nahi hai toh stop
-  if (!file || !institute?._id) return;
+    // ❌ agar file ya institute id nahi hai toh stop
+    if (!file || !institute?._id) return;
 
-  const formData = new FormData();
-  formData.append("logo", file);
-
-  // 🔥 API CALL (same GPS pattern)
-  Uploadlogo(formData, institute._id)
-    .then((res: any) => {
-      console.log("✅ Upload success:", res);
-
-      if (res?.data?.url) {
-        console.log("🌐 Image URL:", res.data.url);
-      }
-    })
-    .catch((err: any) => {
-      console.log("❌ Upload error:", err);
-    });
-
-}, [file]); // 🔥 file change = API call
+    const formData = new FormData();
+    formData.append("logo", file);
+    setIsLoading(true);
+    // 🔥 API CALL (same GPS pattern)
+    Uploadlogo(formData, institute._id)
+      .then((res: any) => {
+        console.log("✅ Upload success:", res);
+        setIsLoading(false);
+        if (res?.data?.url) {
+          console.log("🌐 Image URL:", res.data.url);
+        }
+      })
+      .catch((err: any) => {
+        console.log("❌ Upload error:", err);
+        setIsLoading(false);
+      });
+  }, [file]); // 🔥 file change = API call
 
   return (
     <Modal
       opened={opened}
       onClose={onClose}
-     title={
-  <Group gap="sm">
-    <Box
-      style={{
-        background: "#ede9fe",
-        padding: "6px",
-        borderRadius: "8px",
-      }}
-    >
-      <IconUpload size={18} color="#7c3aed" />
-    </Box>
-    <Text fw={600}>Upload Institute Logo</Text>
-  </Group>
-}
+      title={
+        <Group gap="sm">
+          <Box
+            style={{
+              background: "#ede9fe",
+              padding: "6px",
+              borderRadius: "8px",
+            }}
+          >
+            <IconUpload size={18} color="#7c3aed" />
+          </Box>
+          <Text fw={600}>Upload Institute Logo</Text>
+        </Group>
+      }
       centered
       size="lg"
     >
+      <LoadingOverlay visible={isLoading} />
       <Stack>
-
         {/* TOP TEXT */}
         <Text size="sm" c="dimmed">
-          Upload your school or institute logo. This logo will be displayed on your profile and documents.
+          Upload your school or institute logo. This logo will be displayed on
+          your profile and documents.
         </Text>
 
         {/* IF NO IMAGE */}
@@ -95,11 +88,11 @@ export const LogoModal = ({ opened, onClose, institute }: Props) => {
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
             style={{
-            border: "2px dashed #c4b5fd",
-  borderRadius: "14px",
-  padding: "45px",
-  cursor: "pointer",
-  background: "#faf5ff",   // light purple bg
+              border: "2px dashed #c4b5fd",
+              borderRadius: "14px",
+              padding: "45px",
+              cursor: "pointer",
+              background: "#faf5ff", // light purple bg
             }}
           >
             <Center>
@@ -111,21 +104,21 @@ export const LogoModal = ({ opened, onClose, institute }: Props) => {
                   or
                 </Text>
 
-               <Button
-  variant="light"
-  radius="md"
-  styles={{
-    root: {
-      backgroundColor: "#ede9fe",
-      color: "#6d28d9",
-      border: "1px solid #c4b5fd",
-      fontWeight: 500,
-    },
-  }}
-  leftSection={<IconPhoto size={16} />}
->
-  Browse Files
-</Button>
+                <Button
+                  variant="light"
+                  radius="md"
+                  styles={{
+                    root: {
+                      backgroundColor: "#ede9fe",
+                      color: "#6d28d9",
+                      border: "1px solid #c4b5fd",
+                      fontWeight: 500,
+                    },
+                  }}
+                  leftSection={<IconPhoto size={16} />}
+                >
+                  Browse Files
+                </Button>
 
                 <Text size="xs" c="dimmed" mt={10}>
                   Recommended: PNG, JPG, SVG • Max size: 2MB • Aspect ratio: 1:1
@@ -208,27 +201,16 @@ export const LogoModal = ({ opened, onClose, institute }: Props) => {
         )}
 
         {/* FOOTER BUTTONS */}
-        <Group justify="space-between" mt="md"grow>
-         <Button
-  variant="default"
-  onClick={onClose}
-  style={{
-    width: "220px",
-  }}
->
-  Cancel
-</Button>
-
-        <Button
-  disabled={!file}
-  style={{
-    width: "220px",   // 🔥 width bada kiya
-    background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-    fontWeight: 600,
-  }}
->
-  Save Logo
-</Button>
+        <Group justify="space-between" mt="md" grow>
+          <Button
+            variant="default"
+            onClick={onClose}
+            style={{
+              width: "220px",
+            }}
+          >
+            Cancel
+          </Button>
         </Group>
       </Stack>
     </Modal>

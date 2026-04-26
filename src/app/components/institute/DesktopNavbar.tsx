@@ -53,9 +53,6 @@ export const DesktopNavbar = (props: {
     (state: any) => state.instituteSlice.instituteDetails,
   );
  
-
-
-
   const [openBusiness, setOpenBusiness] = useState(false);
   const [openMarketing, setOpenMarketing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -86,7 +83,7 @@ export const DesktopNavbar = (props: {
     updateschooldetails(institute?._id, {
       name: schoolName,
       email: email,
-      PhoneNumber: phone,
+      institutePhoneNumber: phone,
       address: address,
     })
       .then((res: any) => {
@@ -113,12 +110,13 @@ export const DesktopNavbar = (props: {
   };
 
   useEffect(() => {
+    console.log("institute us 1:", institute);
     if (institute) {
-      console.log("instituteus:", institute.email);
+      console.log("institute us 2:", institute);
       
       setSchoolName(institute.name || "");
       setEmail(institute.email || "");
-      setPhone(institute.PhoneNumber || "");
+      setPhone(institute.phoneNumber || "");
       setAddress(institute.address || "");
     }
   }, [institute]);

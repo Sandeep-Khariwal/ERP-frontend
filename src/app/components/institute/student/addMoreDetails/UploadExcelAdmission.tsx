@@ -17,7 +17,6 @@ import {
 } from "@/app/helperFunction/Notification";
 import { CreateStudent } from "@/axios/institute/InstitutePostApi";
 import { parseExcelDate } from "../../helperFunctions";
-import { StudentsDataWithBatch } from "@/interface/student.interface";
 
 interface Props {
   opened: boolean;
@@ -71,8 +70,6 @@ function UploadExcelAdmission({
           ErrorNotification(`Row ${index + 2}: Name or Phone missing`);
           return null;
         }
-        console.log("student : ", student);
-
         return {
           name: student["name"],
           parentName: student["fatherName"],
@@ -89,7 +86,6 @@ function UploadExcelAdmission({
       });
 
       const finalPayload = payload.filter((p: any) => p !== null);
-      console.log(" finalPayload : ", finalPayload);
 
       setStudentsPayload(finalPayload);
 
@@ -107,9 +103,6 @@ function UploadExcelAdmission({
       ErrorNotification("No valid data found!");
       return;
     }
-
-    console.log("studentsPayload : ", studentsPayload);
-
     try {
       setLoading(true);
 
@@ -157,8 +150,6 @@ function UploadExcelAdmission({
                 : "Partial Paid",
         };
       });
-
-      console.log("studentData : ", studentData);
 
       setStudents(studentData);
 
@@ -263,8 +254,9 @@ function UploadExcelAdmission({
         </Button>
 
         {/* SAMPLE FILE */}
+        {/* https://docs.google.com/spreadsheets/d/12QVGb32mAh66CDbs75fZ2x-Qsq6jivts/export?format=xlsx */}
         <a
-          href="https://docs.google.com/spreadsheets/d/127Ihz4EyAOxJTBfKxCqDE-D_F3RojBa_/export?format=xlsx"
+          href="https://docs.google.com/spreadsheets/d/12QVGb32mAh66CDbs75fZ2x-Qsq6jivts/export?format=xlsx"
           style={{ textDecoration: "none" }}
         >
           <Text

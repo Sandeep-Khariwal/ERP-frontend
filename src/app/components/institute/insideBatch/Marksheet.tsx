@@ -462,13 +462,11 @@ const Marksheet = (props: {
                               overallGrade: item.overallGrade,
                               status: item.status,
                               allsubjecttotal: item.marks.length * 100,
-                              // date: new Date().toLocaleDateString(),
                               date: new Date(item.date).toLocaleDateString("en-GB"),
                               session: item.session,
                               fName:student.parentName,
                               address:student.address,
                               parentNumber:student.parentNumber,
-                              // dob:new Date(student.dateOfBirth),
                               dob: new Date(student.dateOfBirth).toLocaleDateString("en-GB", {
   day: "2-digit",
   month: "short",

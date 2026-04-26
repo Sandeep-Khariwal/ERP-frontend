@@ -95,7 +95,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       text-align: center;
       color: white;
     ">
-      <img src="${window.location.origin}/logo%203.jpg" style="
+      <img src=${data.schoolLogo} style="
         height: 55px; 
         width: 55px; 
         object-fit: contain; 
