@@ -110,9 +110,7 @@ export const DesktopNavbar = (props: {
   };
 
   useEffect(() => {
-    console.log("institute us 1:", institute);
     if (institute) {
-      console.log("institute us 2:", institute);
       
       setSchoolName(institute.name || "");
       setEmail(institute.email || "");

@@ -45,8 +45,6 @@ export const instituteDetails = createSlice({
         };
       }
     ) {
-      console.log("actions.payload:", actions.payload);
-      
       state.instituteDetails = actions.payload;
 
     },

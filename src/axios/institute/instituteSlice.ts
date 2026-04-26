@@ -17,7 +17,6 @@ export function CreateInstitute(data: {
 
 export function GetAccountByToken() {
   
-    console.log("process.env.URL in api : ",process.env.URL);
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/institute/getAccountByToken`)
       .then((response) => resolve(response))
