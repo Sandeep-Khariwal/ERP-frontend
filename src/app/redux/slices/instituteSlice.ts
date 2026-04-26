@@ -6,6 +6,7 @@ export interface InstituteDetails {
   _id: string;
   phoneNumber: string;
   address: string;
+  email?: string;
   featureAccess?: {
     financeManagement: boolean;
     aiChatBoat: boolean;
@@ -33,6 +34,7 @@ export const instituteDetails = createSlice({
           _id: string;
           phoneNumber: string;
           address: string;
+          email?: string;
           featureAccess?: {
             financeManagement: boolean;
             aiChatBoat: boolean;
@@ -44,6 +46,7 @@ export const instituteDetails = createSlice({
       }
     ) {
       state.instituteDetails = actions.payload;
+
     },
     saveToken(state, actions) {
       const token = actions.payload;

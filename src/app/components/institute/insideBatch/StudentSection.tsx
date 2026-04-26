@@ -37,10 +37,19 @@ const StudentSection = (props: {
   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
   setStudents: React.Dispatch<React.SetStateAction<StudentsDataWithBatch[]>>;
+  students: {
+    _id: string;
+    name: string;
+    phoneNumber: string;
+    parentName: string;
+    feeStatus: string;
+  }[];
 }) => {
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
+  console.log("props stdents : ", props.students);
+
   const [students, setStudents] = useState<
     {
       _id: string;
@@ -52,6 +61,10 @@ const StudentSection = (props: {
   >([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setStudents((prev) => [...prev, ...props.students]);
+  }, [props.students]);
 
   useEffect(() => {
     if (props.batchId) {
@@ -76,7 +89,8 @@ const StudentSection = (props: {
               phoneNumber: s.phoneNumber,
               parentName: s.parentName,
               feeStatus:
-                totals.totalAmount === totals.amountPaid
+                totals.totalAmount === totals.amountPaid &&
+                totals.amountPaid > 0
                   ? "Paid"
                   : totals.amountPaid === 0
                     ? "Not Paid"
@@ -96,31 +110,33 @@ const StudentSection = (props: {
   const [deletingStudentId, setDeletingStudentId] = useState<string>("");
 
   const removeStudentFromBatch = () => {
+    setIsLoading(true);
     RemoveStudentFromBatch(deletingStudentId, props.batchId)
       .then((x) => {
         setStudents((prev) => prev.filter((s) => s._id !== deletingStudentId));
         SuccessNotification("Student removed from batch");
         setShowWarning(false);
+        setIsLoading(false);
       })
       .catch((e) => {
         console.log(e);
+        setIsLoading(false);
       });
   };
 
   const downloadIdCard = (id: string) => {
-    console.log("id card : ", id);
 
     GetStudentForIdCard(id)
       .then((res: any) => {
         const studentInfo = res.student;
         const idCardhtml = generateIdCardHTML({
           schoolName: studentInfo.instituteId.name,
-          schoolLogo: "https://yourdomain.com/logo.png",
+          schoolLogo: studentInfo.instituteId.logo,
           schoolAddress: studentInfo.instituteId.address,
           institutePhoneNumber: studentInfo.instituteId.institutePhoneNumber,
 
           studentName: studentInfo.name,
-          studentPhoto: "https://yourdomain.com/student.jpg",
+          studentPhoto: studentInfo.profilePic,
           className: studentInfo.batchId.name,
           rollNo: studentInfo.rollNumber,
           entrollmentNum: studentInfo.enrollmentNo,

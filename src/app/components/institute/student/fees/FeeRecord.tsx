@@ -26,8 +26,18 @@ import { StudentFeesCards } from "./StudentFeesCard";
 import { Installment } from "@/interfaces/batchInterface";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { UpdateMultipleFeeRecord } from "@/axios/student/StudentPut";
-import { GetStudentFeeInstallments } from "@/axios/student/StudentGetApi";
+import { GetStudentFeeInstallments, GetStudentForPdf } from "@/axios/student/StudentGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
+import { createFullFeeOverviewPdf } from "./HtmlToPdf";
+
+const convertHtmlIntoPdf = (html: string) => {
+  const newWindow = window.open("", "_blank");
+  if (!newWindow) return;
+
+  newWindow.document.write(html);
+  newWindow.document.close();
+  newWindow.print();
+};
 
 interface FormValues {
   paymentDate: Date;
@@ -42,6 +52,8 @@ const FeeRecordSection = (props: {
   dateOfJoining: Date;
   batch?: string;
   studentId: string;
+  studentName: string;
+  parentName: string;  
   onPaymentClick: () => void;
   onClickBack: () => void;
   fromBatch: boolean;
@@ -187,29 +199,64 @@ const FeeRecordSection = (props: {
           </Grid.Col>
         </Grid>
         <Box p={10}>
-          <Flex justify={"space-between"} align={"center"} style={{position:"sticky",top:100}}>
-            <Text size="sm" c="blue">
-              Fee Records
-            </Text>
-            {(props.userType == UserType.OTHERS ||
-              props.userType == UserType.TEACHER) && (
-              <Button
-                onClick={() => {
-                  if (totalOverdue <= 0) {
-                    showNotification({
-                      message: "No Pending Payment ",
-                    });
-                    return;
-                  }
-                  setOpenPaymentModel(true);
-                }}
-                fz={13}
-                style={{ fontFamily: "sans-serif" }}
-              >
-                Record Payment
-              </Button>
-            )}
-          </Flex>
+         <Flex justify={"space-between"} align={"center"} style={{position:"sticky",top:100}}>
+  <Text size="sm" c="blue">
+    Fee Records
+  </Text>
+
+  <Flex gap={10}>
+    {/* 🔥 NEW BUTTON */}
+   <Button
+  color="green"
+ onClick={() => {
+  GetStudentForPdf(props.studentId).then((x: any) => {
+    const { student } = x;
+
+    const formattedData = student.feeRecords.map((f: any) => ({
+      name: f.name,
+      amountPaid: f.amountPaid,
+      totalAmount: f.totalAmount,
+      updatedAt: f.updatedAt,
+    }));
+
+    const html = createFullFeeOverviewPdf(
+      student.name,              // ✅ DIRECT API se
+      student.parentName,        // ✅ DIRECT API se
+      formattedData,
+      student.instituteId.name,
+      student.instituteId.logo,
+      student.instituteId.address,
+      student.instituteId.institutePhoneNumber,
+      props.batchName
+    );
+
+    convertHtmlIntoPdf(html);
+  });
+}}
+>
+  Download Report
+</Button>
+
+
+    {/* OLD BUTTON */}
+    {(props.userType == UserType.OTHERS ||
+      props.userType == UserType.TEACHER) && (
+      <Button
+        onClick={() => {
+          if (totalOverdue <= 0) {
+            showNotification({
+              message: "No Pending Payment ",
+            });
+            return;
+          }
+          setOpenPaymentModel(true);
+        }}
+      >
+        Record Payment
+      </Button>
+    )}
+  </Flex>
+</Flex>
 
           <Divider my="sm" />
           <Flex w={"100%"} justify="space-between" align="center" >

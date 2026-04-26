@@ -49,7 +49,6 @@ export function AddInstituteSubjects(Props: {
 
   const createSubjects = () => {
     if (!subjectInput) return;
-    console.log("setSelectedSubject :", selectedSubject);
     setIsLoading(true);
     AddSubjects({
       _id: isEditing ? selectedSubject._id : "",
