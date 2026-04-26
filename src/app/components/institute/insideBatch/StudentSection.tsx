@@ -21,6 +21,13 @@ import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
 import Image from "next/image";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
+import { generateIdCardHTML } from "./IDCardHtml";
+import { useAppSelector } from "@/app/redux/redux.hooks";
+import {
+  GetStudentForIdCard,
+  GetStudentForPdf,
+} from "@/axios/student/StudentGetApi";
+import { formatDate } from "../../marketing/utility/utils";
 
 const StudentSection = (props: {
   batchId: string;
@@ -30,7 +37,19 @@ const StudentSection = (props: {
   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
   setSelectedStudentId: React.Dispatch<React.SetStateAction<string>>;
   setStudents: React.Dispatch<React.SetStateAction<StudentsDataWithBatch[]>>;
+  students: {
+    _id: string;
+    name: string;
+    phoneNumber: string;
+    parentName: string;
+    feeStatus: string;
+  }[];
 }) => {
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails,
+  );
+  console.log("props stdents : ", props.students);
+
   const [students, setStudents] = useState<
     {
       _id: string;
@@ -42,6 +61,10 @@ const StudentSection = (props: {
   >([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setStudents((prev) => [...prev, ...props.students]);
+  }, [props.students]);
 
   useEffect(() => {
     if (props.batchId) {
@@ -57,7 +80,7 @@ const StudentSection = (props: {
                 acc.amountPaid += record.amountPaid;
                 return acc;
               },
-              { totalAmount: 0, amountPaid: 0 }
+              { totalAmount: 0, amountPaid: 0 },
             );
 
             return {
@@ -66,11 +89,12 @@ const StudentSection = (props: {
               phoneNumber: s.phoneNumber,
               parentName: s.parentName,
               feeStatus:
-                totals.totalAmount === totals.amountPaid
+                totals.totalAmount === totals.amountPaid &&
+                totals.amountPaid > 0
                   ? "Paid"
                   : totals.amountPaid === 0
-                  ? "Not Paid"
-                  : "Partial Paid",
+                    ? "Not Paid"
+                    : "Partial Paid",
             };
           });
           props.setStudents(students);
@@ -86,20 +110,59 @@ const StudentSection = (props: {
   const [deletingStudentId, setDeletingStudentId] = useState<string>("");
 
   const removeStudentFromBatch = () => {
+    setIsLoading(true);
     RemoveStudentFromBatch(deletingStudentId, props.batchId)
       .then((x) => {
         setStudents((prev) => prev.filter((s) => s._id !== deletingStudentId));
         SuccessNotification("Student removed from batch");
         setShowWarning(false);
+        setIsLoading(false);
       })
       .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  };
+
+  const downloadIdCard = (id: string) => {
+
+    GetStudentForIdCard(id)
+      .then((res: any) => {
+        const studentInfo = res.student;
+        const idCardhtml = generateIdCardHTML({
+          schoolName: studentInfo.instituteId.name,
+          schoolLogo: studentInfo.instituteId.logo,
+          schoolAddress: studentInfo.instituteId.address,
+          institutePhoneNumber: studentInfo.instituteId.institutePhoneNumber,
+
+          studentName: studentInfo.name,
+          studentPhoto: studentInfo.profilePic,
+          className: studentInfo.batchId.name,
+          rollNo: studentInfo.rollNumber,
+          entrollmentNum: studentInfo.enrollmentNo,
+
+          dob: formatDate(studentInfo.dateOfBirth),
+          phone: studentInfo.phoneNumber,
+          address: studentInfo.address,
+        });
+
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+          printWindow.document.write(idCardhtml);
+          printWindow.document.close();
+          printWindow.print();
+        } else {
+          console.error("Failed to open print window.");
+        }
+      })
+      .catch((e: any) => {
         console.log(e);
       });
   };
 
   const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
-    <Stack w={"100%"} >
+    <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
       {students.length > 0 ? (
         <Table
@@ -250,8 +313,8 @@ const StudentSection = (props: {
                         item.feeStatus === "Paid"
                           ? "green"
                           : item.feeStatus === "Partial Paid"
-                          ? "blue"
-                          : "red"
+                            ? "blue"
+                            : "red"
                       }
                       size="lg"
                       radius="xs"
@@ -305,6 +368,16 @@ const StudentSection = (props: {
                           {" "}
                           Edit Profile
                         </Menu.Item>
+                        <Menu.Item
+                          onClick={() => {
+                            downloadIdCard(item._id);
+                            // setSelectedStudent(item);
+                            // setEditStudentFee(true);
+                          }}
+                        >
+                          {" "}
+                          Download ID Card
+                        </Menu.Item>
                         {props.userType !== UserType.TEACHER && (
                           <Menu.Item
                             onClick={() => {
@@ -313,7 +386,7 @@ const StudentSection = (props: {
                               // setEditStudentFee(false);
                               props.setSelectedStudentId(item._id);
                               props.setShowSelectedScreen(
-                                Screen.VIEWFEEDETAILS
+                                Screen.VIEWFEEDETAILS,
                               );
                             }}
                           >

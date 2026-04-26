@@ -10,7 +10,7 @@ import SingleStudentModal from "./SingleStudentModal";
 import { useMediaQuery } from "@mantine/hooks";
 import * as XLSX from "xlsx";
 import { CreateExamMarksheet, CreateExamMarksheetForExcel } from "@/axios/institute/InstitutePostApi";
-import { GetAllStudentsFromBatch, GetBatAllMarksheet } from "@/axios/institute/InstituteGetApi";
+import { GetAllStudentsFromBatch, GetBatAllMarksheet, GetStudentDetail } from "@/axios/institute/InstituteGetApi";
 import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
 import { GetGrade } from "../helperFunctions";
 import { useAppSelector } from "@/app/redux/redux.hooks";
@@ -30,7 +30,7 @@ const Marksheet = (props: {
   const isMobile = useMediaQuery(`(max-width: 968px)`);
   const [resultDate, setResultDate] = useState<Date | null>(null);
   const [session, setSession] = useState<string>("");
-  const [filterExam, setFilterExam] = useState<string | null>(null);   //table me filter data ke liye 
+  const [filterExam, setFilterExam] = useState<string | null>("Mid TERM Exam");   //table me filter data ke liye 
   const [studentsPayload, setStudentsPayload] = useState<any[]>([]);
   const [allMarksheet, setAllMarksheet] = useState<{
     name: string;
@@ -82,7 +82,6 @@ const Marksheet = (props: {
     // get all marksheet
     GetBatAllMarksheet(props.batchId)
       .then((x: any) => {
-        console.log("marksheets  : ", x.marksheets);
         setAllMarksheet(x.marksheets)
       })
       .catch((e: any) => {
@@ -231,16 +230,16 @@ const Marksheet = (props: {
       ErrorNotification("No valid data found!")
       return;
     }
-
+    console.log("🚀 API PAYLOAD:", studentsPayload);
     CreateExamMarksheetForExcel(studentsPayload)
       .then((x: any) => {
-        console.log("x :",x);
+        console.log("x :", x);
         // GetResult()
         const newMarksheet = x.map((item: any) => item.marksheet);
 
-    // 👉 update state without API call
-    setAllMarksheet((prev) => [...prev, ...newMarksheet]);
-        
+        // 👉 update state without API call
+        setAllMarksheet((prev) => [...prev, ...newMarksheet]);
+
         SuccessNotification("Marksheet Created Success!!")
         setOpenUploadModal(false)
       })
@@ -438,41 +437,66 @@ const Marksheet = (props: {
                       fontWeight: 500,
                       padding: "1rem",
                     }}>
-    
+
                     <IconArrowLeftFromArc
                       size={24}
                       style={{ cursor: "pointer", color: "#00000098" }}
                       onClick={() => {
-                        const html = createMarksheetPdf({
-                          instituteName: institute?.name,
-                          examName: item.name,
-                          batchName: item.batch.name,
-                          studentName: item.student.name,
-                          rollNumber: item.student.rollNumber,
-                          enrolment: item.student.enrollmentNo,
-                          marks: item.marks,
-                          totalMarks: item.totalMarks,
-                          percentage: item.percentage,
-                          overallGrade: item.overallGrade,
-                          status: item.status,
-                          allsubjecttotal: item.marks.length * 100,
-                          // date: new Date().toLocaleDateString(),
-                          date: new Date(item.date).toLocaleDateString("en-GB"),
-                          session: item.session,
-                        });
 
-                        const printWindow = window.open("", "_blank");
 
-                        if (printWindow) {
-                          printWindow.document.write(html);
-                          printWindow.document.close();
-                          // printWindow.print();
-                          printWindow.onload = () => {
-                            setTimeout(() => {
-                              printWindow.print();
-                            }, 800); // 👈 thoda zyada delay safe hai
-                          };
-                        }
+                        GetStudentDetail(item.student._id)
+                          .then((res: any) => {
+                            console.log("student details : ", res);
+                            const student = res.student
+
+                            const html = createMarksheetPdf({
+                              instituteName: institute?.name,
+                              examName: item.name,
+                              batchName: item.batch.name,
+                              studentName: item.student.name,
+                              rollNumber: item.student.rollNumber,
+                              enrolment: item.student.enrollmentNo,
+                              marks: item.marks,
+                              totalMarks: item.totalMarks,
+                              percentage: item.percentage,
+                              overallGrade: item.overallGrade,
+                              status: item.status,
+                              allsubjecttotal: item.marks.length * 100,
+                              date: new Date(item.date).toLocaleDateString("en-GB"),
+                              session: item.session,
+                              fName:student.parentName,
+                              address:student.address,
+                              parentNumber:student.parentNumber,
+                              dob: new Date(student.dateOfBirth).toLocaleDateString("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric"
+}),
+                              photo:student.profilePic,
+                              instituteLogo:student.instituteId.logo,
+                              instituteAdress:student.instituteId.address,
+                              institutePhone: student.instituteId.institutePhoneNumber
+
+                            });
+
+                            const printWindow = window.open("", "_blank");
+
+                            if (printWindow) {
+                              printWindow.document.write(html);
+                              printWindow.document.close();
+                              // printWindow.print();
+                              printWindow.onload = () => {
+                                setTimeout(() => {
+                                  printWindow.print();
+                                }, 800); // 👈 thoda zyada delay safe hai
+                              };
+                            }
+                          })
+                          .catch((e) => {
+                            console.log(e);
+
+                          })
+
                       }}
                     />
                   </Table.Td>
@@ -509,7 +533,7 @@ const Marksheet = (props: {
               w={200}
             />
             <TextInput
-              placeholder="Enter Session (e.g. 2024-2025)"
+              placeholder="2026-2027"
               label="Session"
               value={session}
               onChange={(e) => setSession(e.target.value)}
@@ -517,7 +541,7 @@ const Marksheet = (props: {
             />
           </Flex>
           <Box
-       
+
           >
             <Flex align="center" justify="space-between" gap={20}>
 

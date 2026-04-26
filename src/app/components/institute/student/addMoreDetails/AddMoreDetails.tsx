@@ -28,6 +28,7 @@ import { Installment } from "@/interfaces/batchInterface";
 import { GetStudent } from "@/axios/institute/InstituteGetApi";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
 
+
 interface StudentFormValues {
   name: string;
   email: string;
@@ -120,8 +121,6 @@ export function AddMoreDetails(props: {
           const val = new Date(student.dateOfBirth).setDate(
             new Date(student.dateOfBirth)!!.getDate() - 1,
           );
-
-          console.log("student : ", student);
 
           const studentData = {
             name: student.name,

@@ -86,10 +86,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     (state: any) => state.adminSlice.adminDetails,
   );
 
-  const userType: UserTypes =
-    adminDetails?.role?.toLowerCase() === "user"
-      ? UserTypes.USER
-      : UserTypes.ADMIN;
+ const userType: UserTypes =
+  adminDetails?.role?.toLowerCase() === "user"
+    ? UserTypes.USER
+    : UserTypes.ADMIN;
 
   const getAccountByToken = () => {
     setIsLoading(true);
@@ -346,6 +346,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
 
   // console.log("userType:", userType);
 
+  const filteredOptionalSubjects = subjectOptions.filter(
+  (sub) => !selectedSubjects.includes(sub.value)
+);
+
   return (
     <>
       <Notifications />
@@ -511,7 +515,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             label="Select optional subjects"
             placeholder="pic optional subjects"
             // data={data}
-            data={subjectOptions}
+            //  data={subjectOptions}
+            data={filteredOptionalSubjects}
             value={selectedOptionalSubjects}
             onChange={(subjects: string[]) =>
               setSelectedOptionalSubjects(subjects)

@@ -9,6 +9,7 @@ import "@mantine/carousel/styles.css";
 import { MantineProvider } from "@mantine/core";
 import { ReduxProvider } from "./redux/provider";
 import React from "react";
+import { ModalsProvider } from "@mantine/modals";
 
 export const metadata: Metadata = {
   title: {
@@ -91,7 +92,10 @@ export default function RootLayout({
           }}
         >
           <ReduxProvider>
+             <ModalsProvider>
+
             <React.StrictMode>{children}</React.StrictMode>
+             </ModalsProvider>
           </ReduxProvider>
         </MantineProvider>
       </body>
