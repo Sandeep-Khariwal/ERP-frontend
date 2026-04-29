@@ -133,7 +133,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
         outline: 2px solid ${accentColor};
         -webkit-print-color-adjust: exact;
       ">
-        <img src="${window.location.origin}/pic.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
+        <img src="${data.studentPhoto}" style="width: 100%; height: 100%; object-fit: cover;" />
       </div>
 
       <div style="text-align: center; margin-top: 12px;">

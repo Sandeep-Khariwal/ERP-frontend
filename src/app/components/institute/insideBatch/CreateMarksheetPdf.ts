@@ -90,7 +90,7 @@ export const createMarksheetPdf = (data: any) => {
 
     <div style="background:linear-gradient(#eaf3fb,#d6e6f5); margin-top:15px; padding:20px; border:2px solid #c3d3e2; display:flex; -webkit-print-color-adjust: exact;">
 
-    <img src="${window.location.origin}/pic.jpg" style="width:130px; border:3px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); ">
+    <img src="${data.photo}" style="width:130px; border:3px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); ">
 
     <div style="flex:1; padding-left:25px;">
         

@@ -1,17 +1,37 @@
 "use client";
 
-import { Box, Button, Center, Flex, Select, Stack, Table, Text, TextInput, } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Select,
+  Stack,
+  Table,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useEffect, useState } from "react";
-import { IconDownload, IconArrowLeftFromArc, } from "@tabler/icons-react";
+import { IconDownload, IconArrowLeftFromArc } from "@tabler/icons-react";
 import { Modal } from "@mantine/core";
 import { Image, Group } from "@mantine/core";
 import SingleStudentModal from "./SingleStudentModal";
 import { useMediaQuery } from "@mantine/hooks";
 import * as XLSX from "xlsx";
-import { CreateExamMarksheet, CreateExamMarksheetForExcel } from "@/axios/institute/InstitutePostApi";
-import { GetAllStudentsFromBatch, GetBatAllMarksheet, GetStudentDetail } from "@/axios/institute/InstituteGetApi";
-import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
+import {
+  CreateExamMarksheet,
+  CreateExamMarksheetForExcel,
+} from "@/axios/institute/InstitutePostApi";
+import {
+  GetAllStudentsFromBatch,
+  GetBatAllMarksheet,
+  GetStudentDetail,
+} from "@/axios/institute/InstituteGetApi";
+import {
+  ErrorNotification,
+  SuccessNotification,
+} from "@/app/helperFunction/Notification";
 import { GetGrade } from "../helperFunctions";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createMarksheetPdf } from "./CreateMarksheetPdf";
@@ -23,39 +43,42 @@ const Marksheet = (props: {
     (state: any) => state.instituteSlice.instituteDetails,
   );
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
-  const [batchStudents, setBatchStudents] = useState<{ _id: string, name: string, rollNumber: number }[]>([]);  //state me savee krvana batch student
+  const [batchStudents, setBatchStudents] = useState<
+    { _id: string; name: string; rollNumber: number }[]
+  >([]); //state me savee krvana batch student
   const [openUploadModal, setOpenUploadModal] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [openSingleStudentModal, setOpenSingleStudentModal] = useState(false);
   const isMobile = useMediaQuery(`(max-width: 968px)`);
   const [resultDate, setResultDate] = useState<Date | null>(null);
   const [session, setSession] = useState<string>("");
-  const [filterExam, setFilterExam] = useState<string | null>("Mid TERM Exam");   //table me filter data ke liye 
+  const [filterExam, setFilterExam] = useState<string | null>("Mid TERM Exam"); //table me filter data ke liye
   const [studentsPayload, setStudentsPayload] = useState<any[]>([]);
-  const [allMarksheet, setAllMarksheet] = useState<{
-    name: string;
-    batch: string;
-    session: string;
-    student: {
-      enrollmentNo: string;
+  const [allMarksheet, setAllMarksheet] = useState<
+    {
       name: string;
-      rollNumber: string;
-      _id: string;
-    };
-    marks: {
-      subjectName: string;
-      theory_marks: number;
-      practical_marks: number;
-      obtained_marks: number;
-      grade: string;
-    }[];
-    date: Date;
-    totalMarks: number;
-    percentage: number;
-    overallGrade: string;
-    status: string;
-  }[]>([])
-
+      batch: string;
+      session: string;
+      student: {
+        enrollmentNo: string;
+        name: string;
+        rollNumber: string;
+        _id: string;
+      };
+      marks: {
+        subjectName: string;
+        theory_marks: number;
+        practical_marks: number;
+        obtained_marks: number;
+        grade: string;
+      }[];
+      date: Date;
+      totalMarks: number;
+      percentage: number;
+      overallGrade: string;
+      status: string;
+    }[]
+  >([]);
 
   useEffect(() => {
     //get all subjects
@@ -65,30 +88,27 @@ const Marksheet = (props: {
           return {
             _id: st._id,
             name: st.name,
-            rollNumber: Number(st.rollNumber)
-          }
-        })
+            rollNumber: Number(st.rollNumber),
+          };
+        });
         setBatchStudents(batchStudents);
-
       })
       .catch((e: any) => {
         console.log(e);
-
-      })
-    GetResult()
-  }, [])
+      });
+    GetResult();
+  }, []);
 
   const GetResult = () => {
     // get all marksheet
     GetBatAllMarksheet(props.batchId)
       .then((x: any) => {
-        setAllMarksheet(x.marksheets)
+        setAllMarksheet(x.marksheets);
       })
       .catch((e: any) => {
         console.log(e);
-
-      })
-  }
+      });
+  };
 
   const processMarks = (marksArray: any[]) => {
     return marksArray.map((item) => {
@@ -106,7 +126,7 @@ const Marksheet = (props: {
     let total = 0;
 
     marks.forEach((m: any) => {
-      let obtained_marks = m.practical_marks + m.theory_marks
+      let obtained_marks = m.practical_marks + m.theory_marks;
       total += obtained_marks;
     });
 
@@ -155,7 +175,8 @@ const Marksheet = (props: {
         const subjectMap: any = {};
 
         Object.keys(student).forEach((key) => {
-          if (key === "Name" || key === "Roll No" || key === "__rowNum__") return;
+          if (key === "Name" || key === "Roll No" || key === "__rowNum__")
+            return;
 
           if (key.includes("(THEORY)")) {
             const subject = key.replace(" (THEORY)", "").trim();
@@ -201,13 +222,13 @@ const Marksheet = (props: {
           student: batchStudents.find(
             (std: any) =>
               std.name.toUpperCase() === name?.toUpperCase() ||
-              Number(std.rollNumber) === Number(roll)
+              Number(std.rollNumber) === Number(roll),
           )?._id,
           marks,
           date: resultDate ? resultDate.toISOString() : null,
           rollNumber: roll.toString(),
           session: session,
-          ...overall
+          ...overall,
         };
       });
 
@@ -227,7 +248,7 @@ const Marksheet = (props: {
   const CreateMarksheet = () => {
     if (studentsPayload.length === 0) {
       // alert("No valid data found!");
-      ErrorNotification("No valid data found!")
+      ErrorNotification("No valid data found!");
       return;
     }
     console.log("🚀 API PAYLOAD:", studentsPayload);
@@ -240,15 +261,15 @@ const Marksheet = (props: {
         // 👉 update state without API call
         setAllMarksheet((prev) => [...prev, ...newMarksheet]);
 
-        SuccessNotification("Marksheet Created Success!!")
-        setOpenUploadModal(false)
+        SuccessNotification("Marksheet Created Success!!");
+        setOpenUploadModal(false);
       })
       .catch((e: any) => {
         console.log(e);
-        setOpenUploadModal(false)
+        setOpenUploadModal(false);
       });
   };
-  //table me filter kiya data 
+  //table me filter kiya data
   const filteredMarksheet = filterExam
     ? allMarksheet.filter((item) => item.name === filterExam)
     : [];
@@ -256,31 +277,41 @@ const Marksheet = (props: {
   return (
     <>
       <Stack w={"100%"} mt={20}>
-
         <Text fw={700} fz={22}>
           Marksheet
         </Text>
 
         {/* 🔹 Top Buttons */}
-        <Flex justify="space-between" align="center" mt={10} direction={isMobile ? "column" : "row"}
-          gap={isMobile ? 10 : 0}>
+        <Flex
+          justify="space-between"
+          align="center"
+          mt={10}
+          direction={isMobile ? "column" : "row"}
+          gap={isMobile ? 10 : 0}
+        >
           {/* Left buttons */}
-          <Flex gap={10} direction={isMobile ? "column" : "row"}
-            w={isMobile ? "100%" : "auto"}>
-            <Button variant="outline"
+          <Flex
+            gap={10}
+            direction={isMobile ? "column" : "row"}
+            w={isMobile ? "100%" : "auto"}
+          >
+            <Button
+              variant="outline"
               fullWidth={isMobile}
               c={"#111"}
               style={{ borderColor: "#111" }}
-              onClick={() => setOpenSingleStudentModal(true)}>
+              onClick={() => setOpenSingleStudentModal(true)}
+            >
               + Single Student
             </Button>
 
-            <Button variant="outline"
+            <Button
+              variant="outline"
               fullWidth={isMobile}
               c={"#111"}
               style={{ borderColor: "#111" }}
-              onClick={() => setOpenUploadModal(true)}>
-
+              onClick={() => setOpenUploadModal(true)}
+            >
               Upload File
             </Button>
           </Flex>
@@ -293,17 +324,13 @@ const Marksheet = (props: {
             onChange={setFilterExam}
             // w={200}
             w={isMobile ? "100%" : 200}
-
-
           />
         </Flex>
 
         {/* 🔹 Table Container */}
-        <Box
-
-          style={{ overflowX: "auto" }}
-        >
-          <Table w={"100%"}
+        <Box style={{ overflowX: "auto" }}>
+          <Table
+            w={"100%"}
             mt={8}
             bg={"white"}
             // verticalSpacing="md"
@@ -313,7 +340,6 @@ const Marksheet = (props: {
             verticalSpacing={isMobile ? "sm" : "md"}
             horizontalSpacing={isMobile ? "sm" : "xl"}
             fz={isMobile ? 14 : 18}
-
           >
             {/* 🔹 Table Header */}
             <Table.Thead
@@ -343,8 +369,11 @@ const Marksheet = (props: {
                     fontWeight: 700,
                     color: "#2F4F4F",
                     fontSize: 18,
-                    whiteSpace:"nowrap"
-                  }}>Roll Nomber</Table.Th>
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Roll Nomber
+                </Table.Th>
                 <Table.Th
                   ta="center"
                   style={{
@@ -352,7 +381,10 @@ const Marksheet = (props: {
                     fontWeight: 700,
                     color: "#2F4F4F",
                     fontSize: 18,
-                  }}>Status</Table.Th>
+                  }}
+                >
+                  Status
+                </Table.Th>
                 <Table.Th
                   ta="center"
                   style={{
@@ -360,7 +392,10 @@ const Marksheet = (props: {
                     fontWeight: 700,
                     color: "#2F4F4F",
                     fontSize: 18,
-                  }}>Grade</Table.Th>
+                  }}
+                >
+                  Grade
+                </Table.Th>
                 <Table.Th
                   ta="center"
                   style={{
@@ -368,7 +403,10 @@ const Marksheet = (props: {
                     fontWeight: 700,
                     color: "#2F4F4F",
                     fontSize: 18,
-                  }}>Download</Table.Th>
+                  }}
+                >
+                  Download
+                </Table.Th>
               </Table.Tr>
             </Table.Thead>
 
@@ -381,128 +419,134 @@ const Marksheet = (props: {
                   </Table.Td>
                 </Table.Tr>
               )}
-              {filterExam && filteredMarksheet.map((item: any, index) => (
-                <Table.Tr key={index} style={
-
-                  {
-                    backgroundColor: "#FAFCFF",
-                    textAlign: "center",
-                    fontFamily: "Nunito",
-                    padding: "1rem"
-                  }
-                }
-
-                >
-
-                  <Table.Td
-                    ta="left"
+              {filterExam &&
+                filteredMarksheet.map((item: any, index) => (
+                  <Table.Tr
+                    key={index}
                     style={{
-                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#00000098",
-                      fontWeight: 500,
+                      backgroundColor: "#FAFCFF",
+                      textAlign: "center",
+                      fontFamily: "Nunito",
                       padding: "1rem",
-
                     }}
                   >
-                    {item.student.name}
-                  </Table.Td>
-                  <Table.Td
-                    ta="center"
-                    style={{
-                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#00000098",
-                      fontWeight: 500,
-                      padding: "1rem",
-                    }}>{item.student.rollNumber}</Table.Td>
-                  <Table.Td
-                    ta="center"
-                    style={{
-                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#00000098",
-                      fontWeight: 500,
-                      padding: "1rem",
-                    }}>{item.status}</Table.Td>
-                  <Table.Td
-                    ta="center"
-                    style={{
-                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#00000098",
-                      fontWeight: 500,
-                      padding: "1rem",
-                    }}>{item.overallGrade}</Table.Td>
-                  <Table.Td
-                    ta="center"
-                    style={{
-                      // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      color: "#00000098",
-                      fontWeight: 500,
-                      padding: "1rem",
-                    }}>
-
-                    <IconArrowLeftFromArc
-                      size={24}
-                      style={{ cursor: "pointer", color: "#00000098" }}
-                      onClick={() => {
-
-
-                        GetStudentDetail(item.student._id)
-                          .then((res: any) => {
-                            console.log("student details : ", res);
-                            const student = res.student
-
-                            const html = createMarksheetPdf({
-                              instituteName: institute?.name,
-                              examName: item.name,
-                              batchName: item.batch.name,
-                              studentName: item.student.name,
-                              rollNumber: item.student.rollNumber,
-                              enrolment: item.student.enrollmentNo,
-                              marks: item.marks,
-                              totalMarks: item.totalMarks,
-                              percentage: item.percentage,
-                              overallGrade: item.overallGrade,
-                              status: item.status,
-                              allsubjecttotal: item.marks.length * 100,
-                              date: new Date(item.date).toLocaleDateString("en-GB"),
-                              session: item.session,
-                              fName:student.parentName,
-                              address:student.address,
-                              parentNumber:student.parentNumber,
-                              dob: new Date(student.dateOfBirth).toLocaleDateString("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric"
-}),
-                              photo:student.profilePic,
-                              instituteLogo:student.instituteId.logo,
-                              instituteAdress:student.instituteId.address,
-                              institutePhone: student.instituteId.institutePhoneNumber
-
-                            });
-
-                            const printWindow = window.open("", "_blank");
-
-                            if (printWindow) {
-                              printWindow.document.write(html);
-                              printWindow.document.close();
-                              // printWindow.print();
-                              printWindow.onload = () => {
-                                setTimeout(() => {
-                                  printWindow.print();
-                                }, 800); // 👈 thoda zyada delay safe hai
-                              };
-                            }
-                          })
-                          .catch((e) => {
-                            console.log(e);
-
-                          })
-
+                    <Table.Td
+                      ta="left"
+                      style={{
+                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        color: "#00000098",
+                        fontWeight: 500,
+                        padding: "1rem",
                       }}
-                    />
-                  </Table.Td>
-                </Table.Tr>
-              ))}
+                    >
+                      {item.student.name}
+                    </Table.Td>
+                    <Table.Td
+                      ta="center"
+                      style={{
+                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        color: "#00000098",
+                        fontWeight: 500,
+                        padding: "1rem",
+                      }}
+                    >
+                      {item.student.rollNumber}
+                    </Table.Td>
+                    <Table.Td
+                      ta="center"
+                      style={{
+                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        color: "#00000098",
+                        fontWeight: 500,
+                        padding: "1rem",
+                      }}
+                    >
+                      {item.status}
+                    </Table.Td>
+                    <Table.Td
+                      ta="center"
+                      style={{
+                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        color: "#00000098",
+                        fontWeight: 500,
+                        padding: "1rem",
+                      }}
+                    >
+                      {item.overallGrade}
+                    </Table.Td>
+                    <Table.Td
+                      ta="center"
+                      style={{
+                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        color: "#00000098",
+                        fontWeight: 500,
+                        padding: "1rem",
+                      }}
+                    >
+                      <IconArrowLeftFromArc
+                        size={24}
+                        style={{ cursor: "pointer", color: "#00000098" }}
+                        onClick={() => {
+                          GetStudentDetail(item.student._id)
+                            .then((res: any) => {
+                              console.log("student details : ", res);
+                              const student = res.student;
+
+                              const html = createMarksheetPdf({
+                                instituteName: institute?.name,
+                                examName: item.name,
+                                batchName: item.batch.name,
+                                studentName: item.student.name,
+                                rollNumber: item.student.rollNumber,
+                                enrolment: item.student.enrollmentNo,
+                                marks: item.marks,
+                                totalMarks: item.totalMarks,
+                                percentage: item.percentage,
+                                overallGrade: item.overallGrade,
+                                status: item.status,
+                                allsubjecttotal: item.marks.length * 100,
+                                date: new Date(item.date).toLocaleDateString(
+                                  "en-GB",
+                                ),
+                                session: item.session,
+                                fName: student.parentName,
+                                address: student.address,
+                                parentNumber: student.parentNumber,
+                                dob: new Date(
+                                  student.dateOfBirth,
+                                ).toLocaleDateString("en-GB", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                }),
+                                photo: student.profilePic,
+                                instituteLogo: student.instituteId.logo,
+                                instituteAdress: student.instituteId.address,
+                                institutePhone:
+                                  student.instituteId.institutePhoneNumber,
+                              });
+
+                              const printWindow = window.open("", "_blank");
+
+                              if (printWindow) {
+                                printWindow.document.write(html);
+                                printWindow.document.close();
+                                // printWindow.print();
+                                printWindow.onload = () => {
+                                  setTimeout(() => {
+                                    printWindow.print();
+                                  }, 800); // 👈 thoda zyada delay safe hai
+                                };
+                              }
+                            })
+                            .catch((e) => {
+                              console.log(e);
+                            });
+                        }}
+                      />
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
             </Table.Tbody>
           </Table>
         </Box>
@@ -541,11 +585,8 @@ const Marksheet = (props: {
               w={200}
             />
           </Flex>
-          <Box
-
-          >
+          <Box>
             <Flex align="center" justify="space-between" gap={20}>
-
               {/* 🔹 LEFT IMAGE */}
               <Image
                 src="/modallogo.jpeg"
@@ -555,7 +596,6 @@ const Marksheet = (props: {
 
               {/* 🔹 RIGHT CONTENT */}
               <Stack w="60%">
-
                 <Text fw={700} fz={20}>
                   Upload Excel File
                 </Text>
@@ -576,15 +616,15 @@ const Marksheet = (props: {
                   <Text mb={8}>⬆️</Text>
 
                   <Group justify="center" gap={6}>
-                    <Text fz={14}>
-                      Drag & drop your file here or
-                    </Text>
+                    <Text fz={14}>Drag & drop your file here or</Text>
 
                     <Button
                       size="xs"
                       variant="light"
                       disabled={!selectedExam} // 👈 condition
-                      onClick={() => document.getElementById("fileInput")?.click()}
+                      onClick={() =>
+                        document.getElementById("fileInput")?.click()
+                      }
                     >
                       Browse
                     </Button>
@@ -653,12 +693,11 @@ const Marksheet = (props: {
         batchId={props.batchId}
         batchStudents={batchStudents}
         refreshData={(data) => {
-          setAllMarksheet((prev) => [...prev, data])
+          setAllMarksheet((prev) => [...prev, data]);
         }}
       />
     </>
   );
 };
-
 
 export default Marksheet;
