@@ -128,15 +128,15 @@ export function InstituteInsideBatch(props: {
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [students, setStudents] = useState<StudentsDataWithBatch[]>([]);
-    const [studentsTable, setStudentsTable] = useState<
-      {
-        _id: string;
-        name: string;
-        phoneNumber: string;
-        parentName: string;
-        feeStatus: string;
-      }[]
-    >( []);
+  const [studentsTable, setStudentsTable] = useState<
+    {
+      _id: string;
+      name: string;
+      phoneNumber: string;
+      parentName: string;
+      feeStatus: string;
+    }[]
+  >([]);
 
   return (
     <>
@@ -218,27 +218,20 @@ export function InstituteInsideBatch(props: {
           <Stack w={"100%"}>
             {showSelectedScreen === Screen.NONE && (
               <>
-                <Flex w={"100%"} align={"center"} justify={"space-between"}>
-                  <Flex w={"50%"} gap={10}>
-                    {!props.fromInstituteTeacherSection && (
-                      <Button
-                        variant="outline"
-                        c={"#111"}
-                        style={{ borderColor: "#111" }}
-                        onClick={() => {
-                          setShowSelectedScreen(Screen.ADDMORESCREEN);
-                        }}
-                      >
-                        + Add Student
-                      </Button>
-                    )}
-
+                <Flex
+                  w="100%"
+                  align="center"
+                  justify="space-between"
+                  wrap="wrap"
+                  gap="sm"
+                >
+                  <Flex gap="sm" wrap="wrap" style={{ flex: 1 }}>
                     {students.length > 0 && (
                       <>
                         <Button
                           variant="outline"
-                          c={"#111"}
-                          style={{ borderColor: "#111" }}
+                          color="dark"
+                          style={{ whiteSpace: "nowrap" }}
                           onClick={() => {
                             setTakeAttandance(true);
                           }}
@@ -248,8 +241,8 @@ export function InstituteInsideBatch(props: {
 
                         <Button
                           variant="outline"
-                          c={"#111"}
-                          style={{ borderColor: "#111" }}
+                          color="dark"
+                          style={{ whiteSpace: "nowrap" }}
                           onClick={() => {
                             setOpenAddMarksModal(true);
                           }}
@@ -259,17 +252,42 @@ export function InstituteInsideBatch(props: {
                       </>
                     )}
                   </Flex>
-
-                  <Button
-                    variant="outline"
-                    c={"#111"}
-                    style={{ borderColor: "#111" }}
-                    onClick={() => {
-                      setOpenFileAdmissionModal(true);
-                    }}
+                  <Flex
+                    gap="sm"
+                    align={"center"}
+                    justify={"flex-end"}
+                    wrap="wrap"
+                    style={{ flex: 1 }}
                   >
-                    + Upload file
-                  </Button>
+                    {students.length > 0 && (
+                      <>
+                        {!props.fromInstituteTeacherSection && (
+                          <Button
+                            variant="outline"
+                            color="dark"
+                            style={{ whiteSpace: "nowrap" }}
+                            onClick={() => {
+                              setShowSelectedScreen(Screen.ADDMORESCREEN);
+                            }}
+                          >
+                            + Add Student
+                          </Button>
+                        )}
+                        {!props.fromInstituteTeacherSection && (
+                          <Button
+                            variant="outline"
+                            color="dark"
+                            style={{ whiteSpace: "nowrap" }}
+                            onClick={() => {
+                              setOpenFileAdmissionModal(true);
+                            }}
+                          >
+                            + Upload File
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </Flex>
                 </Flex>
 
                 {takeAttendance ? (

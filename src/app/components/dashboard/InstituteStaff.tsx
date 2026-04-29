@@ -23,7 +23,6 @@ import ReferCodeModal from "./ReferCodeModal";
 import axios from "axios";
 import { GetReferalCode } from "@/axios/institute/InstituteGetApi";
 
-
 interface InstituteProfileProps {
   users: {
     id: string;
@@ -42,12 +41,9 @@ export function InstituteProfile(props: InstituteProfileProps) {
   const [isFetchingRef, setIsFetchingRef] = useState(false);
   const [isUserModel, setIsUserModel] = useState(false);
   const [userData, setUserData] = useState<{ [key: string]: string } | null>(
-    null
+    null,
   );
   const [subjectModalOpen, setSubjectModalOpen] = useState(false);
-  
-
-  
 
   // const [editUserData, setEditUserData] = useState<{
   //   selectedImage: string;
@@ -75,10 +71,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
 
   const handleSubjectModal = () => {
     setSubjectModalOpen(true);
-  }
- 
-
-
+  };
 
   const handleCloseModal = () => {
     setIsUserModel(false);
@@ -94,7 +87,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
   const handleEditProfile = (userId: string) => {
     setIsModalOpen(true);
   };
-  function deleteProfile(deleteProfileId: string) { }
+  function deleteProfile(deleteProfileId: string) {}
   function addTeacher(data: {
     name: string;
     email: string;
@@ -102,9 +95,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
     featureAccess: any;
     batches: string[];
     role: string;
-  }) {
-
-  }
+  }) {}
 
   function updateTeacher(data: {
     email: string;
@@ -119,7 +110,6 @@ export function InstituteProfile(props: InstituteProfileProps) {
     setIsModalOpen(false);
   }
 
-
   const handleReferClick = async () => {
     try {
       setIsFetchingRef(true);
@@ -128,14 +118,11 @@ export function InstituteProfile(props: InstituteProfileProps) {
         .then((res: any) => {
           setRefCode(res.data.couponCode);
         })
-        .catch((e:any) => {
+        .catch((e: any) => {
           console.log(e);
-
-        })
-
+        });
 
       setOpenRefer(true);
-
     } catch (err) {
       console.log(err);
     } finally {
@@ -156,67 +143,68 @@ export function InstituteProfile(props: InstituteProfileProps) {
         bg={"#FFFFFF"}
         style={{ borderRadius: "10px", borderColor: "#0000001A" }}
       >
-        <Flex ml={5} align="center">
+        <Flex ml={5} align="center" direction={isMd ? "column" : "row"}>
           <Text fz={18} fw={700} c={"#1B1212"} ff={"Roboto"}>
             Create/View Profile
           </Text>
           <Flex
             gap="sm"
-            ml= "lg"
-            // ml={35}
-            // mt={10}
-             direction={isMd ? "column" : "row"}
-
+            ml="lg"
+            direction="row"
             style={{
-              // marginLeft: isMd ? 0 : "auto",
               marginTop: isMd ? "10px" : 0,
             }}
+            wrap="wrap"
           >
-
-          <Button
-            onClick={handleSubjectModal}
-            size="sm"
-            variant="default"
-            ml={16}
-            fw={700}
-            c={"#353935"}
-            ff={"Poppins"}
-            style={{
-              fontSize: "16px",
-              borderRadius: "24px",
-              borderColor: "##808080",
-              borderWidth: "1px",
-            }}
-          >
-            + Add Subjects
-          </Button>
             <Button
               onClick={handleOpenModal}
-              size="sm"
+              size="md"
               variant="default"
               fw={700}
+              px={16}
+              py={8}
               style={{
                 fontSize: "16px",
                 borderRadius: "24px",
+                whiteSpace: "nowrap",
               }}
               w={isMd ? "100%" : "auto"}
             >
-              + Add Staff
+              {isMd ? "+ Subjects" : "+ Add Subjects"}
+            </Button>
+            <Button
+              onClick={handleOpenModal}
+              size="md"
+              variant="default"
+              fw={700}
+              px={16}
+              py={8}
+              style={{
+                fontSize: "16px",
+                borderRadius: "24px",
+                whiteSpace: "nowrap",
+              }}
+              w={isMd ? "100%" : "auto"}
+            >
+              {isMd ? "+ Staff" : "+ Add Staff"}
             </Button>
 
             <Button
               onClick={handleReferClick}
               loading={isFetchingRef}
-              size="sm"
+              size="md"
               variant="default"
               fw={700}
+              px={16}
+              py={8}
               style={{
                 fontSize: "16px",
                 borderRadius: "24px",
+                whiteSpace: "nowrap",
               }}
               w={isMd ? "100%" : "auto"}
             >
-              Refer & Earn
+              {isMd ? "Refer" : "Refer & Earn"}
             </Button>
           </Flex>
           <ReferCodeModal
@@ -224,18 +212,15 @@ export function InstituteProfile(props: InstituteProfileProps) {
             onClose={() => setOpenRefer(false)}
             referralCode={refCode}
           />
-
         </Flex>
 
         {subjectModalOpen && (
           <AddInstituteSubjects
             isOpen={subjectModalOpen}
             onClose={() => {
-
               setSubjectModalOpen(false);
             }}
           />
-
         )}
         {isModalOpen && (
           <AddStaffModal
@@ -243,7 +228,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
             isOpen={isModalOpen}
             userType={props.userType}
             onreloadData={() => {
-              props.onreloadData()
+              props.onreloadData();
             }}
             onClose={() => {
               // setEditUserData(null);
@@ -338,7 +323,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
               // cols={isLg ? 2 : 4}
               w={"100%"}
               wrap="wrap"
-            // verticalSpacing={20}
+              // verticalSpacing={20}
             >
               {/* <InstituteUserCard
                 users={props.users.map((user) => ({

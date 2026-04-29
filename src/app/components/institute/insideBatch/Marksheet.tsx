@@ -343,7 +343,8 @@ const Marksheet = (props: {
                     fontWeight: 700,
                     color: "#2F4F4F",
                     fontSize: 18,
-                  }}>Roll Number</Table.Th>
+                    whiteSpace:"nowrap"
+                  }}>Roll Nomber</Table.Th>
                 <Table.Th
                   ta="center"
                   style={{

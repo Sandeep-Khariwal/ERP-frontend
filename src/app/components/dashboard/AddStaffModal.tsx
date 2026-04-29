@@ -258,9 +258,7 @@ const AddStaffModal = (props: {
           <SimpleGrid
             cols={3}
             style={{
-              marginTop: "20px",
-              marginLeft: "20px",
-              marginRight: "20px",
+              gap: 5,
             }}
           >
             {rolesToShow.map((role, index) => (
@@ -285,8 +283,8 @@ const AddStaffModal = (props: {
                     onClick={() => handleImageSelect(role, index)}
                     align="center"
                     justify="center"
-                    mr={15}
-                    w="100px"
+                    // mr={15}
+                    w={isMd ? "90px" : "100px"}
                     h="130px"
                   >
                     <Image

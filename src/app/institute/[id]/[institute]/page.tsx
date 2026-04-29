@@ -88,16 +88,18 @@ const dashboard = () => {
       <div style={{ width: "100%", minHeight: "100vh" }}>
         <LoadingOverlay visible={isLoading} />
 
-        <DesktopNavbar
-          isCollapsed={hovered}
-          onClickCollapse={() => {
-            setHovered(!hovered);
-          }}
-          onSelectTab={(val: Tabs) => {
-            setSelectedTab(val);
-          }}
-          activeTab={selectedTab}
-        />
+        {!isMd && (
+          <DesktopNavbar
+            isCollapsed={hovered}
+            onClickCollapse={() => {
+              setHovered(!hovered);
+            }}
+            onSelectTab={(val: Tabs) => {
+              setSelectedTab(val);
+            }}
+            activeTab={selectedTab}
+          />
+        )}
 
         <Box style={{ display: !isMd ? "none" : "block" }}>
           <MobileNavbar

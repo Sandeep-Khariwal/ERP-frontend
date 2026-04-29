@@ -27,7 +27,7 @@ const MobileNavbar = (props: {
       align={"center"}
       justify={"space-between"}
       style={{
-        position: "absolute",
+        position: "fixed",
         bottom: "1%",
         left: "50%",
         transform: "translateX(-50%)",
