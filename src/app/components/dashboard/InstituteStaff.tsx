@@ -157,7 +157,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
             wrap="wrap"
           >
             <Button
-              onClick={handleOpenModal}
+              onClick={handleSubjectModal}
               size="md"
               variant="default"
               fw={700}
