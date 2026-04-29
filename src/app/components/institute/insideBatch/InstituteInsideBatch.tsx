@@ -259,7 +259,6 @@ export function InstituteInsideBatch(props: {
                     wrap="wrap"
                     style={{ flex: 1 }}
                   >
-                    {students.length > 0 && (
                       <>
                         {!props.fromInstituteTeacherSection && (
                           <Button
@@ -286,7 +285,7 @@ export function InstituteInsideBatch(props: {
                           </Button>
                         )}
                       </>
-                    )}
+                
                   </Flex>
                 </Flex>
 

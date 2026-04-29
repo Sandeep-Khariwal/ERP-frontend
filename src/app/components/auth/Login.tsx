@@ -463,7 +463,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                   </Tabs.Panel>
                 </Tabs>
 
-                {/* {UserTypes.ADMIN === userType && (
+                {UserTypes.ADMIN === userType && (
                   <Text>
                     create institute account?{" "}
                     <span
@@ -477,7 +477,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                       Signup
                     </span>
                   </Text>
-                )} */}
+                )}
                 <Button
                   fullWidth
                   mt="md"
