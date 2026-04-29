@@ -232,9 +232,7 @@ const StudentPage = (props: {
             batchName={student.batchId?.name || ""}
             dateOfJoining={new Date(student.dateOfBirth)}
             batch={student.batchId?._id || ""}
-            studentId={student._id}
-            studentName={student.name}      
-            parentName={student.parentName}
+            studentId={student._id}     
             onPaymentClick={() => { }}
             onClickBack={props.onClickBack}
             fromBatch={false}
