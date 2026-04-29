@@ -81,12 +81,11 @@ export function AddMoreDetails(props: {
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
     van: props.formData.van,
     rollNumber: props.formData?.rollNumber || 0,
+    photo: "",
     
   });
 
   useEffect(() => {
-    console.log("formValues.van  : ", formValues.van);
-
     setSelectedVan(formValues.van ?? "");
   }, [formValues]);
 
@@ -165,7 +164,6 @@ export function AddMoreDetails(props: {
   }, [props.selectedStudentId]);
 
   const handleInputChange = (field: string, value: any) => {
-    console.log(value);
 
     if (field === "dateOfBirth") {
       setFormValues((p) => ({ ...p, dateOfBirth: value ? value : null }));
@@ -203,7 +201,7 @@ export function AddMoreDetails(props: {
         email: formValues.email,
         van: selectedVan ?? formValues.van,
         rollNumber: formValues.rollNumber,
-        photo: formValues.photo,
+        profilePic: formValues.photo,
       };
 
       if (props.isEditableData) {

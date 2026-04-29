@@ -54,9 +54,8 @@ useEffect(() => {
 
   UploadStudentImage(imageFile)
     .then((res: any) => {
-      console.log("SUCCESS:", res);
 
-      const imageUrl = res?.data?.url; // ⚠️ yaha check karna
+      const imageUrl = res?.url; // ⚠️ yaha check karna
 
       if (imageUrl) {
         handleInputChange("photo", imageUrl);
