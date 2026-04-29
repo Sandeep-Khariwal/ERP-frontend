@@ -7,6 +7,7 @@ export function createReceiptPdf(
     amountPaid: number;
     updatedAt: Date;
     name: string;
+    totalAmount: number;
   }[],
   name: string,
   instituteLogo: string,
@@ -17,6 +18,15 @@ export function createReceiptPdf(
 ) {
   const totalAmountInWords =
     numberToWords(amountPaid).toUpperCase() + " RUPEES ONLY";
+
+  const totalFee = paymentRecords[0]?.totalAmount || 0;
+
+  const totalPaid = paymentRecords.reduce(
+    (sum, record) => sum + record.amountPaid,
+    0
+  );
+
+  const remainingFee = totalFee - totalPaid;
 
   const formattedDate = new Date(date).toLocaleDateString("en-IN");
 
@@ -188,11 +198,10 @@ export function createReceiptPdf(
 
       <!-- HEADER -->
       <div class="header">
-        ${
-          instituteLogo
-            ? `<img src="${instituteLogo}" class="logo" />`
-            : ""
-        }
+        ${instituteLogo
+      ? `<img src="${instituteLogo}" class="logo" />`
+      : ""
+    }
 
         <div class="institute-details">
           <div class="institute-name">${name}</div>
@@ -240,9 +249,11 @@ export function createReceiptPdf(
       </div>
 
       <!-- TOTAL -->
-      <div class="total">
-        Total: ₹${amountPaid}
-      </div>
+<div class="total">
+  Total Fee: ₹${totalFee} <br/>
+  Paid: ₹${totalPaid} <br/>
+  <span style="color:red;">Remaining: ₹${remainingFee}</span>
+</div>
 
       <!-- FOOTER -->
       <div class="footer">
@@ -263,9 +274,9 @@ export function createReceiptPdf(
   `;
 }
 function numberToWords(number: number) {
-  const words = ["","one","two","three","four","five","six","seven","eight","nine"];
-  const teens = ["","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
-  const tens = ["","ten","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+  const words = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+  const teens = ["", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+  const tens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
 
   function convertTwoDigitNumber(num: number) {
     if (num < 10) return words[num];
@@ -294,3 +305,299 @@ function numberToWords(number: number) {
 
   return convertNumberWithThousands(number);
 }
+
+export function createFullFeeOverviewPdf(
+  studentName: string,
+  parentName: string,
+  paymentRecords: {
+    amountPaid: number;
+    updatedAt: Date;
+    name: string;
+    totalAmount: number;
+  }[],
+  name: string,
+  instituteLogo: string,
+  address: string,
+  phoneNumber: string,
+  batchName: string
+) {
+  const totalFee = paymentRecords.reduce(
+  (sum, r) => sum + (r.totalAmount || 0),
+  0
+);
+
+const totalPaid = paymentRecords.reduce(
+  (sum, r) => sum + (r.amountPaid || 0),
+  0
+);
+
+const remaining = totalFee - totalPaid;
+
+  const rows = paymentRecords
+    .map((r, index) => {
+      let status = "Not Paid";
+
+      if (r.amountPaid === r.totalAmount) status = "Fully Paid";
+      else if (r.amountPaid > 0) status = "Partial Paid";
+
+      return `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${r.name}</td>
+          <td>${status}</td>
+          <td>₹${r.totalAmount}</td>
+          <td>₹${r.amountPaid || 0}</td>
+          <td>₹${r.totalAmount - (r.amountPaid || 0)}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+return `
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #f4f6f8;
+    padding: 20px;
+  }
+
+  /* PRINT FIX */
+@media print {
+  body {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .container {
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  table {
+    page-break-inside: avoid;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+}
+
+/* COLOR FIX (IMPORTANT) */
+* {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.header {
+  background: #0fb9b1 !important;
+  color: white !important;
+}
+
+table {
+  width: 100%;
+  margin: 20px 0;
+}
+
+  .container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0fb9b1;
+    padding: 20px;
+    color: white;
+  }
+
+  .header h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .header p {
+    margin: 0;
+    font-size: 12px;
+  }
+
+  /* TITLE */
+  .title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 20px 0;
+    color: #333;
+  }
+
+  /* DETAILS CARD */
+  .details {
+    background: #f8f9fa;
+    margin: 0 20px;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  /* TABLE */
+  table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  th {
+    background: #0fb9b1;
+    color: white;
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  td {
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+    border-bottom: 1px solid #eee;
+  }
+
+  tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+
+  /* STATUS */
+  .paid { color: #0fb9b1; font-weight: 600; }
+  .partial { color: orange; font-weight: 600; }
+  .due { color: red; font-weight: 600; }
+
+  /* SUMMARY CARDS */
+  .summary-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+  }
+
+  .card {
+    flex: 1;
+    margin: 5px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f1f3ff;
+    text-align: center;
+  }
+
+  .card h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .card p {
+    margin: 5px 0 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .remaining {
+    color: red;
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div>
+      <h2>${name}</h2>
+      <p>${address}</p>
+    </div>
+  </div>
+
+  <div class="title">FEE OVERVIEW</div>
+
+  <div class="details">
+    <div class="row"><span>Student:</span><span>${studentName}</span></div>
+    <div class="row"><span>Parent:</span><span>${parentName}</span></div>
+    <div class="row"><span>Batch:</span><span>${batchName}</span></div>
+  </div>
+
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Installment</th>
+      <th>Status</th>
+      <th>Total</th>
+      <th>Paid</th>
+      <th>Due</th>
+    </tr>
+
+    ${paymentRecords.map((r, i) => {
+      let status = "Not Paid";
+      let cls = "due";
+
+      if (r.amountPaid === r.totalAmount) {
+        status = "Paid";
+        cls = "paid";
+      } else if (r.amountPaid > 0) {
+        status = "Partial";
+        cls = "partial";
+      }
+
+      return `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${r.name}</td>
+          <td class="${cls}">${status}</td>
+          <td>₹${r.totalAmount}</td>
+          <td>₹${r.amountPaid}</td>
+          <td>₹${r.totalAmount - r.amountPaid}</td>
+        </tr>
+      `;
+    }).join("")}
+
+  </table>
+
+  <div class="summary-container">
+    <div class="card">
+      <h4>Total Fee</h4>
+      <p>₹${totalFee}</p>
+    </div>
+
+    <div class="card">
+      <h4>Total Paid</h4>
+      <p>₹${totalPaid}</p>
+    </div>
+
+    <div class="card">
+      <h4>Remaining</h4>
+      <p class="remaining">₹${remaining}</p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
+`;}

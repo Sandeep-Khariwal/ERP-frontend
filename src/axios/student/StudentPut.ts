@@ -61,3 +61,18 @@ export function insertNewAttendance(data: {
       .catch((error) => reject(error));
   });
 }
+
+
+export function UploadStudentImage(file: File) {
+  const formData = new FormData();
+  formData.append("studentPhoto", file);
+
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/image`,
+      formData
+    )
+      .then((response) => resolve(response))
+      .catch((error) => reject(error));
+  });
+}
