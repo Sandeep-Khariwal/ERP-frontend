@@ -207,6 +207,26 @@ export const DesktopNavbar = (props: {
                 Add School Logo
               </Text>
             </Flex>
+            {/* ADD LOGO */}
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                background: activeSettingTab === "logo" ? "#f3e8ff" : "transparent",
+              }}
+              onClick={() => {
+                setSettingsOpened(false);
+                setLogoModalOpen(true);
+              }}
+            >
+              <IoSettingsOutline size={18} />
+              <Text size="sm" fw={500}>
+                Add Fees GST
+              </Text>
+            </Flex>
           </Stack>
 
           {/* RIGHT SIDE */}

@@ -35,6 +35,7 @@ import {
 import { GetGrade } from "../helperFunctions";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createMarksheetPdf } from "./CreateMarksheetPdf";
+import { formatDate } from "../../marketing/utility/utils";
 const Marksheet = (props: {
   batchId: string;
   subjects: { _id: string; name: string }[];
@@ -512,18 +513,13 @@ const Marksheet = (props: {
                                 fName: student.parentName,
                                 address: student.address,
                                 parentNumber: student.parentNumber,
-                                dob: new Date(
-                                  student.dateOfBirth,
-                                ).toLocaleDateString("en-GB", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                }),
+                                dob: formatDate(student.dateOfBirth),
                                 photo: student.profilePic,
                                 instituteLogo: student.instituteId.logo,
                                 instituteAdress: student.instituteId.address,
                                 institutePhone:
                                   student.instituteId.institutePhoneNumber,
+                                  principalSignature:"/signdumy.jpeg"
                               });
 
                               const printWindow = window.open("", "_blank");

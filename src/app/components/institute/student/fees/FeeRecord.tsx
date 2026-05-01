@@ -217,6 +217,19 @@ const FeeRecordSection = (props: {
                   GetStudentForPdf(props.studentId).then((x: any) => {
                     const { student } = x;
 
+                    let gst = instituteDetails.gst;
+                    if (
+                      instituteDetails.gst.sgst > 0 ||
+                      instituteDetails.gst.cgst
+                    ) {
+                      gst = instituteDetails.gst;
+                    } else {
+                      gst = {
+                        sgst: 0,
+                        cgst: 0,
+                      };
+                    }
+
                     const formattedData = student.feeRecords.map((f: any) => ({
                       name: f.name,
                       amountPaid: f.amountPaid,
@@ -233,6 +246,7 @@ const FeeRecordSection = (props: {
                       student.instituteId.address,
                       student.instituteId.institutePhoneNumber,
                       props.batchName,
+                      gst,
                     );
 
                     convertHtmlIntoPdf(html);
