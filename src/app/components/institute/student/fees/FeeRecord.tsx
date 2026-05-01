@@ -26,8 +26,21 @@ import { StudentFeesCards } from "./StudentFeesCard";
 import { Installment } from "@/interfaces/batchInterface";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { UpdateMultipleFeeRecord } from "@/axios/student/StudentPut";
-import { GetStudentFeeInstallments } from "@/axios/student/StudentGetApi";
+import {
+  GetStudentFeeInstallments,
+  GetStudentForPdf,
+} from "@/axios/student/StudentGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
+import { createFullFeeOverviewPdf } from "./HtmlToPdf";
+
+const convertHtmlIntoPdf = (html: string) => {
+  const newWindow = window.open("", "_blank");
+  if (!newWindow) return;
+
+  newWindow.document.write(html);
+  newWindow.document.close();
+  newWindow.print();
+};
 
 interface FormValues {
   paymentDate: Date;
@@ -50,7 +63,7 @@ const FeeRecordSection = (props: {
   const [installments, setInstallments] = useState<Installment[]>([]);
 
   const instituteDetails = useAppSelector(
-    (state: any) => state.instituteSlice.instituteDetails
+    (state: any) => state.instituteSlice.instituteDetails,
   );
 
   // const instituteDetails = useSelector<RootState, InstituteDetails | null>(
@@ -59,11 +72,11 @@ const FeeRecordSection = (props: {
 
   const totalFees = installments?.reduce(
     (sum: number, record: Installment) => sum + record.amount,
-    0
+    0,
   );
   const totalPaidFees = installments?.reduce(
     (sum: number, record: Installment) => sum + (record.amountPaid ?? 0),
-    0
+    0,
   );
   const totalOverdue = totalFees - totalPaidFees;
 
@@ -171,7 +184,7 @@ const FeeRecordSection = (props: {
             </Text>
           </Flex>
         )}
-        <Grid p={10} style={{position:"sticky",top:50}}>
+        <Grid p={10} style={{ position: "sticky", top: 50 }}>
           <Grid.Col span={isMd ? 12 : 10}>
             <SimpleGrid
               cols={isMd ? 2 : 4}
@@ -187,32 +200,70 @@ const FeeRecordSection = (props: {
           </Grid.Col>
         </Grid>
         <Box p={10}>
-          <Flex justify={"space-between"} align={"center"} style={{position:"sticky",top:100}}>
+          <Flex
+            justify={"space-between"}
+            align={"center"}
+            style={{ position: "sticky", top: 100 }}
+          >
             <Text size="sm" c="blue">
               Fee Records
             </Text>
-            {(props.userType == UserType.OTHERS ||
-              props.userType == UserType.TEACHER) && (
+
+            <Flex gap={10}>
+              {/* 🔥 NEW BUTTON */}
               <Button
+                color="green"
                 onClick={() => {
-                  if (totalOverdue <= 0) {
-                    showNotification({
-                      message: "No Pending Payment ",
-                    });
-                    return;
-                  }
-                  setOpenPaymentModel(true);
+                  GetStudentForPdf(props.studentId).then((x: any) => {
+                    const { student } = x;
+
+                    const formattedData = student.feeRecords.map((f: any) => ({
+                      name: f.name,
+                      amountPaid: f.amountPaid,
+                      totalAmount: f.totalAmount,
+                      updatedAt: f.updatedAt,
+                    }));
+
+                    const html = createFullFeeOverviewPdf(
+                      student.name, // ✅ DIRECT API se
+                      student.parentName, // ✅ DIRECT API se
+                      formattedData,
+                      student.instituteId.name,
+                      student.instituteId.logo,
+                      student.instituteId.address,
+                      student.instituteId.institutePhoneNumber,
+                      props.batchName,
+                    );
+
+                    convertHtmlIntoPdf(html);
+                  });
                 }}
-                fz={13}
-                style={{ fontFamily: "sans-serif" }}
               >
-                Record Payment
+                Download Report
               </Button>
-            )}
+
+              {/* OLD BUTTON */}
+              {(props.userType == UserType.OTHERS ||
+                props.userType == UserType.TEACHER) && (
+                <Button
+                  onClick={() => {
+                    if (totalOverdue <= 0) {
+                      showNotification({
+                        message: "No Pending Payment ",
+                      });
+                      return;
+                    }
+                    setOpenPaymentModel(true);
+                  }}
+                >
+                  Record Payment
+                </Button>
+              )}
+            </Flex>
           </Flex>
 
           <Divider my="sm" />
-          <Flex w={"100%"} justify="space-between" align="center" >
+          <Flex w={"100%"} justify="space-between" align="center">
             <Text
               size="md"
               fw={700}

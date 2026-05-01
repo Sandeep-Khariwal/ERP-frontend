@@ -66,7 +66,7 @@ export default function Home() {
           const instituteDetails = {
             name: data.institute.name,
             _id: data.institute._id,
-            phoneNumber: "",
+            phoneNumber: data.institute.institutePhoneNumber,
             address: data.institute.address,
             email: data.email,
             featureAccess: data.institute.accessFeatures,
@@ -91,7 +91,7 @@ export default function Home() {
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
-            phoneNumber: "",
+            phoneNumber: data.instituteId.institutePhoneNumber,
             email: data.email,
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
@@ -114,7 +114,7 @@ export default function Home() {
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
-            phoneNumber: "",
+            phoneNumber: data.instituteId.institutePhoneNumber,
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
             email: data.email,
@@ -135,7 +135,7 @@ export default function Home() {
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
-            phoneNumber: "",
+            phoneNumber: data.instituteId.institutePhoneNumber,
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
             email: data.email,

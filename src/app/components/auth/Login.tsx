@@ -138,10 +138,10 @@ export default function Login(props: { onCreateAccount: () => void }) {
           const instituteDetails = {
             name: admin.institute.name,
             _id: admin.institute._id,
-            phoneNumber: "",
+            phoneNumber: admin.institute?.institutePhoneNumber,
             address: admin.institute.address,
             featureAccess:admin.institute.accessFeatures,
-             email: admin.instituteId.email
+             email: admin.institute.email
           };
           dispatch(setDetails(instituteDetails));
           // window.location.reload();
@@ -463,7 +463,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                   </Tabs.Panel>
                 </Tabs>
 
-                {UserTypes.ADMIN === userType && (
+                {/* {UserTypes.ADMIN === userType && (
                   <Text>
                     create institute account?{" "}
                     <span
@@ -477,7 +477,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                       Signup
                     </span>
                   </Text>
-                )}
+                )} */}
                 <Button
                   fullWidth
                   mt="md"

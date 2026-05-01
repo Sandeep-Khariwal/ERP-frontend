@@ -34,7 +34,7 @@ export default function IntegrationsPage() {
             leftSection={<IconBrandWhatsapp size={16} />}
         
           >
-            WhatsApp (coming soon)
+            WhatsApp
           </Tabs.Tab>
           <Tabs.Tab
             value="google"

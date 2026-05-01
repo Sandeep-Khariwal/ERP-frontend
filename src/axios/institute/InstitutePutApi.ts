@@ -55,7 +55,7 @@ export function DeleteSubject(subjectId: string) {
 
 export function updateschooldetails(
   instituteId: string,
-  data: { name: string; email: string; PhoneNumber: string; address: string }
+  data: { name: string; email: string; institutePhoneNumber: string; address: string }
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(

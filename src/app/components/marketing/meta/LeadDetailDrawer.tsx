@@ -339,7 +339,7 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
                   <Textarea
                     placeholder="Call Duration"
                     size="sm"
-                    value={callNote}
+                    value={callDuration}
                     onChange={(e) => setCallDuration(e.currentTarget.value)}
                     minRows={2}
                   />

@@ -2,20 +2,21 @@ import { GetStudentDetail } from "@/axios/institute/InstituteGetApi";
 import { useEffect, useState } from "react";
 
 export const createMarksheetPdf = (data: any) => {
-const getRemark = () => {
-  if (data.status === "Fail") {
-    return "Needs improvement. Work harder and try again.";
-  }
+  const getRemark = () => {
+    if (data.status === "Fail") {
+      return "Needs improvement. Work harder and try again.";
+    }
 
-  const percentage = Number(data.percentage);
+    const percentage = Number(data.percentage);
 
-  if (percentage >= 90) return "Outstanding performance! Keep shining.";
-  if (percentage >= 75) return "Excellent performance! Keep up the good work.";
-  if (percentage >= 60) return "Good job! You are doing well.";
-  if (percentage >= 40) return "Satisfactory performance. Keep improving.";
-  
-  return "Needs improvement. Focus more on studies.";
-};
+    if (percentage >= 90) return "Outstanding performance! Keep shining.";
+    if (percentage >= 75)
+      return "Excellent performance! Keep up the good work.";
+    if (percentage >= 60) return "Good job! You are doing well.";
+    if (percentage >= 40) return "Satisfactory performance. Keep improving.";
+
+    return "Needs improvement. Focus more on studies.";
+  };
 
   return `
 <!DOCTYPE html>
@@ -53,7 +54,7 @@ const getRemark = () => {
         <div style="display:flex; justify-content:space-between; align-items:center;">
             
             <div style="display:flex; align-items:center; gap:10px;">
-                <img src="${window.location.origin}/logo%203.jpg"  style="width:80px;">
+                <img src=${data.instituteLogo}  style="width:80px;">
                 <div>
                     <h1 style="margin:0; color:#1f4e8c; font-size:35px; border-bottom:2px solid #f4934d96; display:inline-block;">
                       
@@ -89,7 +90,7 @@ const getRemark = () => {
 
     <div style="background:linear-gradient(#eaf3fb,#d6e6f5); margin-top:15px; padding:20px; border:2px solid #c3d3e2; display:flex; -webkit-print-color-adjust: exact;">
 
-    <img src="${window.location.origin}/pic.jpg" style="width:130px; border:3px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); ">
+    <img src="${data.photo}" style="width:130px; border:3px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); ">
 
     <div style="flex:1; padding-left:25px;">
         
@@ -174,8 +175,10 @@ const getRemark = () => {
         <th style="padding:10px; border:1px solid #c3d3e2;">Theory</th>
         <th style="padding:10px; border:1px solid #c3d3e2;">Marks Obtained</th>
     </tr>
-          ${data.marks.map((m: any, i: number) => `
-    <tr style="background:${(i+1)%2 === 0?"#ffffff":"#eaf3fb"}; -webkit-print-color-adjust: exact;">
+          ${data.marks
+            .map(
+              (m: any, i: number) => `
+    <tr style="background:${(i + 1) % 2 === 0 ? "#ffffff" : "#eaf3fb"}; -webkit-print-color-adjust: exact;">
         <td style="padding:10px; border:1px solid #c3d3e2;">${m.subjectName}</td>
         <td style="border:1px solid #c3d3e2;">100</td>
         <td style="border:1px solid #c3d3e2;">${m.practical_marks}</td>
@@ -184,7 +187,9 @@ const getRemark = () => {
 
     </tr>
 
-      `).join("")}
+      `,
+            )
+            .join("")}
 
 
 </table>

@@ -48,7 +48,7 @@ const dashboard = () => {
           setAdminDetails({
             name: data.name,
             _id: data._id,
-            phone: "",
+            phone: data.institute.institutePhoneNumber,
             institute: data.institute._id,
           }),
         );
@@ -56,10 +56,10 @@ const dashboard = () => {
         const instituteDetails = {
           name: data.institute.name,
           _id: data.institute._id,
-          phoneNumber: "",
+          phoneNumber: data.institute.institutePhoneNumber,
           address: data.institute.address,
           featureAccess: data.institute.accessFeatures,
-               email: data.email,
+          email: data.email,
         };
 
         dispatch(setDetails(instituteDetails));
@@ -88,16 +88,18 @@ const dashboard = () => {
       <div style={{ width: "100%", minHeight: "100vh" }}>
         <LoadingOverlay visible={isLoading} />
 
-        <DesktopNavbar
-          isCollapsed={hovered}
-          onClickCollapse={() => {
-            setHovered(!hovered);
-          }}
-          onSelectTab={(val: Tabs) => {
-            setSelectedTab(val);
-          }}
-          activeTab={selectedTab}
-        />
+        {!isMd && (
+          <DesktopNavbar
+            isCollapsed={hovered}
+            onClickCollapse={() => {
+              setHovered(!hovered);
+            }}
+            onSelectTab={(val: Tabs) => {
+              setSelectedTab(val);
+            }}
+            activeTab={selectedTab}
+          />
+        )}
 
         <Box style={{ display: !isMd ? "none" : "block" }}>
           <MobileNavbar

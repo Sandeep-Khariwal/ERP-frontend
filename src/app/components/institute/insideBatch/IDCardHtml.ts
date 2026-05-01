@@ -95,7 +95,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       text-align: center;
       color: white;
     ">
-      <img src="${window.location.origin}/logo%203.jpg" style="
+      <img src=${data.schoolLogo} style="
         height: 55px; 
         width: 55px; 
         object-fit: contain; 
@@ -133,7 +133,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
         outline: 2px solid ${accentColor};
         -webkit-print-color-adjust: exact;
       ">
-        <img src="${window.location.origin}/pic.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
+        <img src="${data.studentPhoto}" style="width: 100%; height: 100%; object-fit: cover;" />
       </div>
 
       <div style="text-align: center; margin-top: 12px;">

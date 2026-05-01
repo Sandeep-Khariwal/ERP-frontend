@@ -132,6 +132,11 @@ const AddStaffModal = (props: {
             setIsLoading(false);
           });
       } else {
+        if (!selectedBatches.length) {
+          ErrorNotification("Select Batches!!");
+          setIsLoading(false);
+          return;
+        }
         // Add Teacher
         CreateTeacher({
           name: formData.name,
@@ -253,9 +258,7 @@ const AddStaffModal = (props: {
           <SimpleGrid
             cols={3}
             style={{
-              marginTop: "20px",
-              marginLeft: "20px",
-              marginRight: "20px",
+              gap: 5,
             }}
           >
             {rolesToShow.map((role, index) => (
@@ -272,16 +275,16 @@ const AddStaffModal = (props: {
                         selectedImageIndex === -1
                           ? "transparent"
                           : selectedImageIndex === index
-                          ? "#EFF1FE"
-                          : "transparent",
+                            ? "#EFF1FE"
+                            : "transparent",
                       cursor: "pointer",
                       borderRadius: "10px",
                     }}
                     onClick={() => handleImageSelect(role, index)}
                     align="center"
                     justify="center"
-                    mr={15}
-                    w="100px"
+                    // mr={15}
+                    w={isMd ? "90px" : "100px"}
                     h="130px"
                   >
                     <Image

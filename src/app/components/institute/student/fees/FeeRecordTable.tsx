@@ -79,13 +79,12 @@ const FeeRecordTable = (props: {
       const { student } = x;
       const { feeRecords, instituteId } = student;
       
-         console.log("instituteId : ",instituteId);
-      
         const studentName = student.name;
         const date = new Date();
         const parentName = student.parentName;
 
         const InstituteName = instituteId.name;
+        const instituteLogo = instituteId.logo;
         const address = instituteId.address;
         const phoneNumber = instituteId.institutePhoneNumber;
         const receiptNo = "R-" + instituteId.receiptCount;
@@ -115,6 +114,7 @@ const FeeRecordTable = (props: {
           amountPaid,
           paymentRecords,
           InstituteName,
+          instituteLogo,
           address,
           phoneNumber,
           receiptNo,

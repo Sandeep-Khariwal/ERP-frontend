@@ -28,6 +28,7 @@ import { Installment } from "@/interfaces/batchInterface";
 import { GetStudent } from "@/axios/institute/InstituteGetApi";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
 
+
 interface StudentFormValues {
   name: string;
   email: string;
@@ -40,6 +41,7 @@ interface StudentFormValues {
   parentNumber?: string;
   van?: string;
   rollNumber: number;
+  photo?: string
 }
 
 export function AddMoreDetails(props: {
@@ -79,11 +81,11 @@ export function AddMoreDetails(props: {
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
     van: props.formData.van,
     rollNumber: props.formData?.rollNumber || 0,
+    photo: "",
+    
   });
 
   useEffect(() => {
-    console.log("formValues.van  : ", formValues.van);
-
     setSelectedVan(formValues.van ?? "");
   }, [formValues]);
 
@@ -121,8 +123,6 @@ export function AddMoreDetails(props: {
             new Date(student.dateOfBirth)!!.getDate() - 1,
           );
 
-          console.log("student : ", student);
-
           const studentData = {
             name: student.name,
             email: student.email,
@@ -137,6 +137,7 @@ export function AddMoreDetails(props: {
               : new Date(),
             van: student.van,
             rollNumber: student.rollNumber,
+            
           };
 
           const newInstallments = student.feeRecords.map((f: any) => {
@@ -163,7 +164,6 @@ export function AddMoreDetails(props: {
   }, [props.selectedStudentId]);
 
   const handleInputChange = (field: string, value: any) => {
-    console.log(value);
 
     if (field === "dateOfBirth") {
       setFormValues((p) => ({ ...p, dateOfBirth: value ? value : null }));
@@ -201,6 +201,7 @@ export function AddMoreDetails(props: {
         email: formValues.email,
         van: selectedVan ?? formValues.van,
         rollNumber: formValues.rollNumber,
+        profilePic: formValues.photo,
       };
 
       if (props.isEditableData) {

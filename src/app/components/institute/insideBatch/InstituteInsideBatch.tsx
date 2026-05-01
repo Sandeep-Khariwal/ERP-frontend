@@ -33,6 +33,7 @@ import { CreateStudent } from "@/axios/institute/InstitutePostApi";
 import TeacherProfile from "../teacher/TeacherProfile";
 import Tests from "./test/Tests";
 import Marksheet from "./Marksheet";
+import UploadExcelAdmission from "../student/addMoreDetails/UploadExcelAdmission";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -79,7 +80,11 @@ export interface Test {
   testTime?: number;
   totalTime: number;
   questions: Question[];
-  resultId: { id: string; studentId: { _id: string; name: string }; _id: string }[];
+  resultId: {
+    id: string;
+    studentId: { _id: string; name: string };
+    _id: string;
+  }[];
   isDeleted: boolean;
   startTime?: string;
   endTime?: string;
@@ -87,7 +92,6 @@ export interface Test {
 }
 
 export function InstituteInsideBatch(props: {
-  
   batchId: string;
   batchName: string;
   instituteId: string;
@@ -102,9 +106,11 @@ export function InstituteInsideBatch(props: {
     useState<boolean>(false);
   const [takeAttendance, setTakeAttandance] = useState<boolean>(false);
   const [openAddMarksModal, setOpenAddMarksModal] = useState<boolean>(false);
+  const [openFileAdmissionModal, setOpenFileAdmissionModal] =
+    useState<boolean>(false);
 
   const [showSelectedScreen, setShowSelectedScreen] = useState<Screen>(
-    Screen.NONE
+    Screen.NONE,
   );
   const [editStudentDetails, setEditStudentDetails] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -122,6 +128,15 @@ export function InstituteInsideBatch(props: {
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [students, setStudents] = useState<StudentsDataWithBatch[]>([]);
+  const [studentsTable, setStudentsTable] = useState<
+    {
+      _id: string;
+      name: string;
+      phoneNumber: string;
+      parentName: string;
+      feeStatus: string;
+    }[]
+  >([]);
 
   return (
     <>
@@ -149,7 +164,7 @@ export function InstituteInsideBatch(props: {
         </Flex>
 
         {/* 🔹 Tab Bar */}
-        <ScrollArea p={10} mih={70} >
+        <ScrollArea p={10} mih={70}>
           <Flex mt={isMd ? 10 : 20}>
             {Object.values(Tabs).map((item: Tabs, i: number) => {
               return (
@@ -201,48 +216,78 @@ export function InstituteInsideBatch(props: {
 
         {Tabs.STUDENT === activeTab && (
           <Stack w={"100%"}>
-
             {showSelectedScreen === Screen.NONE && (
               <>
-                <Flex w={"100%"} gap={10}>
-                  {!props.fromInstituteTeacherSection && (
-                    <Button
-                      variant="outline"
-                      c={"#111"}
-                      style={{ borderColor: "#111" }}
-                      onClick={() => {
-                        setShowSelectedScreen(Screen.ADDMORESCREEN);
-                      }}
-                    >
-                      + Add Student
-                    </Button>
-                  )}
+                <Flex
+                  w="100%"
+                  align="center"
+                  justify="space-between"
+                  wrap="wrap"
+                  gap="sm"
+                >
+                  <Flex gap="sm" wrap="wrap" style={{ flex: 1 }}>
+                    {students.length > 0 && (
+                      <>
+                        <Button
+                          variant="outline"
+                          color="dark"
+                          style={{ whiteSpace: "nowrap" }}
+                          onClick={() => {
+                            setTakeAttandance(true);
+                          }}
+                        >
+                          Attendance
+                        </Button>
 
-                  {students.length > 0 && (
-                    <>
-                      <Button
-                        variant="outline"
-                        c={"#111"}
-                        style={{ borderColor: "#111" }}
-                        onClick={() => {
-                          setTakeAttandance(true);
-                        }}
-                      >
-                        Attendance
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        c={"#111"}
-                        style={{ borderColor: "#111" }}
-                        onClick={() => {
-                          setOpenAddMarksModal(true);
-                        }}
-                      >
-                        + Add Marks
-                      </Button>
-                    </>
-                  )}
+                        <Button
+                          variant="outline"
+                          color="dark"
+                          style={{ whiteSpace: "nowrap" }}
+                          onClick={() => {
+                            setOpenAddMarksModal(true);
+                          }}
+                        >
+                          + Add Marks
+                        </Button>
+                      </>
+                    )}
+                  </Flex>
+                  <Flex
+                    gap="sm"
+                    align={"center"}
+                    justify={"flex-end"}
+                    wrap="wrap"
+                    style={{ flex: 1 }}
+                  >
+                    {students.length > 0 && (
+                      <>
+                        {!props.fromInstituteTeacherSection && (
+                          <Button
+                            variant="outline"
+                            color="dark"
+                            style={{ whiteSpace: "nowrap" }}
+                            onClick={() => {
+                              setShowSelectedScreen(Screen.ADDMORESCREEN);
+                            }}
+                          >
+                            + Add Student
+                          </Button>
+                        )}
+                        {!props.fromInstituteTeacherSection && (
+                          <Button
+                            variant="outline"
+                            color="dark"
+                            style={{ whiteSpace: "nowrap" }}
+                            onClick={() => {
+                              setOpenFileAdmissionModal(true);
+                            }}
+                          >
+                            + Upload File
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </Flex>
                 </Flex>
 
                 {takeAttendance ? (
@@ -265,6 +310,7 @@ export function InstituteInsideBatch(props: {
                     batchName={props.batchName}
                     setStudents={setStudents}
                     userType={props.userType}
+                    students={studentsTable}
                   />
                 )}
               </>
@@ -304,7 +350,7 @@ export function InstituteInsideBatch(props: {
                 dateOfJoining={new Date()}
                 batch={props?.batchId}
                 studentId={selectedStudentId}
-                onPaymentClick={() => { }}
+                onPaymentClick={() => {}}
                 onClickBack={() => {
                   setSelectedStudentId("");
                   setShowSelectedScreen(Screen.NONE);
@@ -321,6 +367,15 @@ export function InstituteInsideBatch(props: {
             batchId={props.batchId}
             students={students}
             setOpenAddMarksModal={setOpenAddMarksModal}
+          />
+        )}
+        {openFileAdmissionModal && (
+          <UploadExcelAdmission
+            opened={openFileAdmissionModal}
+            setOpenAddMarksModal={setOpenFileAdmissionModal}
+            batchId={props.batchId}
+            instituteId={props.instituteId!}
+            setStudents={setStudentsTable}
           />
         )}
 
@@ -347,9 +402,8 @@ export function InstituteInsideBatch(props: {
         )}
 
         {Tabs.MARKSHEET === activeTab && (
-          <Marksheet batchId={props.batchId} subjects={props.subjects ?? []}/>
+          <Marksheet batchId={props.batchId} subjects={props.subjects ?? []} />
         )}
-
 
         {Tabs.TEST === activeTab && (
           <Tests batchId={props.batchId} subjects={props.subjects ?? []} />
