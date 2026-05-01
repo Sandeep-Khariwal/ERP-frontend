@@ -519,7 +519,8 @@ const Marksheet = (props: {
                                 instituteAdress: student.instituteId.address,
                                 institutePhone:
                                   student.instituteId.institutePhoneNumber,
-                                  principalSignature:"/signdumy.jpeg"
+                                principalSignature:
+                                  student.instituteId.signature,
                               });
 
                               const printWindow = window.open("", "_blank");
@@ -581,23 +582,24 @@ const Marksheet = (props: {
               w={200}
             />
           </Flex>
-          <Box
-
-          >
-            <Flex align="center" justify="space-between" gap={20} direction={isMobile ? "column" : "row"}>
-
+          <Box>
+            <Flex
+              align="center"
+              justify="space-between"
+              gap={20}
+              direction={isMobile ? "column" : "row"}
+            >
               {/* 🔹 LEFT IMAGE */}
               {!isMobile && (
-              <Image
-                src="/modallogo.jpeg"
-                alt="upload"
-                style={{ width: "60%", maxHeight: 180, objectFit: "contain" }}
-              />
+                <Image
+                  src="/modallogo.jpeg"
+                  alt="upload"
+                  style={{ width: "60%", maxHeight: 180, objectFit: "contain" }}
+                />
               )}
 
               {/* 🔹 RIGHT CONTENT */}
               <Stack w={isMobile ? "100%" : "60%"}>
-
                 <Text fw={700} fz={20}>
                   Upload Excel File
                 </Text>

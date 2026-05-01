@@ -115,7 +115,7 @@ export function Uploadlogo(data: FormData,  instituteId: string) {
 export function UploadSignature(data: FormData,  instituteId: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(
-      `${process.env.URL}/api/v1/admin/uploadSignatute/${instituteId}`,data) 
+      `${process.env.URL}/api/v1/admin/uploadSignature/${instituteId}`,data) 
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
