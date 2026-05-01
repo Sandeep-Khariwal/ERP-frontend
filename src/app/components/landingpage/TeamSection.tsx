@@ -1,197 +1,132 @@
-import { Box, Center, Grid, Text, Title, rem, Image } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
+import { Box, Center, Grid, Text, Title, rem, Image, Container } from "@mantine/core";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-const sandeep = "/Sandeep.jpg";
-const johnson = "/Johnson.png";
-const shubham = "/Shubham.png";
-const jagdeep = "/jagdeep.jpeg";
-const guri = "/guri.jpeg"
 
 gsap.registerPlugin(ScrollTrigger);
 
 const teamMembers = [
-  {
-    name: "Sandeep Khariwal",
-    role: "Founder/CEO",
-    image: `${sandeep}`,
-    description:
-      "As Founder and CEO, Sandeep defined Siksha Pay's vision and led the team with clarity and purpose. His leadership and entrepreneurial drive turned the idea into a successful product.",
-  },
-  {
-    name: "Johnson",
-    role: "Frontend Developer",
-    image: `${johnson}`,
-    description:
-      "Johnson crafted the user interface with modern, responsive designs using React and Mantine. He also implemented animations and ensured pixel-perfect UI consistency.",
-  },
-  {
-    name: "Shubham",
-    role: "Backend Developer",
-    image: `${shubham}`,
-    description:
-      "Shubham architected and implemented the backend services with secure and scalable APIs, integrating MongoDB, authentication, and admin functionalities for smooth data flow.",
-  },
-  {
-    name: "jagdeep",
-    role: "FullStack Developer",
-    image: `${jagdeep}`,
-   description:
-  "Jagdeep is a passionate Full Stack Developer with expertise in building robust and scalable web applications. He excels in crafting responsive user interfaces and developing secure, high-performance backend systems. With hands-on experience in modern frameworks, API development, and database management, Jagdeep consistently delivers efficient and user-focused digital solutions."
-  },
-  {
-    name: "Guri",
-    role: "FullStack Developer",
-    image: `${guri}`,
- description:
-  "Guri is a dedicated Full Stack Developer known for building clean, efficient, and scalable web applications. He has strong command over both frontend and backend technologies, creating smooth user experiences and reliable system architecture. With a problem-solving mindset and attention to detail, Guri focuses on delivering high-quality, performance-driven solutions."
-  },
+  { name: "Sandeep Khariwal", role: "Founder/CEO", image: "/Sandeep.jpg" },
+  { name: "Johnson", role: "Frontend Developer", image: "/Johnson.png" },
+  { name: "Shubham", role: "Fullstack Developer", image: "/Shubham.png" },
+  { name: "Jagdeep", role: "Frontend Developer", image: "/jagdeep.jpeg" },
+  { name: "Guri", role: "Frontend Developer", image: "/guri.jpeg" },
+  { name: "Rahul", role: "Fullstack Developer", image: "/rahul.jpeg" },
 ];
 
-const cardStyles = {
-  background: "linear-gradient(135deg, #5668F8, #0599FB)",
-  border: "2px solid #7cdacc",
-  boxShadow: "0 6px 15px rgba(5, 153, 251, 0.3)",
-  borderRadius: rem(16),
-  padding: rem(24),
-  color: "#fff",
-  textAlign: "center" as const,
-  fontFamily: "Poppins, sans-serif",
-  transition: "transform 0.3s ease",
-  height: "100%",
-  display: "flex",
-  flexDirection: "column" as const,
-  justifyContent: "space-between",
-};
-
 const Team = () => {
-  const cardsRef = useRef<Array<HTMLDivElement | null>>([]);
-  const [isMobile, setIsMobile] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+    const ctx = gsap.context(() => {
+      // 1. Reset any hidden states immediately to ensure visibility
+      gsap.set(".team-card", { opacity: 1, y: 0 });
 
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
+      // 2. Entrance Animation: Staggered Fade-in
+      gsap.from(".team-card", {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: ".team-grid",
+          start: "top 85%", 
+          toggleActions: "play none none none"
+        },
+      });
+    }, containerRef);
 
-    return () => window.removeEventListener("resize", checkIsMobile);
+    return () => ctx.revert();
   }, []);
 
-  useEffect(() => {
-    // Only run animations on larger screens
-    if (!isMobile) {
-      cardsRef.current.forEach((card, index) => {
-        if (card) {
-          gsap.fromTo(
-            card,
-            { opacity: 0, y: 50 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 85%",
-              },
-              delay: index * 0.2,
-            }
-          );
-        }
-      });
-    } else {
-      // On mobile, ensure cards are visible immediately
-      cardsRef.current.forEach((card) => {
-        if (card) {
-          gsap.set(card, { opacity: 1, y: 0 });
-        }
-      });
-    }
-  }, [isMobile]);
-
   return (
-    <Box py="xl" px="md" style={{ overflow: "hidden", minHeight: "70vh" }} >
-      <Center mb="xl">
-        <Title
-          order={2}
-          c="#0599FB"
-          style={{
-            fontFamily: "Poppins, sans-serif",
-            fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
-          }}
-        >
-          Meet Our Team
-        </Title>
-      </Center>
-      <Grid gutter="xl" justify="center" align="stretch">
-        {teamMembers.map((member, idx) => (
-          <Grid.Col
-            key={member.name}
-            span={{ base: 12, xs: 12, sm: 6, md: 4, lg: 4 }}
+    <Box 
+      ref={containerRef} 
+      py={80} 
+      style={{ 
+        background: "linear-gradient(180deg, #0a192f 0%, #020c1b 100%)",
+        minHeight: "100vh",
+        overflow: "visible" // Ensure cards aren't clipped
+      }}
+    >
+      <Container size="xl">
+        <Center mb={60} style={{ flexDirection: "column" }}>
+          <Title
+            order={2}
+            c="white"
+            style={{
+              fontFamily: "Poppins, sans-serif",
+              fontSize: "clamp(2rem, 5vw, 3rem)",
+              fontWeight: 800,
+              textAlign: "center"
+            }}
           >
-            <Box
-              style={cardStyles}
-              className="team-card"
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.transform = "translateY(-10px)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.transform = "translateY(0)")
-              }
-            >
-              <Box>
-                <Center>
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    width={80}
-                    height={80}
-                    radius={999}
-                    style={{
-                      objectFit: "cover",
-                      border: "3px solid #7cdacc",
-                      backgroundColor: "#fff",
-                      marginBottom: rem(16),
-                    }}
-                  />
-                </Center>
-                <Text fw={600} size="lg" mb={4}>
+            Meet Our <span style={{ color: "#0599FB" }}>Experts</span>
+          </Title>
+          <Box h={4} w={80} bg="#0599FB" mt={10} style={{ borderRadius: 10 }} />
+        </Center>
+
+        {/* 
+            Grid Explanation:
+            Base 12: 1 card per row
+            SM 6: 2 cards per row
+            MD 4: 3 cards per row
+        */}
+        <Grid gutter={30} className="team-grid" justify="center" align="stretch">
+          {teamMembers.map((member) => (
+            <Grid.Col key={member.name} span={{ base: 12, sm: 6, md: 4, lg: 4 }}  >
+              <Box
+                className="team-card"
+                style={{
+                  background: "rgba(255, 255, 255, 0.05)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: rem(20),
+                  padding: rem(30),
+                  // height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  transition: "transform 0.3s ease, border-color 0.3s ease",
+                  cursor: "default"
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-10px)";
+                    e.currentTarget.style.borderColor = "#0599FB";
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                }}
+              >
+                <Image
+                  src={member.image}
+                  alt={member.name}
+                  w={110}
+                  h={110}
+                  radius={100}
+                  mb={20}
+                  style={{
+                    border: "3px solid #0599FB",
+                    padding: "4px",
+                    background: "rgba(5, 153, 251, 0.1)"
+                  }}
+                />
+                
+                <Text fw={700} size="xl" c="white" mb={5}>
                   {member.name}
                 </Text>
-                <Text fw={400} size="sm" mb={8} style={{ color: "#7cdacc" }}>
+                
+                <Text fw={500} size="sm" c="#0599FB" tt="uppercase" >
                   {member.role}
                 </Text>
+
               </Box>
-              <Text size="sm" style={{ lineHeight: 1.4, marginTop: "auto" }}>
-                {member.description}
-              </Text>
-            </Box>
-          </Grid.Col>
-        ))}
-      </Grid>
-
-      {/* Additional CSS for better mobile experience */}
-      <style jsx global>{`
-        @media (max-width: 576px) {
-          .team-card {
-            margin-bottom: 1.5rem !important;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .team-card {
-            min-height: 320px;
-          }
-        }
-
-        @media (min-width: 769px) and (max-width: 992px) {
-          .team-card {
-            min-height: 360px;
-          }
-        }
-      `}</style>
+            </Grid.Col>
+          ))}
+        </Grid>
+      </Container>
     </Box>
   );
 };

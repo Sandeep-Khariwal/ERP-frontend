@@ -29,6 +29,8 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { LogoModal } from "./LogoModal";
 import { updateschooldetails } from "@/axios/institute/InstitutePutApi";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
+import { MdOutlineImage } from "react-icons/md";
+import { FaSignature } from "react-icons/fa";
 
 // import {
 //   IconUsers,
@@ -39,6 +41,7 @@ import { setDetails } from "@/app/redux/slices/instituteSlice";
 //   IconBuildingSkyscraper,
 // } from "@tabler/icons-react";
 import { TbPlugConnected } from "react-icons/tb";
+import { SignatureModal } from "./signaturemodal";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -58,7 +61,8 @@ export const DesktopNavbar = (props: {
   const [hovered, setHovered] = useState(false);
   const [settingsOpened, setSettingsOpened] = useState(false);
   const [logoModalOpen, setLogoModalOpen] = useState(false);
-  const [activeSettingTab, setActiveSettingTab] = useState<"logo" | "info" | null>("info");
+  const [activeSettingTab, setActiveSettingTab] = useState<"logo" | "info" | "sign" | null>("info");
+  const [signatureModalOpen, setSignatureModalOpen] = useState(false);
 
   const [schoolName, setSchoolName] = useState( "");
   const [email, setEmail] = useState( "");
@@ -181,7 +185,7 @@ export const DesktopNavbar = (props: {
               }}
               onClick={() => setActiveSettingTab("info")}
             >
-              <IoSettingsOutline size={18} />
+              <IoSettingsOutline size={20} />
               <Text size="sm" fw={500}>
                 Change School Information
               </Text>
@@ -202,31 +206,33 @@ export const DesktopNavbar = (props: {
                 setLogoModalOpen(true);
               }}
             >
-              <IoSettingsOutline size={18} />
+            <MdOutlineImage size={20} />
               <Text size="sm" fw={500}>
                 Add School Logo
               </Text>
             </Flex>
-            {/* ADD LOGO */}
-            <Flex
+
+             <Flex
               align="center"
               gap={10}
               style={{
                 padding: "10px",
                 borderRadius: "8px",
                 cursor: "pointer",
-                background: activeSettingTab === "logo" ? "#f3e8ff" : "transparent",
+                background: activeSettingTab === "sign" ? "#f3e8ff" : "transparent",
               }}
               onClick={() => {
                 setSettingsOpened(false);
-                setLogoModalOpen(true);
+                setSignatureModalOpen(true);
               }}
             >
-              <IoSettingsOutline size={18} />
+             <FaSignature size={20} />
               <Text size="sm" fw={500}>
-                Add Fees GST
+                Add Signatures
               </Text>
             </Flex>
+
+
           </Stack>
 
           {/* RIGHT SIDE */}
@@ -338,6 +344,16 @@ export const DesktopNavbar = (props: {
         onClose={() => setLogoModalOpen(false)}
         institute={institute}
       />
+
+        <SignatureModal
+        opened={signatureModalOpen}
+        onClose={() => setSignatureModalOpen(false)}
+        institute={institute}
+      />
+
+      
+
+
 
       <Stack
         w={isMd ? "0px" : hovered ? "250px" : "80px"}
