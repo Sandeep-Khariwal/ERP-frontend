@@ -545,17 +545,19 @@ const Marksheet = (props: {
           <Box
 
           >
-            <Flex align="center" justify="space-between" gap={20}>
+            <Flex align="center" justify="space-between" gap={20} direction={isMobile ? "column" : "row"}>
 
               {/* 🔹 LEFT IMAGE */}
+              {!isMobile && (
               <Image
                 src="/modallogo.jpeg"
                 alt="upload"
                 style={{ width: "60%", maxHeight: 180, objectFit: "contain" }}
               />
+              )}
 
               {/* 🔹 RIGHT CONTENT */}
-              <Stack w="60%">
+              <Stack w={isMobile ? "100%" : "60%"}>
 
                 <Text fw={700} fz={20}>
                   Upload Excel File
