@@ -70,6 +70,7 @@ export default function Home() {
             address: data.institute.address,
             email: data.email,
             featureAccess: data.institute.accessFeatures,
+            gst: data.institute.gst,
           };
         
 
@@ -95,6 +96,7 @@ export default function Home() {
             email: data.email,
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
+             gst: data.instituteId.gst,
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(

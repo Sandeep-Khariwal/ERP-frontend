@@ -14,6 +14,10 @@ export interface InstituteDetails {
     onlineTestSchedule: boolean;
     feesReminderMessage: boolean;
   };
+  gst?: {
+    sgst: number;
+    cgst: number;
+  };
 }
 
 export interface instituteDetailsIntialState {
@@ -42,11 +46,14 @@ export const instituteDetails = createSlice({
             onlineTestSchedule: boolean;
             feesReminderMessage: boolean;
           };
+          gst?: {
+            sgst: number;
+            cgst: number;
+          };
         };
-      }
+      },
     ) {
       state.instituteDetails = actions.payload;
-
     },
     saveToken(state, actions) {
       const token = actions.payload;

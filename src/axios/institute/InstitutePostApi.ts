@@ -111,3 +111,12 @@ export function Uploadlogo(data: FormData,  instituteId: string) {
       .catch((error: any) => reject(error));
   });
 }
+
+export function UploadSignature(data: FormData,  instituteId: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/admin/uploadSignature/${instituteId}`,data) 
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

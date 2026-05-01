@@ -305,7 +305,6 @@ function numberToWords(number: number) {
 
   return convertNumberWithThousands(number);
 }
-
 export function createFullFeeOverviewPdf(
   studentName: string,
   parentName: string,
@@ -319,41 +318,33 @@ export function createFullFeeOverviewPdf(
   instituteLogo: string,
   address: string,
   phoneNumber: string,
-  batchName: string
+  batchName: string,
+  gst: {
+    sgst: number;
+    cgst: number;
+  }
 ) {
-  const totalFee = paymentRecords.reduce(
-  (sum, r) => sum + (r.totalAmount || 0),
-  0
-);
+  // Calculate Base Total
+  const baseTotalFee = paymentRecords.reduce(
+    (sum, r) => sum + (r.totalAmount || 0),
+    0
+  );
 
-const totalPaid = paymentRecords.reduce(
-  (sum, r) => sum + (r.amountPaid || 0),
-  0
-);
+  // Calculate GST amounts based on percentage
+  const cgstAmount = gst.cgst > 0 ? (baseTotalFee * gst.cgst) / 100 : 0;
+  const sgstAmount = gst.sgst > 0 ? (baseTotalFee * gst.sgst) / 100 : 0;
+  
+  // Final Total including GST
+  const totalFeeWithGst = baseTotalFee + cgstAmount + sgstAmount;
 
-const remaining = totalFee - totalPaid;
+  const totalPaid = paymentRecords.reduce(
+    (sum, r) => sum + (r.amountPaid || 0),
+    0
+  );
 
-  const rows = paymentRecords
-    .map((r, index) => {
-      let status = "Not Paid";
+  const remaining = totalFeeWithGst - totalPaid;
 
-      if (r.amountPaid === r.totalAmount) status = "Fully Paid";
-      else if (r.amountPaid > 0) status = "Partial Paid";
-
-      return `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${r.name}</td>
-          <td>${status}</td>
-          <td>₹${r.totalAmount}</td>
-          <td>₹${r.amountPaid || 0}</td>
-          <td>₹${r.totalAmount - (r.amountPaid || 0)}</td>
-        </tr>
-      `;
-    })
-    .join("");
-
-return `
+  return `
 <html>
 <head>
 <style>
@@ -365,44 +356,17 @@ return `
     padding: 20px;
   }
 
-  /* PRINT FIX */
-@media print {
-  body {
-    background: white !important;
-    padding: 0 !important;
+  @media print {
+    body { background: white !important; padding: 0 !important; }
+    .container { width: 100% !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+    table { page-break-inside: avoid; }
+    tr { page-break-inside: avoid; }
   }
 
-  .container {
-    width: 100% !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-
-  table {
-    page-break-inside: avoid;
-  }
-
-  tr {
-    page-break-inside: avoid;
-  }
-}
-
-/* COLOR FIX (IMPORTANT) */
-* {
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-
-.header {
-  background: #0fb9b1 !important;
-  color: white !important;
-}
-
-table {
-  width: 100%;
-  margin: 20px 0;
-}
 
   .container {
     max-width: 800px;
@@ -413,7 +377,6 @@ table {
     overflow: hidden;
   }
 
-  /* HEADER */
   .header {
     display: flex;
     justify-content: space-between;
@@ -423,17 +386,9 @@ table {
     color: white;
   }
 
-  .header h2 {
-    margin: 0;
-    font-size: 20px;
-  }
+  .header h2 { margin: 0; font-size: 20px; }
+  .header p { margin: 0; font-size: 12px; }
 
-  .header p {
-    margin: 0;
-    font-size: 12px;
-  }
-
-  /* TITLE */
   .title {
     text-align: center;
     font-size: 18px;
@@ -442,7 +397,6 @@ table {
     color: #333;
   }
 
-  /* DETAILS CARD */
   .details {
     background: #f8f9fa;
     margin: 0 20px;
@@ -457,7 +411,6 @@ table {
     margin-bottom: 6px;
   }
 
-  /* TABLE */
   table {
     width: 90%;
     margin: 20px auto;
@@ -480,24 +433,22 @@ table {
     border-bottom: 1px solid #eee;
   }
 
-  tr:nth-child(even) {
-    background: #f9f9f9;
-  }
+  tr:nth-child(even) { background: #f9f9f9; }
 
-  /* STATUS */
   .paid { color: #0fb9b1; font-weight: 600; }
   .partial { color: orange; font-weight: 600; }
   .due { color: red; font-weight: 600; }
 
-  /* SUMMARY CARDS */
   .summary-container {
     display: flex;
     justify-content: space-around;
+    flex-wrap: wrap;
     margin: 20px;
   }
 
   .card {
     flex: 1;
+    min-width: 120px;
     margin: 5px;
     padding: 15px;
     border-radius: 10px;
@@ -505,21 +456,9 @@ table {
     text-align: center;
   }
 
-  .card h4 {
-    margin: 0;
-    font-size: 14px;
-    color: #666;
-  }
-
-  .card p {
-    margin: 5px 0 0;
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  .remaining {
-    color: red;
-  }
+  .card h4 { margin: 0; font-size: 12px; color: #666; }
+  .card p { margin: 5px 0 0; font-size: 16px; font-weight: 600; }
+  .remaining { color: red; }
 
 </style>
 </head>
@@ -581,8 +520,25 @@ table {
 
   <div class="summary-container">
     <div class="card">
+      <h4>Base Fee</h4>
+      <p>₹${baseTotalFee}</p>
+    </div>
+
+    ${gst.cgst > 0 ? `
+    <div class="card">
+      <h4>CGST (${gst.cgst}%)</h4>
+      <p>₹${cgstAmount.toFixed(2)}</p>
+    </div>` : ''}
+
+    ${gst.sgst > 0 ? `
+    <div class="card">
+      <h4>SGST (${gst.sgst}%)</h4>
+      <p>₹${sgstAmount.toFixed(2)}</p>
+    </div>` : ''}
+
+    <div class="card">
       <h4>Total Fee</h4>
-      <p>₹${totalFee}</p>
+      <p>₹${totalFeeWithGst.toFixed(2)}</p>
     </div>
 
     <div class="card">
@@ -592,7 +548,7 @@ table {
 
     <div class="card">
       <h4>Remaining</h4>
-      <p class="remaining">₹${remaining}</p>
+      <p class="remaining">₹${remaining.toFixed(2)}</p>
     </div>
   </div>
 
@@ -600,4 +556,5 @@ table {
 
 </body>
 </html>
-`;}
+`;
+}

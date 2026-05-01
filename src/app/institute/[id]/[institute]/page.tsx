@@ -60,6 +60,7 @@ const dashboard = () => {
           address: data.institute.address,
           featureAccess: data.institute.accessFeatures,
           email: data.email,
+          gst:data.institute.gst
         };
 
         dispatch(setDetails(instituteDetails));

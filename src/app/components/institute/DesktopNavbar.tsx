@@ -1,6 +1,15 @@
 "use client";
 
-import { Box, Divider, Flex, Stack, Text, Textarea, TextInput, Transition } from "@mantine/core";
+import {
+  Box,
+  Divider,
+  Flex,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+  Transition,
+} from "@mantine/core";
 import { MdKeyboardArrowDown, MdOutlineDashboard } from "react-icons/md";
 import { PiStudent } from "react-icons/pi";
 import { AiOutlineLogout } from "react-icons/ai";
@@ -12,11 +21,19 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { FaRupeeSign } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { FaArrowTrendUp, FaFacebook, FaUsers, FaWhatsapp } from "react-icons/fa6";
+import {
+  FaArrowTrendUp,
+  FaFacebook,
+  FaUsers,
+  FaWhatsapp,
+} from "react-icons/fa6";
 
 import { LiaBusAltSolid, LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { Tabs } from "@/enums";
-import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
+import {
+  ErrorNotification,
+  SuccessNotification,
+} from "@/app/helperFunction/Notification";
 import { Notifications } from "@mantine/notifications";
 import { saveToken } from "@/app/redux/slices/adminSlice";
 
@@ -27,8 +44,14 @@ import Image from "next/image";
 import { Modal, Button } from "@mantine/core";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LogoModal } from "./LogoModal";
-import { updateschooldetails } from "@/axios/institute/InstitutePutApi";
+import {
+  UpdateGpsInfo,
+  updateschooldetails,
+  updateschoolGST,
+} from "@/axios/institute/InstitutePutApi";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
+import { MdOutlineImage } from "react-icons/md";
+import { FaSignature } from "react-icons/fa";
 
 // import {
 //   IconUsers,
@@ -39,6 +62,7 @@ import { setDetails } from "@/app/redux/slices/instituteSlice";
 //   IconBuildingSkyscraper,
 // } from "@tabler/icons-react";
 import { TbPlugConnected } from "react-icons/tb";
+import { SignatureModal } from "./signaturemodal";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -52,19 +76,26 @@ export const DesktopNavbar = (props: {
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
- 
+
   const [openBusiness, setOpenBusiness] = useState(false);
   const [openMarketing, setOpenMarketing] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [settingsOpened, setSettingsOpened] = useState(false);
   const [logoModalOpen, setLogoModalOpen] = useState(false);
-  const [activeSettingTab, setActiveSettingTab] = useState<"logo" | "info" | null>("info");
+  const [activeSettingTab, setActiveSettingTab] = useState<
+    "logo" | "info" | "sign" | "gst" | null
+  >("info");
+  const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+  const [gstModalOpen, setGstModalOpen] = useState(false);
 
-  const [schoolName, setSchoolName] = useState( "");
-  const [email, setEmail] = useState( "");
-  const [phone, setPhone] = useState( "");
+  const [schoolName, setSchoolName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [cgst, setCgst] = useState<number>(0);
+  const [sgst, setSgst] = useState<number>(0);
 
   const handleUpdateSchool = () => {
     // ❌ agar kuch bhi change nahi hua
@@ -88,16 +119,15 @@ export const DesktopNavbar = (props: {
     })
       .then((res: any) => {
         SuccessNotification("Changes Updated Successfully ✅");
-        dispatch(setDetails({
-          ...institute,
-          name: schoolName,
-          email: email,
-          phoneNumber: phone,
-          address: address
-        }));
-
-    
-
+        dispatch(
+          setDetails({
+            ...institute,
+            name: schoolName,
+            email: email,
+            phoneNumber: phone,
+            address: address,
+          }),
+        );
 
         setIsLoading(false);
         setSettingsOpened(false); // modal close
@@ -111,13 +141,28 @@ export const DesktopNavbar = (props: {
 
   useEffect(() => {
     if (institute) {
-      
       setSchoolName(institute.name || "");
       setEmail(institute.email || "");
       setPhone(institute.phoneNumber || "");
       setAddress(institute.address || "");
+      setCgst(institute?.gst?.cgst ?? 0);
+      setSgst(institute?.gst?.sgst ?? 0);
     }
   }, [institute]);
+
+  const handleUpdateGST = () => {
+    setIsLoading(true);
+    updateschoolGST(institute?._id, { cgst, sgst })
+      .then((res: any) => {
+        setIsLoading(false);
+        SuccessNotification("GST Updated!!");
+        setSettingsOpened(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  };
 
   return (
     <>
@@ -143,7 +188,9 @@ export const DesktopNavbar = (props: {
             </Box>
 
             <Box>
-              <Text fw={700} fz="lg">Settings</Text>
+              <Text fw={700} fz="lg">
+                Settings
+              </Text>
               <Text size="xs" c="dimmed">
                 Manage your school profile and preferences.
               </Text>
@@ -160,7 +207,6 @@ export const DesktopNavbar = (props: {
         <Divider mb="md" />
 
         <Flex>
-
           {/* LEFT SIDE */}
           <Stack
             w="220px"
@@ -177,11 +223,12 @@ export const DesktopNavbar = (props: {
                 padding: "10px",
                 borderRadius: "8px",
                 cursor: "pointer",
-                background: activeSettingTab === "info" ? "#f3e8ff" : "transparent",
+                background:
+                  activeSettingTab === "info" ? "#f3e8ff" : "transparent",
               }}
               onClick={() => setActiveSettingTab("info")}
             >
-              <IoSettingsOutline size={18} />
+              <IoSettingsOutline size={20} />
               <Text size="sm" fw={500}>
                 Change School Information
               </Text>
@@ -195,23 +242,66 @@ export const DesktopNavbar = (props: {
                 padding: "10px",
                 borderRadius: "8px",
                 cursor: "pointer",
-                background: activeSettingTab === "logo" ? "#f3e8ff" : "transparent",
+                background:
+                  activeSettingTab === "logo" ? "#f3e8ff" : "transparent",
               }}
               onClick={() => {
                 setSettingsOpened(false);
                 setLogoModalOpen(true);
               }}
             >
-              <IoSettingsOutline size={18} />
+              <MdOutlineImage size={20} />
               <Text size="sm" fw={500}>
                 Add School Logo
+              </Text>
+            </Flex>
+
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                background:
+                  activeSettingTab === "sign" ? "#f3e8ff" : "transparent",
+              }}
+              onClick={() => {
+                setSettingsOpened(false);
+                setSignatureModalOpen(true);
+              }}
+            >
+              <FaSignature size={20} />
+              <Text size="sm" fw={500}>
+                Add Signatures
+              </Text>
+            </Flex>
+
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                background:
+                  activeSettingTab === "gst" ? "#f3e8ff" : "transparent",
+              }}
+              onClick={() => {
+                // setSettingsOpened(false);
+                // setGstModalOpen(true);
+                setActiveSettingTab("gst");
+              }}
+            >
+              <FaSignature size={20} />
+              <Text size="sm" fw={500}>
+                Add Fees GST
               </Text>
             </Flex>
           </Stack>
 
           {/* RIGHT SIDE */}
           <Box flex={1} pl="md">
-
             {activeSettingTab === "info" && (
               <Stack
                 p="lg"
@@ -301,21 +391,81 @@ export const DesktopNavbar = (props: {
                     Cancel
                   </Button>
 
-                  <Button color="violet" loading={isLoading} onClick={handleUpdateSchool}>
+                  <Button
+                    color="violet"
+                    loading={isLoading}
+                    onClick={handleUpdateSchool}
+                  >
                     Save Changes
                   </Button>
                 </Flex>
               </Stack>
             )}
 
-          </Box>
+            {activeSettingTab === "gst" && (
+              <Stack
+                p="lg"
+                style={{
+                  border: "1px solid #eee",
+                  borderRadius: "12px",
+                  background: "white",
+                }}
+              >
+                <Text fw={700} fz="lg">
+                  Fees GST Percentage
+                </Text>
 
+                <Text size="sm" c="dimmed">
+                  Update your course fees GST.
+                </Text>
+
+                <TextInput
+                  label="Change CGST"
+                  placeholder="Enter CGST"
+                  value={String(cgst)}
+                  radius="md"
+                  onChange={(e) => setCgst(Number(e.currentTarget.value))}
+                />
+
+                <TextInput
+                  label="Change SGST"
+                  placeholder="Enter SGST"
+                  value={String(sgst)}
+                  radius="md"
+                  onChange={(e) => setSgst(Number(e.currentTarget.value))}
+                />
+                {/* ACTION BUTTONS */}
+                <Flex justify="flex-end" gap="sm" mt="md">
+                  <Button
+                    variant="default"
+                    onClick={() => setSettingsOpened(false)}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    color="violet"
+                    loading={isLoading}
+                    onClick={handleUpdateGST}
+                  >
+                    Save Changes
+                  </Button>
+                </Flex>
+              </Stack>
+            )}
+          </Box>
         </Flex>
       </Modal>
 
       <LogoModal
         opened={logoModalOpen}
         onClose={() => setLogoModalOpen(false)}
+        institute={institute}
+      />
+
+      <SignatureModal
+        opened={signatureModalOpen}
+        onClose={() => setSignatureModalOpen(false)}
         institute={institute}
       />
 
@@ -737,7 +887,6 @@ export const DesktopNavbar = (props: {
                 </Box>
               </Flex>
 
-              
               {/* DROPDOWN ITEMS */}
               {openBusiness && hovered && (
                 <Stack pl={30} gap={5}>
@@ -758,7 +907,12 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EXPENSE)}
                   >
-                     <Image src="/expense.png" width={25} height={25} alt="not found" />
+                    <Image
+                      src="/expense.png"
+                      width={25}
+                      height={25}
+                      alt="not found"
+                    />
                     <Text fw={500}>Expanse</Text>
                   </Flex>
 
@@ -779,7 +933,12 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EARNING)}
                   >
-                     <Image src="/earnings.png" width={25} height={25} alt="not found" />
+                    <Image
+                      src="/earnings.png"
+                      width={25}
+                      height={25}
+                      alt="not found"
+                    />
                     <Text fw={500}>Earnings</Text>
                   </Flex>
                 </Stack>
@@ -824,8 +983,7 @@ export const DesktopNavbar = (props: {
                     alignItems: "center",
                   }}
                 >
-                  <FaArrowTrendUp size={25}  />
-                  
+                  <FaArrowTrendUp size={25} />
                 </Box>
 
                 <Box
@@ -845,7 +1003,7 @@ export const DesktopNavbar = (props: {
                     <Text fw={600} fz={17}>
                       Marketing
                     </Text>
-                       {/* Arrow */}
+                    {/* Arrow */}
                     <MdKeyboardArrowDown
                       size={20}
                       style={{
@@ -879,7 +1037,7 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.LEADS)}
                   >
-                       <FaFacebook  size={25}  />
+                    <FaFacebook size={25} />
                     <Text fw={500}>Facebook Leads</Text>
                   </Flex>
                   <Flex
@@ -898,7 +1056,7 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.WHATSAPPLEADS)}
                   >
-                    <FaWhatsapp  size={25}  />
+                    <FaWhatsapp size={25} />
                     <Text fw={500}>Whatsapp Leads</Text>
                   </Flex>
 
@@ -919,7 +1077,7 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.INTEGRATION)}
                   >
-                   <TbPlugConnected  size={25}  />
+                    <TbPlugConnected size={25} />
                     <Text fw={500}>Integration</Text>
                   </Flex>
                 </Stack>

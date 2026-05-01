@@ -2,6 +2,7 @@ import { GetStudentDetail } from "@/axios/institute/InstituteGetApi";
 import { useEffect, useState } from "react";
 
 export const createMarksheetPdf = (data: any) => {
+
   const getRemark = () => {
     if (data.status === "Fail") {
       return "Needs improvement. Work harder and try again.";
@@ -241,17 +242,23 @@ export const createMarksheetPdf = (data: any) => {
     <div style="margin-top:20px;">
         <p style="color:#1f4e8c;"> Date: <span style="color: #2e3f57; font-weight: bolder; "> ${data.date}</span></p>
 
-        <div style="display:flex; justify-content:space-between; margin-top:50px;">
-            <div style="text-align:center; width:40%;">
-               
-                <div style="border-top:2px solid  #9db9d4; margin-top:5px; font-style: italic; font-size: 20px;"> <span style="color: #1f4e8c;"> Class Teacher</span></div>
-            </div>
+<div style="display:flex; justify-content:space-between; margin-top:50px;">
 
-            <div style="text-align:center; width:40%;">
-              
-                <div style="border-top:2px solid #9db9d4; margin-top:5px; font-style: italic; font-size: 20px;"> <span style="color: #1f4e8c;"> Principal</span></div>
-            </div>
+    <!-- Director/Principal Section -->
+    <div style="text-align:center; width:40%; display: flex; flex-direction: column; align-items: center;">
+        <!-- Principal Signature Image -->
+        <img src="${data.principalSignature}" alt="Principal Sign" style="
+            height: 50px; 
+            max-width: 200px; 
+            object-fit: contain; 
+            margin-bottom: -5px; 
+            mix-blend-mode: multiply;
+        " />
+        <div style="border-top:2px solid #9db9d4; width: 100%; margin-top:5px; font-style: italic; font-size: 20px;"> 
+            <span style="color: #1f4e8c;">Director or Principal</span>
         </div>
+    </div>
+</div>
     </div>
 
    

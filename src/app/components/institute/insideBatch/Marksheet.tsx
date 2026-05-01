@@ -35,6 +35,7 @@ import {
 import { GetGrade } from "../helperFunctions";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createMarksheetPdf } from "./CreateMarksheetPdf";
+import { formatDate } from "../../marketing/utility/utils";
 const Marksheet = (props: {
   batchId: string;
   subjects: { _id: string; name: string }[];
@@ -512,18 +513,14 @@ const Marksheet = (props: {
                                 fName: student.parentName,
                                 address: student.address,
                                 parentNumber: student.parentNumber,
-                                dob: new Date(
-                                  student.dateOfBirth,
-                                ).toLocaleDateString("en-GB", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                }),
+                                dob: formatDate(student.dateOfBirth),
                                 photo: student.profilePic,
                                 instituteLogo: student.instituteId.logo,
                                 instituteAdress: student.instituteId.address,
                                 institutePhone:
                                   student.instituteId.institutePhoneNumber,
+                                principalSignature:
+                                  student.instituteId.signature,
                               });
 
                               const printWindow = window.open("", "_blank");
@@ -586,16 +583,23 @@ const Marksheet = (props: {
             />
           </Flex>
           <Box>
-            <Flex align="center" justify="space-between" gap={20}>
+            <Flex
+              align="center"
+              justify="space-between"
+              gap={20}
+              direction={isMobile ? "column" : "row"}
+            >
               {/* 🔹 LEFT IMAGE */}
-              <Image
-                src="/modallogo.jpeg"
-                alt="upload"
-                style={{ width: "60%", maxHeight: 180, objectFit: "contain" }}
-              />
+              {!isMobile && (
+                <Image
+                  src="/modallogo.jpeg"
+                  alt="upload"
+                  style={{ width: "60%", maxHeight: 180, objectFit: "contain" }}
+                />
+              )}
 
               {/* 🔹 RIGHT CONTENT */}
-              <Stack w="60%">
+              <Stack w={isMobile ? "100%" : "60%"}>
                 <Text fw={700} fz={20}>
                   Upload Excel File
                 </Text>

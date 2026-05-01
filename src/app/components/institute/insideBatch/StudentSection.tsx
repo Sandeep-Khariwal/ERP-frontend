@@ -144,6 +144,7 @@ const StudentSection = (props: {
           dob: formatDate(studentInfo.dateOfBirth),
           phone: studentInfo.phoneNumber,
           address: studentInfo.address,
+          principalSignature:studentInfo.instituteId.signature
         });
 
         const printWindow = window.open("", "_blank");
