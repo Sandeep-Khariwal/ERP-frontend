@@ -95,4 +95,12 @@ export function GetStudentDetail(id: string) {
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
   });
+
+}
+export function GetMarksheetVerify(id: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/marksheet/${id}`)
+      .then((response: any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
 }

@@ -6,12 +6,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const teamMembers = [
-  { name: "Sandeep Khariwal", role: "Founder/CEO", image: "/Sandeep.jpg" },
+  { name: "Sandeep Khariwal", role: "Founder / CEO", image: "/Sandeep.jpg" },
   { name: "Johnson", role: "Frontend Developer", image: "/Johnson.png" },
   { name: "Shubham", role: "Fullstack Developer", image: "/Shubham.png" },
   { name: "Jagdeep", role: "Frontend Developer", image: "/jagdeep.jpeg" },
-  { name: "Guri", role: "Frontend Developer", image: "/guri.jpeg" },
-  { name: "Rahul", role: "Fullstack Developer", image: "/rahul.jpeg" },
+  { name: "Guri", role: "Frontend Developer", image: "/guri.jpeg" }
 ];
 
 const Team = () => {

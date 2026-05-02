@@ -203,49 +203,24 @@ export const createMarksheetPdf = (data: any) => {
         <div><b>RESULT:</b> <span style="font-weight: bolder; font-size: larger;" > ${data.status}</span></div>
     </div>
     <p  style="border-bottom: 6px double #9db9d4;"></p>
-
-    
-    <div style="margin-top:30px;">
-
-   
-    <div style="display:flex; align-items:center;">
-
-      
-        <div style="flex:1;">
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-        </div>
-
-        <div style="background:#1f4e8c; color:#fff; padding:5px 20px; font-weight:bold; font-size: 24px; margin:0 10px; -webkit-print-color-adjust: exact;">
-            REMARKS
-        </div>
-
-   
-        <div style="flex:1;">
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-        </div>
-
-    </div>
-
-   
-    <p style="margin-top:25px; border-bottom:2px solid #c3d3e2; padding-bottom:10px; font-style:italic; color:#1f4e8c; font-size: 20px; margin-left: 20px;">
-         ${getRemark()}
-    </p>
-
-</div>
-<p  style="border-bottom: 6px dashed #9db9d4; margin-top: 60px; " ></p>
-
   
     <div style="margin-top:20px;">
         <p style="color:#1f4e8c;"> Date: <span style="color: #2e3f57; font-weight: bolder; "> ${data.date}</span></p>
 
-<div style="display:flex; justify-content:space-between; margin-top:50px;">
+<div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:50px;">
 
-    <!-- Director/Principal Section -->
+    <!-- QR Code Section (Left Side) -->
+    <div style="width:40%; display:flex; justify-content:flex-start;">
+        <img src="${data.qr}" alt="QR Code" style="
+            height: 100px;
+            width: 100px;
+            object-fit: contain;
+        " />
+    </div>
+
+    <!-- Director/Principal Section (Right Side) -->
     <div style="text-align:center; width:40%; display: flex; flex-direction: column; align-items: center;">
+        
         <!-- Principal Signature Image -->
         <img src="${data.principalSignature}" alt="Principal Sign" style="
             height: 50px; 
@@ -254,10 +229,12 @@ export const createMarksheetPdf = (data: any) => {
             margin-bottom: -5px; 
             mix-blend-mode: multiply;
         " />
+
         <div style="border-top:2px solid #9db9d4; width: 100%; margin-top:5px; font-style: italic; font-size: 20px;"> 
             <span style="color: #1f4e8c;">Director or Principal</span>
         </div>
     </div>
+
 </div>
     </div>
 

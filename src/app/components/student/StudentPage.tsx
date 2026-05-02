@@ -17,7 +17,7 @@ import StudentTestCard from "./StudentTestCards";
 export interface StudentOverView {
   _id: string;
   name: string;
-  uniqueRoll: string;
+  rollNumber: string;
   phoneNumber: string[];
   profilePic: string;
   batchId: {
@@ -69,7 +69,7 @@ const StudentPage = (props: {
   const [student, setStudent] = useState<StudentOverView>({
     _id: "",
     name: "",
-    uniqueRoll: "",
+    rollNumber: "",
     phoneNumber: [],
     profilePic: "/boyStudent.png",
     batchId: {
@@ -233,8 +233,6 @@ const StudentPage = (props: {
             dateOfJoining={new Date(student.dateOfBirth)}
             batch={student.batchId?._id || ""}
             studentId={student._id}
-            studentName={student.name}      
-            parentName={student.parentName}
             onPaymentClick={() => { }}
             onClickBack={props.onClickBack}
             fromBatch={false}
