@@ -23,6 +23,7 @@ const Navbar: React.FC = () => {
     { label: "About Us", href: "#About", isExternal: false },
     // { label: "Pricing", href: "/pricing", isExternal: true },
     { label: "Contact Us", href: "#Contact", isExternal: false },
+    { label: "Our Team", href: "#Team", isExternal: false },
   ];
 
   // Scroll behavior - hide/show navbar

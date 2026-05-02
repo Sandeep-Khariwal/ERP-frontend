@@ -41,6 +41,7 @@ const Team = () => {
 
   return (
     <Box 
+      id="Team"
       ref={containerRef} 
       py={80} 
       style={{ 
