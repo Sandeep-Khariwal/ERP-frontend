@@ -33,14 +33,7 @@ import {
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createFullFeeOverviewPdf } from "./HtmlToPdf";
 
-const convertHtmlIntoPdf = (html: string) => {
-  const newWindow = window.open("", "_blank");
-  if (!newWindow) return;
-
-  newWindow.document.write(html);
-  newWindow.document.close();
-  newWindow.print();
-};
+const convertHtmlIntoPdf = (html: string) => {};
 
 interface FormValues {
   paymentDate: Date;
@@ -219,8 +212,8 @@ const FeeRecordSection = (props: {
 
                     let gst = instituteDetails.gst;
                     if (
-                      instituteDetails.gst.sgst > 0 ||
-                      instituteDetails.gst.cgst
+                      instituteDetails?.gst?.sgst > 0 ||
+                      instituteDetails?.gst?.cgst
                     ) {
                       gst = instituteDetails.gst;
                     } else {
@@ -249,7 +242,17 @@ const FeeRecordSection = (props: {
                       gst,
                     );
 
-                    convertHtmlIntoPdf(html);
+                    console.log("btn clicked......");
+
+                    const printWindow = window.open("", "_blank");
+                    if (printWindow) {
+                      printWindow.document.write(html);
+                      printWindow.document.close();
+                      printWindow.print();
+                    } else {
+                      console.error("Failed to open print window.");
+                    }
+                    // convertHtmlIntoPdf(html);
                   });
                 }}
               >
