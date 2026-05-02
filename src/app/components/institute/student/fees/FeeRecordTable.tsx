@@ -118,7 +118,8 @@ const FeeRecordTable = (props: {
           address,
           phoneNumber,
           receiptNo,
-          props.batchName 
+          props.batchName ,
+          instituteId.signature
         );
 
         const printWindow = window.open("", "_blank");

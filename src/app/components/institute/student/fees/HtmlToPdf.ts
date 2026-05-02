@@ -2,7 +2,7 @@ export function createReceiptPdf(
   studentName: string,
   date: Date,
   parentName: string,
-  amountPaid: number,
+  amountPaid: number, // The current payment amount
   paymentRecords: {
     amountPaid: number;
     updatedAt: Date;
@@ -15,54 +15,54 @@ export function createReceiptPdf(
   phoneNumber: string,
   receiptNo: string,
   batchName: string,
+  signature: string // Added signature parametergit a
 ) {
-  const totalAmountInWords =
-    numberToWords(amountPaid).toUpperCase() + " RUPEES ONLY";
+  // Helper for currency formatting
+  const formatCurrency = (num: number) => 
+    "₹" + num.toLocaleString('en-IN', { minimumFractionDigits: 2 });
 
+  const totalAmountInWords = numberToWords(amountPaid).toUpperCase() + " RUPEES ONLY";
   const totalFee = paymentRecords[0]?.totalAmount || 0;
-
-  const totalPaid = paymentRecords.reduce(
-    (sum, record) => sum + record.amountPaid,
-    0
-  );
-
+  const totalPaid = paymentRecords.reduce((sum, record) => sum + record.amountPaid, 0);
   const remainingFee = totalFee - totalPaid;
-
   const formattedDate = new Date(date).toLocaleDateString("en-IN");
 
   const installmentsHtml = paymentRecords
-    .map(
-      (record) => `
-      <div class="table-row">
-        <span>${record.name} (Paid on ${new Date(record.updatedAt).toLocaleDateString("en-IN")})</span>
-        <span>₹${record.amountPaid}</span>
-      </div>
-    `
-    )
-    .join("");
+    .map((record, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${record.name}</td>
+        <td>${new Date(record.updatedAt).toLocaleDateString("en-IN")}</td>
+        <td style="text-align: right; font-weight: 600;">${formatCurrency(record.amountPaid)}</td>
+      </tr>
+    `).join("");
 
   return `
   <html>
   <head>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-* {
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-      body {
-        font-family: 'Poppins', sans-serif;
-        background: #f4f6f8;
-        padding: 20px;
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+      
+      @page {
+        size: A5 landscape;
+        margin: 0;
       }
 
-      .receipt {
-        max-width: 750px;
-        margin: auto;
+      body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 8mm;
         background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid #e0e0e0;
+        color: #333;
+      }
+
+      .receipt-card {
+        border: 1px solid #000;
+        max-height: 130mm; /* Fits A5 Landscape height */
+        display: flex;
+        flex-direction: column;
+        padding: 5mm;
+        box-sizing: border-box;
       }
 
       /* HEADER */
@@ -70,201 +70,158 @@ export function createReceiptPdf(
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: linear-gradient(135deg, #6c63ff, #8f94fb);
-        padding: 20px;
-        color: white;
+        border-bottom: 2px solid #333;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
       }
 
-      .logo {
-        height: 60px;
-        width: 60px;
-        object-fit: contain;
-        background: white;
-        padding: 5px;
-        border-radius: 8px;
-      }
+      .brand { display: flex; align-items: center; gap: 10px; }
+      .logo { height: 45px; width: 45px; object-fit: contain; }
+      .inst-name { font-size: 16px; font-weight: 700; margin: 0; text-transform: uppercase; }
+      .inst-info { font-size: 9px; color: #555; margin: 0; }
 
-      .institute-details {
-        text-align: right;
-      }
+      .receipt-label { text-align: right; }
+      .receipt-label h1 { margin: 0; font-size: 18px; color: #333; }
+      .receipt-label p { margin: 0; font-size: 10px; font-weight: 600; }
 
-      .institute-name {
-        font-size: 22px;
-        font-weight: 700;
+      /* STUDENT INFO GRID */
+      .student-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 20px;
+        margin-bottom: 12px;
+        font-size: 11px;
       }
-
-      .contact {
-        font-size: 13px;
-      }
-
-      /* TITLE */
-      .title {
-        text-align: center;
-        font-size: 20px;
-        font-weight: 600;
-        margin: 20px 0;
-      }
-
-      .badge {
-        background: #6c63ff;
-        color: white;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        margin-left: 10px;
-      }
-
-      /* DETAILS */
-      .section {
-        padding: 0 25px;
-      }
-
-      .row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        font-size: 14px;
-      }
-
-      .label {
-        color: #666;
-      }
-
-      .value {
-        font-weight: 500;
-      }
+      .info-row { display: flex; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
+      .label { color: #666; width: 90px; font-size: 9px; text-transform: uppercase; }
+      .value { font-weight: 600; color: #000; }
 
       /* TABLE */
-      .table {
-        margin: 20px 25px;
-        border: 1px solid #eee;
-        border-radius: 8px;
+      .table-container {
+        flex-grow: 1;
         overflow: hidden;
       }
-
-      .table-header {
-        display: flex;
-        justify-content: space-between;
-        background: #f1f3ff;
-        padding: 10px;
-        font-weight: 600;
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+      }
+      th {
+        background: #f2f2f2;
+        text-align: left;
+        padding: 6px;
+        border: 1px solid #333;
+        text-transform: uppercase;
+        font-size: 9px;
+      }
+      td {
+        padding: 5px 6px;
+        border: 1px solid #eee;
       }
 
-      .table-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-        border-top: 1px solid #eee;
-        font-size: 13px;
-      }
-
-      /* TOTAL */
-      .total {
-        text-align: right;
-        padding: 0 25px;
-        font-size: 18px;
-        font-weight: 700;
-        margin-top: 10px;
-      }
-
-      /* FOOTER */
+      /* FOOTER SECTION */
       .footer {
+        margin-top: 10px;
         display: flex;
         justify-content: space-between;
-        padding: 30px 25px;
+        align-items: flex-end;
       }
 
-      .amount-words {
-        font-size: 13px;
-        max-width: 60%;
+      .footer-left { width: 50%; }
+      .amount-words { 
+        font-size: 9px; 
+        font-style: italic; 
+        background: #f9f9f9; 
+        padding: 5px; 
+        border-radius: 4px;
+        border-left: 3px solid #333;
       }
 
-      .signature {
-        text-align: right;
+      .summary-table {
+        width: 180px;
+        font-size: 11px;
+      }
+      .summary-row { display: flex; justify-content: space-between; padding: 2px 0; }
+      .total-row { 
+        border-top: 1px solid #333; 
+        margin-top: 4px; 
+        padding-top: 4px; 
+        font-weight: 700; 
+        font-size: 12px;
       }
 
-      .signature-line {
-        margin-top: 40px;
-        border-top: 1px solid #000;
-        width: 150px;
-        margin-left: auto;
+      .signature-area {
+        text-align: center;
+        width: 120px;
       }
+      .sig-img { height: 30px; width: auto; mix-blend-mode: multiply; }
+      .sig-line { border-top: 1px solid #000; padding-top: 2px; font-size: 10px; font-weight: 600; }
 
     </style>
   </head>
-
   <body>
-    <div class="receipt">
-
+    <div class="receipt-card">
+      
       <!-- HEADER -->
       <div class="header">
-        ${instituteLogo
-      ? `<img src="${instituteLogo}" class="logo" />`
-      : ""
-    }
-
-        <div class="institute-details">
-          <div class="institute-name">${name}</div>
-          <div class="contact">${address}</div>
-          <div class="contact">${phoneNumber}</div>
+        <div class="brand">
+          ${instituteLogo ? `<img src="${instituteLogo}" class="logo" />` : ''}
+          <div>
+            <h2 class="inst-name">${name}</h2>
+            <p class="inst-info">${address}</p>
+            <p class="inst-info">Ph: ${phoneNumber}</p>
+          </div>
+        </div>
+        <div class="receipt-label">
+          <h1>FEES RECEIPT</h1>
+          <p>No: ${receiptNo}</p>
+          <p>Date: ${formattedDate}</p>
         </div>
       </div>
 
-      <!-- TITLE -->
-      <div class="title">
-        FEE RECEIPT <span class="badge">PAID</span>
+      <!-- STUDENT DETAILS -->
+      <div class="student-info">
+        <div class="info-row"><span class="label">Student:</span><span class="value">${studentName}</span></div>
+        <div class="info-row"><span class="label">Batch:</span><span class="value">${batchName}</span></div>
+        <div class="info-row"><span class="label">Parent:</span><span class="value">${parentName}</span></div>
+        <div class="info-row"><span class="label">Status:</span><span class="value">PARTIAL PAID</span></div>
       </div>
 
-      <!-- DETAILS -->
-      <div class="section">
-        <div class="row">
-          <span class="label">Receipt No:</span>
-          <span class="value">${receiptNo}</span>
-        </div>
-        <div class="row">
-          <span class="label">Date:</span>
-          <span class="value">${formattedDate}</span>
-        </div>
-        <div class="row">
-          <span class="label">Student Name:</span>
-          <span class="value">${studentName}</span>
-        </div>
-        <div class="row">
-          <span class="label">Parent Name:</span>
-          <span class="value">${parentName}</span>
-        </div>
-        <div class="row">
-          <span class="label">Batch:</span>
-          <span class="value">${batchName}</span>
-        </div>
+      <!-- INSTALLMENTS TABLE -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 30px;">#</th>
+              <th>Installment Name</th>
+              <th>Paid Date</th>
+              <th style="text-align: right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${installmentsHtml}
+          </tbody>
+        </table>
       </div>
-
-      <!-- TABLE -->
-      <div class="table">
-        <div class="table-header">
-          <span>Description</span>
-          <span>Amount</span>
-        </div>
-        ${installmentsHtml}
-      </div>
-
-      <!-- TOTAL -->
-<div class="total">
-  Total Fee: ₹${totalFee} <br/>
-  Paid: ₹${totalPaid} <br/>
-  <span style="color:red;">Remaining: ₹${remainingFee}</span>
-</div>
 
       <!-- FOOTER -->
       <div class="footer">
-        <div class="amount-words">
-          <strong>In Words:</strong><br/>
-          ${totalAmountInWords}
+        <div class="footer-left">
+          <div class="amount-words">
+            <b>In Words:</b> ${totalAmountInWords}
+          </div>
+          <p style="font-size: 8px; color: #888; margin-top: 10px;">* This is an official receipt for the payment received.</p>
         </div>
 
-        <div class="signature">
-          Authorized Signature
-          <div class="signature-line"></div>
+        <div class="summary-table">
+          <div class="summary-row"><span>Total Fees:</span><span>${formatCurrency(totalFee)}</span></div>
+          <div class="summary-row"><span>Total Paid:</span><span>${formatCurrency(totalPaid)}</span></div>
+          <div class="summary-row total-row" style="color: #d63031;"><span>Balance:</span><span>${formatCurrency(remainingFee)}</span></div>
+        </div>
+
+        <div class="signature-area">
+          ${signature ? `<img src="${signature}" class="sig-img" />` : '<div style="height:30px"></div>'}
+          <div class="sig-line">Authorized Signatory</div>
         </div>
       </div>
 
@@ -273,6 +230,9 @@ export function createReceiptPdf(
   </html>
   `;
 }
+
+// Ensure your numberToWords function remains in the same file
+
 function numberToWords(number: number) {
   const words = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
   const teens = ["", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
@@ -305,6 +265,8 @@ function numberToWords(number: number) {
 
   return convertNumberWithThousands(number);
 }
+
+
 export function createFullFeeOverviewPdf(
   studentName: string,
   parentName: string,
@@ -322,236 +284,187 @@ export function createFullFeeOverviewPdf(
   gst: {
     sgst: number;
     cgst: number;
-  }
+  },
+  signature: string // Expecting a URL or Base64 string
 ) {
-  // Calculate Base Total
-  const baseTotalFee = paymentRecords.reduce(
-    (sum, r) => sum + (r.totalAmount || 0),
-    0
-  );
-
-  // Calculate GST amounts based on percentage
-  const cgstAmount = gst.cgst > 0 ? (baseTotalFee * gst.cgst) / 100 : 0;
-  const sgstAmount = gst.sgst > 0 ? (baseTotalFee * gst.sgst) / 100 : 0;
-  
-  // Final Total including GST
-  const totalFeeWithGst = baseTotalFee + cgstAmount + sgstAmount;
-
-  const totalPaid = paymentRecords.reduce(
-    (sum, r) => sum + (r.amountPaid || 0),
-    0
-  );
-
+  const totalFeeWithGst = paymentRecords.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
+  const totalPaid = paymentRecords.reduce((sum, r) => sum + (r.amountPaid || 0), 0);
   const remaining = totalFeeWithGst - totalPaid;
+
+  const totalGstPercent = gst.cgst + gst.sgst;
+  const baseTotalFee = totalFeeWithGst / (1 + totalGstPercent / 100);
+  const totalTaxAmount = totalFeeWithGst - baseTotalFee;
 
   return `
 <html>
 <head>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  @page { size: A5 landscape; margin: 0; }
+  
   body {
-    font-family: 'Poppins', sans-serif;
-    background: #f4f6f8;
-    padding: 20px;
-  }
-
-  @media print {
-    body { background: white !important; padding: 0 !important; }
-    .container { width: 100% !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
-    table { page-break-inside: avoid; }
-    tr { page-break-inside: avoid; }
-  }
-
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  .container {
-    max-width: 800px;
-    margin: auto;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 8mm; /* Reduced padding to save space */
     background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    color: #2c3e50;
+    line-height: 1.2;
+  }
+
+  .statement-container {
+    border: 1px solid #d1d8e0;
+    max-height: 125mm; /* Fixed height for A5 Landscape */
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
   }
 
+  /* HEADER SECTION */
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #0fb9b1;
-    padding: 20px;
-    color: white;
+    padding: 10px 15px;
+    background: #f9f9f9;
+    border-bottom: 2px solid #0fb9b1;
   }
 
-  .header h2 { margin: 0; font-size: 20px; }
-  .header p { margin: 0; font-size: 12px; }
+  .brand-area { display: flex; align-items: center; gap: 12px; }
+  .logo { height: 45px; width: 45px; object-fit: contain; }
+  .inst-details h1 { margin: 0; font-size: 16px; color: #0d1010; text-transform: uppercase; }
+  .inst-details p { margin: 0; font-size: 9px; color: #7f8c8d; }
 
-  .title {
-    text-align: center;
-    font-size: 18px;
-    font-weight: 600;
-    margin: 20px 0;
-    color: #333;
+  .doc-label { text-align: right; }
+  .doc-label h2 { margin: 0; font-size: 14px; font-weight: 700; color: #2c3e50; }
+  .doc-label p { margin: 0; font-size: 9px; color: #95a5a6; }
+
+  /* STUDENT INFO SECTION */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 15px;
+    gap: 10px;
+    background: #fff;
   }
 
-  .details {
-    background: #f8f9fa;
-    margin: 0 20px;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 14px;
+  .info-item b { font-size: 8px; color: #95a5a6; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .info-item span { font-size: 12px; font-weight: 600; color: #333; }
+
+  /* FINANCIALS */
+  .summary-box {
+    margin: 0 15px;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
   }
 
   .row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 6px;
+    padding: 4px 0;
+    font-size: 11px;
   }
 
-  table {
-    width: 90%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    overflow: hidden;
-    border-radius: 10px;
+  .row.bold { font-weight: 700; font-size: 13px; border-top: 1px solid #eee; margin-top: 5px; padding-top: 8px; }
+  .row.highlight { 
+    background: #ebfcfb; 
+    padding: 6px 8px; 
+    border-radius: 4px; 
+    color: #06753a; 
+    margin-top: 4px;
+  }
+  .row.danger { 
+    background: #fff5f5; 
+    padding: 6px 8px; 
+    border-radius: 4px; 
+    color: #e74c3c; 
+    margin-top: 4px;
+    font-weight: 700;
   }
 
-  th {
-    background: #0fb9b1;
-    color: white;
-    padding: 10px;
-    font-size: 13px;
-  }
-
-  td {
-    padding: 10px;
-    text-align: center;
-    font-size: 13px;
-    border-bottom: 1px solid #eee;
-  }
-
-  tr:nth-child(even) { background: #f9f9f9; }
-
-  .paid { color: #0fb9b1; font-weight: 600; }
-  .partial { color: orange; font-weight: 600; }
-  .due { color: red; font-weight: 600; }
-
-  .summary-container {
+  /* FOOTER & SIGNATURE */
+  .footer {
+    margin-top: auto;
+    padding: 10px 15px;
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin: 20px;
+    justify-content: space-between;
+    align-items: flex-end;
   }
 
-  .card {
-    flex: 1;
-    min-width: 120px;
-    margin: 5px;
-    padding: 15px;
-    border-radius: 10px;
-    background: #f1f3ff;
-    text-align: center;
-  }
-
-  .card h4 { margin: 0; font-size: 12px; color: #666; }
-  .card p { margin: 5px 0 0; font-size: 16px; font-weight: 600; }
-  .remaining { color: red; }
+  .note { font-size: 8px; color: #bdc3c7; font-style: italic; max-width: 50%; }
+  
+  .signature-section { text-align: center; width: 120px; }
+  .sig-image { height: 35px; width: auto; margin-bottom: 2px; mix-blend-mode: multiply; }
+  .sig-line { border-top: 1px solid #333; font-size: 10px; font-weight: 600; padding-top: 2px; }
 
 </style>
 </head>
-
 <body>
 
-<div class="container">
-
+<div class="statement-container">
   <div class="header">
-    <div>
-      <h2>${name}</h2>
-      <p>${address}</p>
+    <div class="brand-area">
+      ${instituteLogo ? `<img src="${instituteLogo}" class="logo" />` : ''}
+      <div class="inst-details">
+        <h1>${name}</h1>
+        <p>${address}</p>
+        <p>Ph: ${phoneNumber}</p>
+      </div>
+    </div>
+    <div class="doc-label">
+      <h2>FEE SUMMARY</h2>
+      <p>Issued: ${new Date().toLocaleDateString("en-IN")}</p>
     </div>
   </div>
 
-  <div class="title">FEE OVERVIEW</div>
-
-  <div class="details">
-    <div class="row"><span>Student:</span><span>${studentName}</span></div>
-    <div class="row"><span>Parent:</span><span>${parentName}</span></div>
-    <div class="row"><span>Batch:</span><span>${batchName}</span></div>
+  <div class="info-grid">
+    <div class="info-item">
+      <b>Student Details</b>
+      <span>${studentName}</span>
+      <div style="font-size: 10px; font-weight: 400; color: #7f8c8d;">Parent: ${parentName}</div>
+    </div>
+    <div class="info-item">
+      <b>Course / Batch</b>
+      <span>${batchName}</span>
+    </div>
   </div>
 
-  <table>
-    <tr>
-      <th>#</th>
-      <th>Installment</th>
-      <th>Status</th>
-      <th>Total</th>
-      <th>Paid</th>
-      <th>Due</th>
-    </tr>
-
-    ${paymentRecords.map((r, i) => {
-      let status = "Not Paid";
-      let cls = "due";
-
-      if (r.amountPaid === r.totalAmount) {
-        status = "Paid";
-        cls = "paid";
-      } else if (r.amountPaid > 0) {
-        status = "Partial";
-        cls = "partial";
-      }
-
-      return `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${r.name}</td>
-          <td class="${cls}">${status}</td>
-          <td>₹${r.totalAmount}</td>
-          <td>₹${r.amountPaid}</td>
-          <td>₹${r.totalAmount - r.amountPaid}</td>
-        </tr>
-      `;
-    }).join("")}
-
-  </table>
-
-  <div class="summary-container">
-    <div class="card">
-      <h4>Base Fee</h4>
-      <p>₹${baseTotalFee}</p>
+  <div class="summary-box">
+    <div class="row">
+      <span>Course Fee (Base)</span>
+      <span>₹${baseTotalFee.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
     </div>
-
-    ${gst.cgst > 0 ? `
-    <div class="card">
-      <h4>CGST (${gst.cgst}%)</h4>
-      <p>₹${cgstAmount.toFixed(2)}</p>
+    
+    ${totalTaxAmount > 0 ? `
+    <div class="row">
+      <span>Taxes (GST ${totalGstPercent}%)</span>
+      <span>₹${totalTaxAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
     </div>` : ''}
 
-    ${gst.sgst > 0 ? `
-    <div class="card">
-      <h4>SGST (${gst.sgst}%)</h4>
-      <p>₹${sgstAmount.toFixed(2)}</p>
-    </div>` : ''}
-
-    <div class="card">
-      <h4>Total Fee</h4>
-      <p>₹${totalFeeWithGst.toFixed(2)}</p>
+    <div class="row bold">
+      <span>Total Payable Amount</span>
+      <span>₹${totalFeeWithGst.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
     </div>
 
-    <div class="card">
-      <h4>Total Paid</h4>
-      <p>₹${totalPaid}</p>
+    <div class="row highlight">
+      <span>Total Amount Received </span>
+      <span>₹${totalPaid.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
     </div>
 
-    <div class="card">
-      <h4>Remaining</h4>
-      <p class="remaining">₹${remaining.toFixed(2)}</p>
+    <div class="row danger">
+      <span>Outstanding Balance</span>
+      <span>₹${remaining.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
     </div>
   </div>
 
+  <div class="footer">
+    <div class="note">
+      This is a consolidated fee summary. Individual receipts are issued for every transaction.
+    </div>
+    <div class="signature-section">
+      ${signature ? `<img src="${signature}" class="sig-image" />` : '<div style="height:35px"></div>'}
+      <div class="sig-line">Authorized Signatory</div>
+    </div>
+  </div>
 </div>
 
 </body>

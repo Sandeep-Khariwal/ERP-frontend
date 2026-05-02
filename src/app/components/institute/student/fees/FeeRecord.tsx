@@ -229,6 +229,7 @@ const FeeRecordSection = (props: {
                       totalAmount: f.totalAmount,
                       updatedAt: f.updatedAt,
                     }));
+                    
 
                     const html = createFullFeeOverviewPdf(
                       student.name, // ✅ DIRECT API se
@@ -240,6 +241,7 @@ const FeeRecordSection = (props: {
                       student.instituteId.institutePhoneNumber,
                       props.batchName,
                       gst,
+                      student.instituteId.signature
                     );
 
                     console.log("btn clicked......");
