@@ -36,6 +36,8 @@ import { GetGrade } from "../helperFunctions";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createMarksheetPdf } from "./CreateMarksheetPdf";
 import { formatDate } from "../../marketing/utility/utils";
+import QRCode from "qrcode";
+
 const Marksheet = (props: {
   batchId: string;
   subjects: { _id: string; name: string }[];
@@ -487,10 +489,17 @@ const Marksheet = (props: {
                       <IconArrowLeftFromArc
                         size={24}
                         style={{ cursor: "pointer", color: "#00000098" }}
-                        onClick={() => {
+                        onClick={async () => {
+
+
+
+                          const url = `https://shikshapay.cloud/marksheet/${item._id}`;
+                          // const url = `http://localhost:3000/marksheet/${item._id}`;
+
+                          const qr = await QRCode.toDataURL(url);
+                          console.log("qr : ", qr);
                           GetStudentDetail(item.student._id)
                             .then((res: any) => {
-                              console.log("student details : ", res);
                               const student = res.student;
 
                               const html = createMarksheetPdf({
@@ -521,6 +530,7 @@ const Marksheet = (props: {
                                   student.instituteId.institutePhoneNumber,
                                 principalSignature:
                                   student.instituteId.signature,
+                                qr
                               });
 
                               const printWindow = window.open("", "_blank");

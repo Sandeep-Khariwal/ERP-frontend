@@ -52,6 +52,7 @@ import {
 import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { MdOutlineImage } from "react-icons/md";
 import { FaSignature } from "react-icons/fa";
+import { CiMoneyCheck1 } from "react-icons/ci";
 
 // import {
 //   IconUsers,
@@ -293,7 +294,7 @@ export const DesktopNavbar = (props: {
                 setActiveSettingTab("gst");
               }}
             >
-              <FaSignature size={20} />
+              <CiMoneyCheck1 size={20} />
               <Text size="sm" fw={500}>
                 Add Fees GST
               </Text>
