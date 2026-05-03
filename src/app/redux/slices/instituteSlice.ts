@@ -6,12 +6,17 @@ export interface InstituteDetails {
   _id: string;
   phoneNumber: string;
   address: string;
+  email?: string;
   featureAccess?: {
     financeManagement: boolean;
     aiChatBoat: boolean;
     transportManagement: boolean;
     onlineTestSchedule: boolean;
     feesReminderMessage: boolean;
+  };
+  gst?: {
+    sgst: number;
+    cgst: number;
   };
 }
 
@@ -33,6 +38,7 @@ export const instituteDetails = createSlice({
           _id: string;
           phoneNumber: string;
           address: string;
+          email?: string;
           featureAccess?: {
             financeManagement: boolean;
             aiChatBoat: boolean;
@@ -40,8 +46,12 @@ export const instituteDetails = createSlice({
             onlineTestSchedule: boolean;
             feesReminderMessage: boolean;
           };
+          gst?: {
+            sgst: number;
+            cgst: number;
+          };
         };
-      }
+      },
     ) {
       state.instituteDetails = actions.payload;
     },

@@ -1,28 +1,29 @@
 import ApiHelper from "../../ApiHelper";
 
-
 export function UpdateStudent(
   studentId: string,
-  data: { batchId: string; dateOfJoining: Date; optionalSubjects: string[] , van:string }
+  data: {
+    batchId: string;
+    dateOfJoining: Date;
+    optionalSubjects: string[];
+    van: string;
+  },
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
       `${process.env.URL}/api/v1/institute/updateStudent/${studentId}`,
-      data
+      data,
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
 }
 
-export function UpdateStudentBasicInfo(
-  studentId: string,
-  data: any
-) {
+export function UpdateStudentBasicInfo(studentId: string, data: any) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
       `${process.env.URL}/api/v1/institute/updateStudentBasicInfo/${studentId}`,
-      data
+      data,
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
@@ -30,12 +31,12 @@ export function UpdateStudentBasicInfo(
 }
 export function UpdateGpsInfo(
   instituteId: string,
-  data:{ gpsUrl: string; gpsToken: string }
+  data: { gpsUrl: string; gpsToken: string },
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
       `${process.env.URL}/api/v1/institute/updateGpsInfo/${instituteId}`,
-      data
+      data,
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
@@ -44,8 +45,39 @@ export function UpdateGpsInfo(
 
 export function DeleteSubject(subjectId: string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.delete(
-      `${process.env.URL}/api/v1/subject/delete/${subjectId}`
+    ApiHelper.delete(`${process.env.URL}/api/v1/subject/delete/${subjectId}`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function updateschooldetails(
+  instituteId: string,
+  data: {
+    name: string;
+    email: string;
+    institutePhoneNumber: string;
+    address: string;
+  },
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/institute/updateInstitute/${instituteId}`,
+      data,
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function updateschoolGST(
+  instituteId: string,
+  data: { cgst: number; sgst: number },
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/institute/updateGst/${instituteId}`,
+      {gst:data},
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));

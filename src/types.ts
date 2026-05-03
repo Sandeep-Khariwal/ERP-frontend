@@ -126,3 +126,35 @@ export interface LeadFilters {
   page: number;
   limit: number;
 }
+
+// ─── WhatsApp Integration ─────────────────────────────────────────
+
+export interface WhatsAppConnection {
+  _id:                string;
+  phoneNumberId:      string;
+  displayPhoneNumber: string;
+  verifiedName:       string;
+  businessAccountId:  string;
+  connectedAt:        string;
+  totalLeadsReceived: number;
+  lastLeadAt?:        string;
+}
+
+// ─── Conversation ─────────────────────────────────────────────────
+
+export type MessageSender = "user" | "bot" | "admin";
+
+export interface WaMessage {
+  text:      string;
+  sender:    MessageSender;
+  timestamp: string;
+}
+
+export interface Conversation {
+  _id:         string;
+  instituteId: string;
+  leadId:      string;
+  messages:    WaMessage[];
+  createdAt:   string;
+  updatedAt:   string;
+}

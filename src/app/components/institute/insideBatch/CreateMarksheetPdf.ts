@@ -1,18 +1,24 @@
+import { GetStudentDetail } from "@/axios/institute/InstituteGetApi";
+import { useEffect, useState } from "react";
+
 export const createMarksheetPdf = (data: any) => {
-const getRemark = () => {
-  if (data.status === "Fail") {
-    return "Needs improvement. Work harder and try again.";
-  }
 
-  const percentage = Number(data.percentage);
+  const getRemark = () => {
+    if (data.status === "Fail") {
+      return "Needs improvement. Work harder and try again.";
+    }
 
-  if (percentage >= 90) return "Outstanding performance! Keep shining.";
-  if (percentage >= 75) return "Excellent performance! Keep up the good work.";
-  if (percentage >= 60) return "Good job! You are doing well.";
-  if (percentage >= 40) return "Satisfactory performance. Keep improving.";
-  
-  return "Needs improvement. Focus more on studies.";
-};
+    const percentage = Number(data.percentage);
+
+    if (percentage >= 90) return "Outstanding performance! Keep shining.";
+    if (percentage >= 75)
+      return "Excellent performance! Keep up the good work.";
+    if (percentage >= 60) return "Good job! You are doing well.";
+    if (percentage >= 40) return "Satisfactory performance. Keep improving.";
+
+    return "Needs improvement. Focus more on studies.";
+  };
+
   return `
 <!DOCTYPE html>
 <html>
@@ -49,15 +55,29 @@ const getRemark = () => {
         <div style="display:flex; justify-content:space-between; align-items:center;">
             
             <div style="display:flex; align-items:center; gap:10px;">
-                <img src="${window.location.origin}/logo%203.jpg"  style="width:80px;">
+                <img src=${data.instituteLogo}  style="width:80px;">
                 <div>
                     <h1 style="margin:0; color:#1f4e8c; font-size:35px; border-bottom:2px solid #f4934d96; display:inline-block;">
                       
                         ${data.instituteName}
                     </h1>
-                    <div style="color:#ff6a00; font-weight:bold; margin-top:5px; text-align: center;">
-                        LEARN • GROW • SUCCEED
-                    </div>
+                     <div style="margin-top:8px; display:flex; flex-direction:column; gap:4px;">
+
+    <div style="color:#2e3f57; font-size:13px; font-weight:500; display:flex; align-items:flex-start;">
+        <span style="margin-right:6px;"></span>
+        <span style="line-height:1.4;">
+            ${data.instituteAdress || "N/A"}
+        </span>
+    </div>
+
+    <div style="color:#1f4e8c; font-size:13px; font-weight:600; display:flex; align-items:center;">
+        <span style="margin-right:6px;"></span>
+        <span>
+            ${data.institutePhone ? data.institutePhone : "N/A"}
+        </span>
+    </div>
+
+</div>
                 </div>
             </div>
 
@@ -71,45 +91,68 @@ const getRemark = () => {
 
     <div style="background:linear-gradient(#eaf3fb,#d6e6f5); margin-top:15px; padding:20px; border:2px solid #c3d3e2; display:flex; -webkit-print-color-adjust: exact;">
 
-    <img src="${window.location.origin}/pic.jpg" style="width:130px; border:3px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); ">
+    <img src="${data.photo}" style="width:130px; border:3px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); ">
 
     <div style="flex:1; padding-left:25px;">
         
-        <div style="display:flex; justify-content:space-between;">
+       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
 
-            <!-- LEFT SIDE -->
-            <div style="width:30%; ">
+  <!-- LEFT COLUMN -->
+  <div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2;  padding-bottom:5px; width: 40vw;" >
-                    <b style="color:#1f4e8c;">Name:</b><span style="color: #243854; font-weight: bolder; " >   ${data.studentName}</span>
-                </div>
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Name:</b>
+      <span style="font-weight:bold;"> ${data.studentName}</span>
+    </div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px; width: 15vw;">
-                    <b style="color:#1f4e8c;">Roll No:</b> <span style="color: #243854; font-weight: bolder; " > ${data.rollNumber} </span>
-                </div>
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Father Name:</b>
+      <span style="font-weight:bold;"> ${data.fName}</span>
+    </div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;  width: 15vw">
-                    <b style="color:#1f4e8c;">Class:</b><span style="color: #243854; font-weight: bolder; "> ${data.batchName}  </span>
-                </div>
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Roll No:</b>
+      <span style="font-weight:bold;"> ${data.rollNumber}</span>
+    </div>
 
-            </div>
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Class:</b>
+      <span style="font-weight:bold;"> ${data.batchName}</span>
+    </div>
 
-            <!-- RIGHT SIDE -->
-            <div style="width:70%; margin-top: 40px;" >
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">DOB:</b>
+      <span style="font-weight:bold;"> ${data.dob}</span>
+    </div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;  white-space: nowrap;  width: 20vw">
-                    <b style="color:#1f4e8c;">Enrollment No:</b> <span style="color: #243854; font-weight: bolder; ">  ${data.enrolment}</span>
-                </div>
+  </div>
 
-                <div style="margin:12px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;  width: 20vw">
-                    <b style="color:#1f4e8c;">Session:</b> <span style="color: #243854; font-weight: bolder; ">  ${data.session}</span>
-                </div>
+  <!-- RIGHT COLUMN -->
+  <div>
 
-            </div>
-           
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Enrollment No:</b>
+      <span style="font-weight:bold;"> ${data.enrolment}</span>
+    </div>
 
-        </div>
-  
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Session:</b>
+      <span style="font-weight:bold;"> ${data.session}</span>
+    </div>
+
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Parent Mobile:</b>
+      <span style="font-weight:bold;"> ${data.parentNumber}</span>
+    </div>
+
+    <div style="margin:10px 0; border-bottom:2px solid #c3d3e2; padding-bottom:5px;">
+      <b style="color:#1f4e8c;">Address:</b>
+      <span style="font-weight:bold;">${data.address}</span>
+    </div>
+
+  </div>
+
+</div>
     </div>
 
 </div>
@@ -129,20 +172,25 @@ const getRemark = () => {
     <tr style="background:#1f4e8c; color:#fff;  -webkit-print-color-adjust: exact;">
         <th style="padding:px; border:1px solid #c3d3e2;">Subject</th>
         <th style="padding:10px; border:1px solid #c3d3e2;">Max Marks</th>
-        <th style="padding:10px; border:1px solid #c3d3e2;">Marks Obtained</th>
-        <th style="padding:10px; border:1px solid #c3d3e2;">Theory</th>
         <th style="padding:10px; border:1px solid #c3d3e2;">Practical</th>
+        <th style="padding:10px; border:1px solid #c3d3e2;">Theory</th>
+        <th style="padding:10px; border:1px solid #c3d3e2;">Marks Obtained</th>
     </tr>
-          ${data.marks.map((m: any, i: number) => `
-    <tr style="background:${(i+1)%2 === 0?"#ffffff":"#eaf3fb"}; -webkit-print-color-adjust: exact;">
+          ${data.marks
+            .map(
+              (m: any, i: number) => `
+    <tr style="background:${(i + 1) % 2 === 0 ? "#ffffff" : "#eaf3fb"}; -webkit-print-color-adjust: exact;">
         <td style="padding:10px; border:1px solid #c3d3e2;">${m.subjectName}</td>
         <td style="border:1px solid #c3d3e2;">100</td>
-        <td style="border:1px solid #c3d3e2;">${m.obtained_marks}</td>
-        <td style="border:1px solid #c3d3e2;">${m.theory_marks}</td>
         <td style="border:1px solid #c3d3e2;">${m.practical_marks}</td>
+        <td style="border:1px solid #c3d3e2;">${m.theory_marks}</td>
+        <td style="border:1px solid #c3d3e2;">${m.obtained_marks}</td>
+
     </tr>
 
-      `).join("")}
+      `,
+            )
+            .join("")}
 
 
 </table>
@@ -155,56 +203,39 @@ const getRemark = () => {
         <div><b>RESULT:</b> <span style="font-weight: bolder; font-size: larger;" > ${data.status}</span></div>
     </div>
     <p  style="border-bottom: 6px double #9db9d4;"></p>
-
-    
-    <div style="margin-top:30px;">
-
-   
-    <div style="display:flex; align-items:center;">
-
-      
-        <div style="flex:1;">
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-        </div>
-
-        <div style="background:#1f4e8c; color:#fff; padding:5px 20px; font-weight:bold; font-size: 24px; margin:0 10px; -webkit-print-color-adjust: exact;">
-            REMARKS
-        </div>
-
-   
-        <div style="flex:1;">
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-            <div style="border-top:2px solid #9db9d4; margin:2px 0;"></div>
-        </div>
-
-    </div>
-
-   
-    <p style="margin-top:25px; border-bottom:2px solid #c3d3e2; padding-bottom:10px; font-style:italic; color:#1f4e8c; font-size: 20px; margin-left: 20px;">
-         ${getRemark()}
-    </p>
-
-</div>
-<p  style="border-bottom: 6px dashed #9db9d4; margin-top: 60px; " ></p>
-
   
     <div style="margin-top:20px;">
         <p style="color:#1f4e8c;"> Date: <span style="color: #2e3f57; font-weight: bolder; "> ${data.date}</span></p>
 
-        <div style="display:flex; justify-content:space-between; margin-top:50px;">
-            <div style="text-align:center; width:40%;">
-               
-                <div style="border-top:2px solid  #9db9d4; margin-top:5px; font-style: italic; font-size: 20px;"> <span style="color: #1f4e8c;"> Class Teacher</span></div>
-            </div>
+<div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:50px;">
 
-            <div style="text-align:center; width:40%;">
-              
-                <div style="border-top:2px solid #9db9d4; margin-top:5px; font-style: italic; font-size: 20px;"> <span style="color: #1f4e8c;"> Principal</span></div>
-            </div>
+    <!-- QR Code Section (Left Side) -->
+    <div style="width:40%; display:flex; justify-content:flex-start;">
+        <img src="${data.qr}" alt="QR Code" style="
+            height: 100px;
+            width: 100px;
+            object-fit: contain;
+        " />
+    </div>
+
+    <!-- Director/Principal Section (Right Side) -->
+    <div style="text-align:center; width:40%; display: flex; flex-direction: column; align-items: center;">
+        
+        <!-- Principal Signature Image -->
+        <img src="${data.principalSignature}" alt="Principal Sign" style="
+            height: 50px; 
+            max-width: 200px; 
+            object-fit: contain; 
+            margin-bottom: -5px; 
+            mix-blend-mode: multiply;
+        " />
+
+        <div style="border-top:2px solid #9db9d4; width: 100%; margin-top:5px; font-style: italic; font-size: 20px;"> 
+            <span style="color: #1f4e8c;">Director or Principal</span>
         </div>
+    </div>
+
+</div>
     </div>
 
    

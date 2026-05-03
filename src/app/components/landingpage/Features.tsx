@@ -333,6 +333,65 @@ const Features: React.FC = () => {
             evaluate student performance with ease.
           </Text>
         </Flex>
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          w={"30%"}
+          gap={"0.50rem"}
+        >
+          <Image src={"/marksheet_id.png"} alt="Marksheet & ID Card" w={250} />
+          <h4 style={{ fontSize: "1.25rem" }}>
+            Automated Marksheet & ID Card Generation
+          </h4>
+          <Text style={{ fontSize: "0.95rem" }}>
+            Generate professional student marksheets and ID cards instantly with just a few clicks. Fully customizable and print-ready.
+          </Text>
+        </Flex>
+
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          w={"30%"}
+          gap={"0.50rem"}
+        >
+          <Image src={"/earning_dashboard.png"} alt="Earnings Dashboard" w={250} />
+          <h4 style={{ fontSize: "1.25rem" }}>
+            Smart Earnings & Expense Dashboard
+          </h4>
+          <Text style={{ fontSize: "0.95rem" }}>
+            Track all your income and expenses in real-time with a powerful dashboard. Get clear financial insights and manage your institute efficiently.
+          </Text>
+        </Flex>
+
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          w={"30%"}
+          gap={"0.50rem"}
+        >
+          <Image src={"/leads_management.png"} alt="Leads Management" w={250} />
+          <h4 style={{ fontSize: "1.25rem" }}>
+            Lead Management with Meta Integration
+          </h4>
+          <Text style={{ fontSize: "0.95rem" }}>
+            Capture and manage leads directly from Meta Ads. Track inquiries, follow-ups, and conversions in one centralized system.
+          </Text>
+        </Flex>
+
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          w={"30%"}
+          gap={"0.50rem"}
+        >
+          <Image src={"/whatsapp_integration.png"} alt="WhatsApp Integration" w={250} />
+          <h4 style={{ fontSize: "1.25rem" }}>
+            WhatsApp Integration for Instant Communication
+          </h4>
+          <Text style={{ fontSize: "0.95rem" }}>
+            Connect with students and parents instantly through WhatsApp. Send updates, reminders, and respond to inquiries in real-time.
+          </Text>
+        </Flex>
       </Flex>
 
       {/* Features Grid - Mobile/Tablet */}
@@ -606,6 +665,65 @@ const Features: React.FC = () => {
             Students can participate in online quizzes and assessments directly from
             the platform. Teachers can create quizzes, track results instantly, and
             evaluate student performance with ease.
+          </Text>
+        </Flex>
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          gap={"md"}
+          style={{ alignItems: "center", textAlign: "center" }}
+        >
+          <Image src={"/marksheet_id.png"} style={{ maxWidth: "250px", width: "100%" }} />
+          <h4 style={{ fontSize: "1.25rem", margin: 0 }}>
+            Automated Marksheet & ID Card Generation
+          </h4>
+          <Text style={{ fontSize: "0.95rem", maxWidth: "90%" }}>
+            Generate professional student marksheets and ID cards instantly with just a few clicks. Fully customizable and print-ready.
+          </Text>
+        </Flex>
+
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          gap={"md"}
+          style={{ alignItems: "center", textAlign: "center" }}
+        >
+          <Image src={"/earning_dashboard.png"} style={{ maxWidth: "250px", width: "100%" }} />
+          <h4 style={{ fontSize: "1.25rem", margin: 0 }}>
+            Smart Earnings & Expense Dashboard
+          </h4>
+          <Text style={{ fontSize: "0.95rem", maxWidth: "90%" }}>
+            Track all your income and expenses in real-time with a powerful dashboard. Get clear financial insights and manage your institute efficiently.
+          </Text>
+        </Flex>
+
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          gap={"md"}
+          style={{ alignItems: "center", textAlign: "center" }}
+        >
+          <Image src={"/leads_management.png"} style={{ maxWidth: "250px", width: "100%" }} />
+          <h4 style={{ fontSize: "1.25rem", margin: 0 }}>
+            Lead Management with Meta Integration
+          </h4>
+          <Text style={{ fontSize: "0.95rem", maxWidth: "90%" }}>
+            Capture and manage leads directly from Meta Ads. Track inquiries, follow-ups, and conversions in one centralized system.
+          </Text>
+        </Flex>
+
+        <Flex
+          className="animate-item feature-card"
+          direction={"column"}
+          gap={"md"}
+          style={{ alignItems: "center", textAlign: "center" }}
+        >
+          <Image src={"/whatsapp_integration.png"} style={{ maxWidth: "250px", width: "100%" }} />
+          <h4 style={{ fontSize: "1.25rem", margin: 0 }}>
+            WhatsApp Integration for Instant Communication
+          </h4>
+          <Text style={{ fontSize: "0.95rem", maxWidth: "90%" }}>
+            Connect with students and parents instantly through WhatsApp. Send updates, reminders, and respond to inquiries in real-time.
           </Text>
         </Flex>
       </Flex>

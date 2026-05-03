@@ -247,7 +247,7 @@ const StudentOverview = (props: {
             </Text>
             <Text c="dimmed" fz="sm">
               {props.student.batchId?.name} | Student Roll:{" "}
-              {props.student.uniqueRoll}
+              {props.student.rollNumber}
             </Text>
           </Stack>
           {institute?.featureAccess?.transportManagement &&

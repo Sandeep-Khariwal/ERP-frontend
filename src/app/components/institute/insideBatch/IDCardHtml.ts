@@ -11,7 +11,10 @@ type StudentIdCardData = {
   dob: string;
   phone: string;
   address: string;
+  principalSignature: string; // Add this for the signature URL/Base64
 };
+
+
 
 export function generateIdCardHTML(data: StudentIdCardData): string {
   const {
@@ -25,6 +28,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
     dob,
     phone,
     address,
+    principalSignature
   } = data;
 
   const now = new Date();
@@ -53,11 +57,13 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
     position: relative;
     border: 1px solid #e0e0e0;
     color: #333;
-    /* --- CRITICAL PDF COLOR FIXES --- */
+    display: flex;
+    flex-direction: column;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   ">
     
+    <!-- SESSION BADGE -->
     <div style="
       position: absolute;
       top: 18px;
@@ -67,15 +73,15 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       padding: 6px 45px;
       transform: rotate(45deg);
       z-index: 10;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 900;
       box-shadow: 0 4px 10px rgba(0,0,0,0.25);
       letter-spacing: 1px;
-      -webkit-print-color-adjust: exact;
     ">
       ${session}
     </div>
     
+    <!-- HEADER BACKGROUND -->
     <div style="
       position: absolute;
       top: 0;
@@ -85,138 +91,185 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       background: linear-gradient(135deg, ${primaryColor} 0%, #2c3e50 100%);
       clip-path: ellipse(120% 100% at 50% 0%);
       z-index: 1;
-      -webkit-print-color-adjust: exact;
     "></div>
 
+    <!-- SCHOOL HEADER SECTION -->
     <div style="
       position: relative;
       z-index: 2;
-      padding: 20px 15px 10px;
+      padding: 15px 15px 5px;
       text-align: center;
       color: white;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
     ">
-      <img src="${window.location.origin}/logo%203.jpg" style="
-        height: 55px; 
-        width: 55px; 
+      <img src="${data.schoolLogo}" style="
+        height: 50px; 
+        width: 50px; 
         object-fit: contain; 
         background: white; 
         border-radius: 50%; 
-        padding: 4px;
-        margin-bottom: 8px;
+        padding: 3px;
+        margin-bottom: 5px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       " />
-      <h2 style="margin: 0; font-size: 16px; text-transform: uppercase; letter-spacing: 1.2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+      <h2 style="
+        margin: 0; 
+        font-size: 14px; 
+        text-transform: uppercase; 
+        line-height: 1.2;
+        max-height: 34px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      ">
         ${schoolName}
       </h2>
-      <p style="margin: 4px 0 0; font-size: 10px; opacity: 0.9; font-weight: 300; max-width: 80%; margin-left: auto; margin-right: auto;">
+      <p style="
+        margin: 2px 0 0; 
+        font-size: 9px; 
+        opacity: 0.9; 
+        font-weight: 300; 
+        max-width: 85%; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis;
+      ">
         ${schoolAddress}
       </p>
     </div>
 
+    <!-- MAIN BODY SECTION -->
     <div style="
       position: relative;
       z-index: 2;
-      padding-top: 5px;
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding-top: 10px;
     ">
       
+      <!-- PHOTO -->
       <div style="
-        width: 115px;
-        height: 135px;
+        width: 110px;
+        height: 130px;
         border: 3px solid white;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         background: #f0f0f0;
         outline: 2px solid ${accentColor};
-        -webkit-print-color-adjust: exact;
       ">
-        <img src="${window.location.origin}/pic.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
+        <img src="${data.studentPhoto}" style="width: 100%; height: 100%; object-fit: cover;" />
       </div>
 
-      <div style="text-align: center; margin-top: 12px;">
-        <h1 style="margin: 0; font-size: 22px; color: ${primaryColor}; font-weight: 800; letter-spacing: -0.5px;">
+      <!-- NAME & TAG -->
+      <div style="text-align: center; margin-top: 8px; width: 90%;">
+        <h1 style="
+          margin: 0; 
+          font-size: 20px; 
+          color: ${primaryColor}; 
+          font-weight: 800;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        ">
           ${studentName.toUpperCase()}
         </h1>
         <div style="
           display: inline-block;
           background: ${primaryColor}15;
           color: ${primaryColor};
-          padding: 3px 15px;
+          padding: 2px 12px;
           border-radius: 20px;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 700;
-          margin-top: 5px;
-          -webkit-print-color-adjust: exact;
+          margin-top: 3px;
         ">
           STUDENT
         </div>
       </div>
 
+      <!-- DATA MATRIX -->
       <div style="
         width: 100%; 
-        padding: 20px 15px; 
+        padding: 15px 15px; 
         box-sizing: border-box;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: auto auto;
-        gap: 15px 10px;
+        gap: 12px 8px;
       ">
-        <div style="border-left: 3px solid ${accentColor}; padding-left: 8px;">
-          <label style="display: block; color: ${primaryColor}; font-size: 9px; font-weight: 800; text-transform: uppercase;">Roll No</label>
-          <span style="font-weight: 700; font-size: 13px;">${rollNo}</span>
+        <div style="border-left: 2px solid ${accentColor}; padding-left: 6px; overflow: hidden;">
+          <label style="display: block; color: ${primaryColor}; font-size: 8px; font-weight: 800; text-transform: uppercase;">Roll No</label>
+          <span style="font-weight: 700; font-size: 12px; white-space: nowrap;">${rollNo}</span>
         </div>
-        <div style="border-left: 3px solid ${accentColor}; padding-left: 8px;">
-          <label style="display: block; color: ${primaryColor}; font-size: 9px; font-weight: 800; text-transform: uppercase;">Class</label>
-          <span style="font-weight: 700; font-size: 13px;">${className}</span>
+        <div style="border-left: 2px solid ${accentColor}; padding-left: 6px; overflow: hidden;">
+          <label style="display: block; color: ${primaryColor}; font-size: 8px; font-weight: 800; text-transform: uppercase;">Class</label>
+          <span style="font-weight: 700; font-size: 12px; white-space: nowrap;">${className}</span>
         </div>
-        <div style="border-left: 3px solid ${accentColor}; padding-left: 8px;">
-          <label style="display: block; color: ${primaryColor}; font-size: 9px; font-weight: 800; text-transform: uppercase;">D.O.B</label>
-          <span style="font-weight: 700; font-size: 13px;">${dob}</span>
+        <div style="border-left: 2px solid ${accentColor}; padding-left: 6px; overflow: hidden;">
+          <label style="display: block; color: ${primaryColor}; font-size: 8px; font-weight: 800; text-transform: uppercase;">D.O.B</label>
+          <span style="font-weight: 700; font-size: 12px; white-space: nowrap;">${dob}</span>
         </div>
 
-        <div style="border-left: 3px solid ${accentColor}; padding-left: 8px;">
-          <label style="display: block; color: ${primaryColor}; font-size: 9px; font-weight: 800; text-transform: uppercase;">Reg No</label>
-          <span style="font-weight: 700; font-size: 13px;">${entrollmentNum}</span>
+        <div style="border-left: 2px solid ${accentColor}; padding-left: 6px; overflow: hidden;">
+          <label style="display: block; color: ${primaryColor}; font-size: 8px; font-weight: 800; text-transform: uppercase;">Reg No</label>
+          <span style="font-weight: 700; font-size: 12px; white-space: nowrap;">${entrollmentNum}</span>
         </div>
-        <div style="border-left: 3px solid ${accentColor}; padding-left: 8px;">
-          <label style="display: block; color: ${primaryColor}; font-size: 9px; font-weight: 800; text-transform: uppercase;">Phone</label>
-          <span style="font-weight: 700; font-size: 13px;">${phone}</span>
+        <div style="border-left: 2px solid ${accentColor}; padding-left: 6px; overflow: hidden;">
+          <label style="display: block; color: ${primaryColor}; font-size: 8px; font-weight: 800; text-transform: uppercase;">Phone</label>
+          <span style="font-weight: 700; font-size: 12px; white-space: nowrap;">${phone}</span>
         </div>
-        <div style="border-left: 3px solid ${accentColor}; padding-left: 8px;">
-          <label style="display: block; color: ${primaryColor}; font-size: 9px; font-weight: 800; text-transform: uppercase;">Address</label>
-          <span style="font-weight: 700; font-size: 10px; line-height: 1.1; display: block; overflow: hidden; text-overflow: ellipsis;">${address}</span>
+        <div style="border-left: 2px solid ${accentColor}; padding-left: 6px; overflow: hidden;">
+          <label style="display: block; color: ${primaryColor}; font-size: 8px; font-weight: 800; text-transform: uppercase;">Address</label>
+          <span style="
+            font-weight: 700; 
+            font-size: 9px; 
+            line-height: 1.1; 
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          ">${address}</span>
         </div>
       </div>
     </div>
 
+    <!-- FOOTER WITH SIGNATURE -->
     <div style="
-      position: absolute;
-      bottom: 0;
       width: 100%;
-      height: 65px;
+      height: 75px;
       background: #f4f7f8;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
+      align-items: flex-end;
+      padding: 0 15px 10px;
       box-sizing: border-box;
       border-top: 1px solid #eee;
-      -webkit-print-color-adjust: exact;
     ">
-       <div style="text-align: left;">
-         <div style="font-size: 8px; color: ${primaryColor}; text-transform: uppercase; font-weight: 700;">School contact</div>
-         <div style="font-size: 12px; color: ${primaryColor}; font-weight: 800;">
+       <div style="text-align: left; max-width: 50%; padding-bottom: 5px;">
+         <div style="font-size: 7px; color: ${primaryColor}; text-transform: uppercase; font-weight: 700;">Contact</div>
+         <div style="font-size: 11px; color: ${primaryColor}; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
            ${institutePhoneNumber}
          </div>
        </div>
        
-       <div style="text-align: center;">
-         <div style="font-family: 'Brush Script MT', cursive; font-size: 18px; color: #222; margin-bottom: -5px;">Principal</div>
-         <div style="width: 80px; height: 1px; background: ${primaryColor}; margin: 4px auto;"></div>
-         <div style="font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: #777;">Authorized</div>
+       <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+         <!-- Signature Image -->
+         <img src="${principalSignature}" style="
+           height: 35px; 
+           max-width: 80px; 
+           object-fit: contain; 
+           margin-bottom: -5px;
+           mix-blend-mode: multiply;
+         " />
+         <div style="width: 70px; height: 1px; background: ${primaryColor}; margin: 2px auto;"></div>
+         <div style="font-size: 7px; text-transform: uppercase; letter-spacing: 1px; color: #777; font-weight: 700;">Director or Principal</div>
        </div>
     </div>
 

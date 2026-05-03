@@ -47,7 +47,9 @@ export default function Home() {
     setIsLoading(true);
     GetAccountByToken()
       .then((x: any) => {
+
         const { data, type } = x;
+
 
         // navigate on the basis of user type
         if (UserTypes.ADMIN === type) {
@@ -57,16 +59,21 @@ export default function Home() {
               _id: data._id,
               phone: data.phone,
               institute: data.institute,
+         
             }),
           );
           
           const instituteDetails = {
             name: data.institute.name,
             _id: data.institute._id,
-            phoneNumber: "",
+            phoneNumber: data.institute.institutePhoneNumber,
             address: data.institute.address,
+            email: data.email,
             featureAccess: data.institute.accessFeatures,
+            gst: data.institute.gst,
           };
+        
+
           dispatch(setDetails(instituteDetails));
           navigation.push(
             `/institute/${data.institute._id}/${data.institute.name}`,
@@ -79,14 +86,17 @@ export default function Home() {
               _id: data._id,
               phone: "",
               institute: data.instituteId._id,
+             
             }),
           );
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
-            phoneNumber: "",
+            phoneNumber: data.instituteId.institutePhoneNumber,
+            email: data.email,
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
+             gst: data.instituteId.gst,
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(
@@ -100,14 +110,16 @@ export default function Home() {
               _id: data._id,
               phone: data.phoneNumber[0],
               institute: data.instituteId._id,
+             
             }),
           );
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
-            phoneNumber: "",
+            phoneNumber: data.instituteId.institutePhoneNumber,
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
+            email: data.email,
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/teacher/${data._id}/${data.name}`);
@@ -119,14 +131,16 @@ export default function Home() {
               _id: data._id,
               phone: data.phoneNumber[0],
               institute: data.instituteId._id,
+              
             }),
           );
           const instituteDetails = {
             name: data.instituteId.name,
             _id: data.instituteId._id,
-            phoneNumber: "",
+            phoneNumber: data.instituteId.institutePhoneNumber,
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
+            email: data.email,
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(`/student/${data._id}/${data.name}`);

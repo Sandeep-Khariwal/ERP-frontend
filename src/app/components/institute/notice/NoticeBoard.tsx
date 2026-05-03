@@ -18,7 +18,7 @@ import {
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import CreateNoticeCard from "./CreateNoticeCard";
 import { useSelector } from "react-redux";
@@ -42,6 +42,7 @@ export default function NoticeBoard(props: { userType: string }) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notices, setNotices] = useState<Notice[]>([]);
+    const isMd = useMediaQuery(`(max-width: 968px)`);
   const institute = useSelector(
     (state: any) => state.instituteSlice.instituteDetails
   );
@@ -99,9 +100,9 @@ export default function NoticeBoard(props: { userType: string }) {
   };
 
   return (
-    <Stack w={"85%"} p="xl">
+    <Stack w={"80%"}>
       <LoadingOverlay visible={loading} />
-      <Flex align={"center"} justify={"start"} gap={20}>
+      <Flex w={"100%"} align={isMd?"flex-start":"center"} justify={"start"} gap={20}>
         <Title order={2}>Notice Board</Title>
         {/* <CreateNoticeCard/> */}
         {props.userType === "admin" && (
@@ -112,7 +113,7 @@ export default function NoticeBoard(props: { userType: string }) {
       </Flex>
 
       {/* Notice List */}
-      <ScrollArea mih={500}>
+      <ScrollArea mih={"40vh"}>
         <Stack>
           {notices.length === 0 ? (
             <Text c="dimmed">No notices available</Text>

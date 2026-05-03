@@ -34,7 +34,7 @@ import {
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { ScoreBadge, StatusBadge, SourceBadge } from "./LeadBadges";
-import { formatDateTime, getInitials, timeAgo } from "./utility/utils";
+import { formatDateTime, getInitials, timeAgo } from "../utility/utils";
 import { notifications } from "@mantine/notifications";
 import { addCallLog, addNote, updateLead } from "@/axios/marketing/meta";
 import { CallOutcome, Lead, LeadScore, LeadStatus } from "@/types";
@@ -99,6 +99,7 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
       .then((res: any) => {
         setSaving(false);
         setNoteText("");
+        onUpdated(res.lead);
         notifications.show({ color: "green", message: "Note added" });
       })
       .catch((e: any) => {
@@ -111,7 +112,6 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
   const handleAddCallLog = async () => {
     if (!callOutcome) return;
     setSaving(true);
-
     addCallLog(lead._id, {
       outcome: callOutcome as CallOutcome,
       durationSeconds: callDuration ? parseInt(callDuration) : undefined,
@@ -339,7 +339,7 @@ export function LeadDetailDrawer({ lead, opened, onClose, onUpdated }: Props) {
                   <Textarea
                     placeholder="Call Duration"
                     size="sm"
-                    value={callNote}
+                    value={callDuration}
                     onChange={(e) => setCallDuration(e.currentTarget.value)}
                     minRows={2}
                   />

@@ -101,3 +101,22 @@ export async function CreateExamMarksheetForExcel(data: {
   return Promise.all(allPromises);
 
 }
+
+
+export function Uploadlogo(data: FormData,  instituteId: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/admin/uploadLogo/${instituteId}`,data) 
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function UploadSignature(data: FormData,  instituteId: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/admin/uploadSignature/${instituteId}`,data) 
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

@@ -40,7 +40,7 @@ import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { UserTypes } from "@/enums";
 import { usePathname, useRouter } from "next/navigation";
 import NoticeBoard from "./notice/NoticeBoard";
-import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi";//data fetch krne liye subject
+import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi"; //data fetch krne liye subject
 
 export interface Batch {
   id: string;
@@ -83,7 +83,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const typ = prefix?.split("/")[2];
 
   const adminDetails = useAppSelector(
-  (state: any) => state.adminSlice.adminDetails
+    (state: any) => state.adminSlice.adminDetails,
   );
 
  const userType: UserTypes =
@@ -119,9 +119,14 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   useEffect(() => {
     if (institute?._id!!) {
       getAllInstituteBatches();
-        getSubjects();   // subject fetch krne ke liye call kri 
     }
   }, [institute]);
+
+  useEffect(() => {
+    if (openAddBatchModal) {
+      getSubjects();
+    }
+  }, [openAddBatchModal]);
 
   const [data, setData] = useState<{ value: string; label: string }[]>([
     { value: "Hindi", label: "Hindi" },
@@ -142,27 +147,26 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     { value: "History", label: "History" },
     { value: "Physical science", label: "Physical science" },
   ]);
-  //ye dynamic subjects ke liye subjects add kri 
-const [subjectOptions, setSubjectOptions] = useState<{ value: string; label: string }[]>([]);
+  //ye dynamic subjects ke liye subjects add kri
+  const [subjectOptions, setSubjectOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
-//subject fetch krne ke liye fun bnaya jisme api call kri get valo
-const getSubjects = () => {
-  if (!institute?._id) return;
+  //subject fetch krne ke liye fun bnaya jisme api call kri get valo
+  const getSubjects = () => {
+    if (!institute?._id) return;
 
-  GetInstituteSubjects(institute._id)
-    .then((res: any) => {
-      const formatted = (res.subjects || []).map((sub: any) => ({
-        value: sub.value,
-        label: sub.label,
-      }));
+    GetInstituteSubjects()
+      .then((res: any) => {
+        const formatted = (res.subjects || []).map((sub: any) => ({
+          value: sub.value,
+          label: sub.label,
+        }));
 
-      setSubjectOptions(formatted);
-    })
-    .catch((e) => console.log(e));
-};
-
-
-
+        setSubjectOptions(formatted);
+      })
+      .catch((e) => console.log(e));
+  };
 
   const getAllInstituteBatches = () => {
     setIsLoading(true);
@@ -335,15 +339,26 @@ const getSubjects = () => {
     setSelectedOptionalSubjects(batch[0].optionalSubjects.map((s) => s.name));
   };
 
+  const handleCreateSubject = (newSubject: string) => {
+    // setData((prevData) => [...prevData, newSubject]);
+    // setSelectedSubjects((prevSubjects) => [...prevSubjects, newSubject]);
+  };
+
+  // console.log("userType:", userType);
+
+  const filteredOptionalSubjects = subjectOptions.filter(
+  (sub) => !selectedSubjects.includes(sub.value)
+);
+
   return (
     <>
       <Notifications />
       <LoadingOverlay visible={isLoading} />
       {(batchId === null || openEditCourseFee) && (
         <Stack w={"100%"} mih={"100%"} py={20}>
-         {props.isShowTopCard !== false && (
-  <InstituteDetailsCards instituteId={institute?._id || ""} />
-)}
+          {props.isShowTopCard !== false && (
+            <InstituteDetailsCards instituteId={institute?._id || ""} />
+          )}
           <InstituteProfile
             instituteId={institute?._id ?? ""}
             users={[].map((user: any) => ({
@@ -500,7 +515,8 @@ const getSubjects = () => {
             label="Select optional subjects"
             placeholder="pic optional subjects"
             // data={data}
-             data={subjectOptions}
+            //  data={subjectOptions}
+            data={filteredOptionalSubjects}
             value={selectedOptionalSubjects}
             onChange={(subjects: string[]) =>
               setSelectedOptionalSubjects(subjects)
