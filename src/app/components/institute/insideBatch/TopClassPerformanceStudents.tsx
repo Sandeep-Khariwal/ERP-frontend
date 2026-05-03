@@ -32,6 +32,7 @@ export default function TopStudentsPremium(props: { batchId: string }) {
   };
 
   useEffect(() => {
+    // GetTopClassPerformedStudents(props.CLAS-5f381c76-91cc-48df-a099-a64901fb7594)
     GetTopClassPerformedStudents(props.batchId)
       .then((res: any) => {
         const data = res.data?.data || res.data;
@@ -46,6 +47,7 @@ export default function TopStudentsPremium(props: { batchId: string }) {
       })
       .catch((e: any) => console.error(e));
   }, [props.batchId]);
+  
 
   return (
     <Box py={60} style={{ background: "#f8f9fa" }}>
