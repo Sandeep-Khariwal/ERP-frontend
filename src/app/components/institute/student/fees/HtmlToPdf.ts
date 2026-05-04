@@ -127,7 +127,7 @@ export function createReceiptPdf(
       
       <div class="header">
         <div class="brand">
-          ${instituteLogo ? `<img src="${instituteLogo}" class="logo" />` : ''}
+          ${instituteLogo ? `<img src="${instituteLogo}" crossorigin="anonymous" class="logo" />` : ''}
           <div>
             <h2 class="inst-name">${name}</h2>
             <p class="inst-info">${address}</p>
@@ -179,13 +179,13 @@ export function createReceiptPdf(
           <div class="calc-row gst-detail"><span>CGST (${gstPercent / 2}%)</span><span>₹${currentSplitGst.toFixed(2)}</span></div>
           <div class="calc-row gst-detail"><span>SGST (${gstPercent / 2}%)</span><span>₹${currentSplitGst.toFixed(2)}</span></div>
           
-          <div class="calc-row" style="color: #e74c3c; font-weight:bold; border-top: 1px solid #000;"><span>Balance Amount</span><span>${formatCurrency(remainingFee)}</span></div>
+          <div class="calc-row" style="color: #e74c3c; font-weight:bold; border-top: 1px solid #000;"><span>Pending Amount</span><span>${formatCurrency(remainingFee)}</span></div>
         </div>
       </div>
 
       <div style="display: flex; justify-content: flex-end; margin-top: auto;">
         <div class="signature-area">
-          ${signature ? `<img src="${signature}" class="sig-img" />` : '<div style="height:35px"></div>'}
+          ${signature ? `<img src="${signature}" crossorigin="anonymous" class="sig-img" />` : '<div style="height:35px"></div>'}
           <div class="sig-line">Authorized Signatory</div>
         </div>
       </div>
@@ -360,7 +360,7 @@ export function createFullFeeOverviewPdf(
   <table class="header-table">
     <tr>
       <td style="width: 80px;">
-        ${instituteLogo ? `<img src="${instituteLogo}" class="logo" />` : ''}
+        ${instituteLogo ? `<img src="${instituteLogo}" crossorigin="anonymous" class="logo" />` : ''}
       </td>
       <td class="inst-info">
         <h1>${name}</h1>
@@ -448,7 +448,7 @@ export function createFullFeeOverviewPdf(
       3. GST calculations shown above are based on the actual amount received today.
     </div>
     <div class="sig-area">
-      ${signature ? `<img src="${signature}" class="sig-img" />` : '<div style="height:40px"></div>'}
+      ${signature ? `<img src="${signature}" crossorigin="anonymous" class="sig-img" />` : '<div style="height:40px"></div>'}
       <div style="border-top: 1px solid #000; padding-top: 5px; font-weight: 600;">Authorized Signatory</div>
     </div>
   </div>

@@ -490,9 +490,6 @@ const Marksheet = (props: {
                         size={24}
                         style={{ cursor: "pointer", color: "#00000098" }}
                         onClick={async () => {
-
-
-
                           const url = `https://shikshapay.cloud/marksheet/${item._id}`;
                           // const url = `http://localhost:3000/marksheet/${item._id}`;
 
@@ -530,7 +527,7 @@ const Marksheet = (props: {
                                   student.instituteId.institutePhoneNumber,
                                 principalSignature:
                                   student.instituteId.signature,
-                                qr
+                                qr,
                               });
 
                               const printWindow = window.open("", "_blank");
@@ -538,12 +535,49 @@ const Marksheet = (props: {
                               if (printWindow) {
                                 printWindow.document.write(html);
                                 printWindow.document.close();
-                                // printWindow.print();
+
+                                // ✅ WAIT FOR EVERYTHING (images + DOM)
                                 printWindow.onload = () => {
-                                  setTimeout(() => {
+                                  const images = printWindow.document.images;
+                                  let loaded = 0;
+                                  const total = images.length;
+
+                                  if (total === 0) {
                                     printWindow.print();
-                                  }, 800); // 👈 thoda zyada delay safe hai
+                                    return;
+                                  }
+
+                                  const checkDone = () => {
+                                    if (loaded === total) {
+                                      // small delay for layout stability
+                                      setTimeout(() => {
+                                        printWindow.print();
+                                      }, 200);
+                                    }
+                                  };
+
+                                  for (let i = 0; i < total; i++) {
+                                    const img = images[i];
+
+                                    if (img.complete) {
+                                      loaded++;
+                                      checkDone();
+                                    } else {
+                                      img.onload = () => {
+                                        loaded++;
+                                        checkDone();
+                                      };
+
+                                      img.onerror = () => {
+                                        console.warn("Image failed:", img.src);
+                                        loaded++;
+                                        checkDone();
+                                      };
+                                    }
+                                  }
                                 };
+                              } else {
+                                console.error("Failed to open print window.");
                               }
                             })
                             .catch((e) => {

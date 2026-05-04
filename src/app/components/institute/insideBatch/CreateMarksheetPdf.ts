@@ -55,7 +55,7 @@ export const createMarksheetPdf = (data: any) => {
         <div style="display:flex; justify-content:space-between; align-items:center;">
             
             <div style="display:flex; align-items:center; gap:10px;">
-                <img src=${data.instituteLogo}  style="width:80px;">
+                <img src=${data.instituteLogo} crossorigin="anonymous" style="width:80px;">
                 <div>
                     <h1 style="margin:0; color:#1f4e8c; font-size:35px; border-bottom:2px solid #f4934d96; display:inline-block;">
                       
@@ -91,7 +91,7 @@ export const createMarksheetPdf = (data: any) => {
 
     <div style="background:linear-gradient(#eaf3fb,#d6e6f5); margin-top:15px; padding:20px; border:2px solid #c3d3e2; display:flex; -webkit-print-color-adjust: exact;">
 
-    <img src="${data.photo}" style="width:130px; border:3px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); ">
+    <img src="${data.photo}" crossorigin="anonymous" style="width:130px; border:3px solid #fff; box-shadow:0 0 5px rgba(0,0,0,0.2); ">
 
     <div style="flex:1; padding-left:25px;">
         
@@ -211,7 +211,7 @@ export const createMarksheetPdf = (data: any) => {
 
     <!-- QR Code Section (Left Side) -->
     <div style="width:40%; display:flex; justify-content:flex-start;">
-        <img src="${data.qr}" alt="QR Code" style="
+        <img src="${data.qr}" crossorigin="anonymous" alt="QR Code" style="
             height: 100px;
             width: 100px;
             object-fit: contain;
@@ -222,9 +222,9 @@ export const createMarksheetPdf = (data: any) => {
     <div style="text-align:center; width:40%; display: flex; flex-direction: column; align-items: center;">
         
         <!-- Principal Signature Image -->
-        <img src="${data.principalSignature}" alt="Principal Sign" style="
-            height: 50px; 
-            max-width: 200px; 
+        <img src="${data.principalSignature}" crossorigin="anonymous" alt="Principal Sign" style="
+            height: 70px; 
+            width: 350px; 
             object-fit: contain; 
             margin-bottom: -5px; 
             mix-blend-mode: multiply;

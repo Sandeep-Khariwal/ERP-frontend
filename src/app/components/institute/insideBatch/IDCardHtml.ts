@@ -106,7 +106,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       align-items: center;
       justify-content: flex-start;
     ">
-      <img src="${data.schoolLogo}" style="
+      <img src="${data.schoolLogo}" crossorigin="anonymous" style="
         height: 50px; 
         width: 50px; 
         object-fit: contain; 
@@ -165,7 +165,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
         background: #f0f0f0;
         outline: 2px solid ${accentColor};
       ">
-        <img src="${data.studentPhoto}" style="width: 100%; height: 100%; object-fit: cover;" />
+        <img src="${data.studentPhoto}" crossorigin="anonymous" style="width: 100%; height: 100%; object-fit: cover;" />
       </div>
 
       <!-- NAME & TAG -->
@@ -261,7 +261,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
        
        <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
          <!-- Signature Image -->
-         <img src="${principalSignature}" style="
+         <img src="${principalSignature}" crossorigin="anonymous" style="
            height: 35px; 
            max-width: 80px; 
            object-fit: contain; 

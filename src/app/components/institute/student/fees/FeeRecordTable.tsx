@@ -54,11 +54,11 @@ const FeeRecordTable = (props: {
 }) => {
   const batchTotalFees = props.data.reduce(
     (sum: number, record: Installment) => sum + record.amount,
-    0
+    0,
   );
   const batchTotalPaidFees = props.data.reduce(
     (sum: number, record: Installment) => sum + (record.amountPaid ?? 0),
-    0
+    0,
   );
   const batchTotalPandingFees = batchTotalFees - batchTotalPaidFees;
 
@@ -67,18 +67,17 @@ const FeeRecordTable = (props: {
   const [isLoading, setisLoading] = useState<boolean>(false);
 
   const [selectedFeeRecord, setSelectedFeeRecord] = useState<FeeRecord | null>(
-    null
+    null,
   );
 
-
-  const convertHtmlIntoPdf = (id:string) => {
+  const convertHtmlIntoPdf = (id: string) => {
     setisLoading(true);
     GetStudentForPdf(props.studentId)
-    .then((x: any) => {
-      setisLoading(false);
-      const { student } = x;
-      const { feeRecords, instituteId } = student;
-      
+      .then((x: any) => {
+        setisLoading(false);
+        const { student } = x;
+        const { feeRecords, instituteId } = student;
+
         const studentName = student.name;
         const date = new Date();
         const parentName = student.parentName;
@@ -90,14 +89,9 @@ const FeeRecordTable = (props: {
         const receiptNo = "R-" + instituteId.receiptCount;
         let paymentRecords;
         let amountPaid;
-        
 
-        
-        
         if (id) {
-          paymentRecords = feeRecords.filter(
-            (f: any) => f._id === id
-          );
+          paymentRecords = feeRecords.filter((f: any) => f._id === id);
           amountPaid = paymentRecords[0].amountPaid;
         } else {
           paymentRecords = feeRecords;
@@ -106,7 +100,6 @@ const FeeRecordTable = (props: {
             return sum;
           }, 0);
         }
-           
         const receiptHtml = createReceiptPdf(
           studentName,
           date,
@@ -118,15 +111,53 @@ const FeeRecordTable = (props: {
           address,
           phoneNumber,
           receiptNo,
-          props.batchName ,
-          instituteId.signature
+          props.batchName,
+          instituteId.signature,
         );
 
         const printWindow = window.open("", "_blank");
+
         if (printWindow) {
           printWindow.document.write(receiptHtml);
           printWindow.document.close();
-          printWindow.print();
+
+          // ✅ WAIT FOR IMAGES TO LOAD
+          printWindow.onload = () => {
+            const images = printWindow.document.images;
+            let loadedCount = 0;
+
+            if (images.length === 0) {
+              printWindow.print();
+              return;
+            }
+
+            for (let i = 0; i < images.length; i++) {
+              const img = images[i];
+
+              if (img.complete) {
+                loadedCount++;
+              } else {
+                img.onload = () => {
+                  loadedCount++;
+                  if (loadedCount === images.length) {
+                    printWindow.print();
+                  }
+                };
+
+                img.onerror = () => {
+                  loadedCount++;
+                  if (loadedCount === images.length) {
+                    printWindow.print();
+                  }
+                };
+              }
+            }
+
+            // If already loaded
+            if (loadedCount === images.length) {
+              printWindow.print();
+            }
+          };
         } else {
           console.error("Failed to open print window.");
         }
@@ -140,7 +171,7 @@ const FeeRecordTable = (props: {
     <Table.Tr
       style={{
         width: "100%",
-        height:"100%",
+        height: "100%",
         border: "2px solid #F8F8F8",
         backgroundColor: "#F8F8F8",
         borderRadius: "1rem",
@@ -192,8 +223,8 @@ const FeeRecordTable = (props: {
             row.status == "Not paid"
               ? "red"
               : row.status == "Partial paid"
-              ? "#93A3FA"
-              : "green"
+                ? "#93A3FA"
+                : "green"
           }
         >
           {row.status}
@@ -232,23 +263,23 @@ const FeeRecordTable = (props: {
           : "N/A"}
       </Table.Td>
       {/* {props.userType === UserType.TEACHER && ( */}
-        <>
-          <Table.Td
-            style={{
-              padding: isMd ? "10px" : "5px",
-              textAlign: "center",
-              fontSize: "12px",
-              fontFamily: "sans-serif",
-            }}
-          >
-            {(row.amountPaid ?? 0) > 0 && (
-              <IconDownload
-                style={{ cursor: "pointer" }}
-                onClick={() => convertHtmlIntoPdf(row._id ||"")}
-              />
-            ) }
-          </Table.Td>
-          {/* <Table.Td style={{padding: isMd?"10px":"5px", textAlign: isMd?"center":"start" }}>
+      <>
+        <Table.Td
+          style={{
+            padding: isMd ? "10px" : "5px",
+            textAlign: "center",
+            fontSize: "12px",
+            fontFamily: "sans-serif",
+          }}
+        >
+          {(row.amountPaid ?? 0) > 0 && (
+            <IconDownload
+              style={{ cursor: "pointer" }}
+              onClick={() => convertHtmlIntoPdf(row._id || "")}
+            />
+          )}
+        </Table.Td>
+        {/* <Table.Td style={{padding: isMd?"10px":"5px", textAlign: isMd?"center":"start" }}>
             {(row.amountPaid??0) > 0 ? (
               <IconDotsVertical 
               // onClick={() => setSelectedFeeRecord(row)} 
@@ -257,15 +288,15 @@ const FeeRecordTable = (props: {
               ""
             )}
           </Table.Td> */}
-        </>
-       {/* )} */}
+      </>
+      {/* )} */}
     </Table.Tr>
   ));
 
   return (
     <>
       <LoadingOverlay visible={isLoading} />
-      <Stack  w={isMd ? "95%" : "100%"} mb={"1rem"} >
+      <Stack w={isMd ? "95%" : "100%"} mb={"1rem"}>
         <Flex w={"100%"} p={5} justify="space-between" align="center">
           <Stack w={"50%"}>
             <Text fw={500}>{props.batchName}</Text>
@@ -302,7 +333,7 @@ const FeeRecordTable = (props: {
             overflowX: "hidden",
           }}
         >
-          <Box w={isMd ? "100%" : "100%"} h={"100%"} py={20} >
+          <Box w={isMd ? "100%" : "100%"} h={"100%"} py={20}>
             <Table horizontalSpacing="xl">
               <Table.Thead>
                 <Table.Tr style={{ border: "none" }}>
@@ -399,7 +430,7 @@ const FeeRecordTable = (props: {
           setSelectedFeeRecord(null);
         }}
       >
-        <Table style={{padding:"5px"}} >
+        <Table style={{ padding: "5px" }}>
           <thead>
             <tr>
               <th>S No.</th>
@@ -412,7 +443,7 @@ const FeeRecordTable = (props: {
               selectedFeeRecord?.payments?.map(
                 (singlePaymentRecord: any, index: number) => {
                   return (
-                    <tr key={index} >
+                    <tr key={index}>
                       <td>Payment {index + 1}</td>
                       <td>
                         {
@@ -422,16 +453,10 @@ const FeeRecordTable = (props: {
                         }
                       </td>
                       <td>{singlePaymentRecord.amount}</td>
-                      {singlePaymentRecord.amount > 0 ? (
-                        <IconDownload
-                        
-                        />
-                      ) : (
-                        ""
-                      )}
+                      {singlePaymentRecord.amount > 0 ? <IconDownload /> : ""}
                     </tr>
                   );
-                }
+                },
               )}
           </tbody>
         </Table>
