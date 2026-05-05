@@ -27,6 +27,7 @@ import StepThree from "./StepThree";
 import { Installment } from "@/interfaces/batchInterface";
 import { GetStudent } from "@/axios/institute/InstituteGetApi";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
+import StepFour from "./StepFour";
 
 
 interface StudentFormValues {
@@ -210,7 +211,7 @@ export function AddMoreDetails(props: {
             const { student } = x;
             setStudentId(student._id);
             setIsLoading(false);
-            setActive((current) => (current < 2 ? current + 1 : current));
+            setActive((current) => (current < 3 ? current + 1 : current));
           })
           .catch((e) => {
             console.log(e);
@@ -222,7 +223,7 @@ export function AddMoreDetails(props: {
             const { student } = x;
             setStudentId(student._id);
             setIsLoading(false);
-            setActive((current) => (current < 2 ? current + 1 : current));
+            setActive((current) => (current < 3 ? current + 1 : current));
           })
           .catch((e) => {
             console.log(e);
@@ -244,7 +245,7 @@ export function AddMoreDetails(props: {
       })
         .then((x: any) => {
           setIsLoading(false);
-          setActive((current) => (current < 2 ? current + 1 : current));
+          setActive((current) => (current < 3 ? current + 1 : current));
         })
         .catch((e) => {
           console.log(e);
@@ -263,8 +264,8 @@ export function AddMoreDetails(props: {
       })
         .then((x: any) => {
           setIsLoading(false);
-          setActive((current) => (current < 2 ? current + 1 : current));
-          props.onClickBack();
+          setActive((current) => (current < 3 ? current + 1 : current));
+          // props.onClickBack();
           setFormValues({
             name: "",
             email: "",
@@ -393,6 +394,13 @@ export function AddMoreDetails(props: {
               studentInstallments={studentInstallments}
             />
           </Stepper.Step>
+          <Stepper.Step
+  ff={"Roboto"}
+  label="Overview"
+  description="View all details"
+>
+  <StepFour studentId={studentId} />
+</Stepper.Step>
         </Stepper>
         <Stack w={"100%"} mt={"auto"}>
           <Divider size={1} color="#BABABA" />
@@ -404,9 +412,21 @@ export function AddMoreDetails(props: {
           <Button variant="default" disabled={active === 0} onClick={prevStep}>
             Back
           </Button>
-          <Button onClick={nextStep}>
-            {props.isEditableData ? "Save & Next" : "Next step"}
-          </Button>
+          <Button
+  onClick={() => {
+    if (active === 3) {
+      props.onClickBack(); // ya close modal
+    } else {
+      nextStep();
+    }
+  }}
+>
+  {active === 3
+    ? "Done"
+    : props.isEditableData
+    ? "Save & Next"
+    : "Next step"}
+</Button>
         </Group>
       </Stack>
     </>
