@@ -40,7 +40,7 @@ interface StudentFormValues {
   dateOfJoining: Date;
   parentNumber?: string;
   van?: string;
-  rollNumber: number;
+  rollNumber: string;
   photo?: string
 }
 
@@ -80,7 +80,7 @@ export function AddMoreDetails(props: {
     gender: props.formData?.gender || "",
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
     van: props.formData.van,
-    rollNumber: props.formData?.rollNumber || 0,
+    rollNumber: props.formData?.rollNumber || "",
     photo: "",
     
   });
@@ -275,7 +275,7 @@ export function AddMoreDetails(props: {
             parentNumber: "",
             gender: "",
             dateOfJoining: new Date(),
-            rollNumber: 0,
+            rollNumber: "",
           });
         })
         .catch((e) => {
@@ -315,7 +315,7 @@ export function AddMoreDetails(props: {
                 parentNumber: "",
                 gender: "",
                 dateOfJoining: new Date(),
-                rollNumber: 0,
+                rollNumber: "",
               });
             }}
             style={{ cursor: "pointer" }}

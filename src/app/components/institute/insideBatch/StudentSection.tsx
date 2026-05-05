@@ -128,6 +128,8 @@ const StudentSection = (props: {
     GetStudentForIdCard(id)
       .then((res: any) => {
         const studentInfo = res.student;
+        console.log("studentInfo.rollNumber : ",studentInfo.rollNumber);
+        
         const idCardhtml = generateIdCardHTML({
           schoolName: studentInfo.instituteId.name,
           schoolLogo: studentInfo.instituteId.logo,

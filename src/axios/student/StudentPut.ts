@@ -1,12 +1,13 @@
 import { FeeRecordData } from "@/app/components/institute/student/fees/FeeRecord";
 import ApiHelper from "../../ApiHelper";
 
-
-export function UpdateMultipleFeeRecord(instituteId:string,
-  installments: Map<string, FeeRecordData>
+export function UpdateMultipleFeeRecord(
+  instituteId: string,
+  installments: Map<string, FeeRecordData>,
+  studentId: string,
 ) {
   const promises = Array.from(installments.entries()).map(([id, data]) => {
-    return UpdateFeeRecord(id, instituteId,data);
+    return UpdateFeeRecord(id, instituteId, studentId, data);
   });
 
   return Promise.all(promises)
@@ -17,18 +18,28 @@ export function UpdateMultipleFeeRecord(instituteId:string,
       return { success: false, error: error.message };
     });
 }
-export function UpdateFeeRecord(id: string,instituteId:string , data: FeeRecordData) {
+export function UpdateFeeRecord(
+  id: string,
+  instituteId: string,
+  studentId: string,
+  data: FeeRecordData,
+) {
   return new Promise((resolve, reject) => {
-    ApiHelper.put(
-      `${process.env.URL}/api/v1/student/updateFeeRecord/${id}`,{data,instituteId})
+    ApiHelper.put(`${process.env.URL}/api/v1/student/updateFeeRecord/${id}`, {
+      data,
+      instituteId,
+      studentId,
+    })
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
 }
-export function AddStudentRollNumber(id: string, data:string) {
+export function AddStudentRollNumber(id: string, data: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
-      `${process.env.URL}/api/v1/student/addStudentRollNumber/${id}`,{rollNo:data})
+      `${process.env.URL}/api/v1/student/addStudentRollNumber/${id}`,
+      { rollNo: data },
+    )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
@@ -38,11 +49,14 @@ export async function UpdateStudentAttendance(data: {
   date: Date | null;
   currentAttendanceStatus: string;
 }) {
-  return ApiHelper.put(`${process.env.URL}/api/v1/instituteStudent/update/attendance`, {
-    studentId: data.studentId,
-    date: data.date,
-    currentAttendanceStatus: data.currentAttendanceStatus,
-  });
+  return ApiHelper.put(
+    `${process.env.URL}/api/v1/instituteStudent/update/attendance`,
+    {
+      studentId: data.studentId,
+      date: data.date,
+      currentAttendanceStatus: data.currentAttendanceStatus,
+    },
+  );
 }
 export function insertNewAttendance(data: {
   date: Date;
@@ -55,23 +69,19 @@ export function insertNewAttendance(data: {
       {
         date: data.date,
         attendance: data.attendance,
-      }
+      },
     )
       .then((response) => resolve(response))
       .catch((error) => reject(error));
   });
 }
 
-
 export function UploadStudentImage(file: File) {
   const formData = new FormData();
   formData.append("studentPhoto", file);
 
   return new Promise((resolve, reject) => {
-    ApiHelper.put(
-      `${process.env.URL}/api/v1/student/image`,
-      formData
-    )
+    ApiHelper.put(`${process.env.URL}/api/v1/student/image`, formData)
       .then((response) => resolve(response))
       .catch((error) => reject(error));
   });

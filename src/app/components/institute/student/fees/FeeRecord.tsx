@@ -114,7 +114,11 @@ const FeeRecordSection = (props: {
       return;
     }
     setIsLoading(true);
-    UpdateMultipleFeeRecord(instituteDetails._id, feeRecordsMap)
+    UpdateMultipleFeeRecord(
+      instituteDetails._id,
+      feeRecordsMap,
+      props.studentId,
+    )
       .then((resp) => {
         setIsLoading(false);
 
