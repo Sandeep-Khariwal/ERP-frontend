@@ -101,11 +101,16 @@ const itemsPerPage = 10;
     0
   );
 
-  const pendingFees = dueFees.reduce(
-    (sum: number, item: any) =>
-      sum + ((item.totalAmount || 0) - (item.amountPaid || 0)),
-    0
-  );
+  // const pendingFees = dueFees.reduce(
+  //   (sum: number, item: any) =>
+  //     sum + ((item.totalAmount || 0) - (item.amountPaid || 0)),
+  //   0
+  // );
+  const pendingFees = allRecords.reduce(
+  (sum: number, item: any) =>
+    sum + ((item.totalAmount || 0) - (item.amountPaid || 0)),
+  0
+);
 
   const overdueAmount = overdueFees.reduce(
     (sum: number, item: any) =>

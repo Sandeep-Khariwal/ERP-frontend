@@ -120,3 +120,20 @@ export function UploadSignature(data: FormData,  instituteId: string) {
       .catch((error: any) => reject(error));
   });
 }
+
+export function CreateDiary(data: {
+  subject: string;
+  batch: string;
+  teacher: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(`${process.env.URL}/api/v1/diary`, data)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
