@@ -27,7 +27,7 @@ interface StudentFormValues {
   gender: string;
   dateOfJoining: Date;
   parentNumber?: string;
-  rollNumber: number;
+  rollNumber: string;
   photo?: string;
 }
 
@@ -161,7 +161,7 @@ const [preview, setPreview] = useState<string | null>(null);
             radius={"md"}
             value={props.formData.rollNumber || ""}
             onChange={(event) =>
-              handleInputChange("rollNumber", Number(event.currentTarget.value))
+              handleInputChange("rollNumber", event.currentTarget.value)
             }
             styles={{ input: { borderWidth: 2 } }}
           />

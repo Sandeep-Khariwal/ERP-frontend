@@ -125,10 +125,11 @@ const StudentSection = (props: {
   };
 
   const downloadIdCard = (id: string) => {
-
     GetStudentForIdCard(id)
       .then((res: any) => {
         const studentInfo = res.student;
+        console.log("studentInfo.rollNumber : ",studentInfo.rollNumber);
+        
         const idCardhtml = generateIdCardHTML({
           schoolName: studentInfo.instituteId.name,
           schoolLogo: studentInfo.instituteId.logo,
@@ -144,14 +145,54 @@ const StudentSection = (props: {
           dob: formatDate(studentInfo.dateOfBirth),
           phone: studentInfo.phoneNumber,
           address: studentInfo.address,
-          principalSignature:studentInfo.instituteId.signature
+          principalSignature: studentInfo.instituteId.signature,
         });
 
         const printWindow = window.open("", "_blank");
+
         if (printWindow) {
           printWindow.document.write(idCardhtml);
           printWindow.document.close();
-          printWindow.print();
+
+          // ✅ WAIT FOR IMAGES BEFORE PRINT
+          printWindow.onload = () => {
+            const images = printWindow.document.images;
+            let loaded = 0;
+            const total = images.length;
+
+            if (total === 0) {
+              printWindow.print();
+              return;
+            }
+
+            const checkDone = () => {
+              if (loaded === total) {
+                setTimeout(() => {
+                  printWindow.print();
+                }, 200); // small buffer for layout
+              }
+            };
+
+            for (let i = 0; i < total; i++) {
+              const img = images[i];
+
+              if (img.complete) {
+                loaded++;
+                checkDone();
+              } else {
+                img.onload = () => {
+                  loaded++;
+                  checkDone();
+                };
+
+                img.onerror = () => {
+                  console.warn("Image failed:", img.src);
+                  loaded++;
+                  checkDone();
+                };
+              }
+            }
+          };
         } else {
           console.error("Failed to open print window.");
         }
