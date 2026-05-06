@@ -83,3 +83,32 @@ export function updateschoolGST(
       .catch((error: any) => reject(error));
   });
 }
+
+
+export function updateDiary(
+  Id: string,
+  data: {
+    subject: string, 
+    title: string,
+     description: string, 
+     date: string,
+      time: string
+  },
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/diary/${Id}`,
+      data,
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function DeleteDiary(Id: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.delete(`${process.env.URL}/api/v1/diary/${Id}`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

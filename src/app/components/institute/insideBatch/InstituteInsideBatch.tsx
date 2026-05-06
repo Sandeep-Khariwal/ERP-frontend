@@ -34,6 +34,7 @@ import TeacherProfile from "../teacher/TeacherProfile";
 import Tests from "./test/Tests";
 import Marksheet from "./Marksheet";
 import UploadExcelAdmission from "../student/addMoreDetails/UploadExcelAdmission";
+import DiaryPage from "./DiaryPage";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -41,6 +42,7 @@ enum Tabs {
   TEACHER = "Teachers",
   MARKSHEET = "Marksheet",
   TEST = "Tests",
+  DIARY = "Daily Diary",
   STUDY_MATERIAL = "Study Material",
   ASSIGNMENT = "Assignment",
 }
@@ -406,6 +408,9 @@ export function InstituteInsideBatch(props: {
 
         {Tabs.TEST === activeTab && (
           <Tests batchId={props.batchId} subjects={props.subjects ?? []} />
+        )}
+        {Tabs. DIARY === activeTab && (
+          <DiaryPage batchId={props.batchId} subjects={props.subjects ?? []}/>
         )}
 
         {Tabs.STUDY_MATERIAL === activeTab && (
