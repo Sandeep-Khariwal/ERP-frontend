@@ -100,7 +100,7 @@ export function generateIdCardHTML(data: StudentIdCardData): string {
       padding: 15px 15px 5px;
       text-align: center;
       color: white;
-      height: 100px;
+      min-height: 100px;
       display: flex;
       flex-direction: column;
       align-items: center;
