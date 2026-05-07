@@ -113,9 +113,9 @@ export function DeleteDiary(Id: string) {
   });
 }
 
-export function DeleteMarksheet(Id: string) {
+export function DeleteMarksheet(id: string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.delete(`${process.env.URL}api/v1/marksheet/delete/${Id}`)
+    ApiHelper.delete(`${process.env.URL}/api/v1/marksheet/delete/${id}`)
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });

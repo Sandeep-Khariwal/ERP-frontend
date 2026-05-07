@@ -484,7 +484,7 @@ const Marksheet = (props: {
                         padding: "1rem",
                       }}
                     >
-                      {item.student.name}
+                      {item.student?.name}
                     </Table.Td>
                     <Table.Td
                       ta="center"
@@ -495,7 +495,7 @@ const Marksheet = (props: {
                         padding: "1rem",
                       }}
                     >
-                      {item.student.rollNumber}
+                      {item.student?.rollNumber}
                     </Table.Td>
                     <Table.Td
                       ta="center"
@@ -660,9 +660,9 @@ const Marksheet = (props: {
                 instituteName: institute?.name,
                 examName: item.name,
                 batchName: item.batch.name,
-                studentName: item.student.name,
-                rollNumber: item.student.rollNumber,
-                enrolment: item.student.enrollmentNo,
+                studentName: item.student?.name,
+                rollNumber: item.student?.rollNumber,
+                enrolment: item.student?.enrollmentNo,
                 marks: item.marks,
                 totalMarks: item.totalMarks,
                 percentage: item.percentage,

@@ -154,7 +154,7 @@ const StepFour = ({ studentId }: { studentId: string }) => {
                 <Grid.Col span={6}>
                   <InfoLabel>Date of Birth</InfoLabel>
                   <Text fw={600} size="sm">
-                    {overview.dateOfBirth ? new Date(overview.dateOfBirth).toLocaleDateString() : "-"}
+                    {overview.dateOfBirth ? formatDate(overview.dateOfBirth) : "-"}
                   </Text>
                 </Grid.Col>
                 <Grid.Col span={6}>
@@ -209,7 +209,7 @@ const StepFour = ({ studentId }: { studentId: string }) => {
                     <img src={overview.instituteId.signature} height={35} style={{ mixBlendMode: 'multiply' }} />
                   )}
                 </Box>
-                <Text size="xs" fw={700} mt={5} c="#6A11CB">Principal Sign</Text>
+                <Text size="xs" fw={700} mt={5} c="#6A11CB">Director OR Principal Sign</Text>
               </Box>
             </Flex>
 
@@ -225,5 +225,6 @@ const StepFour = ({ studentId }: { studentId: string }) => {
 // SimpleGrid import fix if needed
 import { SimpleGrid } from "@mantine/core";
 import Image from "next/image";
+import { formatDate } from "@/app/components/marketing/utility/utils";
 
 export default StepFour;
