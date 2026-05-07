@@ -1,8 +1,9 @@
 "use client";
-import {
-  GetBatchFee,
-} from "@/axios/institute/InstituteGetApi";
+
+import { GetBatchFee } from "@/axios/institute/InstituteGetApi";
+
 import { Installment } from "@/interfaces/batchInterface";
+
 import {
   ActionIcon,
   Box,
@@ -15,8 +16,11 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+
 import { useMediaQuery } from "@mantine/hooks";
+
 import { IconCaretDownFilled, IconTrash } from "@tabler/icons-react";
+
 import React, { useEffect, useState } from "react";
 
 const StepThree = (props: {
@@ -29,83 +33,172 @@ const StepThree = (props: {
   setCustomOrBatch: React.Dispatch<React.SetStateAction<string>>;
   setSelectedBatchId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+  const isMd = useMediaQuery("(max-width: 980px)");
 
-  const [selectedBatchId, setSelectedBatchId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // currently selected type in UI
+  const [selectedType, setSelectedType] = useState<string>("");
+
+  // ORIGINAL fee type
+  // IMPORTANT: never changes
+  const [originalFeeType] = useState(props.feeType);
+
+  const defaultInstallment: Installment = {
+    _id: "",
+    name: "Installment 1",
+    dueDate: new Date().toISOString().split("T")[0],
+    amount: 0,
+    isDeleted: false,
+  };
+
+  // currently visible installments
   const [installments, setInstallments] = useState<Installment[]>([
-    {
-      _id: "",
-      name: "Installment 1",
-      dueDate: new Date().toISOString().split("T")[0],
-      amount: 0,
-      isDeleted: false,
-    },
+    defaultInstallment,
   ]);
+
+  // preserve original batch installments
+  const [batchInstallments, setBatchInstallments] = useState<Installment[]>([]);
+
+  // preserve original custom installments
+  const [customInstallments, setCustomInstallments] = useState<Installment[]>([
+    defaultInstallment,
+  ]);
+
+  // =========================================
+  // INITIAL LOAD
+  // =========================================
+
+  useEffect(() => {
+    if (!originalFeeType) return;
+
+    // =========================================
+    // EDIT MODE
+    // =========================================
+
+    if (props.isEditable) {
+      // ORIGINAL = BATCH
+      if (originalFeeType === "Batch") {
+        setBatchInstallments(props.studentInstallments);
+
+        setInstallments(props.studentInstallments);
+
+        setSelectedType("Batch");
+
+        props.setInstallments(props.studentInstallments);
+
+        props.setCustomOrBatch("Batch");
+
+        props.setSelectedBatchId(props.batchId);
+      }
+
+      // ORIGINAL = CUSTOM
+      else {
+        setCustomInstallments(props.studentInstallments);
+
+        setInstallments(props.studentInstallments);
+
+        setSelectedType("Custom");
+
+        props.setInstallments(props.studentInstallments);
+
+        props.setCustomOrBatch("Custom");
+      }
+
+      return;
+    }
+
+    // =========================================
+    // CREATE MODE
+    // =========================================
+
+    onClickCustomOrBatch(originalFeeType);
+  }, []);
+
+  // =========================================
+  // UPDATE PARENT INSTALLMENTS
+  // =========================================
 
   useEffect(() => {
     props.setInstallments(installments);
   }, [installments]);
 
-  useEffect(() => {
-    if (props.feeType) {
-      onClickCustomOrBatch(props.feeType);
-    }
-  }, [props.feeType]);
+  // =========================================
+  // SWITCH TYPE
+  // =========================================
 
-  const [customOrBatch, setCustomOrBatch] = useState<Map<string, string>>(
-    new Map()
-  );
-  const [assignBatchInstallment, setAssignBatchInstallment] = useState<
-    Map<string, Installment[]>
-  >(new Map());
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const isMd = useMediaQuery("(max-width: 980px)");
+  const onClickCustomOrBatch = async (type: string) => {
+    setSelectedType(type);
 
-  useEffect(() => {
-    if (selectedBatchId != "0") {
-      if (props.feeType !== "Batch" && props.isEditable) {
-        setInstallments(props.studentInstallments);
+    props.setCustomOrBatch(type);
+
+    // =========================================
+    // CUSTOM
+    // =========================================
+
+    if (type === "Custom") {
+      // restore original custom installments
+      if (props.isEditable && originalFeeType === "Custom") {
+        setInstallments(customInstallments);
       } else {
-        GetBatchFee(props.batchId)
-          .then((x: any) => {
-            const { feeInstallments, feeType } = x.batchFee;
-            const newMap = new Map(assignBatchInstallment);
-            newMap.set(selectedBatchId, feeInstallments);
-            setAssignBatchInstallment(newMap);
-            const newInstallments = feeInstallments.map((f: any) => {
-              return {
-                name: f.name,
-                dueDate: new Date(f.dueDate).toISOString().split("T")[0],
-                amount: f.amount,
-              };
-            });
-            setInstallments(newInstallments);
+        // batch student switching to custom
+        setInstallments([defaultInstallment]);
+      }
 
-            setIsLoading(false);
-          })
-          .catch((e) => {
-            console.log(e);
-            setIsLoading(false);
-          });
-      }
-    } else {
-      if (props.isEditable && props.studentInstallments.length > 0) {
-        setInstallments(props.studentInstallments);
-        return;
-      }
-      setInstallments([
-        {
-          _id: "",
-          name: "Installment 1",
-          dueDate: new Date().toISOString().split("T")[0],
-          amount: 0,
-          isDeleted: false,
-        },
-      ]);
+      return;
     }
-  }, [selectedBatchId]);
 
-  const handleInstallmentChange = (index: any, field: any, value: any) => {
+    // =========================================
+    // BATCH
+    // =========================================
+
+    props.setSelectedBatchId(props.batchId);
+
+    // restore original batch installments
+    if (props.isEditable && originalFeeType === "Batch") {
+      setInstallments(batchInstallments);
+
+      return;
+    }
+
+    // fetch batch installments
+    try {
+      setIsLoading(true);
+
+      const x: any = await GetBatchFee(props.batchId);
+
+      const { feeInstallments } = x.batchFee;
+
+      const newInstallments = feeInstallments.map((f: any) => ({
+        _id: f._id || "",
+        name: f.name,
+        dueDate: new Date(f.dueDate).toISOString().split("T")[0],
+        amount: f.amount,
+        isDeleted: false,
+      }));
+
+      // save batch installments
+      setBatchInstallments(newInstallments);
+
+      setInstallments(newInstallments);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // =========================================
+  // CHANGE INSTALLMENT
+  // =========================================
+
+  const handleInstallmentChange = (
+    index: number,
+    field: string,
+    value: any,
+  ) => {
     const updatedInstallments = [...installments];
+
     updatedInstallments[index] = {
       ...updatedInstallments[index],
       [field]: value,
@@ -113,83 +206,88 @@ const StepThree = (props: {
 
     setInstallments(updatedInstallments);
 
-    setAssignBatchInstallment((prevState) => {
-      const updatedMap = new Map(prevState);
-      updatedMap.set(selectedBatchId, updatedInstallments);
-      return updatedMap;
-    });
+    // preserve custom state
+    if (selectedType === "Custom") {
+      setCustomInstallments(updatedInstallments);
+    }
+
+    // preserve batch state
+    if (selectedType === "Batch") {
+      setBatchInstallments(updatedInstallments);
+    }
   };
+
+  // =========================================
+  // ADD INSTALLMENT
+  // =========================================
+
   const handleAddInstallment = () => {
-    let index = installments.length + 1;
-    setInstallments([
+    const updatedInstallments = [
       ...installments,
       {
-        name: "Installment " + index,
+        _id: "",
+        name: `Installment ${installments.length + 1}`,
         dueDate: new Date().toISOString().split("T")[0],
         amount: 0,
+        isDeleted: false,
       },
-    ]);
+    ];
+
+    setInstallments(updatedInstallments);
+
+    setCustomInstallments(updatedInstallments);
   };
+
+  // =========================================
+  // REMOVE INSTALLMENT
+  // =========================================
+
   const handleRemoveInstallment = (index: number) => {
-    const newInstallments = installments.filter((_, i) => i !== index);
-    setInstallments(newInstallments);
-    props.setInstallments(newInstallments);
-    setAssignBatchInstallment((prevState) => {
-      const updatedMap = new Map(prevState);
-      updatedMap.set(selectedBatchId, newInstallments);
-      return updatedMap;
-    });
-  };
-  const onClickCustomOrBatch = (type: string) => {
-    setCustomOrBatch((prevMap) => {
-      const updatedMap = new Map(prevMap);
+    const updatedInstallments = installments.filter((_, i) => i !== index);
 
-      if (type === "Custom") {
-        updatedMap.set("0", type);
-        setSelectedBatchId("0");
-        props.setCustomOrBatch("Custom");
-      } else {
-        updatedMap.set(props.batchId || "", type);
-        setSelectedBatchId(props.batchId || "");
-        props.setSelectedBatchId(props.batchId || "");
-        props.setCustomOrBatch("Batch");
-      }
+    setInstallments(updatedInstallments);
 
-      return updatedMap;
-    });
+    setCustomInstallments(updatedInstallments);
   };
+
   return (
     <Stack bg={"white"}>
       <LoadingOverlay visible={isLoading} />
+
       <Flex align={"center"} mt={15} gap={15}>
         <Text>{props.batchName}</Text>
         <Text ff={"Roboto"}>Fee Information</Text>
       </Flex>
+
       <Select
         ff={"Roboto"}
         w={"10rem"}
         label="Fee Scheme"
         placeholder="select scheme"
-        data={["Custom", "Batch"].map((i) => i)}
+        data={["Custom", "Batch"]}
         rightSection={<IconCaretDownFilled style={{ cursor: "pointer" }} />}
-        value={customOrBatch.get(selectedBatchId)}
-        onChange={(i) => onClickCustomOrBatch(i!!)}
+        value={selectedType}
+        onChange={(value) => {
+          if (value) {
+            onClickCustomOrBatch(value);
+          }
+        }}
       />
 
-      {customOrBatch.get(selectedBatchId) && (
+      {selectedType && (
         <Box style={{ width: "100%", overflowX: "auto" }}>
           <Table style={{ marginTop: "2rem" }} ff={"Roboto"}>
             <thead>
-              <tr style={{ border: "0.5px solid #D3D3D3", padding: "8px" }}>
+              <tr>
                 <th
                   style={{
                     border: "0.5px solid #D3D3D3",
                     padding: "8px",
-                    whiteSpace: "nowrap",
                   }}
                 >
                   S No.
                 </th>
+
                 <th
                   style={{
                     border: "0.5px solid #D3D3D3",
@@ -198,6 +296,7 @@ const StepThree = (props: {
                 >
                   Name
                 </th>
+
                 <th
                   style={{
                     border: "0.5px solid #D3D3D3",
@@ -206,6 +305,7 @@ const StepThree = (props: {
                 >
                   Due Date
                 </th>
+
                 <th
                   style={{
                     border: "0.5px solid #D3D3D3",
@@ -214,7 +314,8 @@ const StepThree = (props: {
                 >
                   Amount in ₹
                 </th>
-                {customOrBatch.get(selectedBatchId) !== "Batch" && (
+
+                {selectedType !== "Batch" && (
                   <th
                     style={{
                       border: "0.5px solid #D3D3D3",
@@ -226,22 +327,10 @@ const StepThree = (props: {
                 )}
               </tr>
             </thead>
-            <tbody
-              style={{
-                border: "0.5px solid #D3D3D3",
-                padding: "0.5px",
-                fontFamily: "Roboto",
-              }}
-            >
-              {installments?.map((installment, index) => (
-                <tr
-                  style={{
-                    border: "0.5px solid #D3D3D3",
-                    padding: "8px",
-                    fontFamily: "Roboto",
-                  }}
-                  key={index}
-                >
+
+            <tbody>
+              {installments.map((installment, index) => (
+                <tr key={index}>
                   <td
                     style={{
                       border: "0.5px solid #D3D3D3",
@@ -250,27 +339,27 @@ const StepThree = (props: {
                   >
                     {index + 1}
                   </td>
+
                   <td
                     style={{
                       border: "0.5px solid #D3D3D3",
                       padding: "8px",
-                      fontFamily: "Roboto",
                     }}
                   >
                     <TextInput
                       w={isMd ? "10rem" : "auto"}
-                      ff={"Roboto"}
                       value={installment.name}
+                      readOnly={selectedType === "Batch"}
                       onChange={(event) =>
                         handleInstallmentChange(
                           index,
                           "name",
-                          event.currentTarget.value
+                          event.currentTarget.value,
                         )
                       }
-                      readOnly={customOrBatch.get(selectedBatchId) === "Batch"}
                     />
                   </td>
+
                   <td
                     style={{
                       border: "0.5px solid #D3D3D3",
@@ -278,19 +367,19 @@ const StepThree = (props: {
                     }}
                   >
                     <TextInput
-                      ff={"Roboto"}
                       type="date"
                       value={installment.dueDate}
+                      readOnly={selectedType === "Batch"}
                       onChange={(event) =>
                         handleInstallmentChange(
                           index,
                           "dueDate",
-                          event.currentTarget.value
+                          event.currentTarget.value,
                         )
                       }
-                      readOnly={customOrBatch.get(selectedBatchId) === "Batch"}
                     />
                   </td>
+
                   <td
                     style={{
                       border: "0.5px solid #D3D3D3",
@@ -298,52 +387,53 @@ const StepThree = (props: {
                     }}
                   >
                     <NumberInput
-                      ff={"Roboto"}
                       w={isMd ? "6rem" : "auto"}
                       value={installment.amount}
-                      onChange={(value) =>
-                        handleInstallmentChange(index, "amount", value)
-                      }
                       min={0}
                       max={1000000}
                       hideControls
-                      readOnly={customOrBatch.get(selectedBatchId) === "Batch"}
+                      readOnly={selectedType === "Batch"}
+                      onChange={(value) =>
+                        handleInstallmentChange(index, "amount", value)
+                      }
                     />
                   </td>
-                  {customOrBatch.get(selectedBatchId) !== "Batch" && (
+
+                  {selectedType !== "Batch" && (
                     <td
                       style={{
                         border: "0.5px solid #D3D3D3",
                         padding: "8px",
                       }}
                     >
-                      {!(index === 0) && (
+                      {index !== 0 && (
                         <ActionIcon
                           color="red"
-                          onClick={() => {
-                            handleInstallmentChange(index, "isDeleted", true);
-                            handleRemoveInstallment(index);
-                          }}
+                          onClick={() => handleRemoveInstallment(index)}
                         >
-                          <IconTrash size={"30"} />
+                          <IconTrash size={24} />
                         </ActionIcon>
                       )}
                     </td>
                   )}
                 </tr>
               ))}
-              {customOrBatch.get(selectedBatchId) !== "Batch" && (
-                <Text
-                  onClick={handleAddInstallment}
-                  c="blue"
-                  mt="md"
-                  style={{ whiteSpace: "nowrap", cursor: "pointer" }}
-                >
-                  + Add Installment
-                </Text>
-              )}
             </tbody>
           </Table>
+
+          {selectedType !== "Batch" && (
+            <Text
+              onClick={handleAddInstallment}
+              c="blue"
+              mt="md"
+              style={{
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              + Add Installment
+            </Text>
+          )}
         </Box>
       )}
     </Stack>
