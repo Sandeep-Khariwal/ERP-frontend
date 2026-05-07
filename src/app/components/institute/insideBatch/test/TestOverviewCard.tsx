@@ -33,6 +33,7 @@ import{
     CreateTestQuestion, 
   UpdateTest
 } from  "../../../../../axios/tests/Tests.post"
+import QuestionBankModal from "./QuestionBankModal";
 
 // Types
 interface Subject {
@@ -105,6 +106,7 @@ export default function SimpleEditTestModal({
   test,
   onTestUpdated,
   subjects = [],
+
 }: Props) {
   // UI State
   const [currentView, setCurrentView] = useState<"list" | "edit-question" | "add-question" | "edit-test">("list");
@@ -143,6 +145,8 @@ export default function SimpleEditTestModal({
     subjectId: "",
     startTime: "",
   });
+
+  const [questionBankOpen, setQuestionBankOpen] = useState(false);
 
   // Fetch questions from API
   const fetchQuestions = () => {
@@ -393,6 +397,17 @@ export default function SimpleEditTestModal({
         <Text fw={600} fz={16} ff="Roboto">
           Questions ({questions.length})
         </Text>
+          <Group gap="sm">
+
+          <Button
+    variant="outline"
+    size="sm"
+    c="#111"
+    style={{ borderColor: "#111" }}
+    onClick={() => setQuestionBankOpen(true)}
+  >
+    Question Bank
+  </Button>
         <Button 
           leftSection={<IconPlus size={16} />} 
           onClick={handleAddNewQuestion} 
@@ -403,6 +418,7 @@ export default function SimpleEditTestModal({
         >
           Add New Question
         </Button>
+        </Group>
       </Flex>
 
       <ScrollArea h={400}>
@@ -755,6 +771,15 @@ export default function SimpleEditTestModal({
           </Flex>
         </Stack>
       </Modal>
+
+
+      <QuestionBankModal
+  opened={questionBankOpen}
+  onClose={() => setQuestionBankOpen(false)}
+     batchId={test?.batchId || ""}
+
+
+/>
     </>
   );
 }
