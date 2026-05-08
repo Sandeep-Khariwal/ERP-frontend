@@ -43,6 +43,8 @@ interface StudentFormValues {
   van?: string;
   rollNumber: string;
   photo?: string
+  admissionNumber?: string
+  motherName?: string
 }
 
 export function AddMoreDetails(props: {
@@ -78,6 +80,8 @@ export function AddMoreDetails(props: {
       : new Date(),
     address: props.formData?.address || "",
     parentNumber: props.formData?.parentNumber || "",
+    admissionNumber: props.formData?.admissionNumber || "",
+    motherName: props.formData?.motherName || "",
     gender: props.formData?.gender || "",
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
     van: props.formData.van,
@@ -190,6 +194,8 @@ export function AddMoreDetails(props: {
           ...additionalPhoneNumbers,
         ].filter((phone, index, self) => self.indexOf(phone) === index),
         parentNumber: formValues.parentNumber || "",
+        admissionNumber: formValues.admissionNumber || "",
+        motherName: formValues.motherName || "",
         dateOfBirth: new Date(
           new Date(formValues.dateOfBirth!!).setDate(
             formValues.dateOfBirth!!!!.getDate() + 1,

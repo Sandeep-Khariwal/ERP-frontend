@@ -88,8 +88,12 @@ const StudentOverview = (props: {
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
-  const [lineOptions, setLineOptions] = useState<ChartOptions<"line"> | null>(null);
-  const [barOptions, setBarOptions] = useState<ChartOptions<"bar"> | null>(null);
+  const [lineOptions, setLineOptions] = useState<ChartOptions<"line"> | null>(
+    null,
+  );
+  const [barOptions, setBarOptions] = useState<ChartOptions<"bar"> | null>(
+    null,
+  );
 
   const addRollNumber = () => {
     setIsLoading(true);
@@ -135,7 +139,6 @@ const StudentOverview = (props: {
     }
   }, [selectedSubjectLine]);
 
-
   useEffect(() => {
     if (selectedSubjectBar) {
       const marksArray = props.testOnlineMap.get(selectedSubjectBar) ?? [];
@@ -166,8 +169,7 @@ const StudentOverview = (props: {
         return [...prev, x];
       });
     }
-  },[props.testReportMap])
-
+  }, [props.testReportMap]);
 
   useEffect(() => {
     for (const x of props.testOnlineMap.keys()) {
@@ -204,6 +206,7 @@ const StudentOverview = (props: {
     //   setData(data);
     // }
   }, [props.testReportMap]);
+  console.log("props?.student? : ", props?.student);
 
   return (
     <Stack gap="lg" w={"100%"}>
@@ -375,7 +378,9 @@ const StudentOverview = (props: {
           p="md"
           w={isMd ? "100%" : "50%"}
         >
-          <Text c={"#575555"} fw={700} >Off-line Class Test</Text>
+          <Text c={"#575555"} fw={700}>
+            Off-line Class Test
+          </Text>
           <Flex justify="space-between" align="center">
             <Text fw={600} fz={18} mb="sm">
               {selectedSubjectLine} class Test Progress
@@ -407,7 +412,9 @@ const StudentOverview = (props: {
           p="md"
           w={isMd ? "100%" : "50%"}
         >
-          <Text c={"#575555"} fw={700} >Online Quiz</Text>
+          <Text c={"#575555"} fw={700}>
+            Online Quiz
+          </Text>
           <Flex justify="space-between" align="center">
             <Text fw={600} fz={18} mb="sm">
               {selectedSubjectBar} Progress
@@ -422,7 +429,7 @@ const StudentOverview = (props: {
             />
           </Flex>
 
-          <Divider mb="sm" mt={10}/>
+          <Divider mb="sm" mt={10} />
 
           <Stack h={300}>
             {barData && barOptions && (

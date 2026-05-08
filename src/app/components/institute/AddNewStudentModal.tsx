@@ -78,7 +78,7 @@ import { Screen } from "./insideBatch/InstituteInsideBatch";
         dateOfBirth: datePickerValue!!,
         address: address,
         phoneNumber: [phoneNumber],
-        additionalPhoneNumbers: additionalPhoneNumbers,
+        additionalPhoneNumbers: additionalPhoneNumbers
       };
       if (setFormData) {
         setFormData(formData);

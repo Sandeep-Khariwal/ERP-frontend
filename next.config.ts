@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   env: {
-  //  URL: "http://localhost:8080"
+  //  URL: "http://localhost:9000"
    URL: "https://server.shikshapay.cloud"
   },
   

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Stack, Text, Loader } from "@mantine/core";
-import MySocket from "@/socket/MySocket";
+import { socket } from "@/socket/MySocket";
 
 interface VanTrackerProps {
   instituteId: string;
@@ -11,6 +11,12 @@ function VanTracker({ van, instituteId }: VanTrackerProps) {
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(
     null
   );
+
+  useEffect(()=>{
+
+    console.log("van platNum : ",van);
+  },[])
+  
   const [isConnected, setIsConnected] = useState<boolean>(true);
 
   // always create a fresh socket when component mounts
@@ -21,6 +27,8 @@ function VanTracker({ van, instituteId }: VanTrackerProps) {
 
     if (devices && devices.length > 0) {
       const device = devices[0];
+      console.log("device : ",);
+      
       const lat = device.latitude ?? device.lat ?? device.position?.lat ?? null;
       const lng =
         device.longitude ?? device.lng ?? device.position?.lng ?? null;
@@ -32,33 +40,39 @@ function VanTracker({ van, instituteId }: VanTrackerProps) {
   }, []);
 
   useEffect(() => {
-    const socketInstance = new MySocket();
-    const socket = socketInstance.socket
+    console.log("COMPONENT MOUNTED");
 
-    socket.on("connect", () => {
-      console.log("✅ Socket connected:", socket.id);
-    //   setIsConnected(true);
+    const onConnect = () => {
+      console.log("✅ CONNECT EVENT FIRED");
+      console.log("socket id:", socket.id);
 
-      // join institute room
       socket.emit("joinSchool", instituteId);
-    });
+    };
 
-    socket.on("disconnect", (reason: string) => {
-      console.log("❌ Socket disconnected:", reason);
-    //   setIsConnected(false);
-    });
+    const onDisconnect = (reason: string) => {
+      console.log("❌ disconnected:", reason);
+    };
 
-    // subscribe to this van
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+
     socket.on(`vanLocationUpdate:${van}`, handleLocationUpdate);
 
+    // connect AFTER listeners
+    if (!socket.connected) {
+      socket.connect();
+    } else {
+      onConnect();
+    }
+
     return () => {
-      console.log("🧹 Cleaning up socket for", van);
-      socket.off("connect");
-      socket.off("disconnect");
+      console.log("cleanup");
+
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
       socket.off(`vanLocationUpdate:${van}`, handleLocationUpdate);
-      socket.disconnect(); // ensures no ghost connections
     };
-  }, [ instituteId]);
+  }, [van, instituteId, handleLocationUpdate]);
 
   return (
     <Stack w={"100%"}  >
