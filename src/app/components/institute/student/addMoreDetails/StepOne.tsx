@@ -156,7 +156,7 @@ const [preview, setPreview] = useState<string | null>(null);
             label="Roll Number"
             placeholder="Enter roll number"
             required
-            type="number"
+            type="text"
             error={props.showError && "Roll number required"}
             radius={"md"}
             value={props.formData.rollNumber || ""}

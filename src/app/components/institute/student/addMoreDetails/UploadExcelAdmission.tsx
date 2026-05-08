@@ -76,6 +76,8 @@ function UploadExcelAdmission({
           email: student["email"],
           parentNumber: student["parentNumber"],
           phoneNumber: [String(student["phoneNumber"])],
+          admissionNumber: [String(student["admissionNumber"])],
+          motherName: [String(student["motherName"])],
           address: student["address"],
           gender: student["gender"],
           instituteId,

@@ -13,7 +13,17 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useEffect, useState } from "react";
-import { IconDownload, IconArrowLeftFromArc } from "@tabler/icons-react";
+import { IconArrowLeftFromArc } from "@tabler/icons-react";
+import {
+  Menu,
+  ActionIcon,
+} from "@mantine/core";
+
+import {
+  IconDownload,
+  IconTrash,
+  IconDotsVertical,
+} from "@tabler/icons-react";
 import { Modal } from "@mantine/core";
 import { Image, Group } from "@mantine/core";
 import SingleStudentModal from "./SingleStudentModal";
@@ -37,6 +47,7 @@ import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createMarksheetPdf } from "./CreateMarksheetPdf";
 import { formatDate } from "../../marketing/utility/utils";
 import QRCode from "qrcode";
+import { DeleteMarksheet } from "@/axios/institute/InstitutePutApi";
 
 const Marksheet = (props: {
   batchId: string;
@@ -52,13 +63,16 @@ const Marksheet = (props: {
   const [openUploadModal, setOpenUploadModal] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [openSingleStudentModal, setOpenSingleStudentModal] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const isMobile = useMediaQuery(`(max-width: 968px)`);
   const [resultDate, setResultDate] = useState<Date | null>(null);
   const [session, setSession] = useState<string>("");
   const [filterExam, setFilterExam] = useState<string | null>("Mid TERM Exam"); //table me filter data ke liye
   const [studentsPayload, setStudentsPayload] = useState<any[]>([]);
+  const [selectedMarksheetId, setSelectedMarksheetId] = useState<string>("");
   const [allMarksheet, setAllMarksheet] = useState<
     {
+       _id: string;
       name: string;
       batch: string;
       session: string;
@@ -272,6 +286,34 @@ const Marksheet = (props: {
         setOpenUploadModal(false);
       });
   };
+
+  const HandleDeleteMarksheet = () => {
+  if (!selectedMarksheetId) {
+    ErrorNotification("Marksheet id missing!");
+    return;
+  }
+
+  DeleteMarksheet(selectedMarksheetId)
+    .then((x: any) => {
+      console.log("delete response :", x);
+
+      // state se remove
+      setAllMarksheet((prev: any) =>
+        prev.filter((item: any) => item._id !== selectedMarksheetId),
+      );
+
+      SuccessNotification("Marksheet Deleted Successfully!");
+
+      setDeleteModalOpen(false);
+      setSelectedMarksheetId("");
+    })
+    .catch((e: any) => {
+      console.log(e);
+
+      ErrorNotification("Failed to delete marksheet!");
+      setDeleteModalOpen(false);
+    });
+};
   //table me filter kiya data
   const filteredMarksheet = filterExam
     ? allMarksheet.filter((item) => item.name === filterExam)
@@ -408,7 +450,7 @@ const Marksheet = (props: {
                     fontSize: 18,
                   }}
                 >
-                  Download
+                  Action
                 </Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -442,7 +484,7 @@ const Marksheet = (props: {
                         padding: "1rem",
                       }}
                     >
-                      {item.student.name}
+                      {item.student?.name}
                     </Table.Td>
                     <Table.Td
                       ta="center"
@@ -453,7 +495,7 @@ const Marksheet = (props: {
                         padding: "1rem",
                       }}
                     >
-                      {item.student.rollNumber}
+                      {item.student?.rollNumber}
                     </Table.Td>
                     <Table.Td
                       ta="center"
@@ -477,7 +519,7 @@ const Marksheet = (props: {
                     >
                       {item.overallGrade}
                     </Table.Td>
-                    <Table.Td
+                    {/* <Table.Td
                       ta="center"
                       style={{
                         // color: item.isInActive ? "#bebebe" : "#7D7D7D",
@@ -585,7 +627,136 @@ const Marksheet = (props: {
                             });
                         }}
                       />
-                    </Table.Td>
+                    </Table.Td> */}
+                    <Table.Td
+  ta="center"
+  style={{
+    color: "#00000098",
+    fontWeight: 500,
+    padding: "1rem",
+  }}
+>
+  <Menu shadow="md" width={180} position="bottom-end">
+    <Menu.Target>
+      <ActionIcon variant="subtle" color="gray">
+        <IconDotsVertical size={22} />
+      </ActionIcon>
+    </Menu.Target>
+
+    <Menu.Dropdown>
+      {/* DOWNLOAD */}
+      <Menu.Item
+        leftSection={<IconDownload size={18} />}
+        onClick={async () => {
+          const url = `https://shikshapay.cloud/marksheet/${item._id}`;
+
+          const qr = await QRCode.toDataURL(url);
+
+          GetStudentDetail(item.student._id)
+            .then((res: any) => {
+              const student = res.student;
+
+              const html = createMarksheetPdf({
+                instituteName: institute?.name,
+                examName: item.name,
+                batchName: item.batch.name,
+                studentName: item.student?.name,
+                rollNumber: item.student?.rollNumber,
+                enrolment: item.student?.enrollmentNo,
+                marks: item.marks,
+                totalMarks: item.totalMarks,
+                percentage: item.percentage,
+                overallGrade: item.overallGrade,
+                status: item.status,
+                allsubjecttotal: item.marks.length * 100,
+                date: new Date(item.date).toLocaleDateString(
+                  "en-GB",
+                ),
+                session: item.session,
+                fName: student.parentName,
+                address: student.address,
+                parentNumber: student.parentNumber,
+                dob: formatDate(student.dateOfBirth),
+                photo: student.profilePic,
+                instituteLogo: student.instituteId.logo,
+                instituteAdress: student.instituteId.address,
+                institutePhone:
+                  student.instituteId.institutePhoneNumber,
+                principalSignature:
+                  student.instituteId.signature,
+                qr,
+              });
+
+              const printWindow = window.open("", "_blank");
+
+              if (printWindow) {
+                printWindow.document.write(html);
+                printWindow.document.close();
+
+                printWindow.onload = () => {
+                  const images = printWindow.document.images;
+                  let loaded = 0;
+                  const total = images.length;
+
+                  if (total === 0) {
+                    printWindow.print();
+                    return;
+                  }
+
+                  const checkDone = () => {
+                    if (loaded === total) {
+                      setTimeout(() => {
+                        printWindow.print();
+                      }, 200);
+                    }
+                  };
+
+                  for (let i = 0; i < total; i++) {
+                    const img = images[i];
+
+                    if (img.complete) {
+                      loaded++;
+                      checkDone();
+                    } else {
+                      img.onload = () => {
+                        loaded++;
+                        checkDone();
+                      };
+
+                      img.onerror = () => {
+                        loaded++;
+                        checkDone();
+                      };
+                    }
+                  }
+                };
+              }
+            })
+            .catch((e) => {
+              console.log(e);
+            });
+        }}
+      >
+        Download
+      </Menu.Item>
+
+      {/* DELETE */}
+      <Menu.Item
+        color="red"
+        leftSection={<IconTrash size={18} />}
+        onClick={() => {
+          console.log("Delete clicked", item._id);
+            setSelectedMarksheetId(item._id);
+
+          // yaha delete API lagegi
+            setDeleteModalOpen(true);
+        }}
+      >
+        Delete
+      </Menu.Item>
+    </Menu.Dropdown>
+  </Menu>
+</Table.Td>
                   </Table.Tr>
                 ))}
             </Table.Tbody>
@@ -744,6 +915,51 @@ const Marksheet = (props: {
           setAllMarksheet((prev) => [...prev, data]);
         }}
       />
+    <Modal
+  opened={deleteModalOpen}
+  onClose={() => setDeleteModalOpen(false)}
+  title={
+    <Text fw={700} style={{ color: "#c0392b" }}>
+      Delete Marksheet
+    </Text>
+  }
+  centered
+  radius="lg"
+  size="sm"
+>
+  <Stack>
+    <Text size="sm" c="dimmed">
+      Are you sure you want to delete this marksheet? This action cannot
+      be undone.
+    </Text>
+
+    <Group justify="flex-end" gap="sm">
+      {/* Cancel Button */}
+      <Button
+        variant="default"
+        radius="md"
+        onClick={() => setDeleteModalOpen(false)}
+      >
+        Cancel
+      </Button>
+
+      {/* Delete Button */}
+      <Button
+        color="red"
+        radius="md"
+        leftSection={<IconTrash size={14} />}
+        onClick={() => {
+          setDeleteModalOpen(false);
+            HandleDeleteMarksheet();
+
+          // future me delete API yaha lagegi
+        }}
+      >
+        Delete
+      </Button>
+    </Group>
+  </Stack>
+</Modal>
     </>
   );
 };

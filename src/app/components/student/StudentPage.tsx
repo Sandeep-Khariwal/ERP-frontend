@@ -42,8 +42,6 @@ export interface StudentOverView {
   }[];
 }
 
-
-
 interface Dataset {
   label: string;
   data: number[];
@@ -94,45 +92,47 @@ const StudentPage = (props: {
         subject: { _id: "", name: "" },
       },
     ],
-    resultId: [{
-      marks: 0,
-      name: ""
-    }]
+    resultId: [
+      {
+        marks: 0,
+        name: "",
+      },
+    ],
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [testReportMap, setTestReportMap] = useState<Map<string, number[]>>(new Map())
+  const [testReportMap, setTestReportMap] = useState<Map<string, number[]>>(
+    new Map(),
+  );
 
-  const [testOnlineMap, settestOnlineMap] = useState<Map<string, number[]>>(new Map())
+  const [testOnlineMap, settestOnlineMap] = useState<Map<string, number[]>>(
+    new Map(),
+  );
 
   useEffect(() => {
-    const newMap = new Map()
-    const newMap1 = new Map()
+    const newMap = new Map();
+    const newMap1 = new Map();
 
     student.resultId.forEach((result) => {
-
       if (newMap1.has(result.name)) {
-        const arr = newMap1.get(result.name)
-        arr.push(result.marks)
+        const arr = newMap1.get(result.name);
+        arr.push(result.marks);
       } else {
-        newMap1.set(result.name, [result.marks])
+        newMap1.set(result.name, [result.marks]);
       }
-    })
-    settestOnlineMap(newMap1)
+    });
+    settestOnlineMap(newMap1);
 
     student.testReports.forEach((test) => {
-
       if (newMap.has(test.subject.name)) {
-        const arr = newMap.get(test.subject.name)
-        arr.push(test.marks)
+        const arr = newMap.get(test.subject.name);
+        arr.push(test.marks);
       } else {
-        newMap.set(test.subject.name, [test.marks])
+        newMap.set(test.subject.name, [test.marks]);
       }
-    })
-    setTestReportMap(newMap)
+    });
+    setTestReportMap(newMap);
   }, [student]);
-
-
 
   useEffect(() => {
     if (props.studentId) {
@@ -157,10 +157,10 @@ const StudentPage = (props: {
     <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
-        {
-          props.userType !== UserType.STUDENT ?
-
-            (<> <Image
+        {props.userType !== UserType.STUDENT ? (
+          <>
+            {" "}
+            <Image
               onClick={() => props.onClickBack()}
               src={"/backArrow.png"}
               alt="profile"
@@ -168,25 +168,28 @@ const StudentPage = (props: {
               height={15}
               style={{ cursor: "pointer" }}
             />
-              <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
-                Students
-              </Text> </>) :
-            (<>
-              <Text fw={500} fz={24} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
-                Students
-              </Text>
-            </>)
-        }
+            <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
+              Students
+            </Text>{" "}
+          </>
+        ) : (
+          <>
+            <Text fw={500} fz={24} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
+              Students
+            </Text>
+          </>
+        )}
       </Flex>
       <Flex mt={isMd ? 10 : 20}>
         {Object.values(StudentTabs)
           .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
           .map((item: StudentTabs, i: number) => {
             return (
-              <Box key={i} >
-                {
-                  !(item === StudentTabs.FEES && UserType.TEACHER === props.userType) &&
-
+              <Box key={i}>
+                {!(
+                  item === StudentTabs.FEES &&
+                  UserType.TEACHER === props.userType
+                ) && (
                   <Text
                     key={i}
                     onClick={() => setActiveTab(item)}
@@ -207,8 +210,9 @@ const StudentPage = (props: {
                     {item}
                     {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
                   </Text>
-                }
-              </Box>);
+                )}
+              </Box>
+            );
           })}
       </Flex>
 
@@ -217,7 +221,6 @@ const StudentPage = (props: {
         <Stack mt={10} w={"100%"} bg={"white"} p={10}>
           <StudentOverview
             student={student}
-
             testReportMap={testReportMap}
             testOnlineMap={testOnlineMap}
             refreshStudents={() => getStudents()}
@@ -233,7 +236,7 @@ const StudentPage = (props: {
             dateOfJoining={new Date(student.dateOfBirth)}
             batch={student.batchId?._id || ""}
             studentId={student._id}
-            onPaymentClick={() => { }}
+            onPaymentClick={() => {}}
             onClickBack={props.onClickBack}
             fromBatch={false}
           />
