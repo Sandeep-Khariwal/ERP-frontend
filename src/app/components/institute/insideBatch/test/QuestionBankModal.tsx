@@ -15,6 +15,8 @@ import {
   ActionIcon,
   Group,
   Divider,
+  Loader,
+  Center,
 } from "@mantine/core";
 
 import {
@@ -25,12 +27,17 @@ import {
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
+import { CreateQuestionBank } from "@/axios/tests/Tests.post";
+import { ErrorNotification } from "@/app/helperFunction/Notification";
+import { GetAllQuestionsByTestId } from "@/axios/tests/TestsGetApi";
 
 interface Props {
   opened: boolean;
   onClose: () => void;
 
    batchId: string;
+    testId: string;
+    onSuccess: () => void;
   
 
 }
@@ -52,49 +59,53 @@ export default function QuestionBankModal({
   onClose,
   
   batchId,
- 
+  testId,
+  onSuccess,
   
 }: Props) {
 
   // Dummy Questions
-  const [questions] = useState<Question[]>([
-    {
-      _id: "1",
-      question: "how are you?",
-      options: [
-        { _id: "1", name: "fine", answer: true },
-        { _id: "2", name: "good", answer: false },
-      ],
-    },
-    {
-      _id: "2",
-      question: "what is your name?",
-      options: [
-        { _id: "1", name: "John", answer: false },
-        { _id: "2", name: "Mike", answer: false },
-      ],
-    },
-    {
-      _id: "3",
-      question: "where do you live?",
-      options: [
-        { _id: "1", name: "India", answer: false },
-        { _id: "2", name: "USA", answer: false },
-      ],
-    },
-    {
-      _id: "4",
-      question: "what is 2 + 2?",
-      options: [
-        { _id: "1", name: "3", answer: false },
-        { _id: "2", name: "4", answer: true },
-      ],
-    },
-  ]);
+  // const [questions] = useState<Question[]>([
+  //   {
+  //     _id: "1",
+  //     question: "how are you?",
+  //     options: [
+  //       { _id: "1", name: "fine", answer: true },
+  //       { _id: "2", name: "good", answer: false },
+  //     ],
+  //   },
+  //   {
+  //     _id: "2",
+  //     question: "what is your name?",
+  //     options: [
+  //       { _id: "1", name: "John", answer: false },
+  //       { _id: "2", name: "Mike", answer: false },
+  //     ],
+  //   },
+  //   {
+  //     _id: "3",
+  //     question: "where do you live?",
+  //     options: [
+  //       { _id: "1", name: "India", answer: false },
+  //       { _id: "2", name: "USA", answer: false },
+  //     ],
+  //   },
+  //   {
+  //     _id: "4",
+  //     question: "what is 2 + 2?",
+  //     options: [
+  //       { _id: "1", name: "3", answer: false },
+  //       { _id: "2", name: "4", answer: true },
+  //     ],
+  //   },
+  // ]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   // Selected Questions
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
 //   const [selectedBatch, setSelectedBatch] = useState<string | null>(batchName);
+const [selectedBatch, setSelectedBatch] = useState<string | null>(batchId);
 
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [subjects, setSubjects] = useState<
@@ -135,14 +146,100 @@ const institute = useAppSelector(
     }
   };
 
+  const fetchQuestions = () => {
+
+  if (!testId) return;
+
+  setLoadingQuestions(true);
+
+  GetAllQuestionsByTestId(testId)
+
+    .then((res: any) => {
+
+      console.log("QUESTIONS :", res);
+
+      const fetchedQuestions = res.data.questions || [];
+
+      setQuestions(fetchedQuestions);
+
+      setLoadingQuestions(false);
+    })
+
+    .catch((err) => {
+
+      console.log(err);
+
+      setQuestions([]);
+
+      setLoadingQuestions(false);
+    });
+};
+
+useEffect(() => {
+
+  if (opened && testId) {
+
+    fetchQuestions();
+
+  }
+
+}, [opened, testId]);
+
   // Add Selected
-  const handleAddSelected = () => {
-    console.log("Selected Questions :", selectedQuestions);
+ const handleAddSelected = async () => {
 
-    // API Call yaha karna hai future me
+    if (selectedQuestions.length === 0) {
+    ErrorNotification("No questions selected");
+    return;
+  }
 
-    onClose();
-  };
+  if (!selectedSubject) {
+    ErrorNotification("Please select subject");
+    return;
+  }
+
+  const filteredQuestions = questions.filter((question) =>
+    selectedQuestions.includes(question._id)
+  );
+
+    console.log("SELECTED QUESTION IDS :", selectedQuestions);
+
+  console.log("FILTERED QUESTIONS :", filteredQuestions);
+  
+  const payload = filteredQuestions.map((question) => ({
+    question: {
+      testId: testId,
+
+      question: question.question,
+
+      options: question.options.map((option) => ({
+        name: option.name,
+        answer: option.answer,
+      })),
+
+      correctAns:
+        question.options.find((opt) => opt.answer)?.name || "",
+
+      explanation: "",
+    },
+
+    batchId:  selectedBatch || "",
+
+    subjectId: selectedSubject || "",
+  }));
+
+  console.log(payload);
+
+  CreateQuestionBank(payload)
+    .then((res) => {
+      console.log("Questions Created", res);
+ onSuccess();
+      onClose();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
   const getAllInstituteBatches = () => {
   GetInstituteBatches(institute?._id || "")
@@ -153,20 +250,31 @@ const institute = useAppSelector(
       console.log(e);
     });
 };
+useEffect(() => {
 
-  useEffect(() => {
-  if (!batchId) return;
+  if (!selectedBatch) return;
 
-  GetAllSubjectsFromBatch(batchId)
+  GetAllSubjectsFromBatch(selectedBatch)
+
     .then((res: any) => {
+
       const subjectsData = res.subjects.subjects || [];
 
+      console.log("SUBJECTS :", subjectsData);
+
       setSubjects(subjectsData);
+
     })
+
     .catch((err) => {
+
       console.log(err);
+
+      setSubjects([]);
+
     });
-}, [batchId]);
+
+}, [selectedBatch]);
 
 useEffect(() => {
   if (institute?._id) {
@@ -227,6 +335,13 @@ useEffect(() => {
     value: batch._id,
     label: batch.name,
   }))}
+    onChange={(value) => {
+
+    setSelectedBatch(value);
+
+    setSelectedSubject(null);
+
+  }}
   w={220}
 />
 
@@ -255,6 +370,7 @@ useEffect(() => {
   placeholder="Select Subject"
   value={selectedSubject}
   onChange={setSelectedSubject}
+  
   data={subjects.map((subject) => ({
     value: subject._id,
     label: subject.name,
@@ -269,6 +385,7 @@ useEffect(() => {
               style={{
     background: "#228be6",
   }}
+  onClick={handleAddSelected}
           >
             Add in Test
           </Button>
@@ -321,92 +438,116 @@ useEffect(() => {
 
           <ScrollArea h={380}>
 
-            <Stack p="md">
+  {loadingQuestions ? (
 
-              {questions.map((question, index) => (
+    <Center py="xl">
 
-              <Box
-  key={question._id}
-  p="sm"
-  style={{
-    border: "1px solid #e9ecef",
-    borderRadius: 12,
-    background: "#fdfdfd",
-    minHeight: 110,
-  }}
->
+      <Loader />
 
-                  <Flex justify="space-between" align="flex-start">
+    </Center>
 
-                    {/* Left Side */}
+  ) : questions.length === 0 ? (
 
-                    <Flex gap="md" align="flex-start">
+    <Center py="xl">
 
-                      <Checkbox
-                        mt={4}
-                        checked={selectedQuestions.includes(question._id)}
-                        onChange={() =>
-                          handleSelectQuestion(question._id)
-                        }
-                      />
+      <Text c="dimmed">
 
-                      <Box>
+        No Questions Found
 
-                       <Text fw={700} size="md" mb={6}>
-                          Q{index + 1}: {question.question}
-                        </Text>
+      </Text>
 
-                        <Stack gap={1}>
+    </Center>
 
-                          {question.options.map((option, optIndex) => (
+  ) : (
 
-                            <Text
-                              key={option._id}
-                              size="md"
-                              c={option.answer ? "green" : "gray"}
-                            >
-                              {String.fromCharCode(65 + optIndex)}.{" "}
-                              {option.name}
-                              {option.answer && " ✓"}
-                            </Text>
+    <Stack p="md">
 
-                          ))}
+      {questions.map((question, index) => (
 
-                        </Stack>
+        <Box
+          key={question._id}
+          p="sm"
+          style={{
+            border: "1px solid #e9ecef",
+            borderRadius: 12,
+            background: "#fdfdfd",
+            minHeight: 110,
+          }}
+        >
 
-                      </Box>
+          <Flex justify="space-between" align="flex-start">
 
-                    </Flex>
+            {/* Left Side */}
 
-                    {/* Right Side Icons */}
+            <Flex gap="md" align="flex-start">
 
-                    <Group gap="xs">
+              <Checkbox
+                mt={4}
+                checked={selectedQuestions.includes(question._id)}
+                onChange={() =>
+                  handleSelectQuestion(question._id)
+                }
+              />
 
-                      <ActionIcon
-                        variant="light"
-                        color="blue"
-                      >
-                        <IconEdit size={16} />
-                      </ActionIcon>
+              <Box>
 
-                      <ActionIcon
-                        variant="light"
-                        color="red"
-                      >
-                        <IconTrash size={16} />
-                      </ActionIcon>
+                <Text fw={700} size="md" mb={6}>
+                  Q{index + 1}: {question.question}
+                </Text>
 
-                    </Group>
+                <Stack gap={1}>
 
-                  </Flex>
+                  {question.options.map((option, optIndex) => (
 
-                </Box>
+                    <Text
+                      key={option._id}
+                      size="md"
+                      c={option.answer ? "green" : "gray"}
+                    >
+                      {String.fromCharCode(65 + optIndex)}.{" "}
+                      {option.name}
+                      {option.answer && " ✓"}
+                    </Text>
 
-              ))}
+                  ))}
 
-            </Stack>
+                </Stack>
 
-          </ScrollArea>
+              </Box>
+
+            </Flex>
+
+            {/* Right Side Icons */}
+
+            <Group gap="xs">
+
+              <ActionIcon
+                variant="light"
+                color="blue"
+              >
+                <IconEdit size={16} />
+              </ActionIcon>
+
+              <ActionIcon
+                variant="light"
+                color="red"
+              >
+                <IconTrash size={16} />
+              </ActionIcon>
+
+            </Group>
+
+          </Flex>
+
+        </Box>
+
+      ))}
+
+    </Stack>
+
+  )}
+
+</ScrollArea>
 
         </Box>
 
