@@ -33,6 +33,8 @@ import{
     CreateTestQuestion, 
   UpdateTest
 } from  "../../../../../axios/tests/Tests.post"
+import { log } from "console";
+import QuestionBankModal from "./QuestionBankModal";
 
 // Types
 interface Subject {
@@ -64,6 +66,10 @@ interface Test {
   totalTime: number;
   questions: Question[];
   startTime?: string;
+   subject?: {
+    _id: string;
+    name: string;
+  };
 }
 
 interface Props {
@@ -127,6 +133,7 @@ export default function SimpleEditTestModal({
   const [questions, setQuestions] = useState<Question[]>([]);
   const [maxMarks, setMaxMarks] = useState<number>(0); // Frontend state for max marks
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [questionBankOpen, setQuestionBankOpen] = useState(false);
 
   // Form State - Question
   const [questionForm, setQuestionForm] = useState({
@@ -264,6 +271,9 @@ export default function SimpleEditTestModal({
     }
 
     setLoading(true);
+
+    console.log("TEST OBJECT :", test);
+console.log("TEST SUBJECT ID :", test.subjectId);
     
     const questionData = {
       question: {
@@ -276,11 +286,22 @@ export default function SimpleEditTestModal({
         correctAns: questionForm.options[questionForm.correctIndex],
         ...(questionForm.explanation && { explanation: questionForm.explanation })
       },
+        // SIRF NEW QUESTION ADD TIME PE
+  ...(!editingQuestion?._id && test.batchId && {
+    batchId: test.batchId,
+  }),
+
+  ...(!editingQuestion?._id && test.subject?._id && {
+  subjectId: test.subject._id,
+}),
+
       ...(editingQuestion?._id && { questionId: editingQuestion._id })
     };
-
+console.log("FINAL QUESTION DATA :", questionData);
     CreateTestQuestion(questionData)
       .then((res: any) => {
+        console.log("create: ", res);
+        
         showNotification(
           `Question ${editingQuestion ? "updated" : "added"} successfully`,
           "success"
@@ -393,6 +414,19 @@ export default function SimpleEditTestModal({
         <Text fw={600} fz={16} ff="Roboto">
           Questions ({questions.length})
         </Text>
+        <Group gap="sm">
+
+        <Button
+    leftSection={<IconPlus size={16} />}
+    onClick={() => setQuestionBankOpen(true)}
+    size="sm"
+      variant="outline"
+          c="#111"
+          style={{ borderColor: "#111" }}
+  >
+    Question Bank
+  </Button>
+
         <Button 
           leftSection={<IconPlus size={16} />} 
           onClick={handleAddNewQuestion} 
@@ -403,6 +437,7 @@ export default function SimpleEditTestModal({
         >
           Add New Question
         </Button>
+        </Group>
       </Flex>
 
       <ScrollArea h={400}>
@@ -755,6 +790,14 @@ export default function SimpleEditTestModal({
           </Flex>
         </Stack>
       </Modal>
+
+      <QuestionBankModal
+  opened={questionBankOpen}
+  onClose={() => setQuestionBankOpen(false)}
+  batchId={test?.batchId || ""}
+  testId={test?._id || ""}
+    onSuccess={fetchQuestions}
+/>
     </>
   );
 }

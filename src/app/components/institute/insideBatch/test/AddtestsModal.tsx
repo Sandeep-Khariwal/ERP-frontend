@@ -168,7 +168,7 @@ const AddTestsModal = (props: {
       for (let mcq of mcqs) {
         const options = mcq.options.map((opt, i) => ({
           name: opt,
-          answer: i === mcq.correctAnswerIndex,
+          answer:i === mcq.correctAnswerIndex,
         }));
 
         const payload = {
@@ -177,9 +177,14 @@ const AddTestsModal = (props: {
             testId: testId,
             options: options,
             correctAns: mcq.options[mcq.correctAnswerIndex],
-          }
-        };
+          },
+            // NEW
+  batchId: props.batchId,
 
+  // NEW
+  subjectId: selectedSubject,
+        };
+console.log("QUESTION PAYLOAD :", payload);
         await CreateTestQuestion(payload);
       }
 
