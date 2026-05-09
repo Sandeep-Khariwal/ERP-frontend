@@ -14,16 +14,9 @@ import {
 import { DateInput } from "@mantine/dates";
 import { useEffect, useState } from "react";
 import { IconArrowLeftFromArc } from "@tabler/icons-react";
-import {
-  Menu,
-  ActionIcon,
-} from "@mantine/core";
+import { Menu, ActionIcon } from "@mantine/core";
 
-import {
-  IconDownload,
-  IconTrash,
-  IconDotsVertical,
-} from "@tabler/icons-react";
+import { IconDownload, IconTrash, IconDotsVertical } from "@tabler/icons-react";
 import { Modal } from "@mantine/core";
 import { Image, Group } from "@mantine/core";
 import SingleStudentModal from "./SingleStudentModal";
@@ -40,6 +33,7 @@ import {
 } from "@/axios/institute/InstituteGetApi";
 import {
   ErrorNotification,
+  getBase64Image,
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
 import { GetGrade } from "../helperFunctions";
@@ -72,7 +66,7 @@ const Marksheet = (props: {
   const [selectedMarksheetId, setSelectedMarksheetId] = useState<string>("");
   const [allMarksheet, setAllMarksheet] = useState<
     {
-       _id: string;
+      _id: string;
       name: string;
       batch: string;
       session: string;
@@ -288,32 +282,32 @@ const Marksheet = (props: {
   };
 
   const HandleDeleteMarksheet = () => {
-  if (!selectedMarksheetId) {
-    ErrorNotification("Marksheet id missing!");
-    return;
-  }
+    if (!selectedMarksheetId) {
+      ErrorNotification("Marksheet id missing!");
+      return;
+    }
 
-  DeleteMarksheet(selectedMarksheetId)
-    .then((x: any) => {
-      console.log("delete response :", x);
+    DeleteMarksheet(selectedMarksheetId)
+      .then((x: any) => {
+        console.log("delete response :", x);
 
-      // state se remove
-      setAllMarksheet((prev: any) =>
-        prev.filter((item: any) => item._id !== selectedMarksheetId),
-      );
+        // state se remove
+        setAllMarksheet((prev: any) =>
+          prev.filter((item: any) => item._id !== selectedMarksheetId),
+        );
 
-      SuccessNotification("Marksheet Deleted Successfully!");
+        SuccessNotification("Marksheet Deleted Successfully!");
 
-      setDeleteModalOpen(false);
-      setSelectedMarksheetId("");
-    })
-    .catch((e: any) => {
-      console.log(e);
+        setDeleteModalOpen(false);
+        setSelectedMarksheetId("");
+      })
+      .catch((e: any) => {
+        console.log(e);
 
-      ErrorNotification("Failed to delete marksheet!");
-      setDeleteModalOpen(false);
-    });
-};
+        ErrorNotification("Failed to delete marksheet!");
+        setDeleteModalOpen(false);
+      });
+  };
   //table me filter kiya data
   const filteredMarksheet = filterExam
     ? allMarksheet.filter((item) => item.name === filterExam)
@@ -629,134 +623,125 @@ const Marksheet = (props: {
                       />
                     </Table.Td> */}
                     <Table.Td
-  ta="center"
-  style={{
-    color: "#00000098",
-    fontWeight: 500,
-    padding: "1rem",
-  }}
->
-  <Menu shadow="md" width={180} position="bottom-end">
-    <Menu.Target>
-      <ActionIcon variant="subtle" color="gray">
-        <IconDotsVertical size={22} />
-      </ActionIcon>
-    </Menu.Target>
+                      ta="center"
+                      style={{
+                        color: "#00000098",
+                        fontWeight: 500,
+                        padding: "1rem",
+                      }}
+                    >
+                      <Menu shadow="md" width={180} position="bottom-end">
+                        <Menu.Target>
+                          <ActionIcon variant="subtle" color="gray">
+                            <IconDotsVertical size={22} />
+                          </ActionIcon>
+                        </Menu.Target>
 
-    <Menu.Dropdown>
-      {/* DOWNLOAD */}
-      <Menu.Item
-        leftSection={<IconDownload size={18} />}
-        onClick={async () => {
-          const url = `https://shikshapay.cloud/marksheet/${item._id}`;
+                        <Menu.Dropdown>
+                          {/* DOWNLOAD */}
+                          <Menu.Item
+                            leftSection={<IconDownload size={18} />}
+                            onClick={async () => {
+                              const url = `https://shikshapay.cloud/marksheet/${item._id}`;
 
-          const qr = await QRCode.toDataURL(url);
+                              const qr = await QRCode.toDataURL(url);
 
-          GetStudentDetail(item.student._id)
-            .then((res: any) => {
-              const student = res.student;
+                              GetStudentDetail(item.student._id)
+                                .then(async(res: any) => {
+                                  const student = res.student;
 
-              const html = createMarksheetPdf({
-                instituteName: institute?.name,
-                examName: item.name,
-                batchName: item.batch.name,
-                studentName: item.student?.name,
-                rollNumber: item.student?.rollNumber,
-                enrolment: item.student?.enrollmentNo,
-                marks: item.marks,
-                totalMarks: item.totalMarks,
-                percentage: item.percentage,
-                overallGrade: item.overallGrade,
-                status: item.status,
-                allsubjecttotal: item.marks.length * 100,
-                date: new Date(item.date).toLocaleDateString(
-                  "en-GB",
-                ),
-                session: item.session,
-                fName: student.parentName,
-                address: student.address,
-                parentNumber: student.parentNumber,
-                dob: formatDate(student.dateOfBirth),
-                photo: student.profilePic,
-                instituteLogo: student.instituteId.logo,
-                instituteAdress: student.instituteId.address,
-                institutePhone:
-                  student.instituteId.institutePhoneNumber,
-                principalSignature:
-                  student.instituteId.signature,
-                qr,
-              });
+                                  const base64Photo = await getBase64Image(
+                                    student.profilePic,
+                                  );
 
-              const printWindow = window.open("", "_blank");
+                                  const base64Logo = await getBase64Image(
+                                    student.instituteId.logo,
+                                  );
 
-              if (printWindow) {
-                printWindow.document.write(html);
-                printWindow.document.close();
+                                  const base64Signature = await getBase64Image(
+                                    student.instituteId.signature,
+                                  );
 
-                printWindow.onload = () => {
-                  const images = printWindow.document.images;
-                  let loaded = 0;
-                  const total = images.length;
+                                  const html = createMarksheetPdf({
+                                    instituteName: institute?.name,
+                                    examName: item.name,
+                                    batchName: item.batch.name,
+                                    studentName: item.student?.name,
+                                    rollNumber: item.student?.rollNumber,
+                                    enrolment: item.student?.enrollmentNo,
+                                    marks: item.marks,
+                                    totalMarks: item.totalMarks,
+                                    percentage: item.percentage,
+                                    overallGrade: item.overallGrade,
+                                    status: item.status,
+                                    allsubjecttotal: item.marks.length * 100,
+                                    date: new Date(
+                                      item.date,
+                                    ).toLocaleDateString("en-GB"),
+                                    session: item.session,
+                                    fName: student.parentName,
+                                    address: student.address,
+                                    parentNumber: student.parentNumber,
+                                    dob: formatDate(student.dateOfBirth),
 
-                  if (total === 0) {
-                    printWindow.print();
-                    return;
-                  }
+                                    // ✅ Base64 images
+                                    photo: base64Photo,
+                                    instituteLogo: base64Logo,
+                                    principalSignature: base64Signature,
 
-                  const checkDone = () => {
-                    if (loaded === total) {
-                      setTimeout(() => {
-                        printWindow.print();
-                      }, 200);
-                    }
-                  };
+                                    instituteAdress:
+                                      student.instituteId.address,
+                                    institutePhone:
+                                      student.instituteId.institutePhoneNumber,
 
-                  for (let i = 0; i < total; i++) {
-                    const img = images[i];
+                                    qr,
+                                  });
 
-                    if (img.complete) {
-                      loaded++;
-                      checkDone();
-                    } else {
-                      img.onload = () => {
-                        loaded++;
-                        checkDone();
-                      };
+                                  const printWindow = window.open("", "_blank");
 
-                      img.onerror = () => {
-                        loaded++;
-                        checkDone();
-                      };
-                    }
-                  }
-                };
-              }
-            })
-            .catch((e) => {
-              console.log(e);
-            });
-        }}
-      >
-        Download
-      </Menu.Item>
+                                  if (printWindow) {
+                                    printWindow.document.open();
 
-      {/* DELETE */}
-      <Menu.Item
-        color="red"
-        leftSection={<IconTrash size={18} />}
-        onClick={() => {
-          console.log("Delete clicked", item._id);
-            setSelectedMarksheetId(item._id);
+                                    printWindow.document.write(html);
 
-          // yaha delete API lagegi
-            setDeleteModalOpen(true);
-        }}
-      >
-        Delete
-      </Menu.Item>
-    </Menu.Dropdown>
-  </Menu>
-</Table.Td>
+                                    printWindow.document.close();
+
+                                    setTimeout(() => {
+                                      printWindow.focus();
+
+                                      printWindow.print();
+
+                                      printWindow.onafterprint = () => {
+                                        printWindow.close();
+                                      };
+                                    }, 500);
+                                  }
+                                })
+                                .catch((e) => {
+                                  console.log(e);
+                                });
+                            }}
+                          >
+                            Download
+                          </Menu.Item>
+
+                          {/* DELETE */}
+                          <Menu.Item
+                            color="red"
+                            leftSection={<IconTrash size={18} />}
+                            onClick={() => {
+                              console.log("Delete clicked", item._id);
+                              setSelectedMarksheetId(item._id);
+
+                              // yaha delete API lagegi
+                              setDeleteModalOpen(true);
+                            }}
+                          >
+                            Delete
+                          </Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
+                    </Table.Td>
                   </Table.Tr>
                 ))}
             </Table.Tbody>
@@ -915,51 +900,51 @@ const Marksheet = (props: {
           setAllMarksheet((prev) => [...prev, data]);
         }}
       />
-    <Modal
-  opened={deleteModalOpen}
-  onClose={() => setDeleteModalOpen(false)}
-  title={
-    <Text fw={700} style={{ color: "#c0392b" }}>
-      Delete Marksheet
-    </Text>
-  }
-  centered
-  radius="lg"
-  size="sm"
->
-  <Stack>
-    <Text size="sm" c="dimmed">
-      Are you sure you want to delete this marksheet? This action cannot
-      be undone.
-    </Text>
-
-    <Group justify="flex-end" gap="sm">
-      {/* Cancel Button */}
-      <Button
-        variant="default"
-        radius="md"
-        onClick={() => setDeleteModalOpen(false)}
+      <Modal
+        opened={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title={
+          <Text fw={700} style={{ color: "#c0392b" }}>
+            Delete Marksheet
+          </Text>
+        }
+        centered
+        radius="lg"
+        size="sm"
       >
-        Cancel
-      </Button>
+        <Stack>
+          <Text size="sm" c="dimmed">
+            Are you sure you want to delete this marksheet? This action cannot
+            be undone.
+          </Text>
 
-      {/* Delete Button */}
-      <Button
-        color="red"
-        radius="md"
-        leftSection={<IconTrash size={14} />}
-        onClick={() => {
-          setDeleteModalOpen(false);
-            HandleDeleteMarksheet();
+          <Group justify="flex-end" gap="sm">
+            {/* Cancel Button */}
+            <Button
+              variant="default"
+              radius="md"
+              onClick={() => setDeleteModalOpen(false)}
+            >
+              Cancel
+            </Button>
 
-          // future me delete API yaha lagegi
-        }}
-      >
-        Delete
-      </Button>
-    </Group>
-  </Stack>
-</Modal>
+            {/* Delete Button */}
+            <Button
+              color="red"
+              radius="md"
+              leftSection={<IconTrash size={14} />}
+              onClick={() => {
+                setDeleteModalOpen(false);
+                HandleDeleteMarksheet();
+
+                // future me delete API yaha lagegi
+              }}
+            >
+              Delete
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </>
   );
 };

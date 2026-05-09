@@ -17,7 +17,10 @@ import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { Screen } from "./InstituteInsideBatch";
 import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
-import { SuccessNotification } from "@/app/helperFunction/Notification";
+import {
+  getBase64Image,
+  SuccessNotification,
+} from "@/app/helperFunction/Notification";
 import { StudentsDataWithBatch } from "@/interface/student.interface";
 import Image from "next/image";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
@@ -126,18 +129,25 @@ const StudentSection = (props: {
 
   const downloadIdCard = (id: string) => {
     GetStudentForIdCard(id)
-      .then((res: any) => {
+      .then(async (res: any) => {
         const studentInfo = res.student;
-        console.log("studentInfo.rollNumber : ",studentInfo.rollNumber);
-        
+        console.log(
+          "studentInfo.rollNumber : ",
+          studentInfo.rollNumber,
+          studentInfo.profilePic,
+        );
+
+        const base64Profile = await getBase64Image(studentInfo.profilePic);
+        const base64Logo = await getBase64Image(studentInfo.instituteId.logo);
+
         const idCardhtml = generateIdCardHTML({
           schoolName: studentInfo.instituteId.name,
-          schoolLogo: studentInfo.instituteId.logo,
+          schoolLogo: base64Logo,
           schoolAddress: studentInfo.instituteId.address,
           institutePhoneNumber: studentInfo.instituteId.institutePhoneNumber,
 
           studentName: studentInfo.name,
-          studentPhoto: studentInfo.profilePic,
+          studentPhoto: base64Profile,
           className: studentInfo.batchId.name,
           rollNo: studentInfo.rollNumber,
           entrollmentNum: studentInfo.enrollmentNo,
@@ -151,50 +161,13 @@ const StudentSection = (props: {
         const printWindow = window.open("", "_blank");
 
         if (printWindow) {
+          printWindow.document.open();
           printWindow.document.write(idCardhtml);
           printWindow.document.close();
 
-          // ✅ WAIT FOR IMAGES BEFORE PRINT
-          printWindow.onload = () => {
-            const images = printWindow.document.images;
-            let loaded = 0;
-            const total = images.length;
-
-            if (total === 0) {
-              printWindow.print();
-              return;
-            }
-
-            const checkDone = () => {
-              if (loaded === total) {
-                setTimeout(() => {
-                  printWindow.print();
-                }, 200); // small buffer for layout
-              }
-            };
-
-            for (let i = 0; i < total; i++) {
-              const img = images[i];
-
-              if (img.complete) {
-                loaded++;
-                checkDone();
-              } else {
-                img.onload = () => {
-                  loaded++;
-                  checkDone();
-                };
-
-                img.onerror = () => {
-                  console.warn("Image failed:", img.src);
-                  loaded++;
-                  checkDone();
-                };
-              }
-            }
-          };
-        } else {
-          console.error("Failed to open print window.");
+          setTimeout(() => {
+            printWindow.print();
+          }, 1000);
         }
       })
       .catch((e: any) => {

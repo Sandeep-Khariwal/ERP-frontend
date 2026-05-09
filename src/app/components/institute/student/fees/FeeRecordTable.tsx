@@ -22,6 +22,7 @@ import { Installment } from "@/interfaces/batchInterface";
 import { createReceiptPdf } from "./HtmlToPdf";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { GetStudentForPdf } from "@/axios/student/StudentGetApi";
+import { getBase64Image } from "@/app/helperFunction/Notification";
 
 export interface FeeRecord {
   _id: string;
@@ -73,7 +74,7 @@ const FeeRecordTable = (props: {
   const convertHtmlIntoPdf = (id: string) => {
     setisLoading(true);
     GetStudentForPdf(props.studentId)
-      .then((x: any) => {
+      .then(async (x: any) => {
         setisLoading(false);
         const { student } = x;
         const { feeRecords, instituteId } = student;
@@ -100,6 +101,11 @@ const FeeRecordTable = (props: {
             return sum;
           }, 0);
         }
+
+        const base64Logo = await getBase64Image(instituteId.logo);
+
+        const base64Signature = await getBase64Image(instituteId.signature);
+
         const receiptHtml = createReceiptPdf(
           studentName,
           date,
@@ -107,59 +113,32 @@ const FeeRecordTable = (props: {
           amountPaid,
           paymentRecords,
           InstituteName,
-          instituteLogo,
+          base64Logo,
           address,
           phoneNumber,
           receiptNo,
           props.batchName,
-          instituteId.signature,
+          base64Signature,
         );
 
         const printWindow = window.open("", "_blank");
 
         if (printWindow) {
+          printWindow.document.open();
+
           printWindow.document.write(receiptHtml);
+
           printWindow.document.close();
 
-          // ✅ WAIT FOR IMAGES TO LOAD
-          printWindow.onload = () => {
-            const images = printWindow.document.images;
-            let loadedCount = 0;
+          setTimeout(() => {
+            printWindow.focus();
 
-            if (images.length === 0) {
-              printWindow.print();
-              return;
-            }
+            printWindow.print();
 
-            for (let i = 0; i < images.length; i++) {
-              const img = images[i];
-
-              if (img.complete) {
-                loadedCount++;
-              } else {
-                img.onload = () => {
-                  loadedCount++;
-                  if (loadedCount === images.length) {
-                    printWindow.print();
-                  }
-                };
-
-                img.onerror = () => {
-                  loadedCount++;
-                  if (loadedCount === images.length) {
-                    printWindow.print();
-                  }
-                };
-              }
-            }
-
-            // If already loaded
-            if (loadedCount === images.length) {
-              printWindow.print();
-            }
-          };
-        } else {
-          console.error("Failed to open print window.");
+            printWindow.onafterprint = () => {
+              printWindow.close();
+            };
+          }, 500);
         }
       })
       .catch((e) => {

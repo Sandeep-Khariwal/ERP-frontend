@@ -32,6 +32,7 @@ import {
 } from "@/axios/student/StudentGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createFullFeeOverviewPdf } from "./HtmlToPdf";
+import { getBase64Image } from "@/app/helperFunction/Notification";
 
 const convertHtmlIntoPdf = (html: string) => {};
 
@@ -211,7 +212,7 @@ const FeeRecordSection = (props: {
               <Button
                 color="green"
                 onClick={() => {
-                  GetStudentForPdf(props.studentId).then((x: any) => {
+                  GetStudentForPdf(props.studentId).then(async (x: any) => {
                     const { student } = x;
 
                     let gst = instituteDetails.gst;
@@ -234,17 +235,31 @@ const FeeRecordSection = (props: {
                       updatedAt: f.updatedAt,
                     }));
 
+                    const base64Logo = await getBase64Image(
+                      student.instituteId.logo,
+                    );
+
+                    const base64Signature = await getBase64Image(
+                      student.instituteId.signature,
+                    );
+
                     const html = createFullFeeOverviewPdf(
                       student.name,
                       student.parentName,
                       formattedData,
+
                       student.instituteId.name,
-                      student.instituteId.logo,
+
+                      // ✅ Base64 logo
+                      base64Logo,
+
                       student.instituteId.address,
                       student.instituteId.institutePhoneNumber,
                       props.batchName,
                       gst,
-                      student.instituteId.signature,
+
+                      // ✅ Base64 signature
+                      base64Signature,
                     );
 
                     console.log("btn clicked......");
@@ -252,50 +267,20 @@ const FeeRecordSection = (props: {
                     const printWindow = window.open("", "_blank");
 
                     if (printWindow) {
+                      printWindow.document.open();
                       printWindow.document.write(html);
+
                       printWindow.document.close();
 
-                      // ✅ WAIT FOR IMAGES BEFORE PRINT
-                      printWindow.onload = () => {
-                        const images = printWindow.document.images;
-                        let loaded = 0;
-                        const total = images.length;
+                      setTimeout(() => {
+                        printWindow.focus();
 
-                        if (total === 0) {
-                          printWindow.print();
-                          return;
-                        }
+                        printWindow.print();
 
-                        const checkDone = () => {
-                          if (loaded === total) {
-                            setTimeout(() => {
-                              printWindow.print();
-                            }, 200); // small buffer for layout
-                          }
+                        printWindow.onafterprint = () => {
+                          printWindow.close();
                         };
-
-                        for (let i = 0; i < total; i++) {
-                          const img = images[i];
-
-                          if (img.complete) {
-                            loaded++;
-                            checkDone();
-                          } else {
-                            img.onload = () => {
-                              loaded++;
-                              checkDone();
-                            };
-
-                            img.onerror = () => {
-                              console.warn("Image failed:", img.src);
-                              loaded++;
-                              checkDone();
-                            };
-                          }
-                        }
-                      };
-                    } else {
-                      console.error("Failed to open print window.");
+                      }, 500);
                     }
                     // convertHtmlIntoPdf(html);
                   });
