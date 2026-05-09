@@ -19,27 +19,24 @@ import {
   Center,
 } from "@mantine/core";
 
-import {
-  IconPlus,
-  IconEdit,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconPlus, IconEdit, IconTrash } from "@tabler/icons-react";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
 import { CreateQuestionBank } from "@/axios/tests/Tests.post";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
-import { GetAllQuestionsByTestId } from "@/axios/tests/TestsGetApi";
+import {
+  GetAllQuestionsByTestId,
+  GetAllQuestionsFromBank,
+} from "@/axios/tests/TestsGetApi";
 
 interface Props {
   opened: boolean;
   onClose: () => void;
 
-   batchId: string;
-    testId: string;
-    onSuccess: () => void;
-  
-
+  batchId: string;
+  testId: string;
+  onSuccess: () => void;
 }
 
 interface Option {
@@ -57,13 +54,11 @@ interface Question {
 export default function QuestionBankModal({
   opened,
   onClose,
-  
+
   batchId,
   testId,
   onSuccess,
-  
 }: Props) {
-
   // Dummy Questions
   // const [questions] = useState<Question[]>([
   //   {
@@ -100,40 +95,36 @@ export default function QuestionBankModal({
   //   },
   // ]);
   const [questions, setQuestions] = useState<Question[]>([]);
-const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   // Selected Questions
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
-//   const [selectedBatch, setSelectedBatch] = useState<string | null>(batchName);
-const [selectedBatch, setSelectedBatch] = useState<string | null>(batchId);
+  //   const [selectedBatch, setSelectedBatch] = useState<string | null>(batchName);
+  const [selectedBatch, setSelectedBatch] = useState<string>(batchId);
 
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [subjects, setSubjects] = useState<
-  {
-    _id: string;
-    name: string;
-  }[]
->([]);
+    {
+      _id: string;
+      name: string;
+    }[]
+  >([]);
 
-const [batches, setBatches] = useState<
-  {
-    _id: string;
-    name: string;
-  }[]
->([]);
+  const [batches, setBatches] = useState<
+    {
+      _id: string;
+      name: string;
+    }[]
+  >([]);
 
-
-const institute = useAppSelector(
-  (state) => state.instituteSlice.instituteDetails
-);
-
+  const institute = useAppSelector(
+    (state) => state.instituteSlice.instituteDetails,
+  );
 
   // Single Select
   const handleSelectQuestion = (id: string) => {
     setSelectedQuestions((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
@@ -146,141 +137,103 @@ const institute = useAppSelector(
     }
   };
 
-  const fetchQuestions = () => {
-
-  if (!testId) return;
-
-  setLoadingQuestions(true);
-
-  GetAllQuestionsByTestId(testId)
-
-    .then((res: any) => {
-
-      console.log("QUESTIONS :", res);
-
-      const fetchedQuestions = res.data.questions || [];
-
-      setQuestions(fetchedQuestions);
-
-      setLoadingQuestions(false);
-    })
-
-    .catch((err) => {
-
-      console.log(err);
-
-      setQuestions([]);
-
-      setLoadingQuestions(false);
-    });
-};
-
-useEffect(() => {
-
-  if (opened && testId) {
-
-    fetchQuestions();
-
-  }
-
-}, [opened, testId]);
+  useEffect(() => {
+    GetAllQuestionsFromBank(selectedBatch, selectedSubject)
+      .then((res: any) => {
+        setQuestions(res.data.questions);
+      })
+      .catch((e: any) => {
+        console.log(e);
+      });
+  }, [selectedBatch, selectedSubject]);
 
   // Add Selected
- const handleAddSelected = async () => {
-
+  const handleAddSelected = async () => {
     if (selectedQuestions.length === 0) {
-    ErrorNotification("No questions selected");
-    return;
-  }
+      ErrorNotification("No questions selected");
+      return;
+    }
 
-  if (!selectedSubject) {
-    ErrorNotification("Please select subject");
-    return;
-  }
+    if (!selectedSubject) {
+      ErrorNotification("Please select subject");
+      return;
+    }
 
-  const filteredQuestions = questions.filter((question) =>
-    selectedQuestions.includes(question._id)
-  );
+    const filteredQuestions = questions.filter((question) =>
+      selectedQuestions.includes(question._id),
+    );
 
     console.log("SELECTED QUESTION IDS :", selectedQuestions);
 
-  console.log("FILTERED QUESTIONS :", filteredQuestions);
-  
-  const payload = filteredQuestions.map((question) => ({
-    question: {
-      testId: testId,
+    console.log("FILTERED QUESTIONS :", filteredQuestions);
 
-      question: question.question,
+    const payload = filteredQuestions.map((question) => ({
+      question: {
+        testId: testId,
 
-      options: question.options.map((option) => ({
-        name: option.name,
-        answer: option.answer,
-      })),
+        question: question.question,
 
-      correctAns:
-        question.options.find((opt) => opt.answer)?.name || "",
+        options: question.options.map((option) => ({
+          name: option.name,
+          answer: option.answer,
+        })),
 
-      explanation: "",
-    },
+        correctAns: question.options.find((opt) => opt.answer)?.name || "",
 
-    batchId:  selectedBatch || "",
+        explanation: "",
+      },
 
-    subjectId: selectedSubject || "",
-  }));
+      batchId: selectedBatch || "",
 
-  console.log(payload);
+      subjectId: selectedSubject || "",
+    }));
 
-  CreateQuestionBank(payload)
-    .then((res) => {
-      console.log("Questions Created", res);
- onSuccess();
-      onClose();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+    console.log(payload);
+
+    CreateQuestionBank(payload)
+      .then((res) => {
+        console.log("Questions Created", res);
+        onSuccess();
+        onClose();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const getAllInstituteBatches = () => {
-  GetInstituteBatches(institute?._id || "")
-    .then((x: any) => {
-      setBatches(x.batches || []);
-    })
-    .catch((e) => {
-      console.log(e);
-    });
-};
-useEffect(() => {
+    GetInstituteBatches(institute?._id || "")
+      .then((x: any) => {
+        setBatches(x.batches || []);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+  useEffect(() => {
+    if (!selectedBatch) return;
 
-  if (!selectedBatch) return;
+    GetAllSubjectsFromBatch(selectedBatch)
+      .then((res: any) => {
+        const subjectsData = res.subjects.subjects || [];
 
-  GetAllSubjectsFromBatch(selectedBatch)
+        console.log("SUBJECTS :", subjectsData);
 
-    .then((res: any) => {
+        setSubjects(subjectsData);
+      })
 
-      const subjectsData = res.subjects.subjects || [];
+      .catch((err) => {
+        console.log(err);
 
-      console.log("SUBJECTS :", subjectsData);
+        setSubjects([]);
+      });
+  }, [selectedBatch]);
 
-      setSubjects(subjectsData);
-
-    })
-
-    .catch((err) => {
-
-      console.log(err);
-
-      setSubjects([]);
-
-    });
-
-}, [selectedBatch]);
-
-useEffect(() => {
-  if (institute?._id) {
-    getAllInstituteBatches();
-  }
-}, [institute?._id]);
+  useEffect(() => {
+    if (institute?._id) {
+      getAllInstituteBatches();
+    }
+  }, [institute?._id]);
   return (
     <Modal
       opened={opened}
@@ -306,21 +259,20 @@ useEffect(() => {
       }}
     >
       <Stack gap="md">
-
         {/* Top Filters */}
 
         <Flex
-  justify="space-between"
-  align="center"
-  p="md"
-  bg="#f8fafc"
-  style={{
-    border: "1px solid #e9ecef",
-    borderRadius: 12,
-  }}
->
+          justify="space-between"
+          align="center"
+          p="md"
+          bg="#f8fafc"
+          style={{
+            border: "1px solid #e9ecef",
+            borderRadius: 12,
+          }}
+        >
           <Group>
-{/* 
+            {/* 
            <Select
               placeholder="Select Batch"
               data={[
@@ -330,22 +282,20 @@ useEffect(() => {
               w={220}
             /> */}
             <Select
-  placeholder="Select Batch"
-  data={batches.map((batch) => ({
-    value: batch._id,
-    label: batch.name,
-  }))}
-    onChange={(value) => {
+              placeholder="Select Batch"
+              data={batches.map((batch) => ({
+                value: batch._id,
+                label: batch.name,
+              }))}
+              onChange={(value: any) => {
+                setSelectedBatch(value!);
 
-    setSelectedBatch(value);
+                setSelectedSubject("");
+              }}
+              w={220}
+            />
 
-    setSelectedSubject(null);
-
-  }}
-  w={220}
-/>
-
-  {/* <Select
+            {/* <Select
               placeholder="Select Subject"
               data={[
                 { value: "math", label: "Math" },
@@ -353,7 +303,7 @@ useEffect(() => {
               ]}
               w={220}
             /> */}
-       {/* <Select
+            {/* <Select
   placeholder="Select Subject"
   value={selectedSubject}
   onChange={setSelectedSubject}
@@ -366,53 +316,46 @@ useEffect(() => {
   w={220}
 /> */}
 
-<Select
-  placeholder="Select Subject"
-  value={selectedSubject}
-  onChange={setSelectedSubject}
-  
-  data={subjects.map((subject) => ({
-    value: subject._id,
-    label: subject.name,
-  }))}
-  w={220}
-/>
+            <Select
+              placeholder="Select Subject"
+              value={selectedSubject}
+              onChange={(v: any) => {
+                console.log("select subject : ", v);
 
+                setSelectedSubject(v);
+              }}
+              data={subjects.map((subject) => ({
+                value: subject._id,
+                label: subject.name,
+              }))}
+              w={220}
+            />
           </Group>
 
           <Button
             leftSection={<IconPlus size={18} />}
-              style={{
-    background: "#228be6",
-  }}
-  onClick={handleAddSelected}
+            style={{
+              background: "#228be6",
+            }}
+            onClick={handleAddSelected}
           >
             Add in Test
           </Button>
         </Flex>
 
-        
-         
-
         {/* Questions Container */}
 
-      <Box
-  bg="#fafafa"
-  style={{
-    border: "1px solid #e9ecef",
-    borderRadius: 12,
-  }}
->
-
+        <Box
+          bg="#fafafa"
+          style={{
+            border: "1px solid #e9ecef",
+            borderRadius: 12,
+          }}
+        >
           {/* Header */}
 
-          <Flex
-            justify="space-between"
-            align="center"
-            p="md"
-          >
+          <Flex justify="space-between" align="center" p="md">
             <Group>
-
               <Checkbox
                 checked={
                   questions.length > 0 &&
@@ -421,10 +364,7 @@ useEffect(() => {
                 onChange={handleSelectAll}
               />
 
-              <Text fw={600}>
-                All Questions
-              </Text>
-
+              <Text fw={600}>All Questions</Text>
             </Group>
 
             <Text fw={600} c="blue">
@@ -437,135 +377,84 @@ useEffect(() => {
           {/* Questions List */}
 
           <ScrollArea h={380}>
+            {loadingQuestions ? (
+              <Center py="xl">
+                <Loader />
+              </Center>
+            ) : questions.length === 0 ? (
+              <Center py="xl">
+                <Text c="dimmed">No Questions Found</Text>
+              </Center>
+            ) : (
+              <Stack p="md">
+                {questions.map((question, index) => (
+                  <Box
+                    key={question._id}
+                    p="sm"
+                    style={{
+                      border: "1px solid #e9ecef",
+                      borderRadius: 12,
+                      background: "#fdfdfd",
+                      minHeight: 110,
+                    }}
+                  >
+                    <Flex justify="space-between" align="flex-start">
+                      {/* Left Side */}
 
-  {loadingQuestions ? (
+                      <Flex gap="md" align="flex-start">
+                        <Checkbox
+                          mt={4}
+                          checked={selectedQuestions.includes(question._id)}
+                          onChange={() => handleSelectQuestion(question._id)}
+                        />
 
-    <Center py="xl">
+                        <Box>
+                          <Text fw={700} size="md" mb={6}>
+                            Q{index + 1}: {question.question}
+                          </Text>
 
-      <Loader />
+                          <Stack gap={1}>
+                            {question.options.map((option, optIndex) => (
+                              <Text
+                                key={option._id}
+                                size="md"
+                                c={option.answer ? "green" : "gray"}
+                              >
+                                {String.fromCharCode(65 + optIndex)}.{" "}
+                                {option.name}
+                                {option.answer && " ✓"}
+                              </Text>
+                            ))}
+                          </Stack>
+                        </Box>
+                      </Flex>
 
-    </Center>
+                      {/* Right Side Icons */}
 
-  ) : questions.length === 0 ? (
+                      <Group gap="xs">
+                        <ActionIcon variant="light" color="blue">
+                          <IconEdit size={16} />
+                        </ActionIcon>
 
-    <Center py="xl">
-
-      <Text c="dimmed">
-
-        No Questions Found
-
-      </Text>
-
-    </Center>
-
-  ) : (
-
-    <Stack p="md">
-
-      {questions.map((question, index) => (
-
-        <Box
-          key={question._id}
-          p="sm"
-          style={{
-            border: "1px solid #e9ecef",
-            borderRadius: 12,
-            background: "#fdfdfd",
-            minHeight: 110,
-          }}
-        >
-
-          <Flex justify="space-between" align="flex-start">
-
-            {/* Left Side */}
-
-            <Flex gap="md" align="flex-start">
-
-              <Checkbox
-                mt={4}
-                checked={selectedQuestions.includes(question._id)}
-                onChange={() =>
-                  handleSelectQuestion(question._id)
-                }
-              />
-
-              <Box>
-
-                <Text fw={700} size="md" mb={6}>
-                  Q{index + 1}: {question.question}
-                </Text>
-
-                <Stack gap={1}>
-
-                  {question.options.map((option, optIndex) => (
-
-                    <Text
-                      key={option._id}
-                      size="md"
-                      c={option.answer ? "green" : "gray"}
-                    >
-                      {String.fromCharCode(65 + optIndex)}.{" "}
-                      {option.name}
-                      {option.answer && " ✓"}
-                    </Text>
-
-                  ))}
-
-                </Stack>
-
-              </Box>
-
-            </Flex>
-
-            {/* Right Side Icons */}
-
-            <Group gap="xs">
-
-              <ActionIcon
-                variant="light"
-                color="blue"
-              >
-                <IconEdit size={16} />
-              </ActionIcon>
-
-              <ActionIcon
-                variant="light"
-                color="red"
-              >
-                <IconTrash size={16} />
-              </ActionIcon>
-
-            </Group>
-
-          </Flex>
-
-        </Box>
-
-      ))}
-
-    </Stack>
-
-  )}
-
-</ScrollArea>
-
+                        <ActionIcon variant="light" color="red">
+                          <IconTrash size={16} />
+                        </ActionIcon>
+                      </Group>
+                    </Flex>
+                  </Box>
+                ))}
+              </Stack>
+            )}
+          </ScrollArea>
         </Box>
 
         {/* Footer Buttons */}
 
         <Flex justify="flex-end" gap="md" mt="sm">
-
-          <Button
-            variant="outline"
-            onClick={onClose}
-          >
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-
-       
-
         </Flex>
-
       </Stack>
     </Modal>
   );

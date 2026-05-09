@@ -21,18 +21,24 @@ import {
   Center,
   Loader,
 } from "@mantine/core";
-import { IconX, IconPlus, IconEdit, IconSettings, IconTrash } from "@tabler/icons-react";
+import {
+  IconX,
+  IconPlus,
+  IconEdit,
+  IconSettings,
+  IconTrash,
+} from "@tabler/icons-react";
 
 // Import your API functions
-import { 
-  DeleteTestQuestionById, 
-  GetAllQuestionsByTestId 
-} from "../../../../../axios/tests/TestsGetApi"; 
+import {
+  DeleteTestQuestionById,
+  GetAllQuestionsByTestId,
+} from "../../../../../axios/tests/TestsGetApi";
 
-import{
-    CreateTestQuestion, 
-  UpdateTest
-} from  "../../../../../axios/tests/Tests.post"
+import {
+  CreateTestQuestion,
+  UpdateTest,
+} from "../../../../../axios/tests/Tests.post";
 import { log } from "console";
 import QuestionBankModal from "./QuestionBankModal";
 
@@ -66,7 +72,7 @@ interface Test {
   totalTime: number;
   questions: Question[];
   startTime?: string;
-   subject?: {
+  subject?: {
     _id: string;
     name: string;
   };
@@ -113,21 +119,22 @@ export default function SimpleEditTestModal({
   subjects = [],
 }: Props) {
   // UI State
-  const [currentView, setCurrentView] = useState<"list" | "edit-question" | "add-question" | "edit-test">("list");
+  const [currentView, setCurrentView] = useState<
+    "list" | "edit-question" | "add-question" | "edit-test"
+  >("list");
   const [loading, setLoading] = useState<boolean>(false);
   const [questionsLoading, setQuestionsLoading] = useState<boolean>(false);
-  const [deleteModal, setDeleteModal] = useState<{ 
-    open: boolean; 
-    questionId: string; 
-    questionText: string 
+  const [deleteModal, setDeleteModal] = useState<{
+    open: boolean;
+    questionId: string;
+    questionText: string;
   }>({
     open: false,
     questionId: "",
     questionText: "",
   });
 
-  console.log("subjects : ",subjects);
-  
+  console.log("subjects : ", subjects);
 
   // Data State
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -154,7 +161,7 @@ export default function SimpleEditTestModal({
   // Fetch questions from API
   const fetchQuestions = () => {
     if (!test?._id) return;
-    
+
     setQuestionsLoading(true);
     GetAllQuestionsByTestId(test._id)
       .then((res: any) => {
@@ -180,7 +187,7 @@ export default function SimpleEditTestModal({
         subjectId: test.subjectId || "",
         startTime: formatDateTimeForInput(test.startTime || ""),
       });
-      
+
       fetchQuestions();
     }
   }, [test]);
@@ -205,28 +212,32 @@ export default function SimpleEditTestModal({
   };
 
   const handleOptionChange = (index: number, value: string) => {
-    setQuestionForm(prev => ({
+    setQuestionForm((prev) => ({
       ...prev,
-      options: prev.options.map((opt, i) => i === index ? value : opt)
+      options: prev.options.map((opt, i) => (i === index ? value : opt)),
     }));
   };
 
   const addOption = () => {
     if (questionForm.options.length < 6) {
-      setQuestionForm(prev => ({
+      setQuestionForm((prev) => ({
         ...prev,
-        options: [...prev.options, ""]
+        options: [...prev.options, ""],
       }));
     }
   };
 
   const removeOption = (index: number) => {
     if (questionForm.options.length > 2) {
-      setQuestionForm(prev => ({
+      setQuestionForm((prev) => ({
         ...prev,
         options: prev.options.filter((_, i) => i !== index),
-        correctIndex: prev.correctIndex === index ? -1 : 
-                    prev.correctIndex > index ? prev.correctIndex - 1 : prev.correctIndex
+        correctIndex:
+          prev.correctIndex === index
+            ? -1
+            : prev.correctIndex > index
+              ? prev.correctIndex - 1
+              : prev.correctIndex,
       }));
     }
   };
@@ -236,8 +247,8 @@ export default function SimpleEditTestModal({
     setEditingQuestion(question);
     setQuestionForm({
       text: question.question,
-      options: question.options?.map(opt => opt.name) || ["", "", "", ""],
-      correctIndex: question.options?.findIndex(opt => opt.answer) || -1,
+      options: question.options?.map((opt) => opt.name) || ["", "", "", ""],
+      correctIndex: question.options?.findIndex((opt) => opt.answer) || -1,
       explanation: question.explanation || "",
     });
     setCurrentView("edit-question");
@@ -260,7 +271,7 @@ export default function SimpleEditTestModal({
       return;
     }
 
-    if (questionForm.options.some(opt => !opt.trim())) {
+    if (questionForm.options.some((opt) => !opt.trim())) {
       showNotification("Please fill all options", "error");
       return;
     }
@@ -273,41 +284,45 @@ export default function SimpleEditTestModal({
     setLoading(true);
 
     console.log("TEST OBJECT :", test);
-console.log("TEST SUBJECT ID :", test.subjectId);
-    
+    console.log("TEST SUBJECT ID :", test.subjectId);
+
     const questionData = {
       question: {
         testId: test._id,
         question: questionForm.text,
         options: questionForm.options.map((option, index) => ({
           name: option,
-          answer: index === questionForm.correctIndex
+          answer: index === questionForm.correctIndex,
         })),
         correctAns: questionForm.options[questionForm.correctIndex],
-        ...(questionForm.explanation && { explanation: questionForm.explanation })
+        ...(questionForm.explanation && {
+          explanation: questionForm.explanation,
+        }),
       },
-        // SIRF NEW QUESTION ADD TIME PE
-  ...(!editingQuestion?._id && test.batchId && {
-    batchId: test.batchId,
-  }),
+      // SIRF NEW QUESTION ADD TIME PE
+      ...(!editingQuestion?._id &&
+        test.batchId && {
+          batchId: test.batchId,
+        }),
 
-  ...(!editingQuestion?._id && test.subject?._id && {
-  subjectId: test.subject._id,
-}),
+      ...(!editingQuestion?._id &&
+        test.subject?._id && {
+          subjectId: test.subject._id,
+        }),
 
-      ...(editingQuestion?._id && { questionId: editingQuestion._id })
+      ...(editingQuestion?._id && { questionId: editingQuestion._id }),
     };
-console.log("FINAL QUESTION DATA :", questionData);
+    console.log("FINAL QUESTION DATA :", questionData);
     CreateTestQuestion(questionData)
       .then((res: any) => {
         console.log("create: ", res);
-        
+
         showNotification(
           `Question ${editingQuestion ? "updated" : "added"} successfully`,
-          "success"
+          "success",
         );
-        
-        fetchQuestions(); 
+
+        fetchQuestions();
         setCurrentView("list");
         resetQuestionForm();
         onTestUpdated();
@@ -324,16 +339,18 @@ console.log("FINAL QUESTION DATA :", questionData);
     if (!deleteModal.questionId) return;
 
     setLoading(true);
-    
+
     DeleteTestQuestionById(deleteModal.questionId)
       .then((res: any) => {
         showNotification("Question deleted successfully", "success");
-        
+
         // Update local state
-        const updatedQuestions = questions.filter(q => q._id !== deleteModal.questionId);
+        const updatedQuestions = questions.filter(
+          (q) => q._id !== deleteModal.questionId,
+        );
         setQuestions(updatedQuestions);
         setMaxMarks(updatedQuestions.length); // Update max marks on frontend
-        
+
         setDeleteModal({ open: false, questionId: "", questionText: "" });
         onTestUpdated();
         setLoading(false);
@@ -357,14 +374,16 @@ console.log("FINAL QUESTION DATA :", questionData);
     }
 
     setLoading(true);
-    
+
     const updateData = {
       testId: test._id,
       name: testForm.name.trim(),
       testName: testForm.name.trim(),
       totalTime: testForm.duration,
       ...(testForm.subjectId && { subjectId: testForm.subjectId }),
-      ...(testForm.startTime && { startTime: new Date(testForm.startTime).toISOString() }),
+      ...(testForm.startTime && {
+        startTime: new Date(testForm.startTime).toISOString(),
+      }),
     };
 
     UpdateTest(updateData)
@@ -400,9 +419,15 @@ console.log("FINAL QUESTION DATA :", questionData);
       </Flex>
       <Text size="sm" c="dimmed" ff="Roboto">
         Duration: {testForm.duration} minutes | Max Marks: {maxMarks}
-        {test?.startTime && <> | Start: {new Date(test.startTime).toLocaleString()}</>}
+        {test?.startTime && (
+          <> | Start: {new Date(test.startTime).toLocaleString()}</>
+        )}
         {subjects.length > 0 && testForm.subjectId && (
-          <> | Subject: {subjects.find(s => s._id === testForm.subjectId)?.name}</>
+          <>
+            {" "}
+            | Subject:{" "}
+            {subjects.find((s) => s._id === testForm.subjectId)?.name}
+          </>
         )}
       </Text>
     </Box>
@@ -415,28 +440,27 @@ console.log("FINAL QUESTION DATA :", questionData);
           Questions ({questions.length})
         </Text>
         <Group gap="sm">
+          <Button
+            leftSection={<IconPlus size={16} />}
+            onClick={() => setQuestionBankOpen(true)}
+            size="sm"
+            variant="outline"
+            c="#111"
+            style={{ borderColor: "#111" }}
+          >
+            Question Bank
+          </Button>
 
-        <Button
-    leftSection={<IconPlus size={16} />}
-    onClick={() => setQuestionBankOpen(true)}
-    size="sm"
-      variant="outline"
-          c="#111"
-          style={{ borderColor: "#111" }}
-  >
-    Question Bank
-  </Button>
-
-        <Button 
-          leftSection={<IconPlus size={16} />} 
-          onClick={handleAddNewQuestion} 
-          size="sm"
-          variant="outline"
-          c="#111"
-          style={{ borderColor: "#111" }}
-        >
-          Add New Question
-        </Button>
+          <Button
+            leftSection={<IconPlus size={16} />}
+            onClick={handleAddNewQuestion}
+            size="sm"
+            variant="outline"
+            c="#111"
+            style={{ borderColor: "#111" }}
+          >
+            Add New Question
+          </Button>
         </Group>
       </Flex>
 
@@ -445,7 +469,9 @@ console.log("FINAL QUESTION DATA :", questionData);
           <Center py="xl">
             <Stack align="center" gap="sm">
               <Loader size="md" />
-              <Text size="sm" c="dimmed">Loading questions...</Text>
+              <Text size="sm" c="dimmed">
+                Loading questions...
+              </Text>
             </Stack>
           </Center>
         ) : (
@@ -453,7 +479,9 @@ console.log("FINAL QUESTION DATA :", questionData);
             {questions.length === 0 ? (
               <Center py="xl">
                 <Stack align="center" gap="sm">
-                  <Text size="lg" c="dimmed">📝</Text>
+                  <Text size="lg" c="dimmed">
+                    📝
+                  </Text>
                   <Text size="sm" c="dimmed" ta="center">
                     No questions found. Add your first question to get started.
                   </Text>
@@ -461,23 +489,28 @@ console.log("FINAL QUESTION DATA :", questionData);
               </Center>
             ) : (
               questions.map((question, index) => (
-                <Box 
-                  key={question._id} 
-                  p="md" 
-                  style={{ 
-                    border: "1px solid #ddd", 
+                <Box
+                  key={question._id}
+                  p="md"
+                  style={{
+                    border: "1px solid #ddd",
                     borderRadius: 8,
-                    backgroundColor: "#fafafa"
+                    backgroundColor: "#fafafa",
                   }}
                 >
                   <Flex justify="space-between" align="flex-start" mb="xs">
-                    <Text fw={600} size="sm" ff="Roboto" style={{ flex: 1, marginRight: 10 }}>
+                    <Text
+                      fw={600}
+                      size="sm"
+                      ff="Roboto"
+                      style={{ flex: 1, marginRight: 10 }}
+                    >
                       Q{index + 1}: {question.question}
                     </Text>
                     <Flex gap="xs">
-                      <ActionIcon 
-                        size="sm" 
-                        variant="light" 
+                      <ActionIcon
+                        size="sm"
+                        variant="light"
                         onClick={() => handleEditQuestion(question)}
                       >
                         <IconEdit size={14} />
@@ -486,30 +519,33 @@ console.log("FINAL QUESTION DATA :", questionData);
                         size="sm"
                         variant="light"
                         color="red"
-                        onClick={() => setDeleteModal({
-                          open: true,
-                          questionId: question._id,
-                          questionText: question.question,
-                        })}
+                        onClick={() =>
+                          setDeleteModal({
+                            open: true,
+                            questionId: question._id,
+                            questionText: question.question,
+                          })
+                        }
                       >
                         <IconTrash size={14} />
                       </ActionIcon>
                     </Flex>
                   </Flex>
-                  
+
                   <Stack gap={4}>
                     {question.options?.map((option, optIndex) => (
-                      <Text 
-                        key={option._id || optIndex} 
-                        size="xs" 
+                      <Text
+                        key={option._id || optIndex}
+                        size="xs"
                         c={option.answer ? "green" : "gray"}
                         ff="Roboto"
                       >
-                        {String.fromCharCode(65 + optIndex)}. {option.name} {option.answer && " ✓"}
+                        {String.fromCharCode(65 + optIndex)}. {option.name}{" "}
+                        {option.answer && " ✓"}
                       </Text>
                     ))}
                   </Stack>
-                  
+
                   {question.explanation && (
                     <Text size="xs" c="blue" mt="xs" ff="Roboto">
                       💡 {question.explanation}
@@ -529,24 +565,30 @@ console.log("FINAL QUESTION DATA :", questionData);
       <Text fw={600} mb="md" fz={18} ff="Roboto">
         {editingQuestion ? "Edit Question" : "Add New Question"}
       </Text>
-      
+
       <Stack gap="md">
         <Textarea
           label="Question"
           placeholder="Enter your question here..."
           value={questionForm.text}
-          onChange={(e) => setQuestionForm(prev => ({ ...prev, text: e.target.value }))}
+          onChange={(e) =>
+            setQuestionForm((prev) => ({ ...prev, text: e.target.value }))
+          }
           minRows={2}
           required
         />
 
-        <Text size="sm" fw={500} ff="Roboto">Options</Text>
+        <Text size="sm" fw={500} ff="Roboto">
+          Options
+        </Text>
         <Stack gap="sm">
           {questionForm.options.map((option, index) => (
             <Flex key={index} align="center" gap="xs">
               <Radio
                 checked={questionForm.correctIndex === index}
-                onChange={() => setQuestionForm(prev => ({ ...prev, correctIndex: index }))}
+                onChange={() =>
+                  setQuestionForm((prev) => ({ ...prev, correctIndex: index }))
+                }
               />
               <TextInput
                 placeholder={`Option ${String.fromCharCode(65 + index)}`}
@@ -556,9 +598,9 @@ console.log("FINAL QUESTION DATA :", questionData);
                 required
               />
               {questionForm.options.length > 2 && (
-                <ActionIcon 
-                  color="red" 
-                  variant="light" 
+                <ActionIcon
+                  color="red"
+                  variant="light"
                   onClick={() => removeOption(index)}
                 >
                   <IconX size={16} />
@@ -569,9 +611,9 @@ console.log("FINAL QUESTION DATA :", questionData);
         </Stack>
 
         {questionForm.options.length < 6 && (
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={addOption}
             leftSection={<IconPlus size={16} />}
           >
@@ -583,20 +625,25 @@ console.log("FINAL QUESTION DATA :", questionData);
           label="Explanation (Optional)"
           placeholder="Explain why this is the correct answer..."
           value={questionForm.explanation}
-          onChange={(e) => setQuestionForm(prev => ({ ...prev, explanation: e.target.value }))}
+          onChange={(e) =>
+            setQuestionForm((prev) => ({
+              ...prev,
+              explanation: e.target.value,
+            }))
+          }
           minRows={2}
         />
 
         <Flex justify="flex-end" gap="sm" mt="md">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => setCurrentView("list")}
             disabled={loading}
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleSaveQuestion} 
+          <Button
+            onClick={handleSaveQuestion}
             loading={loading}
             c="#fff"
             style={{ backgroundColor: "#111" }}
@@ -610,14 +657,18 @@ console.log("FINAL QUESTION DATA :", questionData);
 
   const renderTestDetailsForm = () => (
     <Stack gap="md">
-      <Text fw={600} fz={18} ff="Roboto">Edit Test Details</Text>
-      
+      <Text fw={600} fz={18} ff="Roboto">
+        Edit Test Details
+      </Text>
+
       <Grid>
         <Grid.Col span={8}>
           <TextInput
             label="Test Name"
             value={testForm.name}
-            onChange={(e) => setTestForm(prev => ({ ...prev, name: e.target.value }))}
+            onChange={(e) =>
+              setTestForm((prev) => ({ ...prev, name: e.target.value }))
+            }
             required
             placeholder="Enter test name"
           />
@@ -626,7 +677,9 @@ console.log("FINAL QUESTION DATA :", questionData);
           <NumberInput
             label="Duration (minutes)"
             value={testForm.duration}
-            onChange={(value) => setTestForm(prev => ({ ...prev, duration: Number(value) || 0 }))}
+            onChange={(value) =>
+              setTestForm((prev) => ({ ...prev, duration: Number(value) || 0 }))
+            }
             min={1}
             max={999}
             required
@@ -640,8 +693,13 @@ console.log("FINAL QUESTION DATA :", questionData);
           label="Subject"
           placeholder="Select subject"
           value={testForm.subjectId}
-          onChange={(value) => setTestForm(prev => ({ ...prev, subjectId: value || "" }))}
-          data={subjects.map(subject => ({ value: subject._id, label: subject.name }))}
+          onChange={(value) =>
+            setTestForm((prev) => ({ ...prev, subjectId: value || "" }))
+          }
+          data={subjects.map((subject) => ({
+            value: subject._id,
+            label: subject.name,
+          }))}
           clearable
         />
       )}
@@ -650,20 +708,22 @@ console.log("FINAL QUESTION DATA :", questionData);
         label="Start Time (Optional)"
         type="datetime-local"
         value={testForm.startTime}
-        onChange={(e) => setTestForm(prev => ({ ...prev, startTime: e.target.value }))}
+        onChange={(e) =>
+          setTestForm((prev) => ({ ...prev, startTime: e.target.value }))
+        }
         placeholder="Select start time"
       />
 
       <Flex justify="flex-end" gap="sm" mt="md">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => setCurrentView("list")}
           disabled={loading}
         >
           Cancel
         </Button>
-        <Button 
-          onClick={handleSaveTestDetails} 
+        <Button
+          onClick={handleSaveTestDetails}
           loading={loading}
           c="white"
           style={{ backgroundColor: "#b60f0f" }}
@@ -680,28 +740,28 @@ console.log("FINAL QUESTION DATA :", questionData);
 
   return (
     <>
-      <Modal 
-        opened={opened} 
-        onClose={handleClose} 
-        title="Edit Test" 
+      <Modal
+        opened={opened}
+        onClose={handleClose}
+        title="Edit Test"
         size="xl"
         centered
         styles={{
-          header: { 
-            borderBottom: '1px solid #eee',
-            paddingBottom: '1rem'
-          }
+          header: {
+            borderBottom: "1px solid #eee",
+            paddingBottom: "1rem",
+          },
         }}
       >
         <Stack gap="md" pos="relative">
           {loading && (
-            <Box 
-              pos="absolute" 
-              top={0} 
-              left={0} 
-              right={0} 
-              bottom={0} 
-              bg="rgba(255,255,255,0.8)" 
+            <Box
+              pos="absolute"
+              top={0}
+              left={0}
+              right={0}
+              bottom={0}
+              bg="rgba(255,255,255,0.8)"
               style={{ zIndex: 1000 }}
             >
               <Center h="100%">
@@ -723,7 +783,8 @@ console.log("FINAL QUESTION DATA :", questionData);
             </>
           )}
 
-          {(currentView === "edit-question" || currentView === "add-question") && (
+          {(currentView === "edit-question" ||
+            currentView === "add-question") && (
             <>
               <Divider />
               {renderQuestionForm()}
@@ -742,47 +803,52 @@ console.log("FINAL QUESTION DATA :", questionData);
       {/* Delete Confirmation Modal */}
       <Modal
         opened={deleteModal.open}
-        onClose={() => setDeleteModal({ open: false, questionId: "", questionText: "" })}
+        onClose={() =>
+          setDeleteModal({ open: false, questionId: "", questionText: "" })
+        }
         title="Delete Question"
         size="md"
         centered
       >
         <Stack gap="md">
           <Text ff="Roboto">
-            Are you sure you want to delete this question? This action cannot be undone.
+            Are you sure you want to delete this question? This action cannot be
+            undone.
           </Text>
-          
-          <Box 
-            p="md" 
-            bg="yellow.1" 
-            style={{ 
-              borderRadius: 8, 
-              border: "1px solid #ffc107" 
+
+          <Box
+            p="md"
+            bg="yellow.1"
+            style={{
+              borderRadius: 8,
+              border: "1px solid #ffc107",
             }}
           >
             <Text size="sm" fw={500} mb="xs" ff="Roboto">
               Question to be deleted:
             </Text>
-            <Text 
-              size="sm" 
-              style={{ wordBreak: "break-word" }}
-              ff="Roboto"
-            >
+            <Text size="sm" style={{ wordBreak: "break-word" }} ff="Roboto">
               "{deleteModal.questionText}"
             </Text>
           </Box>
 
           <Flex justify="flex-end" gap="sm">
-            <Button 
-              variant="outline" 
-              onClick={() => setDeleteModal({ open: false, questionId: "", questionText: "" })}
+            <Button
+              variant="outline"
+              onClick={() =>
+                setDeleteModal({
+                  open: false,
+                  questionId: "",
+                  questionText: "",
+                })
+              }
               disabled={loading}
             >
               Cancel
             </Button>
-            <Button 
-              color="red" 
-              onClick={handleDeleteQuestion} 
+            <Button
+              color="red"
+              onClick={handleDeleteQuestion}
               loading={loading}
             >
               Delete Question
@@ -792,12 +858,12 @@ console.log("FINAL QUESTION DATA :", questionData);
       </Modal>
 
       <QuestionBankModal
-  opened={questionBankOpen}
-  onClose={() => setQuestionBankOpen(false)}
-  batchId={test?.batchId || ""}
-  testId={test?._id || ""}
-    onSuccess={fetchQuestions}
-/>
+        opened={questionBankOpen}
+        onClose={() => {setQuestionBankOpen(false)}}
+        batchId={test?.batchId || ""}
+        testId={test?._id || ""}
+        onSuccess={fetchQuestions}
+      />
     </>
   );
 }

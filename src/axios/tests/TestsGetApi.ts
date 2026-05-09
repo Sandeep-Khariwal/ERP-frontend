@@ -26,7 +26,7 @@ export type Test = {
 // ✅ Get all tests by subject
 export function GetAllTestsByBatchAndSubject(
   batchId: string,
-  subjectId?: string
+  subjectId?: string,
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/onlinetest/allTests`, {
@@ -41,7 +41,16 @@ export function GetAllTestsByBatchAndSubject(
 export function GetAllQuestionsByTestId(testId: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(
-      `${process.env.URL}/api/v1/onlinetestquestion/getAllQuestions/${testId}`
+      `${process.env.URL}/api/v1/onlinetestquestion/getAllQuestions/${testId}`,
+    )
+      .then((response: any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+export function GetAllQuestionsFromBank(batchId: string, subjectId: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/questionBank?batchId=${batchId}&&subjectId=${subjectId}`,
     )
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
@@ -51,7 +60,7 @@ export function GetAllQuestionsByTestId(testId: string) {
 export function GetAllLiveTest(batchId: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(
-      `${process.env.URL}/api/v1/onlinetest/getAllLiveTest?batchId=${batchId}`
+      `${process.env.URL}/api/v1/onlinetest/getAllLiveTest?batchId=${batchId}`,
     )
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
@@ -60,10 +69,10 @@ export function GetAllLiveTest(batchId: string) {
 
 export function GetOnlineTest(testId?: string): Promise<any> {
   return new Promise((resolve, reject) => {
-      console.log("batch id : ",testId);
-    
+    console.log("batch id : ", testId);
+
     ApiHelper.get(
-      `${process.env.URL}/api/v1/onlinetest/getTest?testId=${testId}`
+      `${process.env.URL}/api/v1/onlinetest/getTest?testId=${testId}`,
     )
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
@@ -74,7 +83,7 @@ export function GetOnlineTest(testId?: string): Promise<any> {
 export function DeleteTestById(testId: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.delete(
-      `${process.env.URL}/api/v1/onlinetest/deleteTest/${testId}`
+      `${process.env.URL}/api/v1/onlinetest/deleteTest/${testId}`,
     )
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
@@ -85,7 +94,7 @@ export function DeleteTestById(testId: string) {
 export function DeleteTestQuestionById(questionId: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.delete(
-      `${process.env.URL}/api/v1/onlinetestquestion/deleteQuestion/${questionId}`
+      `${process.env.URL}/api/v1/onlinetestquestion/deleteQuestion/${questionId}`,
     )
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
@@ -109,10 +118,10 @@ export function GetTestById(testId: string) {
   });
 }
 
-export function GetTestResult(testId: string , studentId:string) {
+export function GetTestResult(testId: string, studentId: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(
-      `${process.env.URL}/api/v1/onlinetestresult/getResultById?testId=${testId}&studentId=${studentId}`
+      `${process.env.URL}/api/v1/onlinetestresult/getResultById?testId=${testId}&studentId=${studentId}`,
     )
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));

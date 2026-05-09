@@ -69,51 +69,55 @@ const StepThree = (props: {
   // INITIAL LOAD
   // =========================================
 
-  useEffect(() => {
-    if (!originalFeeType) return;
+useEffect(() => {
 
-    // =========================================
-    // EDIT MODE
-    // =========================================
+  // =========================================
+  // EDIT MODE
+  // =========================================
 
-    if (props.isEditable) {
-      // ORIGINAL = BATCH
-      if (originalFeeType === "Batch") {
-        setBatchInstallments(props.studentInstallments);
+  if (props.isEditable) {
 
-        setInstallments(props.studentInstallments);
+    // ORIGINAL = BATCH
+    if (originalFeeType === "Batch") {
 
-        setSelectedType("Batch");
+      setBatchInstallments(props.studentInstallments);
 
-        props.setInstallments(props.studentInstallments);
+      setInstallments(props.studentInstallments);
 
-        props.setCustomOrBatch("Batch");
+      setSelectedType("Batch");
 
-        props.setSelectedBatchId(props.batchId);
-      }
+      props.setInstallments(props.studentInstallments);
 
-      // ORIGINAL = CUSTOM
-      else {
-        setCustomInstallments(props.studentInstallments);
+      props.setCustomOrBatch("Batch");
 
-        setInstallments(props.studentInstallments);
-
-        setSelectedType("Custom");
-
-        props.setInstallments(props.studentInstallments);
-
-        props.setCustomOrBatch("Custom");
-      }
-
-      return;
+      props.setSelectedBatchId(props.batchId);
     }
 
-    // =========================================
-    // CREATE MODE
-    // =========================================
+    // ORIGINAL = CUSTOM
+    else if (originalFeeType === "Custom") {
 
-    onClickCustomOrBatch(originalFeeType);
-  }, []);
+      setCustomInstallments(props.studentInstallments);
+
+      setInstallments(props.studentInstallments);
+
+      setSelectedType("Custom");
+
+      props.setInstallments(props.studentInstallments);
+
+      props.setCustomOrBatch("Custom");
+    }
+
+    return;
+  }
+
+  // =========================================
+  // CREATE MODE
+  // =========================================
+
+  // by default always Batch
+  onClickCustomOrBatch("Batch");
+
+}, []);
 
   // =========================================
   // UPDATE PARENT INSTALLMENTS
@@ -170,7 +174,7 @@ const StepThree = (props: {
       const { feeInstallments } = x.batchFee;
 
       const newInstallments = feeInstallments.map((f: any) => ({
-        _id: f._id || "",
+        _id:  "",
         name: f.name,
         dueDate: new Date(f.dueDate).toISOString().split("T")[0],
         amount: f.amount,
