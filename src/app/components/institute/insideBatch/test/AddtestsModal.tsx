@@ -34,6 +34,9 @@ import {
 } from "@tabler/icons-react";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { DateTimePicker } from '@mantine/dates';
+import { IconPlus } from "@tabler/icons-react";
+import QuestionBankModal from "./QuestionBankModal";
+import UploadExcelQues from "./UploadExcelQues";
 
 const AddTestsModal = (props: {
   opened: boolean;
@@ -63,6 +66,8 @@ const AddTestsModal = (props: {
   const [testTime, setTestTime] = useState<number>(0);
   const [active, setActive] = useState(0);
   const [testId, setTestId] = useState<string>("");
+  const [questionBankOpen, setQuestionBankOpen] = useState(false);
+    const [excelModalOpen, setExcelModalOpen] = useState(false);
   type McqQuestion = {
     question: string;
     options: string[];
@@ -358,9 +363,49 @@ console.log("QUESTION PAYLOAD :", payload);
             </>
           )}{page === 1 && (
             <>
-              <Text ta="center" mx={isMd ? 14 : 30} mt={20} ml="36%" c="#2F4F4F" fw={600} fz={24} ff="Roboto">
-                Make Mcq  Questions
-              </Text>
+            <Flex
+  justify="space-between"
+  align="center"
+  w="100%"
+  mt={20}
+  wrap="wrap"
+  gap="sm"
+>
+  {/* LEFT SIDE TITLE */}
+  <Text
+    c="#2F4F4F"
+    fw={600}
+    fz={24}
+    ff="Roboto"
+  >
+    Make Mcq Questions
+  </Text>
+
+  {/* RIGHT SIDE BUTTONS */}
+  <Group>
+    <Button
+      leftSection={<IconPlus size={16} />}
+      onClick={() => setExcelModalOpen(true)}
+      size="sm"
+      variant="outline"
+      c="#111"
+      style={{ borderColor: "#111" }}
+    >
+      Upload ExcelFile
+    </Button>
+
+    <Button
+      leftSection={<IconPlus size={16} />}
+      onClick={() => setQuestionBankOpen(true)}
+      size="sm"
+      variant="outline"
+      c="#111"
+      style={{ borderColor: "#111" }}
+    >
+      Question Bank
+    </Button>
+  </Group>
+</Flex>
               <Box w="100%" h="15%">
                 <Textarea
                   label="Enter your question"
@@ -540,6 +585,29 @@ console.log("QUESTION PAYLOAD :", payload);
           )}
         </Group>
       </Modal>
+      <QuestionBankModal
+  opened={questionBankOpen}
+  onClose={() => {
+    setQuestionBankOpen(false);
+  }}
+  batchId={props.batchId}
+  testId={testId}
+  onSuccess={() => {
+    console.log("Question Bank Success");
+  }}
+/>
+
+<UploadExcelQues
+  opened={excelModalOpen}
+  onClose={() => setExcelModalOpen(false)}
+  batchId={props.batchId}
+  testId={testId}
+  subjectId={selectedSubject}
+  onSuccess={() => {
+    console.log("Questions Uploaded");
+  }}
+/>
+
     </>
 
   );

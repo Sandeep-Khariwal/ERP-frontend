@@ -29,6 +29,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
+
 // Import your API functions
 import {
   DeleteTestQuestionById,
@@ -41,6 +42,7 @@ import {
 } from "../../../../../axios/tests/Tests.post";
 import { log } from "console";
 import QuestionBankModal from "./QuestionBankModal";
+import UploadExcelQues from "./UploadExcelQues";
 
 // Types
 interface Subject {
@@ -141,7 +143,8 @@ export default function SimpleEditTestModal({
   const [maxMarks, setMaxMarks] = useState<number>(0); // Frontend state for max marks
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [questionBankOpen, setQuestionBankOpen] = useState(false);
-
+  const [excelModalOpen, setExcelModalOpen] = useState(false);
+  
   // Form State - Question
   const [questionForm, setQuestionForm] = useState({
     text: "",
@@ -440,6 +443,17 @@ export default function SimpleEditTestModal({
           Questions ({questions.length})
         </Text>
         <Group gap="sm">
+             <Button
+            leftSection={<IconPlus size={16} />}
+            onClick={() => setExcelModalOpen(true)}
+            size="sm"
+            variant="outline"
+            c="#111"
+            style={{ borderColor: "#111" }}
+          >
+            Upload ExcelFile
+          </Button>
+
           <Button
             leftSection={<IconPlus size={16} />}
             onClick={() => setQuestionBankOpen(true)}
@@ -864,6 +878,17 @@ export default function SimpleEditTestModal({
         testId={test?._id || ""}
         onSuccess={fetchQuestions}
       />
+
+      <UploadExcelQues
+  opened={excelModalOpen}
+  onClose={() => setExcelModalOpen(false)}
+  batchId={test?.batchId || ""}
+  testId={test?._id || ""}
+  // subjectId={test?.subjectId || ""}
+   subjectId={test?.subject?._id || ""}
+  onSuccess={fetchQuestions}
+/>
+      
     </>
   );
 }
