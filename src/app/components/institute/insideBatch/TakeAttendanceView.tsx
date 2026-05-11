@@ -28,13 +28,15 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { IconArrowBack, IconCalendar } from "@tabler/icons-react";
+import { IconArrowBack, IconCalendar, IconBellFilled, } from "@tabler/icons-react";
 import { DatePickerInput } from "@mantine/dates";
 import Image from "next/image";
 import {
   CreateAttendance,
   GetAttendanceOnDate,
+  GetBatchLeave,
 } from "@/axios/batch/BatchPostApi";
+import StudentLeave from "./StudentLeave";
 
 interface TakeAttendanceViewProps {
   students: StudentsDataWithBatch[];
@@ -71,6 +73,12 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
   const [openHomeWorkModal, setOpenHomeWorkModal] = useState<boolean>(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+  // aah jdo backend ch jive hoya audo likhge dynamic hojuga
+  // const leaveCount = leaveStudents.length;
+  // const leaveCount = 4;
+  const [leaveCount, setLeaveCount] = useState<number>(0);
+const [leaveData, setLeaveData] = useState<any[]>([]);
 
 
   useEffect(() => {
@@ -88,20 +96,42 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
       const attendanceTakenDate = new Date(attendanceDate);
       const today = new Date();
 
-        setIsLoading(true);
-        GetAttendanceOnDate(props.batchId, new Date(attendanceDate))
-          .then((x: any) => {
-            const { attendance } = x;
-            setPrevDateSttendance(attendance);
+      setIsLoading(true);
+      GetAttendanceOnDate(props.batchId, new Date(attendanceDate))
+        .then((x: any) => {
+          const { attendance } = x;
+          setPrevDateSttendance(attendance);
 
-            setIsLoading(false);
-          })
-          .catch((e) => {
-            console.log(e);
-            setIsLoading(false);
-          });
+          setIsLoading(false);
+        })
+        .catch((e) => {
+          console.log(e);
+          setIsLoading(false);
+        });
     }
   }, [attendanceDate]);
+
+  useEffect(() => {
+  if (props.batchId) {
+    GetBatchLeave(props.batchId)
+      .then((x: any) => {
+        console.log("Leave API Response =>", x);
+
+        // payload me jo data aa rha hai
+        // const leaves = x?.batchLeave || [];
+        const leaves = x?.leaves || [];
+
+        // pura leave data save
+        setLeaveData(leaves);
+
+        // bell notification count
+        setLeaveCount(leaves.length);
+      })
+      .catch((e: any) => {
+        console.log("Leave API Error =>", e);
+      });
+  }
+}, [props.batchId]);
 
   // function findAttendanceRecordByDate(
   //   attendanceRecords: AttendanceInterface[]
@@ -153,25 +183,69 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
     <>
       <LoadingOverlay visible={isLoading} />
       <Stack w={"100%"} mt={16} py={10} px={5} bg={"white"}>
-        <Flex align={"center"}>
+        <Flex align={"center"} justify={"space-between"}>
+          <Flex align={"center"}>
+            <Box
+              w="24px"
+              h="24px"
+              onClick={() => props.onBackClicked()}
+              style={{ cursor: "pointer" }}
+            >
+              <IconArrowBack color="black" />
+            </Box>
+
+            <Text ml={24} fw={600} fz={24}>
+              View/Take Attendance
+            </Text>
+          </Flex>
+
           <Box
-            w="24px"
-            h="24px"
-            onClick={() => props.onBackClicked()}
-            style={{ cursor: "pointer" }}
+            onClick={() => setLeaveModalOpen(true)}
+            style={{
+              cursor: "pointer",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: "10px",
+            }}
           >
-            <IconArrowBack color="black" />
+            <IconBellFilled
+              size={28}
+              color="#4B65F6"
+            />
+
+            {leaveCount > 0 && (
+              <Box
+                style={{
+                  position: "absolute",
+                  top: "-6px",
+                  right: "-8px",
+                  backgroundColor: "#FF3B30",
+                  borderRadius: "50%",
+                  minWidth: "20px",
+                  height: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  padding: "2px",
+                }}
+              >
+                {leaveCount}
+              </Box>
+            )}
           </Box>
-          <Text ml={24} fw={600} fz={24}>
-            View/Take Attendance
-          </Text>
         </Flex>
+
         <DatePickerInput
           rightSection={<IconCalendar stroke={1} />}
           value={attendanceDate}
           onChange={(date: Date | null) => {
             if (date) {
-              
+
               // Set time to 00:00:00 for consistent date storage
               // date.setHours(0, 0, 0, 0);
               const isStringDate = date.toISOString()
@@ -245,7 +319,7 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
             {prevDateSttendance.length === 0 && props.students.map((student, index) => {
               return (
                 attendanceDate?.toDateString() ===
-                  todaysDate?.toDateString() && (
+                todaysDate?.toDateString() && (
                   <AttendanceCard
                     key={index}
                     studentId={student._id || ""}
@@ -285,7 +359,7 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
                   name={att.studentId.name}
                   phone={att.studentId.parentNumber}
                   date={attendanceDate!!}
-                  submitHandler={() => {}}
+                  submitHandler={() => { }}
                   status={att.status}
                 />
               ))}
@@ -296,8 +370,8 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
                 onClick={() => {
                   submitAttendance();
                 }}
-                style={{ backgroundColor: "#4B65F6", marginBottom:"20px" }}
-                px={100} 
+                style={{ backgroundColor: "#4B65F6", marginBottom: "20px" }}
+                px={100}
               >
                 Submit
               </Button>
@@ -338,6 +412,12 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
             /> */}
         </Modal>
       )}
+      <StudentLeave
+        opened={leaveModalOpen}
+        onClose={() => setLeaveModalOpen(false)}
+        batchId={props.batchId}
+          leaveData={leaveData}
+      />
     </>
   );
 }

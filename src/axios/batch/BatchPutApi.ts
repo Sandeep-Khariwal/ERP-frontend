@@ -15,3 +15,17 @@ export function EditTheBatchName(id:string,name:string) {
       .catch((error: any) => reject(error));
   });
 }
+
+export function PutLeaveMethod(
+  leaveId: string,
+  isDecline: boolean
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/batch/updateLeave/${leaveId}?isDecline=${isDecline}`,
+      {}
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
