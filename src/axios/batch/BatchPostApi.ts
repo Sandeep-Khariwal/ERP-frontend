@@ -28,6 +28,15 @@ export function GetAttendanceOnDate(batchId: string, data: Date) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetBatchLeave(batchId: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/batch/batchLeave/${batchId}`
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
 export function CreateTest(data: {
   batchId: string;
   maxNumber: number;
