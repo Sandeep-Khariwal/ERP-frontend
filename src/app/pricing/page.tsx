@@ -81,7 +81,7 @@ export default function SubscriptionPlans() {
 
   const paymentHandler = async (amount: number, subscrriptionId:string, type: number) => {
     let adminId = "";
-    if (!email.includes("@gmail.com")) {
+    if (!email.includes("@gmail.com") && !email.includes("@yahoo.com")) {
       ErrorNotification("Enter valid email!!");
       return;
     }

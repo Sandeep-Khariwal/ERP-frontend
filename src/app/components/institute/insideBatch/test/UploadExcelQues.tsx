@@ -144,6 +144,7 @@ export default function UploadExcelQues({
         onSuccess();
 
         onClose();
+        
 
         setLoading(false);
       })
