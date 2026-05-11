@@ -15,3 +15,28 @@ export function EditTheBatchName(id:string,name:string) {
       .catch((error: any) => reject(error));
   });
 }
+
+export function SetPassoutBatch(id:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/batch/setPassout/${id}`,
+      {}
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function PromoteBatch(
+  currentBatchId:string,
+  nextBatchId:string
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/batch/promoteTo/${currentBatchId}/${nextBatchId}`,
+      {}
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
