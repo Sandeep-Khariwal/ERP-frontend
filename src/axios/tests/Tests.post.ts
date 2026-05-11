@@ -26,13 +26,65 @@ export function CreateTestQuestion(data: {
     correctAns: string;
     explanation?: string; 
   },
+   subjectId?:string;
+   batchId?:string; 
+
   questionId?: string; // Optional: include this for updates
+
+
 }) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(`${process.env.URL}/api/v1/onlinetestquestion/createQuestion`, data)
       .then(resolve)
       .catch(reject);
   });
+}
+
+export  async function CreateQuestionBank(data: {
+  question: {
+    testId: string;
+    question: string;
+    options: { name: string; answer: boolean }[];
+    correctAns: string;
+    explanation?: string; 
+  },
+
+
+  questionId?: string; // Optional: include this for updates
+
+
+}[]) {
+   const allPromises = data.map((payload) =>
+    CreateTestQuestion(payload)
+    );
+  
+    return Promise.all(allPromises);
+
+}
+
+
+
+export  async function CreateExcelAllQues(data: {
+  question: {
+    testId: string;
+    question: string;
+    options: { name: string; answer: boolean }[];
+    correctAns: string;
+    explanation?: string; 
+  },
+    subjectId?:string;
+   batchId?:string; 
+
+  questionId?: string; // Optional: include this for updates
+
+
+}[]) {
+   const allPromises = data.map((payload) =>
+    CreateTestQuestion(payload)
+    );
+  
+    return Promise.all(allPromises);
+
 }
 
 // 3. CORRECTED: Update test using the new API endpoint with PUT method

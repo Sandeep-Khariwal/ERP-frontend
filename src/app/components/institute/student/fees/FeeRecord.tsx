@@ -32,6 +32,7 @@ import {
 } from "@/axios/student/StudentGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createFullFeeOverviewPdf } from "./HtmlToPdf";
+import { getBase64Image } from "@/app/helperFunction/Notification";
 
 const convertHtmlIntoPdf = (html: string) => {};
 
@@ -114,7 +115,11 @@ const FeeRecordSection = (props: {
       return;
     }
     setIsLoading(true);
-    UpdateMultipleFeeRecord(instituteDetails._id, feeRecordsMap)
+    UpdateMultipleFeeRecord(
+      instituteDetails._id,
+      feeRecordsMap,
+      props.studentId,
+    )
       .then((resp) => {
         setIsLoading(false);
 
@@ -207,7 +212,7 @@ const FeeRecordSection = (props: {
               <Button
                 color="green"
                 onClick={() => {
-                  GetStudentForPdf(props.studentId).then((x: any) => {
+                  GetStudentForPdf(props.studentId).then(async (x: any) => {
                     const { student } = x;
 
                     let gst = instituteDetails.gst;
@@ -230,27 +235,52 @@ const FeeRecordSection = (props: {
                       updatedAt: f.updatedAt,
                     }));
 
-                    const html = createFullFeeOverviewPdf(
-                      student.name, // ✅ DIRECT API se
-                      student.parentName, // ✅ DIRECT API se
-                      formattedData,
-                      student.instituteId.name,
+                    const base64Logo = await getBase64Image(
                       student.instituteId.logo,
+                    );
+
+                    const base64Signature = await getBase64Image(
+                      student.instituteId.signature,
+                    );
+
+                    const html = createFullFeeOverviewPdf(
+                      student.name,
+                      student.parentName,
+                      formattedData,
+
+                      student.instituteId.name,
+
+                      // ✅ Base64 logo
+                      base64Logo,
+
                       student.instituteId.address,
                       student.instituteId.institutePhoneNumber,
                       props.batchName,
                       gst,
+
+                      // ✅ Base64 signature
+                      base64Signature,
                     );
 
                     console.log("btn clicked......");
 
                     const printWindow = window.open("", "_blank");
+
                     if (printWindow) {
+                      printWindow.document.open();
                       printWindow.document.write(html);
+
                       printWindow.document.close();
-                      printWindow.print();
-                    } else {
-                      console.error("Failed to open print window.");
+
+                      setTimeout(() => {
+                        printWindow.focus();
+
+                        printWindow.print();
+
+                        printWindow.onafterprint = () => {
+                          printWindow.close();
+                        };
+                      }, 500);
                     }
                     // convertHtmlIntoPdf(html);
                   });

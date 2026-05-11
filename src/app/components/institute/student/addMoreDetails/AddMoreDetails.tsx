@@ -27,6 +27,7 @@ import StepThree from "./StepThree";
 import { Installment } from "@/interfaces/batchInterface";
 import { GetStudent } from "@/axios/institute/InstituteGetApi";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
+import StepFour from "./StepFour";
 
 
 interface StudentFormValues {
@@ -40,8 +41,10 @@ interface StudentFormValues {
   dateOfJoining: Date;
   parentNumber?: string;
   van?: string;
-  rollNumber: number;
+  rollNumber: string;
   photo?: string
+  admissionNumber?: string
+  motherName?: string
 }
 
 export function AddMoreDetails(props: {
@@ -77,10 +80,12 @@ export function AddMoreDetails(props: {
       : new Date(),
     address: props.formData?.address || "",
     parentNumber: props.formData?.parentNumber || "",
+    admissionNumber: props.formData?.admissionNumber || "",
+    motherName: props.formData?.motherName || "",
     gender: props.formData?.gender || "",
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
     van: props.formData.van,
-    rollNumber: props.formData?.rollNumber || 0,
+    rollNumber: props.formData?.rollNumber || "",
     photo: "",
     
   });
@@ -189,6 +194,8 @@ export function AddMoreDetails(props: {
           ...additionalPhoneNumbers,
         ].filter((phone, index, self) => self.indexOf(phone) === index),
         parentNumber: formValues.parentNumber || "",
+        admissionNumber: formValues.admissionNumber || "",
+        motherName: formValues.motherName || "",
         dateOfBirth: new Date(
           new Date(formValues.dateOfBirth!!).setDate(
             formValues.dateOfBirth!!!!.getDate() + 1,
@@ -210,7 +217,7 @@ export function AddMoreDetails(props: {
             const { student } = x;
             setStudentId(student._id);
             setIsLoading(false);
-            setActive((current) => (current < 2 ? current + 1 : current));
+            setActive((current) => (current < 3 ? current + 1 : current));
           })
           .catch((e) => {
             console.log(e);
@@ -222,7 +229,7 @@ export function AddMoreDetails(props: {
             const { student } = x;
             setStudentId(student._id);
             setIsLoading(false);
-            setActive((current) => (current < 2 ? current + 1 : current));
+            setActive((current) => (current < 3 ? current + 1 : current));
           })
           .catch((e) => {
             console.log(e);
@@ -244,7 +251,7 @@ export function AddMoreDetails(props: {
       })
         .then((x: any) => {
           setIsLoading(false);
-          setActive((current) => (current < 2 ? current + 1 : current));
+          setActive((current) => (current < 3 ? current + 1 : current));
         })
         .catch((e) => {
           console.log(e);
@@ -263,8 +270,8 @@ export function AddMoreDetails(props: {
       })
         .then((x: any) => {
           setIsLoading(false);
-          setActive((current) => (current < 2 ? current + 1 : current));
-          props.onClickBack();
+          setActive((current) => (current < 3 ? current + 1 : current));
+          // props.onClickBack();
           setFormValues({
             name: "",
             email: "",
@@ -275,7 +282,7 @@ export function AddMoreDetails(props: {
             parentNumber: "",
             gender: "",
             dateOfJoining: new Date(),
-            rollNumber: 0,
+            rollNumber: "",
           });
         })
         .catch((e) => {
@@ -315,7 +322,7 @@ export function AddMoreDetails(props: {
                 parentNumber: "",
                 gender: "",
                 dateOfJoining: new Date(),
-                rollNumber: 0,
+                rollNumber: "",
               });
             }}
             style={{ cursor: "pointer" }}
@@ -393,6 +400,13 @@ export function AddMoreDetails(props: {
               studentInstallments={studentInstallments}
             />
           </Stepper.Step>
+          <Stepper.Step
+  ff={"Roboto"}
+  label="Overview"
+  description="View all details"
+>
+  <StepFour studentId={studentId} />
+</Stepper.Step>
         </Stepper>
         <Stack w={"100%"} mt={"auto"}>
           <Divider size={1} color="#BABABA" />
@@ -404,9 +418,21 @@ export function AddMoreDetails(props: {
           <Button variant="default" disabled={active === 0} onClick={prevStep}>
             Back
           </Button>
-          <Button onClick={nextStep}>
-            {props.isEditableData ? "Save & Next" : "Next step"}
-          </Button>
+          <Button
+  onClick={() => {
+    if (active === 3) {
+      props.onClickBack(); // ya close modal
+    } else {
+      nextStep();
+    }
+  }}
+>
+  {active === 3
+    ? "Done"
+    : props.isEditableData
+    ? "Save & Next"
+    : "Next step"}
+</Button>
         </Group>
       </Stack>
     </>

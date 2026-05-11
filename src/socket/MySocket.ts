@@ -1,21 +1,9 @@
-import { io , Socket } from "socket.io-client";
+// socket.ts
+import { io } from "socket.io-client";
 
-class MySocket {
-    public socket:any;
-    public URL:string;
+// const URL = "http://localhost:8080";
+const URL = "https://server.shikshapay.cloud";
 
-  constructor(){
-    this.URL = "https://server.shikshapay.cloud";
-    // this.URL = "http://localhost:8080";
-
-    this.socket = io(this.URL,{autoConnect:true})
-
-    this.socket.on("connect_error", (err:any) => {
-    if (err.message === "invalid username") {
-      console.log("Error from server : ", err); 
-    }
-    });
-  }
-}
-
-export default MySocket
+export const socket = io(URL, {
+  autoConnect: false,
+});

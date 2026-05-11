@@ -76,6 +76,8 @@ function UploadExcelAdmission({
           email: student["email"],
           parentNumber: student["parentNumber"],
           phoneNumber: [String(student["phoneNumber"])],
+          admissionNumber: [String(student["admissionNumber"])],
+          motherName: [String(student["motherName"])],
           address: student["address"],
           gender: student["gender"],
           instituteId,
@@ -111,17 +113,15 @@ function UploadExcelAdmission({
 
       for (const student of studentsPayload) {
         try {
-          await CreateStudent(student);
-          success.push(student);
+          const res:any = await CreateStudent(student);
+          success.push(res);
         } catch (err) {
           failed.push({ student, error: err });
         }
       }
 
-      console.log("success admisionss : ", success);
       const allStudents = success.flatMap((item: any) => {
         // handle both cases safely
-        if (item?.students) return item.students;
         if (item?.student) return [item.student];
         return [];
       });

@@ -173,11 +173,15 @@ export function EditCourseFeeModal(props: {
           props.setisCourseFeesEdit(null);
         });
     } else {
-      CreateBatchFee({
-        installments,
-        batchId: props.batchId,
-        feeType: selectedFeeOption,
-      })
+      const filteredInstallments = installments.filter(
+  (x) => x.amount > 0 && x.dueDate !== "" && x.name !== ""
+);
+
+CreateBatchFee({
+  installments: filteredInstallments,
+  batchId: props.batchId,
+  feeType: selectedFeeOption,
+})
         .then((x: any) => {
           SuccessNotification("Batch fee created!!");
           props.setisCourseFeesEdit(null);
@@ -506,15 +510,16 @@ export function EditCourseFeeModal(props: {
       }
     }
   }, [selectedMonth, datesData]);
-  function isValid() {
-    if (selectedFeeOption === FeeOptions.QUARTERLY) {
-      return installments.slice(0, 4).every((x) => x.amount > 0);
-    } else if (selectedFeeOption === FeeOptions.MONTHLY) {
-      return installments.slice(0, 12).every((x) => x.amount > 0);
-    } else {
-      return yearlyInstallments.amount > 0;
-    }
+ function isValid() {
+  if (selectedFeeOption === FeeOptions.YEARLY) {
+    return yearlyInstallments.amount > 0;
   }
+
+  // monthly / quarterly
+  return installments.some(
+    (x) => x.amount > 0 && x.dueDate !== "" && x.name !== ""
+  );
+}
   useEffect(() => {
     if (selectedMonth) {
       const year = selectedMonth.getFullYear() + 1;

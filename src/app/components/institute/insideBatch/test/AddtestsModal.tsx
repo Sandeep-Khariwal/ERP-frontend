@@ -1,6 +1,5 @@
 "use client";
 
-
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
@@ -29,18 +28,19 @@ import {
   ActionIcon,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import {
-  IconX,
-} from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import React, { SetStateAction, useEffect, useState } from "react";
-import { DateTimePicker } from '@mantine/dates';
+import { DateTimePicker } from "@mantine/dates";
+import { IconPlus } from "@tabler/icons-react";
+import QuestionBankModal from "./QuestionBankModal";
+import UploadExcelQues from "./UploadExcelQues";
 
 const AddTestsModal = (props: {
   opened: boolean;
   batchId: string;
   students: StudentsDataWithBatch[];
   setOpenAddTestsModal: React.Dispatch<SetStateAction<boolean>>;
-  onCreateTest: () => void
+  onCreateTest: () => void;
 }) => {
   const [allSubjects, setAllSubjects] = useState<
     {
@@ -63,6 +63,8 @@ const AddTestsModal = (props: {
   const [testTime, setTestTime] = useState<number>(0);
   const [active, setActive] = useState(0);
   const [testId, setTestId] = useState<string>("");
+  const [questionBankOpen, setQuestionBankOpen] = useState(false);
+  const [excelModalOpen, setExcelModalOpen] = useState(false);
   type McqQuestion = {
     question: string;
     options: string[];
@@ -71,7 +73,6 @@ const AddTestsModal = (props: {
 
   const [mcqs, setMcqs] = useState<McqQuestion[]>([]);
   const [startTime, setStartTime] = useState<Date | null>(null);
-
 
   useEffect(() => {
     setIsLoading(true);
@@ -84,7 +85,7 @@ const AddTestsModal = (props: {
               value: s._id,
               label: s.name,
             };
-          }
+          },
         );
 
         setAllSubjects(formatedSubjects);
@@ -99,15 +100,15 @@ const AddTestsModal = (props: {
   const handleMarkChange = (
     studentId: string,
     name: string,
-    newMarks: number
+    newMarks: number,
   ) => {
     setMarks((prevMarks) => {
       const existingMark = prevMarks.find(
-        (mark) => mark.studentId === studentId
+        (mark) => mark.studentId === studentId,
       );
       if (existingMark) {
         return prevMarks.map((mark) =>
-          mark.studentId === studentId ? { ...mark, marks: newMarks } : mark
+          mark.studentId === studentId ? { ...mark, marks: newMarks } : mark,
         );
       } else {
         return [...prevMarks, { studentId, name: name, marks: newMarks }];
@@ -119,7 +120,6 @@ const AddTestsModal = (props: {
     options: string[];
     correctAnswerIndex: number;
   };
-
 
   const handleNextFromStep1 = async () => {
     const payload = {
@@ -133,24 +133,19 @@ const AddTestsModal = (props: {
 
     CreateTestMeta(payload)
       .then((x: any) => {
-        props.onCreateTest()
-        const testId = x.data.test._id
+        props.onCreateTest();
+        const testId = x.data.test._id;
         if (testId) {
           setTestId(testId);
           setPage(1);
           SuccessNotification("Test created!");
         }
-
       })
       .catch((e) => {
         console.log(e);
         ErrorNotification("Failed to create test!");
-      })
+      });
   };
-
-
-
-
 
   const createTest = async () => {
     if (!testId) {
@@ -177,15 +172,19 @@ const AddTestsModal = (props: {
             testId: testId,
             options: options,
             correctAns: mcq.options[mcq.correctAnswerIndex],
-          }
-        };
+          },
+          // NEW
+          batchId: props.batchId,
 
+          // NEW
+          subjectId: selectedSubject,
+        };
+        console.log("QUESTION PAYLOAD :", payload);
         await CreateTestQuestion(payload);
       }
 
       SuccessNotification("Test and all questions submitted successfully!");
       props.setOpenAddTestsModal(false);
-
     } catch (err) {
       console.error(err);
       ErrorNotification("Failed to submit questions");
@@ -193,7 +192,6 @@ const AddTestsModal = (props: {
       setIsLoading(false);
     }
   };
-
 
   const handleOptionChange = (index: number, value: string) => {
     const updated = [...options];
@@ -205,7 +203,6 @@ const AddTestsModal = (props: {
   const removeOption = (index: number) => {
     const updated = options.filter((_, i) => i !== index);
     setOptions(updated);
-
 
     if (correctAnswer === index.toString()) {
       setCorrectAnswer("");
@@ -219,7 +216,11 @@ const AddTestsModal = (props: {
   };
 
   const handleSubmit = () => {
-    if (!question || options.some((opt) => opt === "") || correctAnswer === "") {
+    if (
+      !question ||
+      options.some((opt) => opt === "") ||
+      correctAnswer === ""
+    ) {
       ErrorNotification("Fill all fields");
       return;
     }
@@ -240,9 +241,12 @@ const AddTestsModal = (props: {
     SuccessNotification("Question saved!");
   };
 
-
   const handleSaveAndNew = () => {
-    if (!question || options.some((opt) => opt === "") || correctAnswer === "") {
+    if (
+      !question ||
+      options.some((opt) => opt === "") ||
+      correctAnswer === ""
+    ) {
       ErrorNotification("Fill all fields");
       return;
     }
@@ -269,13 +273,11 @@ const AddTestsModal = (props: {
       <Modal
         opened={props.opened}
         onClose={() => {
-          props.setOpenAddTestsModal(false)
-        }
-        }
+          props.setOpenAddTestsModal(false);
+        }}
         title={"Add Tests for students"}
         size={"lg"}
       >
-
         <Group mb="lg">
           {page === 0 && (
             <>
@@ -344,18 +346,51 @@ const AddTestsModal = (props: {
                     />
                   </Box>
 
-                  <Box w="15rem">
-
-                  </Box>
+                  <Box w="15rem"></Box>
                 </Flex>
               </Flex>
-
             </>
-          )}{page === 1 && (
+          )}
+          {page === 1 && (
             <>
-              <Text ta="center" mx={isMd ? 14 : 30} mt={20} ml="36%" c="#2F4F4F" fw={600} fz={24} ff="Roboto">
-                Make Mcq  Questions
-              </Text>
+              <Flex
+                justify="space-between"
+                align="center"
+                w="100%"
+                mt={20}
+                wrap="wrap"
+                gap="sm"
+              >
+                {/* LEFT SIDE TITLE */}
+                <Text c="#2F4F4F" fw={600} fz={24} ff="Roboto">
+                  Make Mcq Questions
+                </Text>
+
+                {/* RIGHT SIDE BUTTONS */}
+                <Group>
+                  <Button
+                    leftSection={<IconPlus size={16} />}
+                    onClick={() => setExcelModalOpen(true)}
+                    size="sm"
+                    variant="outline"
+                    c="#111"
+                    style={{ borderColor: "#111" }}
+                  >
+                    Upload ExcelFile
+                  </Button>
+
+                  <Button
+                    leftSection={<IconPlus size={16} />}
+                    onClick={() => setQuestionBankOpen(true)}
+                    size="sm"
+                    variant="outline"
+                    c="#111"
+                    style={{ borderColor: "#111" }}
+                  >
+                    Question Bank
+                  </Button>
+                </Group>
+              </Flex>
               <Box w="100%" h="15%">
                 <Textarea
                   label="Enter your question"
@@ -385,13 +420,17 @@ const AddTestsModal = (props: {
                         <Radio
                           value={index.toString()}
                           checked={correctAnswer === index.toString()}
-                          onChange={() => handleCorrectAnswerChange(index.toString())}
+                          onChange={() =>
+                            handleCorrectAnswerChange(index.toString())
+                          }
                         />
 
                         <TextInput
                           placeholder={`Option ${index + 1}`}
                           value={opt}
-                          onChange={(e) => handleOptionChange(index, e.target.value)}
+                          onChange={(e) =>
+                            handleOptionChange(index, e.target.value)
+                          }
                           required
                           style={{ flex: 1 }}
                         />
@@ -426,7 +465,6 @@ const AddTestsModal = (props: {
                   <Button color="blue" onClick={handleSubmit}>
                     💾 Save Question
                   </Button>
-
                 </Group>
               </Group>
             </>
@@ -492,7 +530,9 @@ const AddTestsModal = (props: {
                           {mcq.options.map((opt, i) => (
                             <Text
                               key={i}
-                              color={i === mcq.correctAnswerIndex ? "green" : "black"}
+                              color={
+                                i === mcq.correctAnswerIndex ? "green" : "black"
+                              }
                             >
                               {String.fromCharCode(65 + i)}. {opt}
                             </Text>
@@ -505,9 +545,8 @@ const AddTestsModal = (props: {
               </Box>
             </>
           )}
-
         </Group>
-        <Group mt={30} >
+        <Group mt={30}>
           <Button
             disabled={page === 0}
             variant="default"
@@ -535,8 +574,32 @@ const AddTestsModal = (props: {
           )}
         </Group>
       </Modal>
-    </>
+      <QuestionBankModal
+        opened={questionBankOpen}
+        onClose={() => {
+          setQuestionBankOpen(false);
+        }}
+        batchId={props.batchId}
+        testId={testId}
+        onSuccess={() => {
+          console.log("Question Bank Success");
+        }}
+      />
 
+      <UploadExcelQues
+        opened={excelModalOpen}
+        onClose={() => {
+          setExcelModalOpen(false);
+          props.setOpenAddTestsModal(false);
+        }}
+        batchId={props.batchId}
+        testId={testId}
+        subjectId={selectedSubject}
+        onSuccess={() => {
+          console.log("Questions Uploaded");
+        }}
+      />
+    </>
   );
 };
 export default AddTestsModal;

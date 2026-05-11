@@ -34,6 +34,7 @@ import TeacherProfile from "../teacher/TeacherProfile";
 import Tests from "./test/Tests";
 import Marksheet from "./Marksheet";
 import UploadExcelAdmission from "../student/addMoreDetails/UploadExcelAdmission";
+import DiaryPage from "./DiaryPage";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -41,6 +42,7 @@ enum Tabs {
   TEACHER = "Teachers",
   MARKSHEET = "Marksheet",
   TEST = "Tests",
+  DIARY = "Daily Diary",
   STUDY_MATERIAL = "Study Material",
   ASSIGNMENT = "Assignment",
 }
@@ -121,6 +123,8 @@ export function InstituteInsideBatch(props: {
     parentName: "",
     dateOfBirth: new Date(),
     address: "",
+    motherName: "",
+    admissionNumber: "",
     van: "",
     phoneNumber: [],
     additionalPhoneNumbers: [],
@@ -259,33 +263,32 @@ export function InstituteInsideBatch(props: {
                     wrap="wrap"
                     style={{ flex: 1 }}
                   >
-                      <>
-                        {!props.fromInstituteTeacherSection && (
-                          <Button
-                            variant="outline"
-                            color="dark"
-                            style={{ whiteSpace: "nowrap" }}
-                            onClick={() => {
-                              setShowSelectedScreen(Screen.ADDMORESCREEN);
-                            }}
-                          >
-                            + Add Student
-                          </Button>
-                        )}
-                        {!props.fromInstituteTeacherSection && (
-                          <Button
-                            variant="outline"
-                            color="dark"
-                            style={{ whiteSpace: "nowrap" }}
-                            onClick={() => {
-                              setOpenFileAdmissionModal(true);
-                            }}
-                          >
-                            + Upload File
-                          </Button>
-                        )}
-                      </>
-                
+                    <>
+                      {!props.fromInstituteTeacherSection && (
+                        <Button
+                          variant="outline"
+                          color="dark"
+                          style={{ whiteSpace: "nowrap" }}
+                          onClick={() => {
+                            setShowSelectedScreen(Screen.ADDMORESCREEN);
+                          }}
+                        >
+                          + Add Student
+                        </Button>
+                      )}
+                      {!props.fromInstituteTeacherSection && (
+                        <Button
+                          variant="outline"
+                          color="dark"
+                          style={{ whiteSpace: "nowrap" }}
+                          onClick={() => {
+                            setOpenFileAdmissionModal(true);
+                          }}
+                        >
+                          + Upload File
+                        </Button>
+                      )}
+                    </>
                   </Flex>
                 </Flex>
 
@@ -406,6 +409,9 @@ export function InstituteInsideBatch(props: {
 
         {Tabs.TEST === activeTab && (
           <Tests batchId={props.batchId} subjects={props.subjects ?? []} />
+        )}
+        {Tabs.DIARY === activeTab && (
+          <DiaryPage batchId={props.batchId} subjects={props.subjects ?? []} />
         )}
 
         {Tabs.STUDY_MATERIAL === activeTab && (

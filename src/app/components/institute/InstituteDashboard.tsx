@@ -475,6 +475,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               setBatchId(null);
             }}
             fromInstituteTeacherSection={false}
+            subjects={selectedBatch?.subjects}
           />
         </Stack>
       )}

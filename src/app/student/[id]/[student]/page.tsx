@@ -47,7 +47,7 @@ const Student = () => {
             _id: data._id,
             phone: data.phoneNumber[0],
             institute: data.instituteId._id,
-          })
+          }),
         );
 
         dispatch(
@@ -57,7 +57,7 @@ const Student = () => {
             phoneNumber: "",
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
-          })
+          }),
         );
 
         setIsLoading(false);
@@ -73,8 +73,22 @@ const Student = () => {
   const handleLogout = () => {
     LogOut();
 
-    dispatch(setStudentDetails(null));
-    dispatch(setDetails(null));
+    dispatch(
+      setStudentDetails({
+        name: "",
+        _id: "",
+        phone: "",
+        institute: "",
+      }),
+    );
+    dispatch(
+      setDetails({
+        name: "",
+        _id: "",
+        phoneNumber: "",
+        address: "",
+      }),
+    );
 
     // 🔥 guaranteed redirect
     window.location.href = "/";

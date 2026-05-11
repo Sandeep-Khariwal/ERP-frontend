@@ -118,6 +118,10 @@ export default function Login(props: { onCreateAccount: () => void }) {
 
       LoginAdmin(loginData)
         .then((x: any) => {
+
+          console.log("xjdj :", x);
+          
+
           
           setIsLoading(false);
           SuccessNotification("Login Successfully!!");
