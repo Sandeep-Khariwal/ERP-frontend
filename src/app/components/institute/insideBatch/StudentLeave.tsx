@@ -1,6 +1,9 @@
 "use client";
 
-import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
+import {
+  ErrorNotification,
+  SuccessNotification,
+} from "@/app/helperFunction/Notification";
 import { PutLeaveMethod } from "@/axios/batch/BatchPutApi";
 import {
   Modal,
@@ -19,17 +22,15 @@ import { useState } from "react";
 
 interface StudentLeaveProps {
   opened: boolean;
-  onClose: () => void;
-   batchId: string;
-   leaveData: any[];
+  onClose: (leaveId:string) => void;
+  batchId: string;
+  leaveData: any[];
 }
 
 const leaveStudents = [
-
   {
     id: 1,
-    profile:
-      "https://i.pravatar.cc/150?img=1",
+    profile: "https://i.pravatar.cc/150?img=1",
     name: "Rahul Sharma",
     rollNumber: "101",
     reason: "Fever and cold ",
@@ -38,8 +39,7 @@ const leaveStudents = [
   },
   {
     id: 2,
-    profile:
-      "https://i.pravatar.cc/150?img=2",
+    profile: "https://i.pravatar.cc/150?img=2",
     name: "Priya Verma",
     rollNumber: "102",
     reason: "Family Function",
@@ -48,8 +48,7 @@ const leaveStudents = [
   },
   {
     id: 3,
-    profile:
-      "https://i.pravatar.cc/150?img=3",
+    profile: "https://i.pravatar.cc/150?img=3",
     name: "Aman Kumar",
     rollNumber: "103",
     reason: "Medical Checkup",
@@ -58,8 +57,7 @@ const leaveStudents = [
   },
   {
     id: 4,
-    profile:
-      "https://i.pravatar.cc/150?img=4",
+    profile: "https://i.pravatar.cc/150?img=4",
     name: "Sneha Gupta",
     rollNumber: "104",
     reason: "Personal Work",
@@ -74,49 +72,45 @@ const truncateReason = (text: string) => {
   }
 
   return text;
-}
+};
 
 export default function StudentLeave({
   opened,
   onClose,
-    batchId,
+  batchId,
   leaveData,
 }: StudentLeaveProps) {
-
-  console.log("Batchid:", batchId);
   const [declineLoading, setDeclineLoading] = useState<string>("");
 
-const handleLeaveAction = (
-  leaveId: string,
-  isDecline: boolean
-) => {
-  setDeclineLoading(leaveId);
+  const handleLeaveAction = (leaveId: string, isDecline: boolean) => {
+    setDeclineLoading(leaveId);
 
-  PutLeaveMethod(leaveId, isDecline)
-    .then((res: any) => {
-      console.log("Leave Updated =>", res);
+    PutLeaveMethod(leaveId, isDecline)
+      .then((res: any) => {
+        console.log("Leave Updated =>", res);
 
-      SuccessNotification(
-        isDecline
-          ? "Leave Declined Successfully"
-          : "Leave Approved Successfully"
-      );
+        SuccessNotification(
+          isDecline
+            ? "Leave Declined Successfully"
+            : "Leave Approved Successfully",
+        );
+        onClose(leaveId);
+        setDeclineLoading("");
+      })
+      .catch((e: any) => {
+        console.log("Leave Update Error =>", e);
 
-      setDeclineLoading("");
-    })
-    .catch((e: any) => {
-      console.log("Leave Update Error =>", e);
+        ErrorNotification("Something went wrong");
 
-      ErrorNotification("Something went wrong");
-
-      setDeclineLoading("");
-    });
-};
+        setDeclineLoading("");
+      });
+    onClose("");
+  };
 
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={()=>onClose("")}
       centered
       size="80%"
       radius={16}
@@ -126,12 +120,8 @@ const handleLeaveAction = (
         </Text>
       }
     >
-      <Paper
-        radius={16}
-        p="md"
-        bg="#F8FAFC"
-      >
-        <ScrollArea >
+      <Paper radius={16} p="md" bg="#F8FAFC">
+        <ScrollArea>
           <Table
             striped
             highlightOnHover
@@ -178,77 +168,64 @@ const handleLeaveAction = (
                         size={45}
                       />
 
-                      <Text fw={600}>
-                     {student.studentId?.name}
-                      </Text>
+                      <Text fw={600}>{student.studentId?.name}</Text>
                     </Group>
                   </Table.Td>
 
                   <Table.Td>
-                    <Badge
-                      variant="light"
-                      color="blue"
-                      size="lg"
-                    >
+                    <Badge variant="light" color="blue" size="lg">
                       #{student.studentId?.rollNumber}
                     </Badge>
                   </Table.Td>
 
                   <Table.Td>
-                  <Text
-  size="sm"
-  c="dimmed"
-  style={{
-    maxWidth: "300px",
-    whiteSpace: "normal",
-    wordBreak: "break-word",
-    lineHeight: "1.5",
-  }}
->
- {truncateReason(student.leaveReason)}
-</Text>
-                  </Table.Td>
-
-                  <Table.Td>
-                    <Text fw={500}>
-                    {new Date(student.leaveDate).toLocaleDateString()}
+                    <Text
+                      size="sm"
+                      c="dimmed"
+                      style={{
+                        maxWidth: "300px",
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        lineHeight: "1.5",
+                      }}
+                    >
+                      {truncateReason(student.leaveReason)}
                     </Text>
                   </Table.Td>
 
                   <Table.Td>
-                    <Badge
-                      color="yellow"
-                      variant="light"
-                    >
+                    <Text fw={500}>
+                      {new Date(student.leaveDate).toLocaleDateString()}
+                    </Text>
+                  </Table.Td>
+
+                  <Table.Td>
+                    <Badge color="yellow" variant="light">
                       {student.status}
                     </Badge>
                   </Table.Td>
 
                   <Table.Td>
                     <Flex gap={10}>
-                    <Button
-  color="green"
-  radius="md"
-  size="xs"
-  loading={declineLoading === student._id}
-  onClick={() =>
-    handleLeaveAction(student._id, false)
-  }
->
-  Approve
-</Button>
-                   <Button
-  color="red"
-  radius="md"
-  size="xs"
-  variant="light"
-  loading={declineLoading === student._id}
-  onClick={() =>
-    handleLeaveAction(student._id, true)
-  }
->
-  Decline
-</Button>
+                      <Button
+                        color="green"
+                        radius="md"
+                        size="xs"
+                        loading={declineLoading === student._id}
+                        onClick={() => handleLeaveAction(student._id, false)}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        color="red"
+                        radius="md"
+                        size="xs"
+                        variant="light"
+                        loading={declineLoading === student._id}
+                        onClick={() => handleLeaveAction(student._id, true)}
+                      >
+                        Decline
+                      </Button>
                     </Flex>
                   </Table.Td>
                 </Table.Tr>

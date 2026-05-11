@@ -28,7 +28,11 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { IconArrowBack, IconCalendar, IconBellFilled, } from "@tabler/icons-react";
+import {
+  IconArrowBack,
+  IconCalendar,
+  IconBellFilled,
+} from "@tabler/icons-react";
 import { DatePickerInput } from "@mantine/dates";
 import Image from "next/image";
 import {
@@ -53,7 +57,7 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
   const [attendanceDate, setAttendanceDate] = useState<Date | null>(new Date());
   const [todaysDate, setTodaysDate] = useState<Date>(new Date());
   const [singleAttendance, setSingleAttendance] = useState<AttendanceStatus>(
-    AttendanceStatus.ABSENT
+    AttendanceStatus.ABSENT,
   );
   const [currentDateStudentAttendanceRecords, setCurrentDateAttendanceRecords] =
     useState<AttendanceInterface[]>([]);
@@ -78,8 +82,7 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
   // const leaveCount = leaveStudents.length;
   // const leaveCount = 4;
   const [leaveCount, setLeaveCount] = useState<number>(0);
-const [leaveData, setLeaveData] = useState<any[]>([]);
-
+  const [leaveData, setLeaveData] = useState<any[]>([]);
 
   useEffect(() => {
     var todayDate = new Date(Date.now());
@@ -112,26 +115,26 @@ const [leaveData, setLeaveData] = useState<any[]>([]);
   }, [attendanceDate]);
 
   useEffect(() => {
-  if (props.batchId) {
-    GetBatchLeave(props.batchId)
-      .then((x: any) => {
-        console.log("Leave API Response =>", x);
+    if (props.batchId) {
+      GetBatchLeave(props.batchId)
+        .then((x: any) => {
+          console.log("Leave API Response =>", x);
 
-        // payload me jo data aa rha hai
-        // const leaves = x?.batchLeave || [];
-        const leaves = x?.leaves || [];
+          // payload me jo data aa rha hai
+          // const leaves = x?.batchLeave || [];
+          const leaves = x?.leaves || [];
 
-        // pura leave data save
-        setLeaveData(leaves);
+          // pura leave data save
+          setLeaveData(leaves);
 
-        // bell notification count
-        setLeaveCount(leaves.length);
-      })
-      .catch((e: any) => {
-        console.log("Leave API Error =>", e);
-      });
-  }
-}, [props.batchId]);
+          // bell notification count
+          setLeaveCount(leaves.length);
+        })
+        .catch((e: any) => {
+          console.log("Leave API Error =>", e);
+        });
+    }
+  }, [props.batchId]);
 
   // function findAttendanceRecordByDate(
   //   attendanceRecords: AttendanceInterface[]
@@ -210,10 +213,7 @@ const [leaveData, setLeaveData] = useState<any[]>([]);
               marginRight: "10px",
             }}
           >
-            <IconBellFilled
-              size={28}
-              color="#4B65F6"
-            />
+            <IconBellFilled size={28} color="#4B65F6" />
 
             {leaveCount > 0 && (
               <Box
@@ -245,10 +245,9 @@ const [leaveData, setLeaveData] = useState<any[]>([]);
           value={attendanceDate}
           onChange={(date: Date | null) => {
             if (date) {
-
               // Set time to 00:00:00 for consistent date storage
               // date.setHours(0, 0, 0, 0);
-              const isStringDate = date.toISOString()
+              const isStringDate = date.toISOString();
               setAttendanceDate(new Date(isStringDate)); // Set date as a valid Date object
             }
 
@@ -316,41 +315,41 @@ const [leaveData, setLeaveData] = useState<any[]>([]);
             </Center>
           </SimpleGrid>
           <ScrollArea h={"50dvh"} px={5} bg={"white"}>
-            {prevDateSttendance.length === 0 && props.students.map((student, index) => {
-              return (
-                attendanceDate?.toDateString() ===
-                todaysDate?.toDateString() && (
-                  <AttendanceCard
-                    key={index}
-                    studentId={student._id || ""}
-                    batchId={student.batchId!!}
-                    name={student.name}
-                    selectedDate={attendanceDate!!}
-                    phone={student.phoneNumber[0]}
-                    status={singleAttendance}
-                    setSingleAttendance={(val: AttendanceInterface) => {
-
-                      setCurrentDateAttendanceRecords((prevRecords) => {
-                        const existingIndex = prevRecords.findIndex(
-                          (record) => record.studentId === val.studentId
-                        );
-                        if (existingIndex !== -1) {
-                          const updatedRecords = [...prevRecords];
-                          updatedRecords[existingIndex] = {
-                            ...updatedRecords[existingIndex],
-                            ...val,
-                          };
-                          return updatedRecords;
-                        } else {
-                          return [...prevRecords, val];
-                        }
-                      });
-                    }}
-                    hidePhoneNumbers={false}
-                  />
-                )
-              );
-            })}
+            {prevDateSttendance.length === 0 &&
+              props.students.map((student, index) => {
+                return (
+                  attendanceDate?.toDateString() ===
+                    todaysDate?.toDateString() && (
+                    <AttendanceCard
+                      key={index}
+                      studentId={student._id || ""}
+                      batchId={student.batchId!!}
+                      name={student.name}
+                      selectedDate={attendanceDate!!}
+                      phone={student.phoneNumber[0]}
+                      status={singleAttendance}
+                      setSingleAttendance={(val: AttendanceInterface) => {
+                        setCurrentDateAttendanceRecords((prevRecords) => {
+                          const existingIndex = prevRecords.findIndex(
+                            (record) => record.studentId === val.studentId,
+                          );
+                          if (existingIndex !== -1) {
+                            const updatedRecords = [...prevRecords];
+                            updatedRecords[existingIndex] = {
+                              ...updatedRecords[existingIndex],
+                              ...val,
+                            };
+                            return updatedRecords;
+                          } else {
+                            return [...prevRecords, val];
+                          }
+                        });
+                      }}
+                      hidePhoneNumbers={false}
+                    />
+                  )
+                );
+              })}
 
             {prevDateSttendance.length > 0 &&
               prevDateSttendance.map((att) => (
@@ -359,7 +358,7 @@ const [leaveData, setLeaveData] = useState<any[]>([]);
                   name={att.studentId.name}
                   phone={att.studentId.parentNumber}
                   date={attendanceDate!!}
-                  submitHandler={() => { }}
+                  submitHandler={() => {}}
                   status={att.status}
                 />
               ))}
@@ -414,9 +413,17 @@ const [leaveData, setLeaveData] = useState<any[]>([]);
       )}
       <StudentLeave
         opened={leaveModalOpen}
-        onClose={() => setLeaveModalOpen(false)}
+        onClose={(leaveId: string) => {
+          if (leaveId) {
+            setLeaveData((prev) =>
+              prev.filter((leave: any) => leave._id !== leaveId),
+            );
+            setLeaveCount(leaveCount - 1);
+          }
+          setLeaveModalOpen(false);
+        }}
         batchId={props.batchId}
-          leaveData={leaveData}
+        leaveData={leaveData}
       />
     </>
   );
