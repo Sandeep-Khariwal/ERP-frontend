@@ -7,7 +7,7 @@ import {
   Text,
   Group,
   Avatar,
-  Stack,
+  Stack, 
   Grid,
   Paper,
   Box,

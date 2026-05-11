@@ -7,7 +7,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { GetBatchOverview } from "@/axios/batch/BatchGetApi";
 import TopClassPerformanceStudents from "./TopClassPerformanceStudents";
 
-const OverView = (props: { batchId: string }) => {
+const OverView = (props: { batchId: string }) => {     
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [subjectNames, setSubjectNames] = useState<string[]>([]);
   const [totalStudents, setTotalStudents] = useState<number>(0);
