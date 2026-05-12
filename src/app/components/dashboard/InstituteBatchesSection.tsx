@@ -17,6 +17,11 @@ interface InstituteBatchesSectionProps {
     noOfStudents: number;
     firstThreeStudents: string[];
     firstThreeTeachers: string[];
+
+    allBatches: {
+  id: string;
+  name: string;
+}[];
   }[];
   userType: UserType;
   onAddBatchButtonClick: () => void;
@@ -45,6 +50,9 @@ export function InstituteBatchesSection(props: InstituteBatchesSectionProps) {
             key={index}
             id={batch.id}
             name={batch.name}
+
+            allBatches={props.batches}
+
             subjects={batch.subjects.map((s) => s.name)}
             userType={props.userType}
             noOfTeachers={batch.noOfTeachers}
