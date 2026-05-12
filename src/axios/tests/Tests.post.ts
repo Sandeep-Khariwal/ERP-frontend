@@ -62,6 +62,31 @@ export  async function CreateQuestionBank(data: {
 
 }
 
+
+
+export  async function CreateExcelAllQues(data: {
+  question: {
+    testId: string;
+    question: string;
+    options: { name: string; answer: boolean }[];
+    correctAns: string;
+    explanation?: string; 
+  },
+    subjectId?:string;
+   batchId?:string; 
+
+  questionId?: string; // Optional: include this for updates
+
+
+}[]) {
+   const allPromises = data.map((payload) =>
+    CreateTestQuestion(payload)
+    );
+  
+    return Promise.all(allPromises);
+
+}
+
 // 3. CORRECTED: Update test using the new API endpoint with PUT method
 export function UpdateTest(data: {
   testId: string;
