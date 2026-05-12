@@ -41,7 +41,7 @@ interface Institute {
 interface Teacher {
   _id: string;
   name: string;
-  email: string;   
+  email: string;
   phoneNumber: string[];
   profilePic: string;
   subjects: { _id: string; name: string }[];
@@ -70,7 +70,7 @@ const TeacherProfile = (props: {
     _id: "",
     name: "John Doe",
     phoneNumber: ["+1 234 567 890", "+1 234 567 891"],
-     email: "john@example.com",
+    email: "john@example.com",
     profilePic: "https://randomuser.me/api/portraits/men/1.jpg", // Sample URL for profile image
     subjects: [{ _id: "h kjfdhkj", name: "science" }],
     instituteBatches: [],
@@ -91,8 +91,8 @@ const TeacherProfile = (props: {
       GetTeacherById(props.teacherId)
         .then((x: any) => {
           const { teacher } = x;
-            console.log("setTeacher :", teacher);
-            
+          console.log("setTeacher :", teacher);
+
           setTeacher(teacher);
           setIsLoading(false);
         })
@@ -112,8 +112,7 @@ const TeacherProfile = (props: {
       mih={"100vh"}
       py={20}
       bgr={"20px"}
-     style={{borderRadius:"20px"}}
-      
+      style={{ borderRadius: "20px" }}
     >
       <LoadingOverlay visible={isLoading} />
       {UserType.OTHERS === props.userType && (
@@ -173,8 +172,8 @@ const TeacherProfile = (props: {
                 : ""}
             </Text> */}
             <Text size="sm" c="dimmed">
-  Email: {teacher?.email}
-</Text>
+              Email: {teacher?.email}
+            </Text>
           </Flex>
           <Divider orientation="vertical" />
           <Flex w={"25%"} direction="column" gap="sm" style={{ flexGrow: 1 }}>
@@ -240,13 +239,13 @@ const TeacherProfile = (props: {
           </Tabs.Panel>
 
           <Tabs.Panel value="history">
-            <Stack mt={10} >
+            <Stack mt={10}>
               <SalaryCard teacherId={teacher._id} />
             </Stack>
           </Tabs.Panel>
         </Tabs>
         {batchId === null && (
-          <Stack w={"100%"} h={"100%"} mx={"auto"} p={isMd?5:20}>
+          <Stack w={"100%"} h={"100%"} mx={"auto"} p={isMd ? 5 : 20}>
             <Flex
               w={"100%"}
               align={"center"}
@@ -308,6 +307,10 @@ const TeacherProfile = (props: {
                     noOfStudents: batch?.students.length || 0,
                     firstThreeStudents: batch?.students.slice(0, 3) || [],
                     firstThreeTeachers: batch?.teachers.slice(0, 3) || [],
+                  }))}
+                  allBatches={teacher.instituteBatches.map((batch: any) => ({
+                    id: batch?.id || "",
+                    name: batch?.name || "",
                   }))}
                   userType={UserType.OTHERS}
                   setDeleteBatchId={(val: string) => {
