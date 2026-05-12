@@ -171,21 +171,39 @@ export function formatNumberInK(value: number): number | string {
 };
 
 export const parseExcelDate = (value: any) => {
-  if (!value) return undefined;
+  try {
+    if (!value) return undefined;
 
-  // ✅ If already a string (like "25-10-2001")
-  if (typeof value === "string") {
-    return new Date(value);
+    // DD/MM/YYYY
+    if (typeof value === "string") {
+      const parts = value.trim().split("/");
+
+      if (parts.length !== 3) return undefined;
+
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+
+      const date = new Date(year, month, day);
+
+      if (isNaN(date.getTime())) {
+        return undefined;
+      }
+
+      return date;
+    }
+
+    // Excel serial date
+    if (typeof value === "number") {
+      const parsed = XLSX.SSF.parse_date_code(value);
+
+      if (!parsed) return undefined;
+
+      return new Date(parsed.y, parsed.m - 1, parsed.d);
+    }
+
+    return undefined;
+  } catch {
+    return undefined;
   }
-
-  // ✅ If Excel number (serial)
-  if (typeof value === "number") {
-    const parsed = XLSX.SSF.parse_date_code(value);
-
-    if (!parsed) return undefined;
-
-    return new Date(parsed.y, parsed.m - 1, parsed.d);
-  }
-
-  return undefined;
 };

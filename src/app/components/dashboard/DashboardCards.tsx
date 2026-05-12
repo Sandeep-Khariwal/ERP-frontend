@@ -574,7 +574,7 @@ export function SingleBatchCard(props: {
                       <Text
                         fz={16}
                         fw={500}
-                        ml={10}
+                        ml={2}
                         style={{ fontFamily: "Roboto" }}
                       >
                         Promote Batch

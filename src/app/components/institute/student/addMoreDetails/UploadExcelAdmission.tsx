@@ -75,9 +75,9 @@ function UploadExcelAdmission({
           parentName: student["fatherName"],
           email: student["email"],
           parentNumber: student["parentNumber"],
-          phoneNumber: [String(student["phoneNumber"])],
-          admissionNumber: [String(student["admissionNumber"])],
-          motherName: [String(student["motherName"])],
+          phoneNumber: String(student["phoneNumber"]),
+          admissionNumber: String(student["admissionNumber"]),
+          motherName: String(student["motherName"]),
           address: student["address"],
           gender: student["gender"],
           instituteId,
@@ -88,6 +88,9 @@ function UploadExcelAdmission({
       });
 
       const finalPayload = payload.filter((p: any) => p !== null);
+
+      console.log("finalPayload : ",finalPayload);
+      
 
       setStudentsPayload(finalPayload);
 
