@@ -112,3 +112,20 @@ export function GetAllDiary(id: string) {
       .catch((error: any) => reject(error));
   });
 }
+
+
+export function GetStudentsPendingFee(
+  address: string,
+  studentName: string,
+  phoneNumber: string,
+  batchId: string,
+  instituteId: string
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/student/getStudentsPendingFee?phoneNumber=${phoneNumber}&instituteId=${instituteId}&batchId=${batchId}&address=${address}&studentName=${studentName}`
+    )
+      .then((response: any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
