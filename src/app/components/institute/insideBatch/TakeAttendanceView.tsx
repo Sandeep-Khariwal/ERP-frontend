@@ -41,6 +41,7 @@ import {
   GetBatchLeave,
 } from "@/axios/batch/BatchPostApi";
 import StudentLeave from "./StudentLeave";
+import { useMediaQuery } from "@mantine/hooks";
 
 interface TakeAttendanceViewProps {
   students: StudentsDataWithBatch[];
@@ -83,6 +84,7 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
   // const leaveCount = 4;
   const [leaveCount, setLeaveCount] = useState<number>(0);
   const [leaveData, setLeaveData] = useState<any[]>([]);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     var todayDate = new Date(Date.now());
@@ -158,7 +160,7 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
     setIsLoading(true);
     CreateAttendance(props.batchId, currentDateStudentAttendanceRecords)
       .then((x: any) => {
-        console.log("attendance created");
+        console.log("attendance created", x);
         setIsLoading(false);
         SuccessNotification("Attendance update!!");
       })
@@ -292,7 +294,7 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
       )}
       {props.students.length !== 0 && (
         <>
-          <SimpleGrid
+          {/* <SimpleGrid
             bg={"white"}
             style={{
               // backgroundColor: "#E4EDFD",
@@ -313,8 +315,54 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
                   : "Attendance"}
               </Text>
             </Center>
-          </SimpleGrid>
-          <ScrollArea h={"50dvh"} px={5} bg={"white"}>
+          </SimpleGrid> */}
+         <SimpleGrid
+  bg={"white"}
+  cols={3}
+  py={12}
+  style={{
+    alignItems: "center",
+    height: "50px",
+  }}
+>
+  <Text
+    ta={isMobile ? "center" : "left"}
+    ml={isMobile ? 0 : 10}
+    fw={700}
+    fz={isMobile ? 15 : 14}
+  >
+    Name
+  </Text>
+
+  <Text
+    ta={isMobile ? "center" : "left"}
+    fw={700}
+    fz={isMobile ? 15 : 14}
+  >
+    Phone Number
+  </Text>
+
+  <Center>
+    <Text
+      fw={700}
+      fz={isMobile ? 15 : 14}
+      ta="center"
+    >
+      {isMobile
+        ? "Attendance"
+        : attendanceDate?.toDateString() ===
+          todaysDate?.toDateString()
+        ? "Mark Attendance"
+        : "Attendance"}
+    </Text>
+  </Center>
+</SimpleGrid>
+        <ScrollArea
+  h={isMobile ? "calc(100dvh - 340px)" : "50dvh"}
+  px={5}
+  bg={"white"}
+  pb={isMobile ? 100 : 0}
+>
             {prevDateSttendance.length === 0 &&
               props.students.map((student, index) => {
                 return (
@@ -369,7 +417,10 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
                 onClick={() => {
                   submitAttendance();
                 }}
-                style={{ backgroundColor: "#4B65F6", marginBottom: "20px" }}
+               style={{
+  backgroundColor: "#4B65F6",
+  marginBottom: isMobile ? "150px" : "20px",
+}}
                 px={100}
               >
                 Submit
