@@ -129,3 +129,19 @@ export function GetStudentsPendingFee(
       .catch((error: any) => reject(error));
   });
 }
+
+export function GetAllNotes(id: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/batch/notes/${id}`
+    )
+      .then((response: any) => {
+        console.log("SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}

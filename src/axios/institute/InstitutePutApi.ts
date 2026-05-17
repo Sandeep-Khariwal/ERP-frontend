@@ -120,3 +120,21 @@ export function DeleteMarksheet(id: string) {
       .catch((error: any) => reject(error));
   });
 }
+
+
+export function UploadNotes(data: FormData) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/batch/uploadNotes`,
+      data
+    )
+      .then((response) => {
+        console.log("UPLOAD SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("UPLOAD ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}

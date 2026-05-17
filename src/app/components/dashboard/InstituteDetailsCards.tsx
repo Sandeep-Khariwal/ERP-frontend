@@ -90,7 +90,7 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
           align={"center"}
           justify={"center"}
         >
-          <Image src={"/earnings.png"} alt="Not found" width={40} height={40} />
+          <Image src={"/earnings.jpg"} alt="Not found" width={40} height={40} />
           <Stack align={"center"} justify={"start"} gap={1}>
             <Text lh={1.4} fz={"0.8rem"} c={"#BFBFBF "} fw={600}>
               Earnings
