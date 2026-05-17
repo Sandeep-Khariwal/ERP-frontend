@@ -86,10 +86,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     (state: any) => state.adminSlice.adminDetails,
   );
 
- const userType: UserTypes =
-  adminDetails?.role?.toLowerCase() === "user"
-    ? UserTypes.USER
-    : UserTypes.ADMIN;
+  const userType: UserTypes =
+    adminDetails?.role?.toLowerCase() === "user"
+      ? UserTypes.USER
+      : UserTypes.ADMIN;
 
   const getAccountByToken = () => {
     setIsLoading(true);
@@ -347,8 +347,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   // console.log("userType:", userType);
 
   const filteredOptionalSubjects = subjectOptions.filter(
-  (sub) => !selectedSubjects.includes(sub.value)
-);
+    (sub) => !selectedSubjects.includes(sub.value),
+  );
 
   return (
     <>
@@ -421,6 +421,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                   noOfStudents: batch?.noOfStudents || 0,
                   firstThreeStudents: batch?.firstThreeStudents || [],
                   firstThreeTeachers: batch?.firstThreeTeachers || [],
+                }))}
+                allBatches={batches.map((batch: any) => ({
+                  id: batch?.id || "",
+                  name: batch?.name || "",
                 }))}
                 showAddBatch={true}
                 userType={2}
