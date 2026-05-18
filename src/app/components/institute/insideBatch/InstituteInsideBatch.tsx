@@ -35,6 +35,7 @@ import Tests from "./test/Tests";
 import Marksheet from "./Marksheet";
 import UploadExcelAdmission from "../student/addMoreDetails/UploadExcelAdmission";
 import DiaryPage from "./DiaryPage";
+import StudyMaterialPage from "./StudyMaterialPage";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -352,7 +353,7 @@ export function InstituteInsideBatch(props: {
                 dateOfJoining={new Date()}
                 batch={props?.batchId}
                 studentId={selectedStudentId}
-                onPaymentClick={() => {}}
+                onPaymentClick={() => { }}
                 onClickBack={() => {
                   setSelectedStudentId("");
                   setShowSelectedScreen(Screen.NONE);
@@ -415,8 +416,10 @@ export function InstituteInsideBatch(props: {
         )}
 
         {Tabs.STUDY_MATERIAL === activeTab && (
-          <Stack w={"100%"} mih={isMd ? "100vh" : "70vh"} bg={"white"} mt={20}>
-            <Text m={"auto"}>STUDY_MATERIAL coming soon</Text>
+          <Stack w={"100%"}>
+            <StudyMaterialPage
+              batchId={props.batchId}
+            />
           </Stack>
         )}
 
