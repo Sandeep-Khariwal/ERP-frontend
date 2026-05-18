@@ -140,8 +140,8 @@ export function CreateDiary(data: {
 
 export function CreateNotes(data: {
   batchId: string;
-  Url: string;
-  Title: string;
+  url: string;
+  title: string;
 }) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(
