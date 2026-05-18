@@ -137,3 +137,24 @@ export function CreateDiary(data: {
       .catch((error: any) => reject(error));
   });
 }
+
+export function CreateNotes(data: {
+  batchId: string;
+  url: string;
+  title: string;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/batch/createNotes`,
+      data
+    )
+      .then((response) => {
+        console.log("CREATE SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("CREATE ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}
