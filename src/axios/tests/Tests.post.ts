@@ -7,7 +7,7 @@ export function CreateTestMeta(data: {
   name: string;
   maxMarks: number;
   totalTime: number;
-  startTime: string;
+  startTime: string
   
 }) {
   return new Promise((resolve, reject) => {
@@ -107,7 +107,7 @@ export function UpdateTest(data: {
   console.log("🌐 API URL:", `https://erp-backend-p5nc.onrender.com/api/v1/onlinetest/updateTest/${testId}`);
   
   return new Promise((resolve, reject) => {
-    ApiHelper.put<any>(`https://erp-backend-p5nc.onrender.com/api/v1/onlinetest/updateTest/${testId}`, updateData)
+    ApiHelper.put<any>(`${process.env.URL}/api/v1/onlinetest/updateTest/${testId}`, updateData)
       .then((response) => {
         console.log("✅ Test update successful:", response);
         resolve(response);

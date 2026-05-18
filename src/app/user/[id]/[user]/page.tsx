@@ -49,6 +49,7 @@ function page() {
           phoneNumber: "",
           address: data.instituteId.address,
           featureAccess: data.instituteId.accessFeatures,
+          isAcadmy: data.instituteId.isAcadmy,
         };
 
         dispatch(setDetails(instituteDetails));

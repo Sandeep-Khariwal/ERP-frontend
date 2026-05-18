@@ -81,6 +81,13 @@ export function GetBatAllMarksheet(id: string) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetMidExamMarksheet(id: string,studentId:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/marksheet/midSemMarksheet/${id}/${studentId}`)
+      .then((response: any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
 export function GetAllEarnings(instituteId: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/institute/earnings/${instituteId}`)

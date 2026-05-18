@@ -39,7 +39,6 @@ export default function Home() {
   const navigation = useRouter();
 
   useEffect(() => {
-
     const token = localStorage.getItem("shikshaPayToken"); //"shikshaPayToken"
 
     if (!token) return;
@@ -47,9 +46,7 @@ export default function Home() {
     setIsLoading(true);
     GetAccountByToken()
       .then((x: any) => {
-
         const { data, type } = x;
-
 
         // navigate on the basis of user type
         if (UserTypes.ADMIN === type) {
@@ -59,10 +56,8 @@ export default function Home() {
               _id: data._id,
               phone: data.phone,
               institute: data.institute,
-         
             }),
           );
-          
           const instituteDetails = {
             name: data.institute.name,
             _id: data.institute._id,
@@ -71,8 +66,8 @@ export default function Home() {
             email: data.email,
             featureAccess: data.institute.accessFeatures,
             gst: data.institute.gst,
+            isAcadmy: data.institute.isAcadmy,
           };
-        
 
           dispatch(setDetails(instituteDetails));
           navigation.push(
@@ -86,7 +81,6 @@ export default function Home() {
               _id: data._id,
               phone: "",
               institute: data.instituteId._id,
-             
             }),
           );
           const instituteDetails = {
@@ -96,7 +90,8 @@ export default function Home() {
             email: data.email,
             address: data.instituteId.address,
             featureAccess: data.instituteId.accessFeatures,
-             gst: data.instituteId.gst,
+            gst: data.instituteId.gst,
+            isAcadmy: data.instituteId.isAcadmy,
           };
           dispatch(setDetails(instituteDetails));
           navigation.push(
@@ -110,7 +105,6 @@ export default function Home() {
               _id: data._id,
               phone: data.phoneNumber[0],
               institute: data.instituteId._id,
-             
             }),
           );
           const instituteDetails = {
@@ -131,7 +125,6 @@ export default function Home() {
               _id: data._id,
               phone: data.phoneNumber[0],
               institute: data.instituteId._id,
-              
             }),
           );
           const instituteDetails = {

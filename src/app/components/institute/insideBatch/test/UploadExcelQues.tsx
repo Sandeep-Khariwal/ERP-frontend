@@ -302,7 +302,6 @@ export default function UploadExcelQues({
                     if (selectedFile) {
                       setFile(selectedFile);
 
-                      console.log("SELECTED FILE :", selectedFile);
                     }
                   }}
                 />
@@ -331,7 +330,7 @@ export default function UploadExcelQues({
 
         {/* SAMPLE FILE */}
         <a
-          href="https://docs.google.com/spreadsheets/d/127Ihz4EyAOxJTBfKxCqDE-D_F3RojBa_/export?format=xlsx"
+          href="https://docs.google.com/spreadsheets/d/16t99aQiuabwFcE6w9Bs5-LLQs47lS1rF/export?format=xlsx"
           download
           style={{ textDecoration: "none" }}
         >
