@@ -122,14 +122,20 @@ const AddTestsModal = (props: {
   };
 
   const handleNextFromStep1 = async () => {
+    
+    // return
+    
     const payload = {
       batchId: props.batchId,
       subjectId: selectedSubject,
       name: testName,
       maxMarks: maxMarks,
       totalTime: testTime,
-      startTime: startTime?.toISOString() || "",
+      startTime: new Date(startTime!).toISOString(),
     };
+    
+    console.log("payload : ", payload.startTime);
+    
 
     CreateTestMeta(payload)
       .then((x: any) => {
@@ -583,6 +589,7 @@ const AddTestsModal = (props: {
         testId={testId}
         onSuccess={() => {
           console.log("Question Bank Success");
+           props.setOpenAddTestsModal(false);
         }}
       />
 
@@ -597,6 +604,7 @@ const AddTestsModal = (props: {
         subjectId={selectedSubject}
         onSuccess={() => {
           console.log("Questions Uploaded");
+           props.setOpenAddTestsModal(false);
         }}
       />
     </>

@@ -168,7 +168,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
           <Select
             placeholder="Select Exam"
             label="Select Exam"
-            data={["Mid TERM Exam", "Annual TERM Exam"]}
+            data={["Mid TERM", "Annual TERM"]}
             value={selectedExam}
             onChange={(value) => {
               setSelectedExam(value ?? "")

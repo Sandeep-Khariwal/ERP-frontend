@@ -18,6 +18,7 @@ export interface InstituteDetails {
     sgst: number;
     cgst: number;
   };
+  isAcadmy?:boolean
 }
 
 export interface instituteDetailsIntialState {
@@ -50,9 +51,12 @@ export const instituteDetails = createSlice({
             sgst: number;
             cgst: number;
           };
+          isAcadmy?:boolean
         };
       },
     ) {
+      console.log("payload : ",actions.payload);
+      
       state.instituteDetails = actions.payload;
     },
     saveToken(state, actions) {

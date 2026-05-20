@@ -29,6 +29,7 @@ import {
 import {
   GetAllStudentsFromBatch,
   GetBatAllMarksheet,
+  GetMidExamMarksheet,
   GetStudentDetail,
 } from "@/axios/institute/InstituteGetApi";
 import {
@@ -38,7 +39,11 @@ import {
 } from "@/app/helperFunction/Notification";
 import { GetGrade } from "../helperFunctions";
 import { useAppSelector } from "@/app/redux/redux.hooks";
-import { createMarksheetPdf } from "./CreateMarksheetPdf";
+import {
+  createAcadmyMarksheetPdf,
+  createCombinedMarksheetPdf,
+  createMarksheetPdf,
+} from "./CreateMarksheetPdf";
 import { formatDate } from "../../marketing/utility/utils";
 import QRCode from "qrcode";
 import { DeleteMarksheet } from "@/axios/institute/InstitutePutApi";
@@ -81,6 +86,17 @@ const Marksheet = (props: {
         theory_marks: number;
         practical_marks: number;
         obtained_marks: number;
+        periodic_test: number;
+        note_book: number;
+        subject_enrichment: number;
+        grade: string;
+      }[];
+      activity: {
+        subjectName: string;
+        grade: string;
+      }[];
+      skills: {
+        subjectName: string;
         grade: string;
       }[];
       date: Date;
@@ -115,6 +131,7 @@ const Marksheet = (props: {
     GetBatAllMarksheet(props.batchId)
       .then((x: any) => {
         setAllMarksheet(x.marksheets);
+        setFilterExam("Mid TERM");
       })
       .catch((e: any) => {
         console.log(e);
@@ -184,6 +201,8 @@ const Marksheet = (props: {
         }
 
         const subjectMap: any = {};
+        const activitySubjectMap: any = {};
+        const skillsSubjectMap: any = {};
 
         Object.keys(student).forEach((key) => {
           if (key === "Name" || key === "Roll No" || key === "__rowNum__")
@@ -197,6 +216,9 @@ const Marksheet = (props: {
                 subjectName: subject,
                 theory_marks: 0,
                 practical_marks: 0,
+                periodic_test: 0,
+                note_book: 0,
+                subject_enrichment: 0,
               };
             }
 
@@ -211,14 +233,93 @@ const Marksheet = (props: {
                 subjectName: subject,
                 theory_marks: 0,
                 practical_marks: 0,
+                periodic_test: 0,
+                note_book: 0,
+                subject_enrichment: 0,
               };
             }
 
             subjectMap[subject].practical_marks = student[key] || 0;
           }
+          if (key.includes("(PERIODIC TEST)")) {
+            const subject = key.replace("(PERIODIC TEST)", "").trim();
+
+            if (!subjectMap[subject]) {
+              subjectMap[subject] = {
+                subjectName: subject,
+                theory_marks: 0,
+                practical_marks: 0,
+                periodic_test: 0,
+                note_book: 0,
+                subject_enrichment: 0,
+              };
+            }
+
+            subjectMap[subject].periodic_test = student[key] || 0;
+          }
+          if (key.includes("(NOTEBOOK)")) {
+            const subject = key.replace("(NOTEBOOK)", "").trim();
+
+            if (!subjectMap[subject]) {
+              subjectMap[subject] = {
+                subjectName: subject,
+                theory_marks: 0,
+                practical_marks: 0,
+                periodic_test: 0,
+                note_book: 0,
+                subject_enrichment: 0,
+              };
+            }
+
+            subjectMap[subject].note_book = student[key] || 0;
+          }
+          if (key.includes("(SUBJECT ENRICHMENT)")) {
+            const subject = key.replace("(SUBJECT ENRICHMENT)", "").trim();
+
+            if (!subjectMap[subject]) {
+              subjectMap[subject] = {
+                subjectName: subject,
+                theory_marks: 0,
+                practical_marks: 0,
+                periodic_test: 0,
+                note_book: 0,
+                subject_enrichment: 0,
+              };
+            }
+
+            subjectMap[subject].subject_enrichment = student[key] || 0;
+          }
+
+          if (key.includes("ACTIVITY")) {
+            const subject = key.replace("(GRADE ACTIVITY)", "").trim();
+
+            if (!activitySubjectMap[subject]) {
+              activitySubjectMap[subject] = {
+                subjectName: subject,
+                grade: "",
+              };
+            }
+
+            activitySubjectMap[subject].grade = student[key] || "";
+          }
+
+          if (key.includes("SKILLS")) {
+            const subject = key.replace("(GRADE SKILLS)", "").trim();
+
+            if (!skillsSubjectMap[subject]) {
+              skillsSubjectMap[subject] = {
+                subjectName: subject,
+                grade: "",
+              };
+            }
+
+            skillsSubjectMap[subject].grade = student[key] || "";
+          }
         });
 
         const rawMarks = Object.values(subjectMap);
+        const rawActivity = Object.values(activitySubjectMap);
+        const rawSkills = Object.values(skillsSubjectMap);
         const overall = calculateOverall(rawMarks);
 
         if (!rawMarks.length) {
@@ -239,12 +340,16 @@ const Marksheet = (props: {
           date: resultDate ? resultDate.toISOString() : null,
           rollNumber: roll.toString(),
           session: session,
+          activity: rawActivity,
+          skills: rawSkills,
           ...overall,
         };
       });
 
       // null values hatao
       const finalPayload = payload.filter((p: any) => p !== null);
+
+      console.log("finalPayload : ", finalPayload);
 
       setStudentsPayload(finalPayload);
 
@@ -358,7 +463,7 @@ const Marksheet = (props: {
           {/* Right dropdown */}
           <Select
             placeholder="Select Exam"
-            data={["Mid TERM Exam", "Annual TERM Exam"]}
+            data={["Mid TERM", "Annual TERM"]}
             value={filterExam}
             onChange={setFilterExam}
             // w={200}
@@ -645,9 +750,11 @@ const Marksheet = (props: {
                               const url = `https://shikshapay.cloud/marksheet/${item._id}`;
 
                               const qr = await QRCode.toDataURL(url);
+                              
+                              const isAcadmy = institute.isAcadmy;
 
                               GetStudentDetail(item.student._id)
-                                .then(async(res: any) => {
+                                .then(async (res: any) => {
                                   const student = res.student;
 
                                   const base64Photo = await getBase64Image(
@@ -662,59 +769,180 @@ const Marksheet = (props: {
                                     student.instituteId.signature,
                                   );
 
-                                  const html = createMarksheetPdf({
-                                    instituteName: institute?.name,
-                                    examName: item.name,
-                                    batchName: item.batch.name,
-                                    studentName: item.student?.name,
-                                    rollNumber: item.student?.rollNumber,
-                                    enrolment: item.student?.enrollmentNo,
-                                    marks: item.marks,
-                                    totalMarks: item.totalMarks,
-                                    percentage: item.percentage,
-                                    overallGrade: item.overallGrade,
-                                    status: item.status,
-                                    allsubjecttotal: item.marks.length * 100,
-                                    date: new Date(
-                                      item.date,
-                                    ).toLocaleDateString("en-GB"),
-                                    session: item.session,
-                                    fName: student.parentName,
-                                    address: student.address,
-                                    parentNumber: student.parentNumber,
-                                    dob: formatDate(student.dateOfBirth),
+                                  let term1: any = {};
+                                  let term2: any = {};
 
-                                    // ✅ Base64 images
-                                    photo: base64Photo,
-                                    instituteLogo: base64Logo,
-                                    principalSignature: base64Signature,
+                                  if (filterExam.includes("Annual") && !isAcadmy) {
+                                    const res: any = await GetMidExamMarksheet(
+                                      item.batch._id,
+                                      student._id,
+                                    );
 
-                                    instituteAdress:
-                                      student.instituteId.address,
-                                    institutePhone:
-                                      student.instituteId.institutePhoneNumber,
+                                    const marksheet = res.marksheet;
 
-                                    qr,
-                                  });
+                                    term1 = {
+                                      instituteName: institute?.name,
+                                      examName: item.name,
+                                      batchName: item.batch.name,
+                                      studentName: item.student?.name,
+                                      rollNumber: item.student?.rollNumber,
+                                      enrolment: item.student?.enrollmentNo,
+                                      marks: marksheet.marks,
+                                      activity: marksheet.activity,
+                                      skills: marksheet.skills,
+                                      totalMarks: marksheet.totalMarks,
+                                      percentage: marksheet.percentage,
+                                      overallGrade: marksheet.overallGrade,
+                                      status: marksheet.status,
+                                      allsubjecttotal:
+                                        marksheet.marks.length * 100,
+                                      date: new Date(
+                                        marksheet.date,
+                                      ).toLocaleDateString("en-GB"),
+                                      session: marksheet.session,
+                                      fName: student.parentName,
+                                      address: student.address,
+                                      parentNumber: student.parentNumber,
+                                      dob: formatDate(student.dateOfBirth),
 
-                                  const printWindow = window.open("", "_blank");
+                                      // ✅ Base64 images
+                                      photo: base64Photo,
+                                      instituteLogo: base64Logo,
+                                      principalSignature: base64Signature,
 
-                                  if (printWindow) {
-                                    printWindow.document.open();
+                                      instituteAdress:
+                                        student.instituteId.address,
+                                      institutePhone:
+                                        student.instituteId
+                                          .institutePhoneNumber,
 
-                                    printWindow.document.write(html);
+                                      qr,
+                                    };
 
-                                    printWindow.document.close();
+                                    term2 = {
+                                      instituteName: institute?.name,
+                                      examName: item.name,
+                                      batchName: item.batch.name,
+                                      studentName: item.student?.name,
+                                      rollNumber: item.student?.rollNumber,
+                                      enrolment: item.student?.enrollmentNo,
+                                      marks: item.marks,
+                                      activity: item.activity,
+                                      skills: item.skills,
+                                      totalMarks: item.totalMarks,
+                                      percentage: item.percentage,
+                                      overallGrade: item.overallGrade,
+                                      status: item.status,
+                                      allsubjecttotal: item.marks.length * 100,
+                                      date: new Date(
+                                        item.date,
+                                      ).toLocaleDateString("en-GB"),
+                                      session: item.session,
+                                      fName: student.parentName,
+                                      address: student.address,
+                                      parentNumber: student.parentNumber,
+                                      dob: formatDate(student.dateOfBirth),
 
-                                    setTimeout(() => {
-                                      printWindow.focus();
+                                      // ✅ Base64 images
+                                      photo: base64Photo,
+                                      instituteLogo: base64Logo,
+                                      principalSignature: base64Signature,
 
-                                      printWindow.print();
+                                      instituteAdress:
+                                        student.instituteId.address,
+                                      institutePhone:
+                                        student.instituteId
+                                          .institutePhoneNumber,
+                                      qr,
+                                    };
+                                  } else {
+                                    term1 = {
+                                      instituteName: institute?.name,
+                                      examName: item.name,
+                                      batchName: item.batch.name,
+                                      studentName: item.student?.name,
+                                      rollNumber: item.student?.rollNumber,
+                                      enrolment: item.student?.enrollmentNo,
+                                      marks: item.marks,
+                                      activity: item.activity,
+                                      skills: item.skills,
+                                      totalMarks: item.totalMarks,
+                                      percentage: item.percentage,
+                                      overallGrade: item.overallGrade,
+                                      status: item.status,
+                                      allsubjecttotal: item.marks.length * 100,
+                                      date: new Date(
+                                        item.date,
+                                      ).toLocaleDateString("en-GB"),
+                                      session: item.session,
+                                      fName: student.parentName,
+                                      address: student.address,
+                                      parentNumber: student.parentNumber,
+                                      dob: formatDate(student.dateOfBirth),
 
-                                      printWindow.onafterprint = () => {
-                                        printWindow.close();
-                                      };
-                                    }, 500);
+                                      // ✅ Base64 images
+                                      photo: base64Photo,
+                                      instituteLogo: base64Logo,
+                                      principalSignature: base64Signature,
+
+                                      instituteAdress:
+                                        student.instituteId.address,
+                                      institutePhone:
+                                        student.instituteId
+                                          .institutePhoneNumber,
+
+                                      qr,
+                                    };
+                                  }
+
+                                  let html = "";
+
+                                  if (term1 || term2) {
+                                    console.log(
+                                      "check before print : ",
+                                      filterExam,
+                                      term1.marks,
+                                      term2.marks,
+                                    );
+console.log("isAcadmy : ",isAcadmy);
+
+                                    if (isAcadmy) {
+                                      html = createAcadmyMarksheetPdf(term1);
+                                    } else if (
+                                      filterExam.includes("Annual") &&
+                                      term1.marks &&
+                                      term1.marks.length
+                                    ) {
+                                      html = createCombinedMarksheetPdf(
+                                        term1,
+                                        term2,
+                                      );
+                                    } else {
+                                      html = createMarksheetPdf(term1);
+                                    }
+
+                                    const printWindow = window.open(
+                                      "",
+                                      "_blank",
+                                    );
+
+                                    if (printWindow) {
+                                      printWindow.document.open();
+
+                                      printWindow.document.write(html);
+
+                                      printWindow.document.close();
+
+                                      setTimeout(() => {
+                                        printWindow.focus();
+
+                                        printWindow.print();
+
+                                        printWindow.onafterprint = () => {
+                                          printWindow.close();
+                                        };
+                                      }, 500);
+                                    }
                                   }
                                 })
                                 .catch((e) => {
@@ -762,7 +990,7 @@ const Marksheet = (props: {
             <Select
               placeholder="Select Exam"
               label="Select Exam"
-              data={["Mid TERM Exam", "Annual TERM Exam"]}
+              data={["Mid TERM", "Annual TERM"]}
               value={selectedExam}
               onChange={setSelectedExam}
               w={200}

@@ -104,8 +104,8 @@ function EntryForm({
             // STEP 2 → Save
             await CreateNotes({
                 batchId,
-                Url: uploadedUrl,
-                Title: title,
+                url: uploadedUrl,
+                title: title,
             });
 
             SuccessNotification("Study Material Added!");
@@ -226,9 +226,9 @@ export default function StudyMaterialPage(props: {
                     (item: any, index: number) => ({
                         id: item._id,
                         title:
-                            item.Title ||
+                            item.title ||
                             `Study Material ${index + 1}`,
-                        url: item.Url || "#",
+                        url: item.url || "#",
                     })
                 );
 
@@ -420,7 +420,6 @@ export default function StudyMaterialPage(props: {
                                     radius="xl"
                                     variant="light"
                                     color="violet"
-                                    disabled
                                 >
                                     Download All
                                 </Button>
@@ -481,7 +480,6 @@ export default function StudyMaterialPage(props: {
                                                     variant="subtle"
                                                     radius="xl"
                                                     color="violet"
-                                                    disabled={item.url === "#"}
                                                     title={
                                                         item.url === "#"
                                                             ? "File is not available right now"

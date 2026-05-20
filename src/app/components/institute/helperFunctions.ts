@@ -162,12 +162,14 @@ export function formatNumberInK(value: number): number | string {
 }
 
  export const GetGrade = (marks: number) => {
-  if (marks >= 90) return "A+";
-  if (marks >= 75) return "A";
-  if (marks >= 60) return "B";
-  if (marks >= 50) return "C";
-  if (marks >= 40) return "D";
-  return "F";
+  if (marks > 90) return "A1";
+  if (marks > 80) return "A2";
+  if (marks > 70) return "B1";
+  if (marks > 60) return "B2";
+  if (marks > 50) return "C1";
+  if (marks > 40) return "C2";
+  if (marks >= 33) return "D";
+  return "E";
 };
 
 export const parseExcelDate = (value: any) => {

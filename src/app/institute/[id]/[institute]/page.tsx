@@ -60,7 +60,8 @@ const dashboard = () => {
           address: data.institute.address,
           featureAccess: data.institute.accessFeatures,
           email: data.email,
-          gst:data.institute.gst
+          gst:data.institute.gst,
+          isAcadmy:data.institute.isAcadmy,
         };
 
         dispatch(setDetails(instituteDetails));
