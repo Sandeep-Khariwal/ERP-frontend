@@ -37,6 +37,13 @@ export function GetStudent(id: string) {
       .catch((error: any) => reject(error));
   });
 }
+export function GetStudentMarksheets(id: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/marksheet/student/${id}`)
+      .then((response: any) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
 export function GetStudentFeeRecords(id: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/institute/getStudent/${id}`)
