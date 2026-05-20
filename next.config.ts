@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   env: {
   //  URL: "http://localhost:8080"
    URL: "https://server.shikshapay.cloud"
+
   },
   
 };

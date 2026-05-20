@@ -37,6 +37,12 @@ const StepThree = (props: {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const getMonthName = (date: string) => {
+    return new Date(date).toLocaleString("default", {
+      month: "long",
+    });
+  };
+
   // currently selected type in UI
   const [selectedType, setSelectedType] = useState<string>("");
 
@@ -46,7 +52,7 @@ const StepThree = (props: {
 
   const defaultInstallment: Installment = {
     _id: "",
-    name: "Installment 1",
+    name: getMonthName(new Date().toISOString().split("T")[0]),
     dueDate: new Date().toISOString().split("T")[0],
     amount: 0,
     isDeleted: false,
@@ -69,55 +75,55 @@ const StepThree = (props: {
   // INITIAL LOAD
   // =========================================
 
-useEffect(() => {
+  useEffect(() => {
 
-  // =========================================
-  // EDIT MODE
-  // =========================================
+    // =========================================
+    // EDIT MODE
+    // =========================================
 
-  if (props.isEditable) {
+    if (props.isEditable) {
 
-    // ORIGINAL = BATCH
-    if (originalFeeType === "Batch") {
+      // ORIGINAL = BATCH
+      if (originalFeeType === "Batch") {
 
-      setBatchInstallments(props.studentInstallments);
+        setBatchInstallments(props.studentInstallments);
 
-      setInstallments(props.studentInstallments);
+        setInstallments(props.studentInstallments);
 
-      setSelectedType("Batch");
+        setSelectedType("Batch");
 
-      props.setInstallments(props.studentInstallments);
+        props.setInstallments(props.studentInstallments);
 
-      props.setCustomOrBatch("Batch");
+        props.setCustomOrBatch("Batch");
 
-      props.setSelectedBatchId(props.batchId);
+        props.setSelectedBatchId(props.batchId);
+      }
+
+      // ORIGINAL = CUSTOM
+      else if (originalFeeType === "Custom") {
+
+        setCustomInstallments(props.studentInstallments);
+
+        setInstallments(props.studentInstallments);
+
+        setSelectedType("Custom");
+
+        props.setInstallments(props.studentInstallments);
+
+        props.setCustomOrBatch("Custom");
+      }
+
+      return;
     }
 
-    // ORIGINAL = CUSTOM
-    else if (originalFeeType === "Custom") {
+    // =========================================
+    // CREATE MODE
+    // =========================================
 
-      setCustomInstallments(props.studentInstallments);
+    // by default always Batch
+    onClickCustomOrBatch("Batch");
 
-      setInstallments(props.studentInstallments);
-
-      setSelectedType("Custom");
-
-      props.setInstallments(props.studentInstallments);
-
-      props.setCustomOrBatch("Custom");
-    }
-
-    return;
-  }
-
-  // =========================================
-  // CREATE MODE
-  // =========================================
-
-  // by default always Batch
-  onClickCustomOrBatch("Batch");
-
-}, []);
+  }, []);
 
   // =========================================
   // UPDATE PARENT INSTALLMENTS
@@ -174,7 +180,7 @@ useEffect(() => {
       const { feeInstallments } = x.batchFee;
 
       const newInstallments = feeInstallments.map((f: any) => ({
-        _id:  "",
+        _id: "",
         name: f.name,
         dueDate: new Date(f.dueDate).toISOString().split("T")[0],
         amount: f.amount,
@@ -230,7 +236,7 @@ useEffect(() => {
       ...installments,
       {
         _id: "",
-        name: `Installment ${installments.length + 1}`,
+        name: getMonthName(new Date().toISOString().split("T")[0]),
         dueDate: new Date().toISOString().split("T")[0],
         amount: 0,
         isDeleted: false,
