@@ -15,6 +15,7 @@ import {
   Container,
   LoadingOverlay,
   Box,
+  TextInput,
 } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
@@ -34,7 +35,7 @@ import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createFullFeeOverviewPdf } from "./HtmlToPdf";
 import { getBase64Image } from "@/app/helperFunction/Notification";
 
-const convertHtmlIntoPdf = (html: string) => {};
+const convertHtmlIntoPdf = (html: string) => { };
 
 interface FormValues {
   paymentDate: Date;
@@ -42,6 +43,7 @@ interface FormValues {
 export interface FeeRecordData {
   amount: number;
   paidDate: Date;
+  description?: string;
 }
 const FeeRecordSection = (props: {
   userType: UserType;
@@ -84,24 +86,37 @@ const FeeRecordSection = (props: {
   >(new Map());
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleChange = (key: string, value: any) => {
+  const handleChange = (key: string, value: any, field = "amount") => {
     if (key === "paymentDate") {
       setFormValues((prev) => ({ ...prev, paymentDate: value }));
+
       setFeeRecordsMap((prevMap) => {
         const newMap = new Map(prevMap);
+
         newMap.forEach((record, recordId) => {
-          newMap.set(recordId, { ...record, paidDate: value });
+          newMap.set(recordId, {
+            ...record,
+            paidDate: value,
+          });
         });
+
         return newMap;
       });
     } else {
       setFeeRecordsMap((prevMap) => {
         const newMap = new Map(prevMap);
+
         const existingRecord = newMap.get(key) || {
           amount: 0,
           paidDate: formValues.paymentDate,
+          description: "",
         };
-        newMap.set(key, { ...existingRecord, amount: value });
+
+        newMap.set(key, {
+          ...existingRecord,
+          [field]: value,
+        });
+
         return newMap;
       });
     }
@@ -115,6 +130,8 @@ const FeeRecordSection = (props: {
       return;
     }
     setIsLoading(true);
+    console.log("feeRecordsMap", feeRecordsMap);
+    console.log("converted", Array.from(feeRecordsMap.entries()));
     UpdateMultipleFeeRecord(
       instituteDetails._id,
       feeRecordsMap,
@@ -213,7 +230,11 @@ const FeeRecordSection = (props: {
                 color="green"
                 onClick={() => {
                   GetStudentForPdf(props.studentId).then(async (x: any) => {
+                    console.log("FULL RESPONSE", x);
+                    console.log("FEE RECORDS", x.student.feeRecords);
                     const { student } = x;
+
+                    
 
                     let gst = instituteDetails.gst;
                     if (
@@ -233,7 +254,10 @@ const FeeRecordSection = (props: {
                       amountPaid: f.amountPaid,
                       totalAmount: f.totalAmount,
                       updatedAt: f.updatedAt,
+                      description: f.description,
                     }));
+
+                    console.log(student.feeRecords);
 
                     const base64Logo = await getBase64Image(
                       student.instituteId.logo,
@@ -292,20 +316,20 @@ const FeeRecordSection = (props: {
               {/* OLD BUTTON */}
               {(props.userType == UserType.OTHERS ||
                 props.userType == UserType.TEACHER) && (
-                <Button
-                  onClick={() => {
-                    if (totalOverdue <= 0) {
-                      showNotification({
-                        message: "No Pending Payment ",
-                      });
-                      return;
-                    }
-                    setOpenPaymentModel(true);
-                  }}
-                >
-                  Record Payment
-                </Button>
-              )}
+                  <Button
+                    onClick={() => {
+                      if (totalOverdue <= 0) {
+                        showNotification({
+                          message: "No Pending Payment ",
+                        });
+                        return;
+                      }
+                      setOpenPaymentModel(true);
+                    }}
+                  >
+                    Record Payment
+                  </Button>
+                )}
             </Flex>
           </Flex>
 
@@ -379,30 +403,56 @@ const FeeRecordSection = (props: {
 
           {installments.map((record: any) => {
             return (
-              <Flex key={record?._id} justify={"start"} align={"end"}>
-                <NumberInput
-                  label={record.name}
-                  value={feeRecordsMap.get(record._id)?.amount || 0}
-                  onChange={(value) => {
-                    handleChange(record._id, value || 0);
-                  }}
-                  max={record.amount - record.amountPaid}
-                  min={0}
+              <Stack
+                key={record?._id}
+                gap={8}
+                mb={18}
+                p={8}
+                style={{
+                  border: "1px solid #e9ecef",
+                  borderRadius: "10px",
+                }}
+              >
+                <Flex justify={"start"} align={"end"} gap={10}>
+                  <NumberInput
+                    label={record.name}
+                    value={feeRecordsMap.get(record._id)?.amount || 0}
+                    onChange={(value) => {
+                      handleChange(record._id, value || 0, "amount");
+                    }}
+                    max={record.amount - record.amountPaid}
+                    min={0}
+                    style={{ flex: 1 }}
+                  />
+
+                  <Text
+                    fw={700}
+                    mb={10}
+                    fz="sm"
+                    c="black"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    ₹{record.amount - record.amountPaid}
+                    <span style={{ fontSize: "10px", color: "gray" }}>
+                      {" "}
+                      (Pending)
+                    </span>
+                  </Text>
+                </Flex>
+
+                <TextInput
+                  label="Description"
+                  placeholder="Enter payment description"
+                  value={feeRecordsMap.get(record._id)?.description || ""}
+                  onChange={(e) =>
+                    handleChange(
+                      record._id,
+                      e.currentTarget.value,
+                      "description",
+                    )
+                  }
                 />
-                <Text
-                  fw={700}
-                  lh={1}
-                  ml={4}
-                  fz="sm"
-                  c="black"
-                  style={{ fontFamily: "sans-serif" }}
-                >
-                  ₹{record.amount - record.amountPaid + " "}
-                  <span style={{ fontSize: "10px", color: "gray" }}>
-                    (Pending)
-                  </span>
-                </Text>
-              </Flex>
+              </Stack>
             );
           })}
 

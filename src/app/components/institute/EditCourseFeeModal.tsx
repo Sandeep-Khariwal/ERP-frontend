@@ -38,13 +38,19 @@ export function EditCourseFeeModal(props: {
   >([]);
   const [selectedClassQuaterlyFeeData, setSelectedClassQuaterlyFeeData] =
     useState<FeeData[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<Date | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<Date | null>(new Date());
   const [datesData, setDatesData] = useState<
     {
       value: string;
       label: string;
     }[]
   >([]);
+
+  const getMonthName = (date: string) => {
+    return new Date(date).toLocaleString("default", {
+      month: "long",
+    });
+  };
 
   const isMobile = useMediaQuery("(max-width: 800px)");
   const [startYearDate, setStartYearDate] = useState<Date>(new Date());
@@ -93,10 +99,6 @@ export function EditCourseFeeModal(props: {
       ...p,
       [field]: value,
     }));
-  };
-
-  const handleAddInstallment = () => {
-    setInstallments([...installments, { name: "", dueDate: "", amount: 0 }]);
   };
 
   const handleRemoveInstallment = (index: number) => {
@@ -174,14 +176,14 @@ export function EditCourseFeeModal(props: {
         });
     } else {
       const filteredInstallments = installments.filter(
-  (x) => x.amount > 0 && x.dueDate !== "" && x.name !== ""
-);
+        (x) => x.amount > 0 && x.dueDate !== "" && x.name !== ""
+      );
 
-CreateBatchFee({
-  installments: filteredInstallments,
-  batchId: props.batchId,
-  feeType: selectedFeeOption,
-})
+      CreateBatchFee({
+        installments: filteredInstallments,
+        batchId: props.batchId,
+        feeType: selectedFeeOption,
+      })
         .then((x: any) => {
           SuccessNotification("Batch fee created!!");
           props.setisCourseFeesEdit(null);
@@ -238,8 +240,10 @@ CreateBatchFee({
               currentDate.getMonth() + i + 1,
               1
             );
+            const formattedDueDate = dueDate.toISOString().split("T")[0];
+
             return {
-              name: `Installment ${i + 1}`,
+              name: getMonthName(dueDate.toISOString().split("T")[0]),
               dueDate: dueDate.toISOString().split("T")[0],
               amount: price,
             };
@@ -247,8 +251,12 @@ CreateBatchFee({
         );
         setInstallments(initialInstallments);
       } else {
-        console.log("inside useEffect else", monthlyInstallments);
-        setInstallments(monthlyInstallments);
+        const updatedInstallments = monthlyInstallments.map((item) => ({
+          ...item,
+          name: getMonthName(item.dueDate),
+        }));
+
+        setInstallments(updatedInstallments);
       }
       return;
     } else if (selectedFeeOption === FeeOptions.QUARTERLY) {
@@ -273,7 +281,7 @@ CreateBatchFee({
               );
             }
             return {
-              name: `Installment ${i + 1}`,
+              name: getMonthName(dueDate.toISOString().split("T")[0]),
               dueDate: dueDate.toISOString().split("T")[0],
               amount: price,
             };
@@ -301,13 +309,13 @@ CreateBatchFee({
         );
       }
       if (!editFeeBatch) {
-      const data = {
-        name: `Installment`,
-        dueDate: dueDate.toISOString().split("T")[0],
-        amount: 0,
-      };
-      setYearlyInstallments(data);
-      setInstallment(data);
+        const data = {
+          name: getMonthName(dueDate.toISOString().split("T")[0]),
+          dueDate: dueDate.toISOString().split("T")[0],
+          amount: 0,
+        };
+        setYearlyInstallments(data);
+        setInstallment(data);
       }
     }
   }, [selectedFeeOption, price, monthlyInstallments]);
@@ -420,6 +428,12 @@ CreateBatchFee({
   // }, [props.isCourseFeesEdit]);
 
   useEffect(() => {
+  if (datesData.length > 0 && !selectedMonth) {
+    setSelectedMonth(new Date(datesData[0].value));
+  }
+}, [datesData]);
+
+  useEffect(() => {
     if (props.isCourseFeesEdit) {
       const nextYearMonthsArray = getThisAndNextYearMonths();
       if (selectedFeeOption === FeeOptions.MONTHLY) {
@@ -510,25 +524,24 @@ CreateBatchFee({
       }
     }
   }, [selectedMonth, datesData]);
- function isValid() {
-  if (selectedFeeOption === FeeOptions.YEARLY) {
-    return yearlyInstallments.amount > 0;
-  }
+  function isValid() {
+    if (selectedFeeOption === FeeOptions.YEARLY) {
+      return yearlyInstallments.amount > 0;
+    }
 
-  // monthly / quarterly
-  return installments.some(
-    (x) => x.amount > 0 && x.dueDate !== "" && x.name !== ""
-  );
-}
+    // monthly / quarterly
+    return installments.some(
+      (x) => x.amount > 0 && x.dueDate !== "" && x.name !== ""
+    );
+  }
   useEffect(() => {
     if (selectedMonth) {
       const year = selectedMonth.getFullYear() + 1;
       const month = selectedMonth.getMonth() + 1;
       const day = 1;
 
-      const formattedDate = `${year}-${month < 10 ? `0${month}` : month}-${
-        day < 10 ? `0${day}` : day
-      }`;
+      const formattedDate = `${year}-${month < 10 ? `0${month}` : month}-${day < 10 ? `0${day}` : day
+        }`;
       setInstallment((prevInstallment) => ({
         ...prevInstallment,
         dueDate: formattedDate,
@@ -757,12 +770,11 @@ CreateBatchFee({
                   value={
                     selectedMonth
                       ? selectedMonth.toISOString().split("T")[0]
-                      : new Date().getMonth().toLocaleString()
+                      : datesData[0]?.value || ""
                   }
                   onChange={(val) => {
                     if (val) {
-                      const date = new Date(val);
-                      setSelectedMonth(date);
+                      setSelectedMonth(new Date(val));
                     }
                   }}
                 />

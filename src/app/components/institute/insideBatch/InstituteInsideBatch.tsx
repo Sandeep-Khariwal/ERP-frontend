@@ -36,6 +36,7 @@ import Marksheet from "./Marksheet";
 import UploadExcelAdmission from "../student/addMoreDetails/UploadExcelAdmission";
 import DiaryPage from "./DiaryPage";
 import StudyMaterialPage from "./StudyMaterialPage";
+import SessionsPage from "./SessionsPage";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -46,6 +47,7 @@ enum Tabs {
   DIARY = "Daily Diary",
   STUDY_MATERIAL = "Study Material",
   ASSIGNMENT = "Assignment",
+  SESSIONS = "Sessions",
 }
 
 export enum Screen {
@@ -428,6 +430,15 @@ export function InstituteInsideBatch(props: {
             <Text m={"auto"}>ASSIGNMENT coming soon</Text>
           </Stack>
         )}
+
+        {Tabs.SESSIONS === activeTab && (
+          <Stack w={"100%"}>
+            <SessionsPage
+              batchId={props.batchId}
+            />
+          </Stack>
+        )}
+
       </Stack>
 
       {/* 🔹 Add Student Modal */}
