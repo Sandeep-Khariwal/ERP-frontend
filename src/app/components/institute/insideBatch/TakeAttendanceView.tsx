@@ -4,9 +4,8 @@ import {
   AttendanceInterface,
   StudentsDataWithBatch,
 } from "@/interface/student.interface";
-import { useEffect, useState } from "react";
-import {
-  AttendanceCard,
+import { useCallback, useEffect, useMemo, useState } from "react";
+import AttendanceCard, {
   AttendanceStatus,
   SavedAttendanceCard,
 } from "./AttendanceCard";
@@ -21,7 +20,6 @@ import {
   Flex,
   LoadingOverlay,
   Modal,
-  px,
   ScrollArea,
   Select,
   SimpleGrid,
@@ -51,17 +49,21 @@ interface TakeAttendanceViewProps {
     label: string;
     value: string;
   }[];
-  // addHomework: (description: string, uploadPhoto?: File) => void;
 }
 
 export function TakeAttendanceView(props: TakeAttendanceViewProps) {
-  const [attendanceDate, setAttendanceDate] = useState<Date | null>(new Date());
-  const [todaysDate, setTodaysDate] = useState<Date>(new Date());
-  const [singleAttendance, setSingleAttendance] = useState<AttendanceStatus>(
-    AttendanceStatus.ABSENT,
+  const [attendanceDate, setAttendanceDate] = useState<Date | null>(
+    new Date(),
   );
-  const [currentDateStudentAttendanceRecords, setCurrentDateAttendanceRecords] =
-    useState<AttendanceInterface[]>([]);
+
+  const [todaysDate] = useState<Date>(new Date());
+
+  const [isTodayAttendance, setIsTodayAttendance] =
+    useState<boolean>(false);
+
+  const [currentDateStudentAttendanceRecords,
+    setCurrentDateAttendanceRecords] = useState<AttendanceInterface[]>([]);
+
   const [prevDateSttendance, setPrevDateSttendance] = useState<
     {
       _id: string;
@@ -75,125 +77,238 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
       date: Date;
     }[]
   >([]);
-  const [openHomeWorkModal, setOpenHomeWorkModal] = useState<boolean>(false);
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>();
+
+  const [openHomeWorkModal, setOpenHomeWorkModal] =
+    useState<boolean>(false);
+
+  const [selectedSubjectId, setSelectedSubjectId] =
+    useState<string>();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
-  // aah jdo backend ch jive hoya audo likhge dynamic hojuga
-  // const leaveCount = leaveStudents.length;
-  // const leaveCount = 4;
-  const [leaveCount, setLeaveCount] = useState<number>(0);
+
+  const [leaveModalOpen, setLeaveModalOpen] =
+    useState(false);
+
+  const [leaveCount, setLeaveCount] =
+    useState<number>(0);
+
   const [leaveData, setLeaveData] = useState<any[]>([]);
+
   const isMobile = useMediaQuery("(max-width: 768px)");
 
+  // =========================
+  // MEMOIZED VALUES
+  // =========================
+
+  const isTodaySelected = useMemo(() => {
+    if (!attendanceDate) return false;
+
+    return (
+      attendanceDate.toDateString() ===
+      todaysDate.toDateString()
+    );
+  }, [attendanceDate, todaysDate]);
+
+  const attendanceDateString = useMemo(() => {
+    return attendanceDate
+      ? attendanceDate.toISOString().split("T")[0]
+      : "";
+  }, [attendanceDate]);
+
+  const attendanceMap = useMemo(() => {
+    const map = new Map();
+
+    prevDateSttendance.forEach((att) => {
+      map.set(att.studentId._id, att);
+    });
+
+    return map;
+  }, [prevDateSttendance]);
+
+  // =========================
+  // INITIAL SUBJECT
+  // =========================
+
   useEffect(() => {
-    var todayDate = new Date(Date.now());
-    // todayDate.setHours(6, 0, 0, 0);
-    setTodaysDate(todayDate);
-    setAttendanceDate(todayDate);
     if (props.subjects.length > 0) {
       setSelectedSubjectId(props.subjects[0].value);
     }
-  }, []);
+  }, [props.subjects]);
+
+  // =========================
+  // FETCH ATTENDANCE
+  // =========================
 
   useEffect(() => {
-    if (attendanceDate) {
-      const attendanceTakenDate = new Date(attendanceDate);
-      const today = new Date();
+    if (!attendanceDateString || !props.batchId) return;
 
-      setIsLoading(true);
-      GetAttendanceOnDate(props.batchId, new Date(attendanceDate))
-        .then((x: any) => {
-          const { attendance } = x;
-          setPrevDateSttendance(attendance);
+    let ignore = false;
 
+    async function fetchAttendance() {
+      try {
+        setIsLoading(true);
+
+        const response: any = await GetAttendanceOnDate(
+          props.batchId,
+          new Date(attendanceDateString),
+        );
+
+        if (ignore) return;
+
+        const { attendance } = response;
+
+        setPrevDateSttendance(attendance);
+
+        if (attendance.length > 0) {
+          const attendanceDay = new Date(attendance[0].date)
+            .toISOString()
+            .split("T")[0];
+
+          const today = new Date()
+            .toISOString()
+            .split("T")[0];
+
+          setIsTodayAttendance(today === attendanceDay);
+        } else {
+          setIsTodayAttendance(false);
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        if (!ignore) {
           setIsLoading(false);
-        })
-        .catch((e) => {
-          console.log(e);
-          setIsLoading(false);
-        });
+        }
+      }
     }
-  }, [attendanceDate]);
+
+    fetchAttendance();
+
+    return () => {
+      ignore = true;
+    };
+  }, [attendanceDateString, props.batchId]);
+
+  // =========================
+  // FETCH LEAVES
+  // =========================
 
   useEffect(() => {
-    if (props.batchId) {
-      GetBatchLeave(props.batchId)
-        .then((x: any) => {
-          console.log("Leave API Response =>", x);
+    if (!props.batchId) return;
 
-          // payload me jo data aa rha hai
-          // const leaves = x?.batchLeave || [];
-          const leaves = x?.leaves || [];
+    async function fetchLeaves() {
+      try {
+        const x: any = await GetBatchLeave(props.batchId);
 
-          // pura leave data save
-          setLeaveData(leaves);
+        const leaves = x?.leaves || [];
 
-          // bell notification count
-          setLeaveCount(leaves.length);
-        })
-        .catch((e: any) => {
-          console.log("Leave API Error =>", e);
-        });
+        setLeaveData(leaves);
+        setLeaveCount(leaves.length);
+      } catch (e) {
+        console.log("Leave API Error =>", e);
+      }
     }
+
+    fetchLeaves();
   }, [props.batchId]);
 
-  // function findAttendanceRecordByDate(
-  //   attendanceRecords: AttendanceInterface[]
-  // ): AttendanceInterface | null {
-  //   if (attendanceRecords?.length > 0) {
-  //     for (let i = 0; i < attendanceRecords.length; i++) {
-  //       var attDateObject = new Date(attendanceRecords[i].date);
-  //       attDateObject.setHours(6, 0, 0, 0);
-  //       attendanceRecords[i].date = attDateObject;
-  //       if (attDateObject.toDateString() == attendanceDate?.toDateString()) {
-  //         return attendanceRecords[i];
-  //       }
-  //     }
-  //     return null;
-  //   } else {
-  //     return null;
-  //   }
-  // }
+  // =========================
+  // CALLBACKS
+  // =========================
 
-  function submitAttendance() {
-    setIsLoading(true);
-    CreateAttendance(props.batchId, currentDateStudentAttendanceRecords)
-      .then((x: any) => {
-        console.log("attendance created", x);
-        setIsLoading(false);
-        SuccessNotification("Attendance update!!");
-      })
-      .catch((e: any) => {
-        console.log(e);
-        const { message } = e.response.data;
-        ErrorNotification(message);
-        setIsLoading(false);
+  const handleSingleAttendance = useCallback(
+    (val: AttendanceInterface) => {
+      setCurrentDateAttendanceRecords((prevRecords) => {
+        const existingIndex = prevRecords.findIndex(
+          (record) => record.studentId === val.studentId,
+        );
+
+        if (existingIndex !== -1) {
+          const updatedRecords = [...prevRecords];
+
+          updatedRecords[existingIndex] = {
+            ...updatedRecords[existingIndex],
+            ...val,
+          };
+
+          return updatedRecords;
+        }
+
+        return [...prevRecords, val];
       });
-    // insertNewAttendance({
-    //   attendance: currentDateStudentAttendanceRecords,
-    //   date: currentDateStudentAttendanceRecords[0].date!,
-    //   instituteClassId: props.batchId,
-    // })
-    //   .then(() => {
-    //     SuccessNotification("Attendance recorded successfully");
-    //   })
-    //   .catch((e) => {});
-    // if (props.subjects.length > 0) {
-    //   setOpenHomeWorkModal(true);
-    // }
-  }
+    },
+    [],
+  );
+
+  const submitAttendance = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      const x = await CreateAttendance(
+        props.batchId,
+        currentDateStudentAttendanceRecords,
+      );
+
+      console.log("attendance created", x);
+
+      SuccessNotification("Attendance updated!!");
+    } catch (e: any) {
+      console.log(e);
+
+      const { message } = e.response.data;
+
+      ErrorNotification(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    props.batchId,
+    currentDateStudentAttendanceRecords,
+  ]);
+
+  // =========================
+  // MEMOIZED STUDENT LIST
+  // =========================
+
+  const renderedStudents = useMemo(() => {
+    if (!isTodaySelected) return null;
+
+    return props.students.map((student) => {
+      const attendance = attendanceMap.get(student._id);
+
+      return (
+        <AttendanceCard
+          key={student._id}
+          studentId={student._id || ""}
+          batchId={student.batchId!!}
+          name={student.name}
+          selectedDate={attendanceDate!!}
+          phone={student.phoneNumber[0]}
+          status={attendance?.status}
+          setSingleAttendance={handleSingleAttendance}
+          hidePhoneNumbers={false}
+          studentAttendance={attendance}
+        />
+      );
+    });
+  }, [
+    props.students,
+    attendanceMap,
+    attendanceDate,
+    handleSingleAttendance,
+    isTodaySelected,
+  ]);
 
   return (
     <>
       <LoadingOverlay visible={isLoading} />
+
       <Stack w={"100%"} mt={16} py={10} px={5} bg={"white"}>
         <Flex align={"center"} justify={"space-between"}>
           <Flex align={"center"}>
             <Box
               w="24px"
               h="24px"
-              onClick={() => props.onBackClicked()}
+              onClick={props.onBackClicked}
               style={{ cursor: "pointer" }}
             >
               <IconArrowBack color="black" />
@@ -245,33 +360,19 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
         <DatePickerInput
           rightSection={<IconCalendar stroke={1} />}
           value={attendanceDate}
-          onChange={(date: Date | null) => {
-            if (date) {
-              // Set time to 00:00:00 for consistent date storage
-              // date.setHours(0, 0, 0, 0);
-              const isStringDate = date.toISOString();
-              setAttendanceDate(new Date(isStringDate)); // Set date as a valid Date object
-            }
-
-            // setAttendanceDate(new Date(date));
-          }}
+          onChange={setAttendanceDate}
           clearable={false}
-          maxDate={new Date(Date.now())}
+          maxDate={new Date()}
           radius={50}
-          // styles={{
-          //   rightSection: {
-          //     marginRight: 10,
-          //   },
-          // }}
           w={200}
         />
       </Stack>
+
       {props.students.length === 0 && (
         <Center h="65dvh" w="100%" bg={"white"}>
           <Stack align="center" justify="center">
             <Box
               style={{
-                // backgroundColor: "#EEF4FF",
                 borderRadius: "50%",
                 height: 148,
                 width: 148,
@@ -286,141 +387,88 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
                 />
               </Center>
             </Box>
+
             <Text c="#A4A4A4" fw={500}>
               No student added yet!
             </Text>
           </Stack>
         </Center>
       )}
+
       {props.students.length !== 0 && (
         <>
-          {/* <SimpleGrid
+          <SimpleGrid
             bg={"white"}
-            style={{
-              // backgroundColor: "#E4EDFD",
-              height: "40px",
-              alignContent: "center",
-            }}
-            fw={450}
-            fz={13}
             cols={3}
+            py={12}
+            style={{
+              alignItems: "center",
+              height: "50px",
+            }}
           >
-            <Text ml={10}>Name</Text>
-            <Text>Phone Number</Text>
+            <Text
+              ta={isMobile ? "center" : "left"}
+              ml={isMobile ? 0 : 10}
+              fw={700}
+              fz={isMobile ? 15 : 14}
+            >
+              Name
+            </Text>
+
+            <Text
+              ta={isMobile ? "center" : "left"}
+              fw={700}
+              fz={isMobile ? 15 : 14}
+            >
+              Phone Number
+            </Text>
+
             <Center>
-              <Text>
-                {" "}
-                {attendanceDate == todaysDate
+              <Text fw={700} fz={isMobile ? 15 : 14} ta="center">
+                {isMobile
+                  ? "Attendance"
+                  : isTodaySelected
                   ? "Mark Attendance"
                   : "Attendance"}
               </Text>
             </Center>
-          </SimpleGrid> */}
-         <SimpleGrid
-  bg={"white"}
-  cols={3}
-  py={12}
-  style={{
-    alignItems: "center",
-    height: "50px",
-  }}
->
-  <Text
-    ta={isMobile ? "center" : "left"}
-    ml={isMobile ? 0 : 10}
-    fw={700}
-    fz={isMobile ? 15 : 14}
-  >
-    Name
-  </Text>
+          </SimpleGrid>
 
-  <Text
-    ta={isMobile ? "center" : "left"}
-    fw={700}
-    fz={isMobile ? 15 : 14}
-  >
-    Phone Number
-  </Text>
-
-  <Center>
-    <Text
-      fw={700}
-      fz={isMobile ? 15 : 14}
-      ta="center"
-    >
-      {isMobile
-        ? "Attendance"
-        : attendanceDate?.toDateString() ===
-          todaysDate?.toDateString()
-        ? "Mark Attendance"
-        : "Attendance"}
-    </Text>
-  </Center>
-</SimpleGrid>
-        <ScrollArea
-  h={isMobile ? "calc(100dvh - 340px)" : "50dvh"}
-  px={5}
-  bg={"white"}
-  pb={isMobile ? 100 : 0}
->
-            {prevDateSttendance.length === 0 &&
-              props.students.map((student, index) => {
-                return (
-                  attendanceDate?.toDateString() ===
-                    todaysDate?.toDateString() && (
-                    <AttendanceCard
-                      key={index}
-                      studentId={student._id || ""}
-                      batchId={student.batchId!!}
-                      name={student.name}
-                      selectedDate={attendanceDate!!}
-                      phone={student.phoneNumber[0]}
-                      status={singleAttendance}
-                      setSingleAttendance={(val: AttendanceInterface) => {
-                        setCurrentDateAttendanceRecords((prevRecords) => {
-                          const existingIndex = prevRecords.findIndex(
-                            (record) => record.studentId === val.studentId,
-                          );
-                          if (existingIndex !== -1) {
-                            const updatedRecords = [...prevRecords];
-                            updatedRecords[existingIndex] = {
-                              ...updatedRecords[existingIndex],
-                              ...val,
-                            };
-                            return updatedRecords;
-                          } else {
-                            return [...prevRecords, val];
-                          }
-                        });
-                      }}
-                      hidePhoneNumbers={false}
-                    />
-                  )
-                );
-              })}
+          <ScrollArea
+            h={isMobile ? "calc(100dvh - 340px)" : "50dvh"}
+            px={5}
+            bg={"white"}
+            pb={isMobile ? 100 : 0}
+          >
+            {(prevDateSttendance.length === 0 ||
+              isTodayAttendance) &&
+              renderedStudents}
 
             {prevDateSttendance.length > 0 &&
+              !isTodayAttendance &&
               prevDateSttendance.map((att) => (
                 <SavedAttendanceCard
-                  studentId={att.studentId._id!!}
+                  key={att._id}
+                  studentId={att.studentId._id}
                   name={att.studentId.name}
                   phone={att.studentId.parentNumber}
-                  date={attendanceDate!!}
+                  date={attendanceDate}
                   submitHandler={() => {}}
                   status={att.status}
                 />
               ))}
           </ScrollArea>
-          {attendanceDate?.toDateString() == todaysDate?.toDateString() && (
+
+          {isTodaySelected && (
             <Center>
               <Button
-                onClick={() => {
-                  submitAttendance();
+                onClick={submitAttendance}
+                style={{
+                  backgroundColor: "#4B65F6",
+                  marginBottom: isMobile
+                    ? "150px"
+                    : "20px",
                 }}
-               style={{
-  backgroundColor: "#4B65F6",
-  marginBottom: isMobile ? "150px" : "20px",
-}}
                 px={100}
               >
                 Submit
@@ -430,15 +478,6 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
         </>
       )}
 
-      {/* {currentDateStudentAttendanceRecords.length == 0 && (
-        <Center h="65dvh" w="100%">
-          <Stack align="center" justify="center">
-            <Text c="#A4A4A4" fw={500}>
-              No Attendance was recorded for this day!
-            </Text>
-          </Stack>
-        </Center>
-      )} */}
       {openHomeWorkModal && (
         <Modal
           onClose={() => {
@@ -448,29 +487,28 @@ export function TakeAttendanceView(props: TakeAttendanceViewProps) {
         >
           <Select
             data={props.subjects}
-            label="Add any notice/update with the Attedance"
+            label="Add any notice/update with the Attendance"
             value={selectedSubjectId}
             onChange={(value) => {
               if (value) setSelectedSubjectId(value);
             }}
           />
-          {/* <AddHomeworkModal
-              onSubmitClick={(description: string, uploadPhoto?: File) => {
-                props.addHomework(description, uploadPhoto);
-                setOpenHomeWorkModal(false);
-              }}
-            /> */}
         </Modal>
       )}
+
       <StudentLeave
         opened={leaveModalOpen}
         onClose={(leaveId: string) => {
           if (leaveId) {
             setLeaveData((prev) =>
-              prev.filter((leave: any) => leave._id !== leaveId),
+              prev.filter(
+                (leave: any) => leave._id !== leaveId,
+              ),
             );
-            setLeaveCount(leaveCount - 1);
+
+            setLeaveCount((prev) => prev - 1);
           }
+
           setLeaveModalOpen(false);
         }}
         batchId={props.batchId}

@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
 import { AttendanceInterface } from "@/interface/student.interface";
 import { Box, Center, Flex, Select, SimpleGrid, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 export enum AttendanceStatus {
   PRESENT = "PRESENT",
   ABSENT = "ABSENT",
   LATE = "LATE",
-  LEAVE= "LEAVE"
+  LEAVE = "LEAVE",
 }
 
 const attendanceData = [
@@ -17,7 +17,7 @@ const attendanceData = [
   AttendanceStatus.LATE,
   AttendanceStatus.LEAVE,
 ];
-export function AttendanceCard(props: {
+ function AttendanceCard(props: {
   studentId: string;
   batchId: { _id: string; name: string };
   selectedDate: Date;
@@ -26,18 +26,37 @@ export function AttendanceCard(props: {
   status: AttendanceStatus;
   setSingleAttendance: (val: AttendanceInterface) => void;
   hidePhoneNumbers: boolean;
+  studentAttendance: {
+    _id: string;
+    batchId: string;
+    studentId: {
+      _id: string;
+      name: string;
+      parentNumber: string;
+    };
+    status: AttendanceStatus;
+    date: Date;
+  };
 }) {
-  const [selectedStatus,setSelectedStatus] = useState<AttendanceStatus>(AttendanceStatus.ABSENT)
-  useEffect(()=>{
-    
+  console.log("studentAttendance : ", props?.studentAttendance?.status);
+
+  const [selectedStatus, setSelectedStatus] = useState<AttendanceStatus>(
+    AttendanceStatus.PRESENT,
+  );
+useEffect(() => {
+  if (props?.studentAttendance?.status) {
+    setSelectedStatus(props.studentAttendance.status);
+
     props.setSingleAttendance({
-      _id: "",
+      _id: props.studentAttendance._id??"",
       studentId: props.studentId,
       batchId: props.batchId._id,
-      date: new Date(props.selectedDate) ,
-      status:AttendanceStatus.ABSENT
-    } as AttendanceInterface);
-  },[])
+      date: new Date(props.selectedDate),
+      status: props.studentAttendance.status,
+    });
+  }
+}, [props.studentAttendance]);
+
   return (
     <>
       <Box
@@ -59,18 +78,17 @@ export function AttendanceCard(props: {
           <Center>
             <Select
               data={attendanceData}
-              
               onChange={(val) => {
                 if (val) {
                   props.setSingleAttendance({
-                    _id: "",
+                    _id: props?.studentAttendance?._id??"",
                     studentId: props.studentId,
                     batchId: props.batchId._id,
                     date: props.selectedDate,
-                    status:val as AttendanceStatus
+                    status: val as AttendanceStatus,
                   } as AttendanceInterface);
                 }
-                setSelectedStatus(val as AttendanceStatus)
+                setSelectedStatus(val as AttendanceStatus);
               }}
               value={selectedStatus}
             />
@@ -80,7 +98,9 @@ export function AttendanceCard(props: {
     </>
   );
 }
-export function SavedAttendanceCard(props: {
+export default memo(AttendanceCard)
+
+export function SavedAttendanceCard (props: {
   studentId: string;
   name: string;
   phone: string;
