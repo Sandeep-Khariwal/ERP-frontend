@@ -1,20 +1,26 @@
 export function generateCertificateHTML(data: any) {
-    // Default values mapping incoming functional arguments
-    const certificateData = {
-        recipientName: data.recipientName || "John Doe",
-        profilePic: data.profilePic || "",
-        courseName: data.courseName || "ADCA",
-        courseFullName: data.courseFullName || "(Advance Diploma In Computer Application)",
-        issueDate: data.issueDate || "25 May 2024",
-        authorizedSignatureName: data.authorizedSignatureName || "Authorized Signatory",
-        logo: data.logo || "",
-        qrCodeUrl: data.qrCodeUrl || "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Verified",
-        instituteName: data.instituteName || "EDUSTART",
-        instituteSubText: data.instituteSubText || "Edustart RN Computer And Vocational Training Institute Private Limited",
-        instituteContact: data.instituteContact || "+919416059799"
-    };
+  // Default values mapping incoming functional arguments
+  const certificateData = {
+    recipientName: data.recipientName || "John Doe",
+    profilePic: data.profilePic || "",
+    courseName: data.courseName || "ADCA",
+    courseFullName:
+      data.courseFullName || "(Advance Diploma In Computer Application)",
+    issueDate: data.issueDate || "25 May 2024",
+    authorizedSignatureName:
+      data.authorizedSignatureName || "Authorized Signatory",
+    logo: data.logo || "",
+    qrCodeUrl:
+      data.qrCodeUrl ||
+      "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Verified",
+    instituteName: data.instituteName || "EDUSTART",
+    instituteSubText:
+      data.instituteSubText ||
+      "Edustart RN Computer And Vocational Training Institute Private Limited",
+    instituteContact: data.instituteContact || "+919416059799",
+  };
 
-    return `
+  return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -404,11 +410,15 @@ export function generateCertificateHTML(data: any) {
                 
                 <div class="header-identity">
                     <div class="institute-branding">
-                        ${certificateData.logo ? `
+                        ${
+                          certificateData.logo
+                            ? `
                             <img class="inst-logo" src="${certificateData.logo}" alt="Logo">
-                        ` : `
+                        `
+                            : `
                             <div class="logo-placeholder">✦</div>
-                        `}
+                        `
+                        }
                         <div class="institute-text-block">
                             <h2 class="inst-name">${certificateData.instituteName}</h2>
                             <p class="inst-sub">${certificateData.instituteSubText}</p>
@@ -416,11 +426,15 @@ export function generateCertificateHTML(data: any) {
                         </div>
                     </div>
                     
-                    ${certificateData.profilePic ? `
+                    ${
+                      certificateData.profilePic
+                        ? `
                         <div class="student-photo-container">
                             <img class="student-photo" src="${certificateData.profilePic}" alt="Student Profile">
                         </div>
-                    ` : ''}
+                    `
+                        : ""
+                    }
                 </div>
 
                 <div class="title-group">
@@ -465,11 +479,7 @@ export function generateCertificateHTML(data: any) {
 
                     <div class="footer-column">
                         <div class="signature-box-container">
-                            ${(certificateData.authorizedSignatureName.startsWith('http://') || certificateData.authorizedSignatureName.startsWith('https://')) ? `
-                                <img class="signature-image" src="${certificateData.authorizedSignatureName}" alt="Authorized Signature">
-                            ` : `
                                 <div class="signature-text-fallback">${certificateData.authorizedSignatureName}</div>
-                            `}
                         </div>
                         <div class="signature-base-line"></div>
                         <p class="panel-annotation">Authorized Signatory</p>

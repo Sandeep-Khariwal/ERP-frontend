@@ -24,12 +24,16 @@ import {
 } from "@tabler/icons-react";
 import { generateCertificateHTML } from "@/html/geneRateCertificate";
 import {
+  GetPassout,
   GetStudent,
   GetStudentDetail,
   GetStudentMarksheets,
 } from "@/axios/institute/InstituteGetApi";
 import { getBase64Image } from "@/app/helperFunction/Notification";
 import QRCode from "qrcode";
+import { formatDate } from "@/app/components/marketing/utility/utils";
+import { createAcadmyMarksheetPdf } from "../../insideBatch/CreateMarksheetPdf";
+import { useAppSelector } from "@/app/redux/redux.hooks";
 
 // --- Interfaces for Type Safety ---
 interface FeeRecord {
@@ -70,30 +74,32 @@ export default function PassOutStudents() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<string | null>("All");
+  const institute = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails,
+  );
+
+  console.log("data : ",data);
+  
 
   // --- Fetch API Data ---
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(
-          "http://localhost:8080/api/v1/institute/getPassoutStudents/INST-474efcbb-29cc-4a64-9cf1-a16fed4128ac",
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch passout students data");
-        }
-        const json: ApiResponse = await response.json();
-        setData(json);
-      } catch (err: any) {
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStudents();
   }, []);
 
+  const fetchStudents = () => {
+    setLoading(true);
+    GetPassout(institute._id!)
+      .then((res: any) => {
+        console.log("res : ", res.students);
+
+        setData(res);
+        setLoading(false);
+      })
+      .catch((e: any) => {
+        console.log(e);
+        setLoading(false);
+      });
+  };
   // --- Extract Unique Classes for the Filter Dropdown ---
   const classOptions = useMemo(() => {
     if (!data?.students?.students)
@@ -204,6 +210,83 @@ export default function PassOutStudents() {
       })
       .catch((err) => {
         console.error("Failed to generate and download certificate:", err);
+      });
+  };
+
+  const downloadMarksheet = async (studentId: string) => {
+    const response: any = await GetStudentMarksheets(studentId);
+    const marksheet = response.marksheet[0];
+    const url = `https://shikshapay.cloud/marksheet/${marksheet._id}`;
+
+    const qr = await QRCode.toDataURL(url);
+
+    GetStudentDetail(studentId)
+      .then(async (res: any) => {
+        const student = res.student;
+        console.log("marksheet : ", marksheet, student);
+        const base64Photo = await getBase64Image(student.profilePic);
+
+        const base64Logo = await getBase64Image(student.instituteId.logo);
+
+        const base64Signature = await getBase64Image(
+          student.instituteId.signature,
+        );
+
+        const term1 = {
+          instituteName: student.instituteId?.name,
+          examName: marksheet.name,
+          batchName: marksheet.batch.name,
+          studentName: student?.name,
+          rollNumber: student?.rollNumber,
+          enrolment: student?.enrollmentNo,
+          marks: marksheet.marks,
+          totalMarks: marksheet.totalMarks,
+          percentage: marksheet.percentage,
+          overallGrade: marksheet.overallGrade,
+          status: marksheet.status,
+          allsubjecttotal: marksheet.marks.length * 100,
+          date: new Date(marksheet.date).toLocaleDateString("en-GB"),
+          session: marksheet.session,
+          fName: student.parentName,
+          address: student.address,
+          parentNumber: student.parentNumber,
+          dob: formatDate(student.dateOfBirth),
+
+          // ✅ Base64 images
+          photo: base64Photo,
+          instituteLogo: base64Logo,
+          principalSignature: base64Signature,
+
+          instituteAdress: student.instituteId.address,
+          institutePhone: student.instituteId.institutePhoneNumber,
+
+          qr,
+        };
+
+        const html = createAcadmyMarksheetPdf(term1);
+
+        const printWindow = window.open("", "_blank");
+
+        if (printWindow) {
+          printWindow.document.open();
+
+          printWindow.document.write(html);
+
+          printWindow.document.close();
+
+          setTimeout(() => {
+            printWindow.focus();
+
+            printWindow.print();
+
+            printWindow.onafterprint = () => {
+              printWindow.close();
+            };
+          }, 500);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
       });
   };
 
@@ -397,7 +480,17 @@ export default function PassOutStudents() {
                               handleDownloadCertificate(student._id)
                             }
                           >
-                            Download Certificate
+                            Certificate
+                          </Menu.Item>
+                          <Menu.Item
+                            leftSection={
+                              <IconDownload
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                            onClick={() => downloadMarksheet(student._id)}
+                          >
+                            Marksheet
                           </Menu.Item>
                         </Menu.Dropdown>
                       </Menu>

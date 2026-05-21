@@ -107,6 +107,9 @@ const Marksheet = (props: {
     }[]
   >([]);
 
+  console.log("allMarksheet : ",allMarksheet);
+  
+
   useEffect(() => {
     //get all subjects
     GetAllStudentsFromBatch(props.batchId)
@@ -415,7 +418,7 @@ const Marksheet = (props: {
   };
   //table me filter kiya data
   const filteredMarksheet = filterExam
-    ? allMarksheet.filter((item) => item.name === filterExam)
+    ? allMarksheet.filter((item) => item.name === filterExam || item.name === filterExam + " Exam")
     : [];
 
   return (
@@ -750,7 +753,7 @@ const Marksheet = (props: {
                               const url = `https://shikshapay.cloud/marksheet/${item._id}`;
 
                               const qr = await QRCode.toDataURL(url);
-                              
+
                               const isAcadmy = institute.isAcadmy;
 
                               GetStudentDetail(item.student._id)
@@ -772,7 +775,10 @@ const Marksheet = (props: {
                                   let term1: any = {};
                                   let term2: any = {};
 
-                                  if (filterExam.includes("Annual") && !isAcadmy) {
+                                  if (
+                                    filterExam.includes("Annual") &&
+                                    !isAcadmy
+                                  ) {
                                     const res: any = await GetMidExamMarksheet(
                                       item.batch._id,
                                       student._id,
@@ -904,7 +910,7 @@ const Marksheet = (props: {
                                       term1.marks,
                                       term2.marks,
                                     );
-console.log("isAcadmy : ",isAcadmy);
+                                    console.log("isAcadmy : ", isAcadmy);
 
                                     if (isAcadmy) {
                                       html = createAcadmyMarksheetPdf(term1);
@@ -1097,24 +1103,45 @@ console.log("isAcadmy : ",isAcadmy);
             Upload & Generate
           </Button>
 
-          <a
-            href="https://docs.google.com/uc?export=download&id=1NhUESVU2B8mEVI67KR2QrFr2jdmSD9lf"
-            style={{ textDecoration: "none" }}
-          >
-            <Text
-              ta="center"
-              mt={5}
-              style={{
-                fontSize: "14px",
-                color: "#6A5ACD",
-                fontWeight: 500,
-                cursor: "pointer",
-                textDecoration: "underline",
-              }}
+          {institute.isAcadmy ? (
+            <a
+              href="https://docs.google.com/uc?export=download&id=1NhUESVU2B8mEVI67KR2QrFr2jdmSD9lf"
+              style={{ textDecoration: "none" }}
             >
-              Download the sample excel file
-            </Text>
-          </a>
+              <Text
+                ta="center"
+                mt={5}
+                style={{
+                  fontSize: "14px",
+                  color: "#6A5ACD",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+              >
+                Download the sample excel file
+              </Text>
+            </a>
+          ) : (
+            <a
+              href="https://docs.google.com/spreadsheets/d/19AWkBwps-5Rxr_lL_FH-zF2vKcbPWNTu/export?format=xlsx"
+              style={{ textDecoration: "none" }}
+            >
+              <Text
+                ta="center"
+                mt={5}
+                style={{
+                  fontSize: "14px",
+                  color: "#6A5ACD",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+              >
+                Download the sample excel file
+              </Text>
+            </a>
+          )}
         </Stack>
       </Modal>
 
