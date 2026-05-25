@@ -9,6 +9,7 @@ import {
   Select,
   Space,
   Text,
+  Autocomplete,
   TextInput,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
@@ -29,6 +30,8 @@ interface StudentFormValues {
   parentNumber?: string;
   rollNumber: string;
   photo?: string;
+  motherName: string;
+  admissionNumber: string;
 }
 
 const StepOne = (props: {
@@ -39,6 +42,7 @@ const StepOne = (props: {
   onChangeInputValue: (field: string, value: any) => void;
   setAdditionalPhoneNumbers: React.Dispatch<React.SetStateAction<string[]>>;
   additionalPhoneNumbers: string[]
+  transportAddresses: any[];
 }) => {
 
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -68,6 +72,8 @@ useEffect(() => {
 }, [imageFile]);
 
 const [preview, setPreview] = useState<string | null>(null);
+
+const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
 
   return (
     <Container h={"100%"} w={isMobile ? "98%" : "100%"}>
@@ -151,6 +157,19 @@ const [preview, setPreview] = useState<string | null>(null);
           />
         </Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
+  <TextInput
+    ff={"Poppins"}
+    label="Mother Name"
+    placeholder="Enter mother name here!"
+    value={props.formData.motherName}
+    radius={"md"}
+    onChange={(event) =>
+      handleInputChange("motherName", event.currentTarget.value)
+    }
+    styles={{ input: { borderWidth: 2 } }}
+  />
+</Grid.Col>
+        <Grid.Col span={isMobile ? 12 : 6}>
           <TextInput
             ff={"Poppins"}
             label="Roll Number"
@@ -165,7 +184,26 @@ const [preview, setPreview] = useState<string | null>(null);
             }
             styles={{ input: { borderWidth: 2 } }}
           />
+          
         </Grid.Col>
+
+        <Grid.Col span={isMobile ? 12 : 6}>
+  <TextInput
+    ff={"Poppins"}
+    label="Admission Number"
+    placeholder="Enter admission number"
+    radius={"md"}
+    value={props.formData.admissionNumber || ""}
+    onChange={(event) =>
+      handleInputChange(
+        "admissionNumber",
+        event.currentTarget.value
+      )
+    }
+    styles={{ input: { borderWidth: 2 } }}
+  />
+</Grid.Col>
+
         <Grid.Col span={isMobile ? 12 : 6}>
           <Text
             fz={14}
@@ -305,19 +343,43 @@ const [preview, setPreview] = useState<string | null>(null);
             }}
           />
         </Grid.Col>
-        <Grid.Col span={isMobile ? 12 : 6}>
-          <TextInput
-            label="Address"
-            ff={"Poppins"}
-            placeholder="Enter address here!"
-            radius={"md"}
-            value={props.formData.address}
-            onChange={(event) =>
-              handleInputChange("address", event.currentTarget.value)
-            }
-            styles={{ input: { borderWidth: 2 } }}
-          />
-        </Grid.Col>
+       <Grid.Col span={isMobile ? 12 : 6}>
+  <Autocomplete
+    label="Address"
+    ff={"Poppins"}
+    placeholder="Enter address here!"
+    radius={"md"}
+    value={props.formData.address}
+    data={filteredAddresses.map((item) => item.address)}
+    onChange={(value) => {
+      handleInputChange("address", value);
+
+      const filtered = props.transportAddresses.filter(
+        (item) =>
+          item.address
+            .toLowerCase()
+            .includes(value.toLowerCase())
+      );
+
+      setFilteredAddresses(filtered);
+
+      const selectedAddress =
+        props.transportAddresses.find(
+          (item) => item.address === value
+        );
+
+      if (selectedAddress) {
+        handleInputChange(
+          "transportFees",
+          selectedAddress.price
+        );
+      } else {
+        handleInputChange("transportFees", 0);
+      }
+    }}
+    styles={{ input: { borderWidth: 2 } }}
+  />
+</Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
           <Select
             label="Gender"

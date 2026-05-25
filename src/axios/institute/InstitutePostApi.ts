@@ -158,3 +158,32 @@ export function CreateNotes(data: {
       });
   });
 }
+
+export function CreateTransportAddress(data: {
+  _id?: string;
+  address: string;
+  price: number;
+  institute: string;
+}){
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/institute/addres/create`,
+      data
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function GetTransportAddresses(institute: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/institute/address`,
+      {
+        institute,
+      }
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
