@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { FaRupeeSign } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { TransportChargesUploadModal } from "./TransportChargesUploadModal";
 import {
   FaArrowTrendUp,
   FaFacebook,
@@ -97,6 +98,8 @@ export const DesktopNavbar = (props: {
 
   const [cgst, setCgst] = useState<number>(0);
   const [sgst, setSgst] = useState<number>(0);
+
+  const [transportUploadModal, setTransportUploadModal] = useState(false);
 
   const handleUpdateSchool = () => {
     // ❌ agar kuch bhi change nahi hua
@@ -298,7 +301,28 @@ export const DesktopNavbar = (props: {
               <Text size="sm" fw={500}>
                 Add Fees GST
               </Text>
+
+              
             </Flex>
+
+                      <Flex
+  align="center"
+  gap={10}
+  style={{
+    padding: "10px",
+    borderRadius: "8px",
+    cursor: "pointer",
+  }}
+  onClick={() => {
+    setSettingsOpened(false);
+    setTransportUploadModal(true);
+  }}
+>
+  <LiaBusAltSolid size={20} />
+  <Text size="sm" fw={500}>
+    Upload Transport Charges
+  </Text>
+</Flex>
           </Stack>
 
           {/* RIGHT SIDE */}
@@ -469,6 +493,12 @@ export const DesktopNavbar = (props: {
         onClose={() => setSignatureModalOpen(false)}
         institute={institute}
       />
+
+<TransportChargesUploadModal
+  opened={transportUploadModal}
+  onClose={() => setTransportUploadModal(false)}
+  institute={institute}
+/>
 
       <Stack
         w={isMd ? "0px" : hovered ? "250px" : "80px"}

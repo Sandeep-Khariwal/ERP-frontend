@@ -17,6 +17,7 @@ import StepOne from "./StepOne";
 import {
   CreateStudent,
   CreateStudentFeeRecords,
+  GetTransportAddresses,
 } from "@/axios/institute/InstitutePostApi";
 import AssignBatch from "./StepTwo";
 import {
@@ -39,6 +40,7 @@ interface StudentFormValues {
   address: string;
   gender: string;
   dateOfJoining: Date;
+  transportFees?: number;
   parentNumber?: string;
   van?: string;
   rollNumber: string;
@@ -69,6 +71,7 @@ export function AddMoreDetails(props: {
   >(props.formData?.additionalPhoneNumbers || []);
   const [optionalSubjects, setOptionalSubjects] = useState<string[]>([]);
   const [selectedBatchId, setSelectedBatchId] = useState<string>("");
+  const [transportAddresses, setTransportAddresses] = useState<any[]>([]);
 
   const [formValues, setFormValues] = useState<StudentFormValues>({
     name: props.formData?.name || "",
@@ -87,12 +90,23 @@ export function AddMoreDetails(props: {
     van: props.formData.van,
     rollNumber: props.formData?.rollNumber || "",
     photo: "",
-    
+    transportFees: 0,
+
   });
 
   useEffect(() => {
     setSelectedVan(formValues.van ?? "");
   }, [formValues]);
+
+  useEffect(() => {
+  GetTransportAddresses(props.instituteId)
+    .then((res: any) => {
+      setTransportAddresses(res?.data || []);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}, []);
 
   const [studentInstallments, setStudentInstallments] = useState<Installment[]>(
     [
@@ -142,7 +156,7 @@ export function AddMoreDetails(props: {
               : new Date(),
             van: student.van,
             rollNumber: student.rollNumber,
-            
+
           };
 
           const newInstallments = student.feeRecords.map((f: any) => {
@@ -209,6 +223,7 @@ export function AddMoreDetails(props: {
         van: selectedVan ?? formValues.van,
         rollNumber: formValues.rollNumber,
         profilePic: formValues.photo,
+        transportFees: formValues.transportFees,
       };
 
       if (props.isEditableData) {
@@ -283,6 +298,8 @@ export function AddMoreDetails(props: {
             gender: "",
             dateOfJoining: new Date(),
             rollNumber: "",
+            motherName: "",
+            admissionNumber: "",
           });
         })
         .catch((e) => {
@@ -323,6 +340,8 @@ export function AddMoreDetails(props: {
                 gender: "",
                 dateOfJoining: new Date(),
                 rollNumber: "",
+                motherName: "",
+                admissionNumber: "",
               });
             }}
             style={{ cursor: "pointer" }}
@@ -355,6 +374,7 @@ export function AddMoreDetails(props: {
               }}
               setAdditionalPhoneNumbers={setAdditionalPhoneNumbers}
               additionalPhoneNumbers={additionalPhoneNumbers}
+              transportAddresses={transportAddresses}
             />
           </Stepper.Step>
           <Stepper.Step
@@ -398,15 +418,16 @@ export function AddMoreDetails(props: {
               feeType={customOrBatch}
               isEditable={props.isEditableData}
               studentInstallments={studentInstallments}
+              transportFees={formValues.transportFees??0}
             />
           </Stepper.Step>
           <Stepper.Step
-  ff={"Roboto"}
-  label="Overview"
-  description="View all details"
->
-  <StepFour studentId={studentId} />
-</Stepper.Step>
+            ff={"Roboto"}
+            label="Overview"
+            description="View all details"
+          >
+            <StepFour studentId={studentId} />
+          </Stepper.Step>
         </Stepper>
         <Stack w={"100%"} mt={"auto"}>
           <Divider size={1} color="#BABABA" />
@@ -419,20 +440,20 @@ export function AddMoreDetails(props: {
             Back
           </Button>
           <Button
-  onClick={() => {
-    if (active === 3) {
-      props.onClickBack(); // ya close modal
-    } else {
-      nextStep();
-    }
-  }}
->
-  {active === 3
-    ? "Done"
-    : props.isEditableData
-    ? "Save & Next"
-    : "Next step"}
-</Button>
+            onClick={() => {
+              if (active === 3) {
+                props.onClickBack(); // ya close modal
+              } else {
+                nextStep();
+              }
+            }}
+          >
+            {active === 3
+              ? "Done"
+              : props.isEditableData
+                ? "Save & Next"
+                : "Next step"}
+          </Button>
         </Group>
       </Stack>
     </>
