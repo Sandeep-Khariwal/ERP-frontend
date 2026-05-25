@@ -17,6 +17,7 @@ import StepOne from "./StepOne";
 import {
   CreateStudent,
   CreateStudentFeeRecords,
+  GetTransportAddresses,
 } from "@/axios/institute/InstitutePostApi";
 import AssignBatch from "./StepTwo";
 import {
@@ -69,6 +70,7 @@ export function AddMoreDetails(props: {
   >(props.formData?.additionalPhoneNumbers || []);
   const [optionalSubjects, setOptionalSubjects] = useState<string[]>([]);
   const [selectedBatchId, setSelectedBatchId] = useState<string>("");
+  const [transportAddresses, setTransportAddresses] = useState<any[]>([]);
 
   const [formValues, setFormValues] = useState<StudentFormValues>({
     name: props.formData?.name || "",
@@ -87,12 +89,22 @@ export function AddMoreDetails(props: {
     van: props.formData.van,
     rollNumber: props.formData?.rollNumber || "",
     photo: "",
-    
+
   });
 
   useEffect(() => {
     setSelectedVan(formValues.van ?? "");
   }, [formValues]);
+
+  useEffect(() => {
+  GetTransportAddresses(props.instituteId)
+    .then((res: any) => {
+      setTransportAddresses(res?.data || []);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}, []);
 
   const [studentInstallments, setStudentInstallments] = useState<Installment[]>(
     [
@@ -142,7 +154,7 @@ export function AddMoreDetails(props: {
               : new Date(),
             van: student.van,
             rollNumber: student.rollNumber,
-            
+
           };
 
           const newInstallments = student.feeRecords.map((f: any) => {
@@ -283,6 +295,8 @@ export function AddMoreDetails(props: {
             gender: "",
             dateOfJoining: new Date(),
             rollNumber: "",
+            motherName: "",
+            admissionNumber: "",
           });
         })
         .catch((e) => {
@@ -323,6 +337,8 @@ export function AddMoreDetails(props: {
                 gender: "",
                 dateOfJoining: new Date(),
                 rollNumber: "",
+                motherName: "",
+                admissionNumber: "",
               });
             }}
             style={{ cursor: "pointer" }}
@@ -355,6 +371,7 @@ export function AddMoreDetails(props: {
               }}
               setAdditionalPhoneNumbers={setAdditionalPhoneNumbers}
               additionalPhoneNumbers={additionalPhoneNumbers}
+              transportAddresses={transportAddresses}
             />
           </Stepper.Step>
           <Stepper.Step
@@ -401,12 +418,12 @@ export function AddMoreDetails(props: {
             />
           </Stepper.Step>
           <Stepper.Step
-  ff={"Roboto"}
-  label="Overview"
-  description="View all details"
->
-  <StepFour studentId={studentId} />
-</Stepper.Step>
+            ff={"Roboto"}
+            label="Overview"
+            description="View all details"
+          >
+            <StepFour studentId={studentId} />
+          </Stepper.Step>
         </Stepper>
         <Stack w={"100%"} mt={"auto"}>
           <Divider size={1} color="#BABABA" />
@@ -419,20 +436,20 @@ export function AddMoreDetails(props: {
             Back
           </Button>
           <Button
-  onClick={() => {
-    if (active === 3) {
-      props.onClickBack(); // ya close modal
-    } else {
-      nextStep();
-    }
-  }}
->
-  {active === 3
-    ? "Done"
-    : props.isEditableData
-    ? "Save & Next"
-    : "Next step"}
-</Button>
+            onClick={() => {
+              if (active === 3) {
+                props.onClickBack(); // ya close modal
+              } else {
+                nextStep();
+              }
+            }}
+          >
+            {active === 3
+              ? "Done"
+              : props.isEditableData
+                ? "Save & Next"
+                : "Next step"}
+          </Button>
         </Group>
       </Stack>
     </>

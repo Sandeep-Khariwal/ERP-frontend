@@ -103,9 +103,9 @@ const AssignBatch = (props: {
             data={
               batches.length > 0
                 ? batches.map((batch) => ({
-                    value: batch._id,
-                    label: batch.name,
-                  }))
+                  value: batch._id,
+                  label: batch.name,
+                }))
                 : []
             }
             onChange={(selectedValues) => {
@@ -142,7 +142,7 @@ const AssignBatch = (props: {
             }}
           />
         </Grid.Col>
-        {institute?.featureAccess?.transportManagement && (
+        {/* {institute?.featureAccess?.transportManagement && (
           <Grid.Col span={isMobile ? 12 : 6}>
             <Select
               label="Assign Van "
@@ -162,7 +162,7 @@ const AssignBatch = (props: {
               }}
             />
           </Grid.Col>
-        )}
+        )} */}
       </Grid>
       <Space h="md" />
     </Container>
