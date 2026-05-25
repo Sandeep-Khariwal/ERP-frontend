@@ -41,10 +41,9 @@ const StepOne = (props: {
   onClickBack: () => void;
   onChangeInputValue: (field: string, value: any) => void;
   setAdditionalPhoneNumbers: React.Dispatch<React.SetStateAction<string[]>>;
-  additionalPhoneNumbers: string[]
+  additionalPhoneNumbers: string[];
   transportAddresses: any[];
 }) => {
-
   const isMobile = useMediaQuery("(max-width: 800px)");
 
   const handleInputChange = (field: string, value: any) => {
@@ -53,27 +52,25 @@ const StepOne = (props: {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-useEffect(() => {
-  if (!imageFile) return;
+  useEffect(() => {
+    if (!imageFile) return;
 
-  UploadStudentImage(imageFile)
-    .then((res: any) => {
+    UploadStudentImage(imageFile)
+      .then((res: any) => {
+        const imageUrl = res?.url; // ⚠️ yaha check karna
 
-      const imageUrl = res?.url; // ⚠️ yaha check karna
+        if (imageUrl) {
+          handleInputChange("photo", imageUrl);
+        }
+      })
+      .catch((err: any) => {
+        console.log("ERROR:", err);
+      });
+  }, [imageFile]);
 
-      if (imageUrl) {
-        handleInputChange("photo", imageUrl);
-      }
-    })
-    .catch((err: any) => {
-      console.log("ERROR:", err);
-    });
+  const [preview, setPreview] = useState<string | null>(null);
 
-}, [imageFile]);
-
-const [preview, setPreview] = useState<string | null>(null);
-
-const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
+  const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
 
   return (
     <Container h={"100%"} w={isMobile ? "98%" : "100%"}>
@@ -98,37 +95,35 @@ const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
         </Grid.Col>
 
         <Grid.Col span={isMobile ? 12 : 6}>
-  <Text ff={"Poppins"} mb={5}>
-    Student Photo
-  </Text>
+          <Text ff={"Poppins"} mb={5}>
+            Student Photo
+          </Text>
 
-<input
-  type="file"
-  accept="image/*"
-  onChange={(e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      setPreview(URL.createObjectURL(file)); // 👈 instant preview
-    }
-  }}
-/>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setImageFile(file);
+                setPreview(URL.createObjectURL(file)); // 👈 instant preview
+              }
+            }}
+          />
 
-{props.formData?.photo ? (
-  <img
-    src={props.formData.photo}
-    style={{ width: 100, marginTop: 10, borderRadius: 8 }}
-  />
-) : preview ? (
-  <img
-    src={preview}
-    style={{ width: 100, marginTop: 10, borderRadius: 8 }}
-  />
-) : null}
-
-</Grid.Col>
+          {props.formData?.photo ? (
+            <img
+              src={props.formData.photo}
+              style={{ width: 100, marginTop: 10, borderRadius: 8 }}
+            />
+          ) : preview ? (
+            <img
+              src={preview}
+              style={{ width: 100, marginTop: 10, borderRadius: 8 }}
+            />
+          ) : null}
+        </Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
-
           <TextInput
             ff={"Poppins"}
             label="Email"
@@ -157,18 +152,18 @@ const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
           />
         </Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
-  <TextInput
-    ff={"Poppins"}
-    label="Mother Name"
-    placeholder="Enter mother name here!"
-    value={props.formData.motherName}
-    radius={"md"}
-    onChange={(event) =>
-      handleInputChange("motherName", event.currentTarget.value)
-    }
-    styles={{ input: { borderWidth: 2 } }}
-  />
-</Grid.Col>
+          <TextInput
+            ff={"Poppins"}
+            label="Mother Name"
+            placeholder="Enter mother name here!"
+            value={props.formData.motherName}
+            radius={"md"}
+            onChange={(event) =>
+              handleInputChange("motherName", event.currentTarget.value)
+            }
+            styles={{ input: { borderWidth: 2 } }}
+          />
+        </Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
           <TextInput
             ff={"Poppins"}
@@ -184,25 +179,21 @@ const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
             }
             styles={{ input: { borderWidth: 2 } }}
           />
-          
         </Grid.Col>
 
         <Grid.Col span={isMobile ? 12 : 6}>
-  <TextInput
-    ff={"Poppins"}
-    label="Admission Number"
-    placeholder="Enter admission number"
-    radius={"md"}
-    value={props.formData.admissionNumber || ""}
-    onChange={(event) =>
-      handleInputChange(
-        "admissionNumber",
-        event.currentTarget.value
-      )
-    }
-    styles={{ input: { borderWidth: 2 } }}
-  />
-</Grid.Col>
+          <TextInput
+            ff={"Poppins"}
+            label="Admission Number"
+            placeholder="Enter admission number"
+            radius={"md"}
+            value={props.formData.admissionNumber || ""}
+            onChange={(event) =>
+              handleInputChange("admissionNumber", event.currentTarget.value)
+            }
+            styles={{ input: { borderWidth: 2 } }}
+          />
+        </Grid.Col>
 
         <Grid.Col span={isMobile ? 12 : 6}>
           <Text
@@ -258,7 +249,8 @@ const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
                           finalPhoneNum = finalPhoneNum.substring(1);
                         }
 
-                        props.additionalPhoneNumbers[index] = `+${finalPhoneNum}`;
+                        props.additionalPhoneNumbers[index] =
+                          `+${finalPhoneNum}`;
                         props.setAdditionalPhoneNumbers([
                           ...props.additionalPhoneNumbers,
                         ]);
@@ -293,7 +285,10 @@ const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
             variant="subtle"
             leftSection={<IconPlus size={15} />}
             onClick={() => {
-              props.setAdditionalPhoneNumbers([...props.additionalPhoneNumbers, ""]);
+              props.setAdditionalPhoneNumbers([
+                ...props.additionalPhoneNumbers,
+                "",
+              ]);
             }}
             ff={"Poppins"}
           >
@@ -343,43 +338,36 @@ const [filteredAddresses, setFilteredAddresses] = useState<any[]>([]);
             }}
           />
         </Grid.Col>
-       <Grid.Col span={isMobile ? 12 : 6}>
-  <Autocomplete
-    label="Address"
-    ff={"Poppins"}
-    placeholder="Enter address here!"
-    radius={"md"}
-    value={props.formData.address}
-    data={filteredAddresses.map((item) => item.address)}
-    onChange={(value) => {
-      handleInputChange("address", value);
+        <Grid.Col span={isMobile ? 12 : 6}>
+          <Autocomplete
+            label="Address"
+            ff={"Poppins"}
+            placeholder="Enter address here!"
+            radius={"md"}
+            value={props.formData.address}
+            data={filteredAddresses.map((item) => item.address)}
+            onChange={(value) => {
+              handleInputChange("address", value);
 
-      const filtered = props.transportAddresses.filter(
-        (item) =>
-          item.address
-            .toLowerCase()
-            .includes(value.toLowerCase())
-      );
+              const filtered = props.transportAddresses.filter((item) =>
+                item.address.toLowerCase().includes(value.toLowerCase()),
+              );
 
-      setFilteredAddresses(filtered);
+              setFilteredAddresses(filtered);
 
-      const selectedAddress =
-        props.transportAddresses.find(
-          (item) => item.address === value
-        );
+              const selectedAddress = props.transportAddresses.find(
+                (item) => item.address === value,
+              );
 
-      if (selectedAddress) {
-        handleInputChange(
-          "transportFees",
-          selectedAddress.price
-        );
-      } else {
-        handleInputChange("transportFees", 0);
-      }
-    }}
-    styles={{ input: { borderWidth: 2 } }}
-  />
-</Grid.Col>
+              if (selectedAddress) {
+                handleInputChange("transportFees", Number(selectedAddress.price));
+              } else {
+                handleInputChange("transportFees", 0);
+              }
+            }}
+            styles={{ input: { borderWidth: 2 } }}
+          />
+        </Grid.Col>
         <Grid.Col span={isMobile ? 12 : 6}>
           <Select
             label="Gender"

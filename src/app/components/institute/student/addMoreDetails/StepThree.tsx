@@ -28,11 +28,14 @@ const StepThree = (props: {
   batchId: string;
   feeType: string;
   isEditable: boolean;
+  transportFees: number;
   studentInstallments: Installment[];
   setInstallments: React.Dispatch<React.SetStateAction<Installment[]>>;
   setCustomOrBatch: React.Dispatch<React.SetStateAction<string>>;
   setSelectedBatchId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+  console.log("transportFees : ",props.transportFees);
+  
   const isMd = useMediaQuery("(max-width: 980px)");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);

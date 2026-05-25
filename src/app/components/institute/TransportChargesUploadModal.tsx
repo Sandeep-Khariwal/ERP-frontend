@@ -19,18 +19,25 @@ import {
   IconTrash,
   IconCheck,
 } from "@tabler/icons-react";
-import { CreateTransportAddress, GetTransportAddresses } from "@/axios/institute/InstitutePostApi";
+import {
+  CreateTransportAddress,
+  GetTransportAddresses,
+} from "@/axios/institute/InstitutePostApi";
 import {
   ErrorNotification,
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
-
 
 type Props = {
   opened: boolean;
   onClose: () => void;
   institute: any;
 };
+
+interface ParsedTransportItem {
+  address: string;
+  price: number;
+}
 
 export const TransportChargesUploadModal = ({
   opened,
@@ -41,61 +48,79 @@ export const TransportChargesUploadModal = ({
 
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [transportData, setTransportData] = useState<ParsedTransportItem[]>([]);
+  const [uploadedAddresses, setUploadedAddresses] = useState<any[]>([]);
 
   // HANDLE FILE
   const handleFile = async (selected: File) => {
     setFile(selected);
 
     const data = await selected.arrayBuffer();
-
     const workbook = XLSX.read(data);
-
     const sheetName = workbook.SheetNames[0];
-
     const worksheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
 
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    // Map and process only necessary address and price properties to save in state
+    const processedData: ParsedTransportItem[] = jsonData
+      .map((item) => {
+        const address = item["Transport Stop"] || item["address"] || "";
+        const price = item["Charges"] || item["price"] || 0;
 
-    setTransportData(jsonData);
+        return {
+          address: String(address).trim(),
+          price: Number(price),
+        };
+      })
+      // Filter out empty rows or header duplicate definitions if any
+      .filter(
+        (item) =>
+          item.address && item.address.toLowerCase() !== "transport stop",
+      );
 
-    console.log(jsonData);
+    setTransportData(processedData);
+    console.log("Processed Excel Data Saved to State:", processedData);
   };
 
   const handleUpload = async () => {
     try {
       setIsLoading(true);
 
-      const filteredData = transportData.filter(
-        (item) =>
-          item["Transport Stop"] !== "Transport Stop"
-      );
-
-      for (const item of filteredData) {
-
+      // API executes sequentially (one by one) from state data
+      let addressPromise = [];
+      for (const item of transportData) {
         console.log({
-          _id: " ",
-          address: String(item["Transport Stop"]).trim(),
-          price: Number(item["Charges"]),
+          _id: "",
+          address: item.address,
+          price: item.price,
           institute: institute._id,
         });
 
-        await CreateTransportAddress({
+        const allAddress = CreateTransportAddress({
           _id: "",
-          address: String(item["Transport Stop"]).trim(),
-          price: Number(item["Charges"]),
+          address: item.address,
+          price: item.price,
           institute: institute._id,
         });
+        addressPromise.push(allAddress);
       }
 
-      const res: any = await GetTransportAddresses(
-        institute._id
-      );
+      const response = Promise.all(addressPromise);
 
-      setUploadedAddresses(res?.data || []);
+      const data: any = [];
 
-      SuccessNotification(
-        "Transport charges uploaded successfully ✅"
-      );
+      response
+        .then((res: any) => {
+          data.push(res.data);
+        })
+        .catch((e: any) => {
+          console.log(e);
+        });
+
+      // const res: any = await GetTransportAddresses(institute._id);
+      setUploadedAddresses(data || []);
+
+      SuccessNotification("Transport charges uploaded successfully ✅");
 
       setFile(null);
       setTransportData([]);
@@ -106,15 +131,9 @@ export const TransportChargesUploadModal = ({
 
       setIsLoading(false);
     } catch (err) {
-      console.log(
-        "FULL BACKEND ERROR =>",
-        (err as any)?.response?.data
-      );
+      console.log("FULL BACKEND ERROR =>", (err as any)?.response?.data);
 
-      ErrorNotification(
-        "Failed to upload transport charges ❌"
-      );
-
+      ErrorNotification("Failed to upload transport charges ❌");
       setIsLoading(false);
     }
   };
@@ -122,17 +141,11 @@ export const TransportChargesUploadModal = ({
   // DRAG DROP
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-
     const droppedFile = e.dataTransfer.files[0];
-
     if (droppedFile) {
       handleFile(droppedFile);
     }
   };
-
-  const [transportData, setTransportData] = useState<any[]>([]);
-  const [uploadedAddresses, setUploadedAddresses] = useState<any[]>([]);
-
 
   useEffect(() => {
     if (opened) {
@@ -154,12 +167,7 @@ export const TransportChargesUploadModal = ({
       size="lg"
       title={
         <Group gap="sm">
-          <ThemeIcon
-            size={36}
-            radius="md"
-            variant="light"
-            color="violet"
-          >
+          <ThemeIcon size={36} radius="md" variant="light" color="violet">
             <IconFileSpreadsheet size={20} />
           </ThemeIcon>
 
@@ -178,8 +186,8 @@ export const TransportChargesUploadModal = ({
       <Stack>
         {/* TOP DESCRIPTION */}
         <Text size="sm" c="dimmed">
-          Upload your transport charges sheet containing route names,
-          addresses, pickup points, and monthly transport fees.
+          Upload your transport charges sheet containing route names, addresses,
+          pickup points, and monthly transport fees.
         </Text>
 
         {/* NO FILE */}
@@ -255,16 +263,15 @@ export const TransportChargesUploadModal = ({
           >
             <Group justify="space-between" align="center">
               <Group>
-                <ThemeIcon
-                  size={52}
-                  radius="md"
-                  variant="light"
-                  color="green"
-                >
+                <ThemeIcon size={52} radius="md" variant="light" color="green">
                   <IconCheck size={26} />
                 </ThemeIcon>
 
                 <Box>
+                  <ThemeIcon
+                    variant="transparent"
+                    style={{ display: "none" }}
+                  />
                   <Text fw={600}>{file.name}</Text>
 
                   <Text size="sm" c="dimmed">
@@ -279,6 +286,7 @@ export const TransportChargesUploadModal = ({
                 leftSection={<IconTrash size={16} />}
                 onClick={() => {
                   setFile(null);
+                  setTransportData([]);
                 }}
               >
                 Remove
@@ -312,11 +320,7 @@ export const TransportChargesUploadModal = ({
             Cancel
           </Button>
 
-          <Button
-            color="violet"
-            disabled={!file}
-            onClick={handleUpload}
-          >
+          <Button color="violet" disabled={!file} onClick={handleUpload}>
             Upload Transport File
           </Button>
         </Group>

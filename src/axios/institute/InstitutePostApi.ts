@@ -177,7 +177,7 @@ export function CreateTransportAddress(data: {
 
 export function GetTransportAddresses(institute: string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.post(
+    ApiHelper.get(
       `${process.env.URL}/api/v1/institute/address`,
       {
         institute,

@@ -40,6 +40,7 @@ interface StudentFormValues {
   address: string;
   gender: string;
   dateOfJoining: Date;
+  transportFees?: number;
   parentNumber?: string;
   van?: string;
   rollNumber: string;
@@ -89,6 +90,7 @@ export function AddMoreDetails(props: {
     van: props.formData.van,
     rollNumber: props.formData?.rollNumber || "",
     photo: "",
+    transportFees: 0,
 
   });
 
@@ -221,6 +223,7 @@ export function AddMoreDetails(props: {
         van: selectedVan ?? formValues.van,
         rollNumber: formValues.rollNumber,
         profilePic: formValues.photo,
+        transportFees: formValues.transportFees,
       };
 
       if (props.isEditableData) {
@@ -415,6 +418,7 @@ export function AddMoreDetails(props: {
               feeType={customOrBatch}
               isEditable={props.isEditableData}
               studentInstallments={studentInstallments}
+              transportFees={formValues.transportFees??0}
             />
           </Stepper.Step>
           <Stepper.Step
