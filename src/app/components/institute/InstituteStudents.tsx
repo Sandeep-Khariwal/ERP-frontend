@@ -5,6 +5,7 @@ import {
   Divider,
   Flex,
   LoadingOverlay,
+  Modal,
   Select,
   Stack,
   Text,
@@ -31,6 +32,7 @@ import {
 import { UserType } from "../dashboard/InstituteBatchesSection";
 import * as XLSX from "xlsx";
 import PassOutStudents from "./student/components/PassoutStudents";
+import { PayRecordWithNumber } from "@/axios/student/StudentGetApi";
 
 export interface StudentList {
   _id: string;
@@ -72,7 +74,9 @@ export const InstituteStudents = () => {
   const [showPendingFeeScreen, setShowPendingFeeScreen] =
     useState<boolean>(false);
   const [showPassoutScreen, setShowPassoutScreen] = useState<boolean>(false);
+  const [showAddPayment, setAddPayment] = useState<boolean>(false);
   const [pendingStudents, setPendingStudents] = useState<any[]>([]);
+  const [fees, setFees] = useState<number>(0);
 
   const [pendingFilters, setPendingFilters] = useState({
     address: "",
@@ -195,6 +199,31 @@ export const InstituteStudents = () => {
         });
     }
   }, [selectedBatchId]);
+
+  const addPayment = () => {
+    const studentIds = pendingStudents.map((stud: any) => stud.studentId);
+    console.log(
+      "adding payment : ",
+      fees,
+      pendingFilters.phoneNumber,
+      studentIds,
+    );
+    setIsLoading(true);
+    PayRecordWithNumber(institute._id, {
+      fees,
+      phoneNumber: pendingFilters.phoneNumber,
+      studentIds,
+    })
+      .then((res: any) => {
+        setAddPayment(false);
+        console.log("res : ", res);
+        setIsLoading(false);
+      })
+      .catch((e: any) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  };
 
   const tableHeaderStyle = {
     padding: "16px",
@@ -363,6 +392,7 @@ export const InstituteStudents = () => {
             <TextInput
               placeholder="Phone Number"
               value={pendingFilters.phoneNumber}
+              maxLength={10}
               onChange={(e) =>
                 setPendingFilters({
                   ...pendingFilters,
@@ -398,7 +428,53 @@ export const InstituteStudents = () => {
             >
               Search
             </Button>
+            {pendingStudents.length && (
+              <Button
+                onClick={() => setAddPayment(true)}
+                styles={{
+                  root: {
+                    background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                    border: 0,
+                    borderRadius: "10px",
+                    height: "44px",
+                    minWidth: "120px",
+                  },
+                }}
+              >
+                Add Payment
+              </Button>
+            )}
           </Flex>
+
+          <Modal
+            title={"Pay Fees"}
+            opened={showAddPayment}
+            onClose={() => setAddPayment(false)}
+          >
+            <Flex w={"100%"} align={"center"} justify={"space-between"}>
+              <TextInput
+                placeholder="Add Fees"
+                value={fees}
+                maxLength={10}
+                onChange={(e) => setFees(Number(e.target.value))}
+              />
+
+              <Button
+                onClick={addPayment}
+                styles={{
+                  root: {
+                    background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                    border: 0,
+                    borderRadius: "10px",
+                    height: "44px",
+                    minWidth: "120px",
+                  },
+                }}
+              >
+                Submit
+              </Button>
+            </Flex>
+          </Modal>
 
           <Stack mt={25}>
             {pendingStudents.length > 0 ? (
@@ -441,7 +517,7 @@ export const InstituteStudents = () => {
                           height: "65px",
                         }}
                       >
-                        <td style={tableCellStyle}>{s.Name}</td>
+                        <td style={tableCellStyle}>{s.name}</td>
                         <td style={tableCellStyle}>{s.address || "N/A"}</td>
                         <td style={tableCellStyle}>{s.phoneNumber || "N/A"}</td>
                         <td style={tableCellStyle}>{s.batch?.name || "N/A"}</td>

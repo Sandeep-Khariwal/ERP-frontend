@@ -1,10 +1,9 @@
 import ApiHelper from "../../ApiHelper";
 
-
 export function GetStudentFeeInstallments(id: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(
-      `${process.env.URL}/api/v1/student/getStudentFeeInstallments/${id}`
+      `${process.env.URL}/api/v1/student/getStudentFeeInstallments/${id}`,
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
@@ -12,32 +11,44 @@ export function GetStudentFeeInstallments(id: string) {
 }
 export function GetStudentForPdf(id: string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(
-      `${process.env.URL}/api/v1/student/getStudentForPdf/${id}`
-    )
+    ApiHelper.get(`${process.env.URL}/api/v1/student/getStudentForPdf/${id}`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+export function PayRecordWithNumber(
+  id: string,
+  data: {
+    phoneNumber: string;
+    fees: number;
+    studentIds: string[];
+  },
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(`${process.env.URL}/api/v1/student/payWithNumber/${id}`, data)
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
 }
 export function GetStudentForIdCard(id: string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(
-      `${process.env.URL}/api/v1/student/getStudentForIdCard/${id}`
-    )
+    ApiHelper.get(`${process.env.URL}/api/v1/student/getStudentForIdCard/${id}`)
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
 }
-export function GetStudentOverview(id:string) {
+export function GetStudentOverview(id: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/student/getStudentOverview/${id}`)
       .then((response) => resolve(response))
-      .catch((error: any) => reject(error ));
+      .catch((error: any) => reject(error));
   });
 }
-export function GetStudentAttendance(id:string) {
+export function GetStudentAttendance(id: string) {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/student/getStudentAttendance/${id}`)
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/student/getStudentAttendance/${id}`,
+    )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
