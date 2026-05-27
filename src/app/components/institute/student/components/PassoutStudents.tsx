@@ -144,6 +144,8 @@ export default function PassOutStudents() {
   const handleDownloadCertificate = async (studentId: string) => {
     // 1. Fetch data from API using the provided student ID
     const response: any = await GetStudentMarksheets(studentId);
+    // console.log("response : ",response);
+    
     const marksheet = response.marksheet[0];
 
     GetStudentDetail(studentId)
@@ -152,7 +154,9 @@ export default function PassOutStudents() {
 
         // Note: Assuming 'item' and 'marksheet' are available from your component's context/state scope.
         // 2. Generate the verification URL and convert it to a DataURL Base64 string
-        const url = `https://shikshapay.cloud/marksheet/${marksheet._id}`;
+        // console.log("marksheet : ",marksheet);
+        
+        const url = `https://shikshapay.cloud/marksheet/${marksheet?._id}`;
         const qr = await QRCode.toDataURL(url);
 
         // 3. Resolve all image assets to Base64 to guarantee they remain intact during download
