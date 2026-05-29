@@ -172,12 +172,11 @@ export function AddMoreDetails(props: {
               amount: f.totalAmount,
             };
           });
+
           if (props.isEditableData) {
             setStudentInstallments(newInstallments);
           }
-          console.log("FULL STUDENT :", student);
-
-          console.log("VANFARE DATA :", student.vanfare);
+          
           if (student.vanfare) {
 
             const newVanfare = student.vanfare.map((f: any) => {

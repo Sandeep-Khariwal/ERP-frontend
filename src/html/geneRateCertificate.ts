@@ -628,7 +628,10 @@ export function generateCertificateHTML(data: any) {
           </div>
 
           <div class="sig-block">
-            <div class="sig-name">${certificateData.authorizedSignatureName}</div>
+
+            <div class="sig-name">
+               <img src="${certificateData.authorizedSignatureName}" alt="Verification QR" />
+            </div>
             <div class="sig-line"></div>
             <div class="sig-label">AUTHORIZED SIGNATURE</div>
           </div>
