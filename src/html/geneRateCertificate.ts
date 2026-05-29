@@ -20,6 +20,12 @@ export function generateCertificateHTML(data: any) {
     instituteContact: data.instituteContact || "+919416059799",
   };
 
+  // Safe fallback verification if signature parameter is a standard text string or a remote file asset image URL URL
+  const isSignatureUrl =
+    certificateData.authorizedSignatureName.startsWith("http://") ||
+    certificateData.authorizedSignatureName.startsWith("https://") ||
+    certificateData.authorizedSignatureName.startsWith("data:image/");
+
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -68,6 +74,7 @@ export function generateCertificateHTML(data: any) {
           pointer-events: none;
         }
 
+        /* Safe Zones content padding ensuring zero corner overlap */
         .content {
           position: absolute;
           inset: 0;
@@ -75,28 +82,29 @@ export function generateCertificateHTML(data: any) {
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 24px 70px 20px;
+          padding: 24px 95px 20px; 
         }
 
         .logo-row {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 3px;
+          gap: 2px;
           margin-bottom: 4px;
+          width: 100%;
         }
 
         .logo-emblem {
-          width: 54px;
-          height: 54px;
+          width: 50px;
+          height: 50px;
           border-radius: 50%;
           background: linear-gradient(145deg, #8b0000, #c0392b);
-          border: 3px solid #b8962e;
+          border: 2.5px solid #b8962e;
           display: flex;
           align-items: center;
           justify-content: center;
           position: relative;
-          box-shadow: 0 0 0 3px rgba(184,150,46,.3);
+          box-shadow: 0 0 0 3px rgba(184,150,46,.2);
         }
 
         .logo-img {
@@ -108,14 +116,14 @@ export function generateCertificateHTML(data: any) {
 
         .logo-star {
           position: absolute;
-          top: -7px;
-          font-size: 10px;
+          top: -6px;
+          font-size: 9px;
           color: #b8962e;
         }
 
         .logo-rn {
           font-family: 'Cinzel', serif;
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 900;
           color: #fff;
           letter-spacing: 1px;
@@ -125,31 +133,33 @@ export function generateCertificateHTML(data: any) {
         .logo-laurel {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
         }
 
         .laurel-svg {
-          width: 50px;
-          height: 22px;
+          width: 45px;
+          height: 20px;
           fill: #b8962e;
         }
 
         .inst-name {
           font-family: 'Cinzel', serif;
-          font-size: 21px;
+          font-size: 20px;
           font-weight: 900;
           color: #8b0000;
-          letter-spacing: 3px;
-          line-height: 1;
+          letter-spacing: 2.5px;
+          line-height: 1.1;
+          text-align: center;
         }
 
         .inst-sub {
-          font-size: 9.5px;
+          font-size: 9px;
           font-weight: 600;
           color: #1a1a2e;
-          letter-spacing: .5px;
+          letter-spacing: .3px;
           text-align: center;
-          line-height: 1.5;
+          line-height: 1.3;
+          max-width: 500px;
         }
 
         .divider {
@@ -172,10 +182,10 @@ export function generateCertificateHTML(data: any) {
 
         .cert-title {
           font-family: 'Cinzel', serif;
-          font-size: 44px;
+          font-size: 40px;
           font-weight: 900;
           color: #1a1a2e;
-          letter-spacing: 8px;
+          letter-spacing: 7px;
           line-height: 1;
           text-align: center;
           margin-bottom: 2px;
@@ -183,34 +193,33 @@ export function generateCertificateHTML(data: any) {
 
         .cert-subtitle {
           font-family: 'Montserrat', sans-serif;
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 600;
           color: #1a1a2e;
-          letter-spacing: 7px;
+          letter-spacing: 6px;
           text-align: center;
-          margin-bottom: 5px;
+          margin-bottom: 6px;
         }
 
         .presented-banner {
           background: linear-gradient(90deg, #8b0000, #c0392b, #8b0000);
           width: 100%;
-          padding: 5px 0;
+          padding: 4px 0;
           text-align: center;
           margin-bottom: 8px;
         }
         .presented-banner span {
           font-family: 'Montserrat', sans-serif;
-          font-size: 9.5px;
+          font-size: 9px;
           font-weight: 800;
           color: #fff;
-          letter-spacing: 3px;
+          letter-spacing: 2.5px;
         }
 
-        /* Middle Grid Layout supporting Student Image */
         .main-details-layout {
           display: grid;
-          grid-template-columns: 1fr 110px;
-          gap: 20px;
+          grid-template-columns: 1fr 95px;
+          gap: 15px;
           width: 100%;
           align-items: center;
           margin-bottom: 4px;
@@ -221,19 +230,19 @@ export function generateCertificateHTML(data: any) {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          padding-left: 110px; /* Counter-balance grid alignment offset */
+          padding-left: 95px; 
         }
 
         .recipient-name {
           font-family: 'Great Vibes', cursive;
-          font-size: 46px;
+          font-size: 44px;
           color: #8b0000;
-          line-height: 1.1;
+          line-height: 1;
           margin-bottom: 2px;
         }
 
         .completing-text {
-          font-size: 10px;
+          font-size: 9.5px;
           color: #333;
           letter-spacing: .5px;
           margin-bottom: 4px;
@@ -241,9 +250,9 @@ export function generateCertificateHTML(data: any) {
 
         .course-box {
           border: 1.5px solid #b8962e;
-          padding: 5px 24px;
+          padding: 4px 20px;
           text-align: center;
-          margin-bottom: 5px;
+          margin-bottom: 4px;
           position: relative;
           background: #fff;
         }
@@ -257,31 +266,30 @@ export function generateCertificateHTML(data: any) {
           border-top: 1.5px solid #b8962e;
           border-bottom: 1.5px solid #b8962e;
         }
-        .course-box::before { left: 12px; }
-        .course-box::after  { right: 12px; }
+        .course-box::before { left: 10px; }
+        .course-box::after  { right: 10px; }
 
         .course-title {
           font-family: 'Montserrat', sans-serif;
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 800;
           color: #1a1a2e;
-          letter-spacing: 1px;
+          letter-spacing: .5px;
         }
         .course-full {
-          font-size: 10px;
+          font-size: 9.5px;
           font-weight: 600;
           color: #1a1a2e;
         }
 
-        /* Profile Picture Frame Styling */
         .student-profile-frame {
-          width: 95px;
-          height: 115px;
+          width: 85px;
+          height: 105px;
           border: 2px solid #b8962e;
-          border-radius: 6px;
-          padding: 3px;
+          border-radius: 4px;
+          padding: 2px;
           background: #ffffff;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+          box-shadow: 0 3px 8px rgba(0,0,0,0.12);
           justify-self: center;
           display: flex;
           align-items: center;
@@ -292,16 +300,16 @@ export function generateCertificateHTML(data: any) {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          border-radius: 3px;
+          border-radius: 2px;
           background: #f3f3f3;
         }
 
         .body-text {
-          font-size: 10px;
+          font-size: 9.5px;
           color: #333;
           text-align: center;
-          line-height: 1.6;
-          margin-bottom: 4px;
+          line-height: 1.5;
+          margin-bottom: 6px;
         }
         .body-text strong {
           font-weight: 700;
@@ -314,26 +322,27 @@ export function generateCertificateHTML(data: any) {
           justify-content: space-between;
           width: 100%;
           margin-top: auto;
+          padding: 0 10px;
         }
 
         .qr-block {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4px;
+          gap: 3px;
         }
         .qr-box {
-          width: 68px; height: 68px;
-          border: 2px solid #8b0000;
-          padding: 3px;
+          width: 60px; height: 60px;
+          border: 1.5px solid #8b0000;
+          padding: 2px;
           background: #fff;
         }
         .qr-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
         .qr-label {
-          font-size: 7.5px;
+          font-size: 7px;
           font-weight: 800;
           color: #8b0000;
-          letter-spacing: 1.5px;
+          letter-spacing: 1px;
         }
 
         .date-block {
@@ -341,18 +350,19 @@ export function generateCertificateHTML(data: any) {
           flex-direction: column;
           align-items: center;
           gap: 2px;
+          padding-bottom: 2px;
         }
-        .date-icon { font-size: 16px; color: #8b0000; }
+        .date-icon { font-size: 14px; color: #8b0000; }
         .date-val {
-          font-size: 11px;
+          font-size: 10.5px;
           font-weight: 700;
           color: #1a1a2e;
         }
         .date-label {
-          font-size: 8px;
+          font-size: 7.5px;
           font-weight: 800;
           color: #8b0000;
-          letter-spacing: 2px;
+          letter-spacing: 1.5px;
         }
 
         .medal-block {
@@ -361,42 +371,42 @@ export function generateCertificateHTML(data: any) {
           align-items: center;
         }
         .medal-outer {
-          width: 70px; height: 70px;
+          width: 62px; height: 62px;
           border-radius: 50%;
           background: radial-gradient(circle at 35% 35%, #f5d97a, #b8962e 60%, #8b6914);
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 3px solid #d4af37;
-          box-shadow: 0 4px 12px rgba(0,0,0,.3);
+          border: 2.5px solid #d4af37;
+          box-shadow: 0 3px 8px rgba(0,0,0,.25);
           position: relative;
         }
         .medal-inner {
-          width: 56px; height: 56px;
+          width: 48px; height: 48px;
           border-radius: 50%;
           background: radial-gradient(circle at 35% 35%, #1a1a2e, #0d0d1a);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          border: 2px solid #b8962e;
+          border: 1.5px solid #b8962e;
         }
-        .medal-stars { font-size: 7px; color: #b8962e; letter-spacing: 1px; }
+        .medal-stars { font-size: 6px; color: #b8962e; letter-spacing: .5px; }
         .medal-text {
           font-family: 'Cinzel', serif;
-          font-size: 9px;
+          font-size: 8px;
           font-weight: 700;
           color: #d4af37;
-          line-height: 1.2;
+          line-height: 1.1;
           text-align: center;
         }
         .medal-ribbon {
           display: flex;
-          gap: 4px;
-          margin-top: -4px;
+          gap: 3px;
+          margin-top: -3px;
         }
         .medal-ribbon-piece {
-          width: 12px; height: 22px;
+          width: 10px; height: 18px;
           clip-path: polygon(0 0,100% 0,100% 80%,50% 100%,0 80%);
         }
         .medal-ribbon-l { background: #8b0000; }
@@ -407,31 +417,49 @@ export function generateCertificateHTML(data: any) {
           flex-direction: column;
           align-items: center;
           gap: 2px;
+          width: 110px;
         }
-        .sig-name {
+        .sig-wrap {
+          height: 35px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .sig-img-element {
+          max-height: 100%;
+          max-width: 100%;
+          object-fit: contain;
+        }
+        .sig-name-fallback {
           font-family: 'Great Vibes', cursive;
-          font-size: 22px;
+          font-size: 20px;
           color: #1a1a2e;
+          text-align: center;
+          line-height: 1;
         }
         .sig-line {
-          width: 110px; height: 1px;
+          width: 100%; height: 1px;
           background: #333;
+          margin-top: 2px;
         }
         .sig-label {
-          font-size: 7.5px;
+          font-size: 7px;
           font-weight: 800;
-          letter-spacing: 1.5px;
+          letter-spacing: 1px;
           color: #1a1a2e;
+          text-align: center;
+          margin-top: 1px;
         }
 
         .badge-seal {
           position: absolute;
-          top: 26px; right: 26px;
+          top: 24px; right: 24px;
           z-index: 10;
-          width: 75px; height: 75px;
+          width: 65px; height: 65px;
         }
 
-        /* Strict Overrides for High-Quality PDF Printing engines */
         @media print {
           body {
             background: none !important;
@@ -451,39 +479,30 @@ export function generateCertificateHTML(data: any) {
 
       <svg style="position:absolute;top:0;left:0;width:794px;height:562px;z-index:2;pointer-events:none;"
            viewBox="0 0 794 562" xmlns="http://www.w3.org/2000/svg">
-        <path d="M 0,0 L 72,0 C 36,0 0,36 0,72 Z" fill="#111111"/>
-        <path d="M 0,0 L 170,0 C 130,0 90,10 60,30 C 30,50 10,85 0,130 L 0,72 C 0,36 36,0 72,0 Z" fill="#8b0000"/>
-        <path d="M 100,0 L 210,0 C 170,0 135,12 105,34 C 72,58 48,100 0,180 L 0,130 C 10,85 30,50 60,30 C 90,10 130,0 170,0 Z" fill="#c0392b"/>
-        <path d="M 200,0 L 225,0 C 188,0 155,14 126,38 C 96,63 70,110 0,210 L 0,180 C 48,100 72,58 105,34 C 135,12 170,0 210,0 Z" fill="#d4af37"/>
-        <path d="M 216,0 L 250,0 C 212,0 178,15 148,40 C 115,68 86,118 0,240 L 0,210 C 70,110 96,63 126,38 C 155,14 188,0 225,0 Z" fill="#1a1a1a"/>
-        <path d="M 242,0 L 262,0 C 224,0 190,16 160,42 C 126,70 95,122 0,258 L 0,240 C 86,118 115,68 148,40 C 178,15 212,0 250,0 Z" fill="#f5d97a"/>
-        <path d="M 254,0 L 278,0 C 240,0 205,17 174,44 C 138,74 105,128 0,274 L 0,258 C 95,122 126,70 160,42 C 190,16 224,0 262,0 Z" fill="#a00000" opacity="0.45"/>
+        
+        <path d="M 0,0 L 50,0 C 25,0 0,25 0,50 Z" fill="#111111"/>
+        <path d="M 0,0 L 110,0 C 85,0 60,8 40,22 C 20,36 8,55 0,85 L 0,50 C 0,25 25,0 50,0 Z" fill="#8b0000"/>
+        <path d="M 70,0 L 140,0 C 115,0 92,8 72,24 C 50,40 34,65 0,120 L 0,85 C 8,55 20,36 40,22 C 60,8 85,0 110,0 Z" fill="#c0392b"/>
+        <path d="M 130,0 L 150,0 C 125,0 102,10 82,26 C 62,42 45,72 0,140 L 0,120 C 34,65 50,40 72,24 C 92,8 115,0 140,0 Z" fill="#d4af37"/>
+        <path d="M 142,0 L 165,0 C 140,0 118,10 98,28 C 76,46 56,78 0,160 L 0,140 C 45,72 62,42 82,26 C 102,10 125,0 150,0 Z" fill="#1a1a1a"/>
+        <path d="M 158,0 L 172,0 C 148,0 126,11 106,29 C 84,48 64,80 0,172 L 0,160 C 56,160 76,46 98,28 C 118,10 140,0 165,0 Z" fill="#f5d97a"/>
 
-        <path d="M 794,562 L 722,562 C 758,562 794,526 794,490 Z" fill="#111111"/>
-        <path d="M 794,562 L 624,562 C 664,562 704,552 734,532 C 764,512 784,477 794,432 L 794,490 C 794,526 758,562 722,562 Z" fill="#8b0000"/>
-        <path d="M 694,562 L 584,562 C 624,562 659,550 689,528 C 722,504 746,462 794,382 L 794,432 C 784,477 764,512 734,532 C 704,552 664,562 624,562 Z" fill="#c0392b"/>
-        <path d="M 594,562 L 569,562 C 606,562 639,548 668,524 C 698,499 724,452 794,352 L 794,382 C 746,462 722,504 689,528 C 659,550 624,562 584,562 Z" fill="#d4af37"/>
-        <path d="M 578,562 L 544,562 C 582,562 616,547 646,522 C 679,494 708,444 794,322 L 794,352 C 724,452 698,499 668,524 C 639,548 606,562 569,562 Z" fill="#1a1a1a"/>
-        <path d="M 552,562 L 532,562 C 570,562 604,546 634,520 C 668,492 699,440 794,304 L 794,322 C 708,444 679,494 646,522 C 616,547 582,562 544,562 Z" fill="#f5d97a"/>
-        <path d="M 540,562 L 516,562 C 554,562 589,545 620,518 C 656,488 689,434 794,288 L 794,304 C 699,440 668,492 634,520 C 604,546 570,562 532,562 Z" fill="#a00000" opacity="0.45"/>
+        <path d="M 794,562 L 744,562 C 769,562 794,537 794,512 Z" fill="#111111"/>
+        <path d="M 794,562 L 684,562 C 709,562 734,554 754,540 C 774,526 786,507 794,477 L 794,512 C 794,537 769,562 744,562 Z" fill="#8b0000"/>
+        <path d="M 724,562 L 654,562 C 679,562 702,554 722,538 C 744,522 760,497 794,442 L 794,477 C 786,507 774,526 754,540 C 734,554 709,562 684,562 Z" fill="#c0392b"/>
+        <path d="M 664,562 L 644,562 C 669,562 692,552 712,536 C 732,520 749,490 794,422 L 794,442 C 760,497 744,522 722,538 C 702,554 679,562 654,562 Z" fill="#d4af37"/>
+        <path d="M 652,562 L 629,562 C 654,562 676,552 696,534 C 718,516 738,484 794,402 L 794,422 C 749,490 732,520 712,536 C 692,552 669,562 644,562 Z" fill="#1a1a1a"/>
 
-        <path d="M 794,0 L 722,0 C 758,0 794,36 794,72 Z" fill="#111111"/>
-        <path d="M 794,0 L 630,0 C 666,0 700,12 724,34 C 752,58 768,96 794,148 L 794,72 C 794,36 758,0 722,0 Z" fill="#8b0000"/>
-        <path d="M 642,0 L 560,0 C 596,0 628,12 652,36 C 678,62 696,104 794,192 L 794,148 C 768,96 752,58 724,34 C 700,12 666,0 630,0 Z" fill="#c0392b"/>
-        <path d="M 572,0 L 548,0 C 582,0 614,12 638,36 C 664,62 684,106 794,204 L 794,192 C 696,104 678,62 652,36 C 628,12 596,0 560,0 Z" fill="#d4af37"/>
-        <path d="M 556,0 L 528,0 C 562,0 596,13 620,38 C 648,66 668,112 794,216 L 794,204 C 684,106 664,62 638,36 C 614,12 582,0 548,0 Z" fill="#1a1a1a"/>
-        <path d="M 536,0 L 516,0 C 550,0 582,13 606,38 C 634,66 656,114 794,224 L 794,216 C 668,112 648,66 620,38 C 596,13 562,0 528,0 Z" fill="#f5d97a"/>
+        <path d="M 794,0 L 744,0 C 769,0 794,25 794,50 Z" fill="#111111"/>
+        <path d="M 794,0 L 684,0 C 709,0 732,8 750,24 C 768,40 778,65 794,105 L 794,50 C 794,25 769,0 744,0 Z" fill="#8b0000"/>
+        <path d="M 724,0 L 664,0 C 689,0 712,8 730,25 C 750,44 762,72 794,135 L 794,105 C 778,65 768,40 750,24 C 732,8 709,0 684,0 Z" fill="#c0392b"/>
+        <path d="M 674,0 L 656,0 C 680,0 702,9 720,26 C 738,44 752,75 794,145 L 794,135 C 762,72 750,44 730,25 C 712,8 689,0 664,0 Z" fill="#d4af37"/>
 
         <g>
-          <path d="M 4,542 Q 62,510 122,542" stroke="#b8962e" stroke-width="2" fill="none"/>
-          <path d="M 4,528 Q 55,498 108,526" stroke="#d4af37" stroke-width="1.5" fill="none" opacity=".7"/>
-          <path d="M 4,514 Q 50,488 96,512" stroke="#b8962e" stroke-width="1" fill="none" opacity=".5"/>
-          <circle cx="20" cy="532" r="4.5" fill="#b8962e" opacity=".75"/>
-          <circle cx="40" cy="519" r="3.5" fill="#d4af37" opacity=".65"/>
-          <circle cx="12" cy="516" r="3"   fill="#b8962e" opacity=".5"/>
-          <circle cx="60" cy="509" r="3"   fill="#d4af37" opacity=".55"/>
-          <ellipse cx="28" cy="524" rx="7" ry="3.5" transform="rotate(-32 28 524)" fill="#b8962e" opacity=".3"/>
-          <ellipse cx="50" cy="512" rx="6" ry="3"   transform="rotate(-42 50 512)" fill="#d4af37" opacity=".35"/>
+          <path d="M 4,542 Q 45,515 90,542" stroke="#b8962e" stroke-width="1.5" fill="none"/>
+          <path d="M 4,530 Q 40,505 80,528" stroke="#d4af37" stroke-width="1" fill="none" opacity=".6"/>
+          <circle cx="16" cy="535" r="3" fill="#b8962e" opacity=".7"/>
+          <circle cx="32" cy="524" r="2.5" fill="#d4af37" opacity=".6"/>
         </g>
       </svg>
 
@@ -628,9 +647,13 @@ export function generateCertificateHTML(data: any) {
           </div>
 
           <div class="sig-block">
-
-            <div class="sig-name">
-               <img src="${certificateData.authorizedSignatureName}" alt="Verification QR" />
+            <div class="sig-wrap">
+              ${
+                isSignatureUrl 
+                  ? `<img class="sig-img-element" src="${certificateData.authorizedSignatureName}" alt="Signature" onerror="this.style.display='none'; document.getElementById('sigFallback').style.display='block';" />
+                     <span id="sigFallback" class="sig-name-fallback" style="display:none;">Authorized</span>`
+                  : `<span class="sig-name-fallback">${certificateData.authorizedSignatureName}</span>`
+              }
             </div>
             <div class="sig-line"></div>
             <div class="sig-label">AUTHORIZED SIGNATURE</div>
