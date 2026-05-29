@@ -103,7 +103,7 @@ export function generateCertificateHTML(data: any) {
           align-items: center;
           justify-content: center;
           position: relative;
-          margin: 4px 0;
+          margin: 10px 0;
         }
 
         .logo-img {
