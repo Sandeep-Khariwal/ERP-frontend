@@ -94,24 +94,34 @@ export function generateCertificateHTML(data: any) {
           width: 100%;
         }
 
+        /* Improved rectangular / square format logo block */
         .logo-emblem {
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          background: linear-gradient(145deg, #8b0000, #c0392b);
-          border: 2.5px solid #b8962e;
+          width: 80px;
+          height: auto;
+          max-height: 55px;
           display: flex;
           align-items: center;
           justify-content: center;
           position: relative;
-          box-shadow: 0 0 0 3px rgba(184,150,46,.2);
         }
 
         .logo-img {
           width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 50%;
+          height: auto;
+          max-height: 100%;
+          object-fit: contain;
+        }
+
+        .logo-text-placeholder {
+          background: linear-gradient(145deg, #8b0000, #c0392b);
+          border: 2.5px solid #b8962e;
+          border-radius: 4px;
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 0 3px rgba(184,150,46,.2);
         }
 
         .logo-star {
@@ -133,7 +143,7 @@ export function generateCertificateHTML(data: any) {
         .logo-laurel {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 12px;
         }
 
         .laurel-svg {
@@ -150,6 +160,7 @@ export function generateCertificateHTML(data: any) {
           letter-spacing: 2.5px;
           line-height: 1.1;
           text-align: center;
+          margin-top: 2px;
         }
 
         .inst-sub {
@@ -218,8 +229,8 @@ export function generateCertificateHTML(data: any) {
 
         .main-details-layout {
           display: grid;
-          grid-template-columns: 1fr 95px;
-          gap: 15px;
+          grid-template-columns: 1fr; /* Profile frame removed, layout centered dynamically */
+          gap: 0px;
           width: 100%;
           align-items: center;
           margin-bottom: 4px;
@@ -230,7 +241,7 @@ export function generateCertificateHTML(data: any) {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          padding-left: 95px; 
+          padding-left: 0px; 
         }
 
         .recipient-name {
@@ -250,7 +261,7 @@ export function generateCertificateHTML(data: any) {
 
         .course-box {
           border: 1.5px solid #b8962e;
-          padding: 4px 20px;
+          padding: 4px 35px;
           text-align: center;
           margin-bottom: 4px;
           position: relative;
@@ -266,8 +277,8 @@ export function generateCertificateHTML(data: any) {
           border-top: 1.5px solid #b8962e;
           border-bottom: 1.5px solid #b8962e;
         }
-        .course-box::before { left: 10px; }
-        .course-box::after  { right: 10px; }
+        .course-box::before { left: 12px; }
+        .course-box::after  { right: 12px; }
 
         .course-title {
           font-family: 'Montserrat', sans-serif;
@@ -280,28 +291,6 @@ export function generateCertificateHTML(data: any) {
           font-size: 9.5px;
           font-weight: 600;
           color: #1a1a2e;
-        }
-
-        .student-profile-frame {
-          width: 85px;
-          height: 105px;
-          border: 2px solid #b8962e;
-          border-radius: 4px;
-          padding: 2px;
-          background: #ffffff;
-          box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-          justify-self: center;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .profile-img-element {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 2px;
-          background: #f3f3f3;
         }
 
         .body-text {
@@ -490,7 +479,7 @@ export function generateCertificateHTML(data: any) {
         <path d="M 794,562 L 744,562 C 769,562 794,537 794,512 Z" fill="#111111"/>
         <path d="M 794,562 L 684,562 C 709,562 734,554 754,540 C 774,526 786,507 794,477 L 794,512 C 794,537 769,562 744,562 Z" fill="#8b0000"/>
         <path d="M 724,562 L 654,562 C 679,562 702,554 722,538 C 744,522 760,497 794,442 L 794,477 C 786,507 774,526 754,540 C 734,554 709,562 684,562 Z" fill="#c0392b"/>
-        <path d="M 664,562 L 644,562 C 669,562 692,552 712,536 C 732,520 749,490 794,422 L 794,442 C 760,497 744,522 722,538 C 702,554 679,562 654,562 Z" fill="#d4af37"/>
+        <path d="M 664,562 L 644,562 C 679,562 692,552 712,536 C 732,520 749,490 794,422 L 794,442 C 760,497 744,522 722,538 C 702,554 679,562 654,562 Z" fill="#d4af37"/>
         <path d="M 652,562 L 629,562 C 654,562 676,552 696,534 C 718,516 738,484 794,402 L 794,422 C 749,490 732,520 712,536 C 692,552 669,562 644,562 Z" fill="#1a1a1a"/>
 
         <path d="M 794,0 L 744,0 C 769,0 794,25 794,50 Z" fill="#111111"/>
@@ -559,12 +548,16 @@ export function generateCertificateHTML(data: any) {
               <path d="M28,11 C26,14 22,15 18,14 C22,16 28,14 28,11 Z" fill="#b8962e" opacity=".7"/>
               <line x1="48" y1="11" x2="18" y2="11" stroke="#8b6914" stroke-width=".8"/>
             </svg>
+            
             <div class="logo-emblem">
               ${certificateData.logo ? `<img class="logo-img" src="${certificateData.logo}" alt="Logo"/>` : `
-                <span class="logo-star">★</span>
-                <span class="logo-rn">RN</span>
+                <div class="logo-text-placeholder">
+                  <span class="logo-star">★</span>
+                  <span class="logo-rn">RN</span>
+                </div>
               `}
             </div>
+            
             <svg class="laurel-svg" viewBox="0 0 50 22" style="transform:scaleX(-1)">
               <path d="M48,11 C42,5 34,3 26,6 C32,2 40,2 48,8 Z" fill="#b8962e"/>
               <path d="M48,11 C42,15 34,17 26,14 C32,18 40,18 48,14 Z" fill="#b8962e"/>
@@ -593,23 +586,15 @@ export function generateCertificateHTML(data: any) {
         </div>
 
         <div class="main-details-layout">
-          
           <div class="details-center-pane">
             <div class="recipient-name">${certificateData.recipientName}</div>
             <div class="completing-text">for successfully completing the course</div>
 
             <div class="course-box">
-              <div class="course-title">${certificateData.courseName}</div>
+              <div class="course-title"> ${certificateData.courseName.split('-')[0]}</div>
               <div class="course-full">${certificateData.courseFullName}</div>
             </div>
           </div>
-
-          <div class="student-profile-frame">
-            <img class="profile-img-element" 
-                 src="${certificateData.profilePic || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&h=240&q=80'}" 
-                 alt="Student Photograph" />
-          </div>
-
         </div>
 
         <div class="body-text">
