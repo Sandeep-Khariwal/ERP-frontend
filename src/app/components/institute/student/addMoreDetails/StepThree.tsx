@@ -26,16 +26,21 @@ import React, { useEffect, useState } from "react";
 const StepThree = (props: {
   batchName: string;
   batchId: string;
+   instituteId: string;
   feeType: string;
   isEditable: boolean;
   transportFees: number;
+  setVanFareInstallments: React.Dispatch<
+    React.SetStateAction<Installment[]>
+  >;
   studentInstallments: Installment[];
+  studentVanfare: Installment[];
   setInstallments: React.Dispatch<React.SetStateAction<Installment[]>>;
   setCustomOrBatch: React.Dispatch<React.SetStateAction<string>>;
   setSelectedBatchId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  console.log("transportFees : ",props.transportFees);
-  
+  console.log("transportFees : ", props.transportFees);
+
   const isMd = useMediaQuery("(max-width: 980px)");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -73,6 +78,7 @@ const StepThree = (props: {
   const [customInstallments, setCustomInstallments] = useState<Installment[]>([
     defaultInstallment,
   ]);
+  const [transportInstallments, setTransportInstallments] = useState<Installment[]>([]);
 
   // =========================================
   // INITIAL LOAD
@@ -136,6 +142,52 @@ const StepThree = (props: {
     props.setInstallments(installments);
   }, [installments]);
 
+  useEffect(() => {
+    if (!props.transportFees) return;
+
+    const currentDate = new Date();
+
+    const months = Array.from({ length: 12 }, (_, index) => {
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + index,
+        1
+      );
+
+      return {
+        _id: "",
+        instituteId: props.instituteId,
+        type: "vanfare",
+        name: date.toLocaleString("default", {
+          month: "long",
+        }),
+        dueDate: date.toISOString().split("T")[0],
+        amount: props.transportFees,
+        isDeleted: false,
+      };
+    });
+
+    setTransportInstallments(months);
+
+    props.setVanFareInstallments(months);
+  }, [props.transportFees]);
+
+  useEffect(() => {
+
+  if (
+    props.isEditable &&
+    props.studentVanfare &&
+    props.studentVanfare.length > 0
+  ) {
+
+    setTransportInstallments(props.studentVanfare);
+
+    props.setVanFareInstallments(props.studentVanfare);
+
+  }
+
+}, [props.studentVanfare]);
+
   // =========================================
   // SWITCH TYPE
   // =========================================
@@ -180,7 +232,7 @@ const StepThree = (props: {
 
       const x: any = await GetBatchFee(props.batchId);
 
-      const { feeInstallments } = x.batchFee;
+      const { feeInstallments, vanfareInstallments } = x.batchFee;
 
       const newInstallments = feeInstallments.map((f: any) => ({
         _id: "",
@@ -194,12 +246,28 @@ const StepThree = (props: {
       setBatchInstallments(newInstallments);
 
       setInstallments(newInstallments);
+      if (vanfareInstallments?.length > 0) {
+
+  const transportData = vanfareInstallments.map((f: any) => ({
+    _id: f._id,
+    name: f.name,
+    dueDate: new Date(f.dueDate).toISOString().split("T")[0],
+    amount: f.amount,
+    isDeleted: false,
+  }));
+
+  setTransportInstallments(transportData);
+
+  props.setVanFareInstallments(transportData);
+}
     } catch (e) {
       console.log(e);
     } finally {
       setIsLoading(false);
     }
   };
+
+  
 
   // =========================================
   // CHANGE INSTALLMENT
@@ -251,6 +319,25 @@ const StepThree = (props: {
     setCustomInstallments(updatedInstallments);
   };
 
+  const handleAddTransportInstallment = () => {
+
+    const updatedInstallments = [
+      ...transportInstallments,
+      {
+        _id: "",
+        instituteId: props.instituteId,
+        name: getMonthName(new Date().toISOString().split("T")[0]),
+        dueDate: new Date().toISOString().split("T")[0],
+        amount: props.transportFees,
+        isDeleted: false,
+      },
+    ];
+
+    setTransportInstallments(updatedInstallments);
+
+    props.setVanFareInstallments(updatedInstallments);
+  };
+
   // =========================================
   // REMOVE INSTALLMENT
   // =========================================
@@ -261,6 +348,17 @@ const StepThree = (props: {
     setInstallments(updatedInstallments);
 
     setCustomInstallments(updatedInstallments);
+  };
+
+  const handleRemoveTransportInstallment = (index: number) => {
+
+    const updatedInstallments = transportInstallments.filter(
+      (_, i) => i !== index
+    );
+
+    setTransportInstallments(updatedInstallments);
+
+    props.setVanFareInstallments(updatedInstallments);
   };
 
   return (
@@ -288,166 +386,452 @@ const StepThree = (props: {
       />
 
       {selectedType && (
-        <Box style={{ width: "100%", overflowX: "auto" }}>
-          <Table style={{ marginTop: "2rem" }} ff={"Roboto"}>
-            <thead>
-              <tr>
-                <th
-                  style={{
-                    border: "0.5px solid #D3D3D3",
-                    padding: "8px",
-                  }}
-                >
-                  S No.
-                </th>
+        <>
+          <Flex
+            gap={20}
+            align="flex-start"
+            wrap="nowrap"
+            style={{
+              width: "100%",
+            }}
+          >
 
-                <th
-                  style={{
-                    border: "0.5px solid #D3D3D3",
-                    padding: "8px",
-                  }}
-                >
-                  Name
-                </th>
+            {/* LEFT TABLE */}
 
-                <th
-                  style={{
-                    border: "0.5px solid #D3D3D3",
-                    padding: "8px",
-                  }}
-                >
-                  Due Date
-                </th>
-
-                <th
-                  style={{
-                    border: "0.5px solid #D3D3D3",
-                    padding: "8px",
-                  }}
-                >
-                  Amount in ₹
-                </th>
-
-                {selectedType !== "Batch" && (
-                  <th
-                    style={{
-                      border: "0.5px solid #D3D3D3",
-                      padding: "8px",
-                    }}
-                  >
-                    Action
-                  </th>
-                )}
-              </tr>
-            </thead>
-
-            <tbody>
-              {installments.map((installment, index) => (
-                <tr key={index}>
-                  <td
-                    style={{
-                      border: "0.5px solid #D3D3D3",
-                      padding: "8px",
-                    }}
-                  >
-                    {index + 1}
-                  </td>
-
-                  <td
-                    style={{
-                      border: "0.5px solid #D3D3D3",
-                      padding: "8px",
-                    }}
-                  >
-                    <TextInput
-                      w={isMd ? "10rem" : "auto"}
-                      value={installment.name}
-                      readOnly={selectedType === "Batch"}
-                      onChange={(event) =>
-                        handleInstallmentChange(
-                          index,
-                          "name",
-                          event.currentTarget.value,
-                        )
-                      }
-                    />
-                  </td>
-
-                  <td
-                    style={{
-                      border: "0.5px solid #D3D3D3",
-                      padding: "8px",
-                    }}
-                  >
-                    <TextInput
-                      type="date"
-                      value={installment.dueDate}
-                      readOnly={selectedType === "Batch"}
-                      onChange={(event) =>
-                        handleInstallmentChange(
-                          index,
-                          "dueDate",
-                          event.currentTarget.value,
-                        )
-                      }
-                    />
-                  </td>
-
-                  <td
-                    style={{
-                      border: "0.5px solid #D3D3D3",
-                      padding: "8px",
-                    }}
-                  >
-                    <NumberInput
-                      w={isMd ? "6rem" : "auto"}
-                      value={installment.amount}
-                      min={0}
-                      max={1000000}
-                      hideControls
-                      readOnly={selectedType === "Batch"}
-                      onChange={(value) =>
-                        handleInstallmentChange(index, "amount", value)
-                      }
-                    />
-                  </td>
-
-                  {selectedType !== "Batch" && (
-                    <td
-                      style={{
-                        border: "0.5px solid #D3D3D3",
-                        padding: "8px",
-                      }}
-                    >
-                      {index !== 0 && (
-                        <ActionIcon
-                          color="red"
-                          onClick={() => handleRemoveInstallment(index)}
-                        >
-                          <IconTrash size={24} />
-                        </ActionIcon>
-                      )}
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-
-          {selectedType !== "Batch" && (
-            <Text
-              onClick={handleAddInstallment}
-              c="blue"
-              mt="md"
+            <Box
               style={{
-                cursor: "pointer",
-                whiteSpace: "nowrap",
+                flex: 1,
               }}
             >
-              + Add Installment
-            </Text>
-          )}
-        </Box>
+              <Flex
+                justify="space-between"
+                align="center"
+                mb="2rem"
+              >
+                <Text
+                  fw={700}
+                  ff={"Roboto"}
+                >
+                  Institute Fee Installments
+                </Text>
+
+                {selectedType !== "Batch" && (
+                  <Text
+                    onClick={handleAddInstallment}
+                    c="blue"
+                    fw={600}
+                    style={{
+                      cursor: "pointer",
+                    }}
+                  >
+                    + Add
+                  </Text>
+                )}
+              </Flex>
+
+              <Table
+                style={{
+                  marginTop: "2rem",
+                  width: "100%",
+                }}
+                ff={"Roboto"}
+              >
+                <thead>
+                  <tr>
+                    <th
+                      style={{
+                        border: "0.5px solid #D3D3D3",
+                        padding: "10px",
+                        width: "8%",
+                      }}
+                    >
+                      S No.
+                    </th>
+
+                    <th
+                      style={{
+                        border: "0.5px solid #D3D3D3",
+                        padding: "10px",
+                        width: "32%",
+                      }}
+                    >
+                      Name
+                    </th>
+
+                    <th
+                      style={{
+                        border: "0.5px solid #D3D3D3",
+                        padding: "10px",
+                        width: "30%",
+                      }}
+                    >
+                      Due Date
+                    </th>
+
+                    <th
+                      style={{
+                        border: "0.5px solid #D3D3D3",
+                        padding: "10px",
+                        width: "30%",
+                      }}
+                    >
+                      Amount in ₹
+                    </th>
+
+
+                    {selectedType !== "Batch" && (
+                      <th
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                          width: "10%",
+                        }}
+                      >
+                        Action
+                      </th>
+                    )}
+
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {installments.map((installment, index) => (
+                    <tr key={index}>
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {index + 1}
+                      </td>
+
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                        }}
+                      >
+                        <TextInput
+                          value={installment.name}
+                          readOnly={selectedType === "Batch"}
+                          onChange={(event) =>
+                            handleInstallmentChange(
+                              index,
+                              "name",
+                              event.currentTarget.value,
+                            )
+                          }
+                        />
+                      </td>
+
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                        }}
+                      >
+                        <TextInput
+                          type="date"
+                          value={installment.dueDate}
+                          readOnly={selectedType === "Batch"}
+                          onChange={(event) =>
+                            handleInstallmentChange(
+                              index,
+                              "dueDate",
+                              event.currentTarget.value,
+                            )
+                          }
+                        />
+                      </td>
+
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                        }}
+                      >
+                        <NumberInput
+                          value={installment.amount}
+                          min={0}
+                          max={1000000}
+                          hideControls
+                          readOnly={selectedType === "Batch"}
+                          onChange={(value) =>
+                            handleInstallmentChange(
+                              index,
+                              "amount",
+                              Number(value),
+                            )
+                          }
+                        />
+                      </td>
+
+                      {selectedType !== "Batch" && (
+                        <td
+                          style={{
+                            border: "0.5px solid #D3D3D3",
+                            padding: "10px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {index !== 0 && (
+                            <ActionIcon
+                              color="red"
+                              onClick={() => handleRemoveInstallment(index)}
+                            >
+                              <IconTrash size={20} />
+                            </ActionIcon>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Box>
+
+            <Box
+              style={{
+                width: "1px",
+                background: "linear-gradient(180deg, #8E2DE2 0%, #4A00E0 100%)",
+                alignSelf: "stretch",
+                marginLeft: "10px",
+                marginRight: "10px",
+                boxShadow: "0px 0px 8px rgba(142, 45, 226, 0.4)",
+                borderRadius: "10px",
+              }}
+            />
+
+            {/* RIGHT TABLE */}
+
+            <Box
+              style={{
+                flex: 1,
+              }}
+            >
+              <Flex
+                justify="space-between"
+                align="center"
+                mb="2rem"
+              >
+                <Text
+                  fw={700}
+                  ff={"Roboto"}
+                >
+                  Transport Fee Installments
+                </Text>
+
+                <Text
+                  onClick={handleAddTransportInstallment}
+                  c="blue"
+                  fw={600}
+                  style={{
+                    cursor: "pointer",
+                  }}
+                >
+                  + Add
+                </Text>
+              </Flex>
+              <Table
+                style={{
+                  width: "100%",
+                }}
+                ff={"Roboto"}
+              >
+                <thead>
+                  <tr>
+                    <th
+                      style={{
+                        border: "0.5px solid #D3D3D3",
+                        padding: "10px",
+                        width: "8%",
+                      }}
+                    >
+                      S No.
+                    </th>
+
+                    <th
+                      style={{
+                        border: "0.5px solid #D3D3D3",
+                        padding: "10px",
+                        width: "32%",
+                      }}
+                    >
+                      Name
+                    </th>
+
+                    <th
+                      style={{
+                        border: "0.5px solid #D3D3D3",
+                        padding: "10px",
+                        width: "30%",
+                      }}
+                    >
+                      Due Date
+                    </th>
+
+                    <th
+                      style={{
+                        border: "0.5px solid #D3D3D3",
+                        padding: "10px",
+                        width: "30%",
+                      }}
+                    >
+                      Amount in ₹
+                    </th>
+                 
+                      <th
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                          width: "10%",
+                        }}
+                      >
+                        Action
+                      </th>
+                      
+                  </tr>
+                </thead>
+
+              <tbody>
+
+  {transportInstallments.length === 0 ? (
+
+    <tr>
+      <td
+        colSpan={5}
+        style={{
+          textAlign: "center",
+          padding: "30px",
+          color: "#666",
+          fontWeight: 500,
+        }}
+      >
+        No Transport Selected
+      </td>
+    </tr>
+
+  ) : (
+
+    transportInstallments.map((installment, index) => (
+                    <tr key={index}>
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {index + 1}
+                      </td>
+
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                        }}
+                      >
+                        <TextInput
+                          value={installment.name}
+                          onChange={(event) => {
+
+                            const updated = [...transportInstallments];
+
+                            updated[index] = {
+                              ...updated[index],
+                              name: event.currentTarget.value,
+                            };
+
+                            setTransportInstallments(updated);
+
+                            props.setVanFareInstallments(updated);
+                          }}
+                        />
+                      </td>
+
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                        }}
+                      >
+                        <TextInput
+                          type="date"
+                          value={installment.dueDate}
+                          onChange={(event) => {
+
+                            const updated = [...transportInstallments];
+
+                            updated[index] = {
+                              ...updated[index],
+                              dueDate: event.currentTarget.value,
+                            };
+
+                            setTransportInstallments(updated);
+
+                            props.setVanFareInstallments(updated);
+                          }}
+                        />
+                      </td>
+
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                        }}
+                      >
+                        <NumberInput
+                          value={installment.amount}
+                          min={0}
+                          max={1000000}
+                          hideControls
+                          onChange={(value) => {
+
+                            const updated = [...transportInstallments];
+
+                            updated[index] = {
+                              ...updated[index],
+                              amount: Number(value),
+                            };
+
+                            setTransportInstallments(updated);
+
+                            props.setVanFareInstallments(updated);
+                          }}
+                        />
+                      </td>
+
+                      <td
+                        style={{
+                          border: "0.5px solid #D3D3D3",
+                          padding: "10px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {index !== 0 && (
+                          <ActionIcon
+                            color="red"
+                            onClick={() => handleRemoveTransportInstallment(index)}
+                          >
+                            <IconTrash size={20} />
+                          </ActionIcon>
+                        )}
+                      </td>
+
+                    </tr>
+                 ))
+  )}
+
+</tbody>
+              </Table>
+            </Box>
+
+          </Flex>
+
+
+        </>
       )}
     </Stack>
   );

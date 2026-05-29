@@ -26,6 +26,27 @@ export function CreateStudentFeeRecords(data: {
   });
 }
 
+export function CreateStudentVanfare(data: {
+  studentId: string;
+  batchId: string;
+  id: string;
+  type: string;
+  installments: Installment[];
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/institute/createStudentVanfare/${data.studentId}`,
+{
+  batchId: data.batchId,
+  type: data.type,
+  installments: data.installments,
+}
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
 export function AddGps(data: {
   gpsToken: string;
   gpsUrl: string;

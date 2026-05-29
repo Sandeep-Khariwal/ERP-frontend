@@ -5,9 +5,28 @@ export function UpdateMultipleFeeRecord(
   instituteId: string,
   installments: Map<string, FeeRecordData>,
   studentId: string,
+  type?: "fee" | "vanfare",
 ) {
+
   const promises = Array.from(installments.entries()).map(([id, data]) => {
-    return UpdateFeeRecord(id, instituteId, studentId, data);
+
+    if (type === "vanfare") {
+
+      return UpdateVanfare(
+        id,
+        instituteId,
+        studentId,
+        data
+      );
+
+    }
+
+    return UpdateFeeRecord(
+      id,
+      instituteId,
+      studentId,
+      data
+    );
   });
 
   return Promise.all(promises)
@@ -34,6 +53,27 @@ export function UpdateFeeRecord(
       .catch((error: any) => reject(error));
   });
 }
+
+export function UpdateVanfare(
+  id: string,
+  instituteId: string,
+  studentId: string,
+  data: FeeRecordData,
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/updateVanfare/${id}`,
+      {
+        data,
+        instituteId,
+        studentId,
+      }
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
 export function AddStudentRollNumber(id: string, data: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
