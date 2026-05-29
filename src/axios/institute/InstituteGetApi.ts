@@ -12,7 +12,13 @@ export function GetBatchOptionalSubjects(id: string) {
 export function GetBatchFee(id: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/institute/getBatchFee/${id}`)
-      .then((response: any) => resolve(response))
+      .then((response: any) => {
+
+  console.log("GET BATCH FEE RESPONSE :", response);
+
+  resolve(response);
+
+})
       .catch((error: any) => reject(error));
   });
 }

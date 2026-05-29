@@ -17,6 +17,7 @@ import StepOne from "./StepOne";
 import {
   CreateStudent,
   CreateStudentFeeRecords,
+  CreateStudentVanfare,
   GetTransportAddresses,
 } from "@/axios/institute/InstitutePostApi";
 import AssignBatch from "./StepTwo";
@@ -99,14 +100,14 @@ export function AddMoreDetails(props: {
   }, [formValues]);
 
   useEffect(() => {
-  GetTransportAddresses(props.instituteId)
-    .then((res: any) => {
-      setTransportAddresses(res?.data || []);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}, []);
+    GetTransportAddresses(props.instituteId)
+      .then((res: any) => {
+        setTransportAddresses(res?.data || []);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const [studentInstallments, setStudentInstallments] = useState<Installment[]>(
     [
@@ -119,6 +120,7 @@ export function AddMoreDetails(props: {
       },
     ],
   );
+  const [studentVanfare, setStudentVanfare] = useState<Installment[]>([]);
   const [installments, setInstallments] = useState<Installment[]>([
     {
       _id: "",
@@ -128,6 +130,9 @@ export function AddMoreDetails(props: {
       isDeleted: false,
     },
   ]);
+
+  const [vanFareInstallments, setVanFareInstallments] = useState<Installment[]>([]);
+
   const [customOrBatch, setCustomOrBatch] = useState<string>("0");
 
   useEffect(() => {
@@ -169,6 +174,22 @@ export function AddMoreDetails(props: {
           });
           if (props.isEditableData) {
             setStudentInstallments(newInstallments);
+          }
+          console.log("FULL STUDENT :", student);
+
+          console.log("VANFARE DATA :", student.vanfare);
+          if (student.vanfare) {
+
+            const newVanfare = student.vanfare.map((f: any) => {
+              return {
+                _id: f._id,
+                name: f.name,
+                dueDate: new Date(f.dueDate).toISOString().split("T")[0],
+                amount: f.amount,
+              };
+            });
+
+            setStudentVanfare(newVanfare);
           }
           setCustomOrBatch(student.feeType);
           setFormValues(studentData);
@@ -274,6 +295,8 @@ export function AddMoreDetails(props: {
     }
 
     if (active === 2) {
+      setIsLoading(true);
+
       CreateStudentFeeRecords({
         studentId,
         installments: installments.map((prevIns) => ({
@@ -283,10 +306,20 @@ export function AddMoreDetails(props: {
         batchId: selectedBatch || selectedBatchId,
         type: customOrBatch,
       })
-        .then((x: any) => {
+        .then(async (x: any) => {
+
+          await CreateStudentVanfare({
+            studentId,
+            id: props.instituteId,
+            batchId: selectedBatch || selectedBatchId,
+            type: "Batch",
+            installments: vanFareInstallments,
+          });
+
           setIsLoading(false);
+
           setActive((current) => (current < 3 ? current + 1 : current));
-          // props.onClickBack();
+
           setFormValues({
             name: "",
             email: "",
@@ -304,6 +337,7 @@ export function AddMoreDetails(props: {
         })
         .catch((e) => {
           console.log(e);
+          setIsLoading(false);
         });
     }
   };
@@ -412,13 +446,16 @@ export function AddMoreDetails(props: {
             <StepThree
               batchName={props.batchName}
               batchId={selectedBatch || selectedBatchId}
+              instituteId={props.instituteId}
               setInstallments={setInstallments}
               setCustomOrBatch={setCustomOrBatch}
               setSelectedBatchId={setSelectedBatchId}
               feeType={customOrBatch}
               isEditable={props.isEditableData}
               studentInstallments={studentInstallments}
-              transportFees={formValues.transportFees??0}
+              transportFees={formValues.transportFees ?? 0}
+              setVanFareInstallments={setVanFareInstallments}
+              studentVanfare={studentVanfare}
             />
           </Stepper.Step>
           <Stepper.Step
