@@ -229,13 +229,45 @@ export function generateCertificateHTML(data: any) {
           letter-spacing: 2.5px;
         }
 
+        /* Adjusted layout container to align profile photo on the left and text on the right */
         .main-details-layout {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 0px;
-          width: 100%;
+          display: flex;
+          justify-content: center;
           align-items: center;
+          gap: 24px;
+          width: 100%;
           margin-bottom: 4px;
+        }
+
+        /* Left-positioned Profile Box Styles */
+        .profile-container {
+          width: 85px;
+          height: 95px;
+          border: 2px solid #b8962e;
+          background: #fcfaf7;
+          padding: 3px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          flex-shrink: 0;
+        }
+
+        .profile-img-element {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .profile-placeholder-box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          background: #f3eae1;
+          color: #b8962e;
         }
 
         .details-center-pane {
@@ -500,43 +532,6 @@ export function generateCertificateHTML(data: any) {
       <div class="border-outer"></div>
       <div class="border-inner"></div>
 
-      <svg class="badge-seal" viewBox="0 0 75 75" xmlns="http://www.w3.org/2000/svg">
-        <g transform="translate(37.5,37.5)">
-          <g id="spoke"><rect x="-1" y="-37" width="2" height="10" rx="1" fill="#d4af37"/></g>
-          <use href="#spoke" transform="rotate(22.5)"/>
-          <use href="#spoke" transform="rotate(45)"/>
-          <use href="#spoke" transform="rotate(67.5)"/>
-          <use href="#spoke" transform="rotate(90)"/>
-          <use href="#spoke" transform="rotate(112.5)"/>
-          <use href="#spoke" transform="rotate(135)"/>
-          <use href="#spoke" transform="rotate(157.5)"/>
-          <use href="#spoke" transform="rotate(180)"/>
-          <use href="#spoke" transform="rotate(202.5)"/>
-          <use href="#spoke" transform="rotate(225)"/>
-          <use href="#spoke" transform="rotate(247.5)"/>
-          <use href="#spoke" transform="rotate(270)"/>
-          <use href="#spoke" transform="rotate(292.5)"/>
-          <use href="#spoke" transform="rotate(315)"/>
-          <use href="#spoke" transform="rotate(337.5)"/>
-        </g>
-        <circle cx="37.5" cy="37.5" r="28" fill="none" stroke="#d4af37" stroke-width="2.5"/>
-        <circle cx="37.5" cy="37.5" r="24" fill="url(#badgeGrad)" stroke="#b8962e" stroke-width="1.5"/>
-        <text x="37.5" y="19" text-anchor="middle" font-size="7" fill="#b8962e">★ ★ ★</text>
-        <rect x="27" y="22" width="21" height="15" rx="1" fill="#1a1a2e"/>
-        <rect x="27" y="22" width="10" height="15" rx="1" fill="#2d2d4e"/>
-        <rect x="36" y="22" width="1" height="15" fill="#b8962e"/>
-        <polygon points="37.5,20 32,23 37.5,26 43,23" fill="#d4af37"/>
-        <rect x="41" y="23" width="1.5" height="4" fill="#d4af37"/>
-        <circle cx="37.5" cy="37.5" r="26" fill="none" stroke="#b8962e" stroke-width="0.7" stroke-dasharray="2,2"/>
-        <defs>
-          <radialGradient id="badgeGrad" cx="40%" cy="35%">
-            <stop offset="0%" stop-color="#f5d97a"/>
-            <stop offset="60%" stop-color="#b8962e"/>
-            <stop offset="100%" stop-color="#8b6914"/>
-          </radialGradient>
-        </defs>
-      </svg>
-
       <div class="content">
 
         <div class="logo-row">
@@ -588,6 +583,20 @@ export function generateCertificateHTML(data: any) {
         </div>
 
         <div class="main-details-layout">
+          <div class="profile-container">
+            ${certificateData.profilePic ? `
+              <img class="profile-img-element" src="${certificateData.profilePic}" alt="Student Profile" />
+            ` : `
+              <div class="profile-placeholder-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span style="font-size: 8px; font-weight:700; margin-top:4px; letter-spacing:0.5px;">PHOTO</span>
+              </div>
+            `}
+          </div>
+
           <div class="details-center-pane">
             <div class="recipient-name">${certificateData.recipientName}</div>
             <div class="completing-text">for successfully completing the course</div>
