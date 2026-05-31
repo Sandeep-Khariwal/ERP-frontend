@@ -58,6 +58,8 @@ const FeeRecordSection = (props: {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [installments, setInstallments] = useState<Installment[]>([]);
 
+  const [vanFares, setVanFares] = useState<any[]>([]);
+
   const instituteDetails = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
@@ -76,12 +78,17 @@ const FeeRecordSection = (props: {
   );
   const totalOverdue = totalFees - totalPaidFees;
 
+  const [openVanFareModal, setOpenVanFareModal] = useState(false);
+
   const [openPaymentModel, setOpenPaymentModel] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<FormValues>({
     paymentDate: new Date(),
   });
 
   const [feeRecordsMap, setFeeRecordsMap] = useState<
+    Map<string, FeeRecordData>
+  >(new Map());
+  const [vanFareRecordsMap, setVanFareRecordsMap] = useState<
     Map<string, FeeRecordData>
   >(new Map());
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -150,12 +157,60 @@ const FeeRecordSection = (props: {
       });
   };
 
+  const handleVanFareSubmit = () => {
+    if (!formValues.paymentDate) {
+      showNotification({
+        message: "Select date please!!",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    UpdateMultipleFeeRecord(
+      instituteDetails._id,
+      vanFareRecordsMap,
+      props.studentId,
+      "vanfare"
+    )
+      .then(() => {
+        setIsLoading(false);
+        setOpenVanFareModal(false);
+        setVanFareRecordsMap(new Map());
+
+        GetStudentFeeInstallments(props.studentId)
+          .then((x: any) => {
+            const { feeRecords, vanFares } = x.data;
+
+            setVanFares(vanFares || []);
+
+            const installments = feeRecords.map((f: any) => ({
+              _id: f._id,
+              name: f.name,
+              dueDate: f.dueDate,
+              amount: f.totalAmount,
+              amountPaid: f.amountPaid,
+              updatedAt: f.updatedAt,
+              status: f.status,
+            }));
+
+            setInstallments(installments);
+          });
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     if (props.studentId) {
       setIsLoading(true);
       GetStudentFeeInstallments(props.studentId)
         .then((x: any) => {
-          const { feeRecords } = x.data;
+          const { feeRecords, vanFares } = x.data;
+
+          setVanFares(vanFares || []);
           const installments = feeRecords.map((f: any) => {
             return {
               _id: f._id,
@@ -234,7 +289,7 @@ const FeeRecordSection = (props: {
                     console.log("FEE RECORDS", x.student.feeRecords);
                     const { student } = x;
 
-                    
+
 
                     let gst = instituteDetails.gst;
                     if (
@@ -271,10 +326,8 @@ const FeeRecordSection = (props: {
                       student.name,
                       student.parentName,
                       formattedData,
-
                       student.instituteId.name,
 
-                      // ✅ Base64 logo
                       base64Logo,
 
                       student.instituteId.address,
@@ -282,7 +335,6 @@ const FeeRecordSection = (props: {
                       props.batchName,
                       gst,
 
-                      // ✅ Base64 signature
                       base64Signature,
                     );
 
@@ -313,7 +365,6 @@ const FeeRecordSection = (props: {
                 Download Report
               </Button>
 
-              {/* OLD BUTTON */}
               {(props.userType == UserType.OTHERS ||
                 props.userType == UserType.TEACHER) && (
                   <Button
@@ -330,6 +381,14 @@ const FeeRecordSection = (props: {
                     Record Payment
                   </Button>
                 )}
+              <Button
+                color="orange"
+                onClick={() => {
+                  setOpenVanFareModal(true);
+                }}
+              >
+                Van Fare Update
+              </Button>
             </Flex>
           </Flex>
 
@@ -466,6 +525,119 @@ const FeeRecordSection = (props: {
             </Button>
             <Button radius={10} onClick={handleSubmit} type="submit">
               Payment
+            </Button>
+          </Group>
+        </Container>
+      </Modal>
+      <Modal
+        opened={openVanFareModal}
+        onClose={() => setOpenVanFareModal(false)}
+        title="Van Fare Update"
+        centered
+        size="sm"
+      >
+        <Container>
+          <DateTimePicker
+            label="Payment Date"
+            placeholder="Select date"
+            value={formValues.paymentDate}
+            onChange={(date) => {
+              setFormValues((prev) => ({
+                ...prev,
+                paymentDate: date as Date,
+              }));
+            }}
+          />
+
+          <Divider my="md" />
+
+          {vanFares.map((record: any) => (
+            <Stack
+              key={record._id}
+              gap={8}
+              mb={18}
+              p={8}
+              style={{
+                border: "1px solid #e9ecef",
+                borderRadius: "10px",
+              }}
+            >
+              <Flex justify="start" align="end" gap={10}>
+                <NumberInput
+                  label={record.name}
+                  value={vanFareRecordsMap.get(record._id)?.amount || 0}
+                  onChange={(value) => {
+                    setVanFareRecordsMap((prev) => {
+                      const newMap = new Map(prev);
+
+                      const existingRecord = newMap.get(record._id) || {
+                        amount: 0,
+                        paidDate: formValues.paymentDate,
+                        description: "",
+                      };
+
+                      newMap.set(record._id, {
+                        ...existingRecord,
+                        amount: Number(value) || 0,
+                      });
+
+                      return newMap;
+                    });
+                  }}
+                  max={record.totalAmount - record.amountPaid}
+                  min={0}
+                  style={{ flex: 1 }}
+                />
+
+                <Text fw={700} mb={10} fz="sm">
+                  ₹{record.totalAmount - record.amountPaid}
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      color: "gray",
+                    }}
+                  >
+                    {" "}
+                    (Pending)
+                  </span>
+                </Text>
+              </Flex>
+
+              <TextInput
+                label="Description"
+                placeholder="Enter payment description"
+                value={vanFareRecordsMap.get(record._id)?.description || ""}
+                onChange={(e) => {
+                  setVanFareRecordsMap((prev) => {
+                    const newMap = new Map(prev);
+
+                    const existingRecord = newMap.get(record._id) || {
+                      amount: 0,
+                      paidDate: formValues.paymentDate,
+                      description: "",
+                    };
+
+                    newMap.set(record._id, {
+                      ...existingRecord,
+                      description: e.currentTarget.value,
+                    });
+
+                    return newMap;
+                  });
+                }}
+              />
+            </Stack>
+          ))}
+          <Group justify="right" mt="md">
+            <Button
+              variant="outline"
+              onClick={() => setOpenVanFareModal(false)}
+            >
+              Cancel
+            </Button>
+
+            <Button onClick={handleVanFareSubmit}>
+              Update Van Fare
             </Button>
           </Group>
         </Container>
