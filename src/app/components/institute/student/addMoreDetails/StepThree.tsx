@@ -758,22 +758,27 @@ const StepThree = (props: {
                         }}
                       >
                         <TextInput
-                          type="date"
-                          value={installment.dueDate}
-                          onChange={(event) => {
+  type="date"
+  value={installment.dueDate}
+  onChange={(event) => {
 
-                            const updated = [...transportInstallments];
+    const selectedDate = event.currentTarget.value;
 
-                            updated[index] = {
-                              ...updated[index],
-                              dueDate: event.currentTarget.value,
-                            };
+    const updated = [...transportInstallments];
 
-                            setTransportInstallments(updated);
+    updated[index] = {
+      ...updated[index],
+      dueDate: selectedDate,
+      name: new Date(selectedDate).toLocaleString("default", {
+        month: "long",
+      }),
+    };
 
-                            props.setVanFareInstallments(updated);
-                          }}
-                        />
+    setTransportInstallments(updated);
+
+    props.setVanFareInstallments(updated);
+  }}
+/>
                       </td>
 
                       <td

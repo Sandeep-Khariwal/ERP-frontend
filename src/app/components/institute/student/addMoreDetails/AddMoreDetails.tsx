@@ -184,7 +184,7 @@ export function AddMoreDetails(props: {
                 _id: f._id,
                 name: f.name,
                 dueDate: new Date(f.dueDate).toISOString().split("T")[0],
-                amount: f.amount,
+                amount: f.totalAmount,
               };
             });
 
