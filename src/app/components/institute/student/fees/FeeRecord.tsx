@@ -322,6 +322,8 @@ const FeeRecordSection = (props: {
                       student.instituteId.signature,
                     );
 
+                    const vanfarePayload = student.vanfare || [];
+
                     const html = createFullFeeOverviewPdf(
                       student.name,
                       student.parentName,
@@ -336,6 +338,7 @@ const FeeRecordSection = (props: {
                       gst,
 
                       base64Signature,
+                      vanfarePayload
                     );
 
                     console.log("btn clicked......");
