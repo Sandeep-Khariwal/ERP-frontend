@@ -171,3 +171,54 @@ export function GetAllNotes(id: string) {
       });
   });
 }
+
+
+
+export function GetGallery(id: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/batch/gallery/${id}`
+    )
+      .then((response: any) => {
+        console.log("GET GALLERY SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("GET GALLERY ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}
+
+
+export function GetExamination(id: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/batch/examination/${id}`
+    )
+      .then((response: any) => {
+        console.log("GET EXAMINATION SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("GET EXAMINATION ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}
+
+export function GetTimeTable(id: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/batch/timeTable/${id}`
+    )
+      .then((response: any) => {
+        console.log("GET TIMETABLE SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("GET TIMETABLE ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}
