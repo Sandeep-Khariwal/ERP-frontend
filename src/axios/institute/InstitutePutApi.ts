@@ -138,3 +138,57 @@ export function UploadNotes(data: FormData) {
       });
   });
 }
+
+
+export function UploadThumbnail(data: FormData) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/batch/thumbnail`,
+      data
+    )
+      .then((response) => {
+        console.log("THUMBNAIL UPLOAD SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("THUMBNAIL UPLOAD ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}
+
+
+export function UploadExamination(data: FormData) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/batch/uploadExamination`,
+      data
+    )
+      .then((response) => {
+        console.log("EXAMINATION UPLOAD SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("EXAMINATION UPLOAD ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}
+
+
+export function UploadTimeTable(data: FormData) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/batch/uploadTimeTable`,
+      data
+    )
+      .then((response) => {
+        console.log("TIMETABLE UPLOAD SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("TIMETABLE UPLOAD ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}

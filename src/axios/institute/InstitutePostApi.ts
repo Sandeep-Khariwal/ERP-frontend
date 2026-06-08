@@ -208,3 +208,67 @@ export function GetTransportAddresses(institute: string) {
       .catch((error: any) => reject(error));
   });
 }
+
+export function CreateGallery(data: {
+  batchId: string;
+  title: string;
+  url: string;
+  coverPhoto: string;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/batch/gallery`,
+      data
+    )
+      .then((response) => {
+        console.log("CREATE GALLERY SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("CREATE GALLERY ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}
+
+export function CreateExamination(data: {
+  batchId: string;
+  title: string;
+  url: string;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/batch/createExamination`,
+      data
+    )
+      .then((response) => {
+        console.log("CREATE EXAMINATION SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("CREATE EXAMINATION ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}
+
+export function CreateTimeTable(data: {
+  batchId: string;
+  title: string;
+  url: string;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/batch/timeTable`,
+      data
+    )
+      .then((response) => {
+        console.log("CREATE TIMETABLE SUCCESS :", response);
+        resolve(response);
+      })
+      .catch((error: any) => {
+        console.log("CREATE TIMETABLE ERROR :", error?.response);
+        reject(error);
+      });
+  });
+}

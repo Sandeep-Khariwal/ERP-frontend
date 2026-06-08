@@ -37,6 +37,9 @@ import UploadExcelAdmission from "../student/addMoreDetails/UploadExcelAdmission
 import DiaryPage from "./DiaryPage";
 import StudyMaterialPage from "./StudyMaterialPage";
 import SessionsPage from "./SessionsPage";
+import GalleryPage from "./GalleryPage";
+import ExaminationPage from "./ExaminationPage";
+import TimeTablePage from "./TimeTablePage";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -46,6 +49,9 @@ enum Tabs {
   TEST = "Tests",
   DIARY = "Daily Diary",
   STUDY_MATERIAL = "Study Material",
+  TIME_TABLE = "Time Table",
+  GALLERY = "Gallery",
+  EXAMINATION = "Examination",
   ASSIGNMENT = "Assignment",
   SESSIONS = "Sessions",
 }
@@ -420,6 +426,30 @@ export function InstituteInsideBatch(props: {
         {Tabs.STUDY_MATERIAL === activeTab && (
           <Stack w={"100%"}>
             <StudyMaterialPage
+              batchId={props.batchId}
+            />
+          </Stack>
+        )}
+
+        {Tabs.GALLERY === activeTab && (
+          <Stack w={"100%"}>
+            <GalleryPage
+              batchId={props.batchId}
+            />
+          </Stack>
+        )}
+
+        {Tabs.TIME_TABLE === activeTab && (
+          <Stack w={"100%"}>
+            <TimeTablePage
+              batchId={props.batchId}
+            />
+          </Stack>
+        )}
+
+        {Tabs.EXAMINATION === activeTab && (
+          <Stack w={"100%"}>
+            <ExaminationPage
               batchId={props.batchId}
             />
           </Stack>
