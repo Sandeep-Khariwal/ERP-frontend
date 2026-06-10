@@ -20,6 +20,7 @@ import {
 } from "@mantine/core";
 
 import { useMediaQuery, useDisclosure } from "@mantine/hooks";
+import { Modal } from "@mantine/core";
 
 import {
     IconPlus,
@@ -28,6 +29,8 @@ import {
     IconX,
     IconUpload,
     IconSparkles,
+    // IconTrash,
+    IconDotsVertical,
 } from "@tabler/icons-react";
 
 import { notifications } from "@mantine/notifications";
@@ -36,6 +39,10 @@ import { CreateTimeTable } from "@/axios/institute/InstitutePostApi";
 import { GetTimeTable } from "@/axios/institute/InstituteGetApi";
 import { UploadTimeTable } from "@/axios/institute/InstitutePutApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
+import { IconTrash } from "@tabler/icons-react";
+import { DeleteTimeTable } from "@/axios/institute/InstituteDeleteApi";
+import { Menu, ActionIcon } from "@mantine/core";
+// import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
 
 // ───────────────── TYPES ─────────────────
 
@@ -192,7 +199,9 @@ export default function TimeTablePage(props: {
     const [entry, setEntry] = useState<TimeTableItem | null>(null);
 
     const [isLoading, setIsLoading] = useState(false);
-
+     
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    
     const [addDrawerOpen, { open: openAdd, close: closeAdd }] =
         useDisclosure(false);
 
@@ -238,6 +247,28 @@ export default function TimeTablePage(props: {
     useEffect(() => {
         fetchTimeTable();
     }, [props.batchId, setIsLoading]);
+
+
+    const handleDelete = async () => {
+        try {
+            await DeleteTimeTable(entry?._id as string);
+
+            SuccessNotification("Time Table Deleted!");
+
+            setDeleteModalOpen(false);
+            setEntry(null);
+
+            fetchTimeTable();
+        } catch (error) {
+            console.log(error);
+
+            notifications.show({
+                title: "Delete Failed",
+                message: "Unable to delete timetable",
+                color: "red",
+            });
+        }
+    };
 
     // ───────────────── UI ─────────────────
 
@@ -338,7 +369,7 @@ export default function TimeTablePage(props: {
                             </Title>
 
                             <Text c="dimmed" mt={6}>
-                               Upload class timetable for students
+                                Upload class timetable for students
                             </Text>
 
                             <Button
@@ -389,9 +420,15 @@ export default function TimeTablePage(props: {
                                 </div>
                             </Group>
 
-                            <Grid gutter="xl">
+                            <Grid gutter="xl" >
                                 {entry && (
-                                    <Grid.Col span={12}>
+                                    <Grid.Col
+                                        span={{
+                                            base: 12,
+                                            sm: 6,
+                                            lg: 4,
+                                        }}
+                                    >
                                         <Paper
                                             radius="24px"
                                             p={0}
@@ -411,11 +448,41 @@ export default function TimeTablePage(props: {
                                             <Stack gap={0}>
                                                 <Box
                                                     style={{
-                                                        aspectRatio: "16 / 10",
+                                                        aspectRatio: "16 / 9",
                                                         overflow: "hidden",
                                                         background: "#f5f5f5",
+                                                        position: "relative",
                                                     }}
                                                 >
+                                                    <Menu shadow="md" width={180} position="bottom-end">
+                                                        <Menu.Target>
+                                                            <ActionIcon
+                                                                variant="filled"
+                                                                radius="xl"
+                                                                style={{
+                                                                    position: "absolute",
+                                                                    top: 12,
+                                                                    right: 12,
+                                                                    zIndex: 10,
+                                                                    background: "rgba(255,255,255,0.9)",
+                                                                    color: "#333",
+                                                                }}
+                                                            >
+                                                                <IconDotsVertical size={16} />
+                                                            </ActionIcon>
+                                                        </Menu.Target>
+
+                                                        <Menu.Dropdown>
+                                                            <Menu.Item
+                                                                color="red"
+                                                                leftSection={<IconTrash size={16} />}
+                                                                onClick={() => setDeleteModalOpen(true)}
+                                                            >
+                                                                Delete
+                                                            </Menu.Item>
+                                                        </Menu.Dropdown>
+                                                    </Menu>
+
                                                     <img
                                                         src={entry.url}
                                                         alt={entry.title}
@@ -427,6 +494,8 @@ export default function TimeTablePage(props: {
                                                         }}
                                                     />
                                                 </Box>
+
+
 
                                                 <Box
                                                     p="lg"
@@ -458,6 +527,8 @@ export default function TimeTablePage(props: {
 
                                                     <Box style={{ flexGrow: 1 }} />
 
+
+
                                                     <Button
                                                         component="a"
                                                         href={entry.url}
@@ -477,15 +548,47 @@ export default function TimeTablePage(props: {
 
 
                                         </Paper>
-                                   </Grid.Col>
-)}
+                                    </Grid.Col>
+                                )}
                             </Grid>
 
-                           
+
                         </Paper>
                     )}
                 </>
             )}
+
+
+            <Modal
+                opened={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                title="Delete Time Table"
+                centered
+                radius="xl"
+            >
+                <Text mb="lg">
+                    Are you sure you want to delete this timetable?
+                </Text>
+
+                <Group justify="flex-end">
+                    <Button
+                        variant="default"
+                        radius="xl"
+                        onClick={() => setDeleteModalOpen(false)}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        color="red"
+                        radius="xl"
+                        leftSection={<IconTrash size={16} />}
+                        onClick={handleDelete}
+                    >
+                        Delete
+                    </Button>
+                </Group>
+            </Modal>
 
             {/* DRAWER */}
 

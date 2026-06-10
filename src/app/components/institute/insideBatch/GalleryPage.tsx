@@ -22,6 +22,8 @@ import {
 
 import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 
+import { Modal, Menu, ActionIcon } from "@mantine/core";
+
 import {
     IconPlus,
     IconBook,
@@ -29,7 +31,11 @@ import {
     IconX,
     IconUpload,
     IconSparkles,
+    IconDotsVertical,
+    IconTrash,
 } from "@tabler/icons-react";
+
+import { DeleteGallery } from "@/axios/institute/InstituteDeleteApi";
 
 import { notifications } from "@mantine/notifications";
 
@@ -208,6 +214,11 @@ export default function GalleryPage(props: {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+    const [selectedGallery, setSelectedGallery] =
+        useState<GalleryItem | null>(null);
+
     const PAGE_SIZE = 6;
 
     const [addDrawerOpen, { open: openAdd, close: closeAdd }] =
@@ -259,6 +270,28 @@ export default function GalleryPage(props: {
     useEffect(() => {
         fetchGallery();
     }, [props.batchId, setIsLoading]);
+
+    const handleDelete = async () => {
+        if (!selectedGallery) return;
+
+        try {
+            await DeleteGallery(selectedGallery.id);
+
+            SuccessNotification("Gallery Deleted!");
+
+            setDeleteModalOpen(false);
+
+            fetchGallery();
+        } catch (error) {
+            console.log(error);
+
+            notifications.show({
+                title: "Delete Failed",
+                message: "Unable to delete gallery",
+                color: "red",
+            });
+        }
+    };
 
     // ───────────────── PAGINATION ─────────────────
 
@@ -446,76 +479,108 @@ export default function GalleryPage(props: {
                                                 flexDirection: "column",
                                             }}
                                         >
-                                           
-                                                
-                                                    <Stack gap={0}>
-                                                        <Box
-                                                            style={{
-                                                                aspectRatio: "16 / 10",
-                                                                overflow: "hidden",
-                                                                background: "#f5f5f5",
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={item.coverPhoto}
-                                                                alt={item.title}
-                                                                style={{
-                                                                    width: "100%",
-                                                                    height: "100%",
-                                                                    objectFit: "cover",
-                                                                    display: "block",
-                                                                }}
-                                                            />
-                                                        </Box>
 
-                                                        <Box
-                                                            p="lg"
-                                                            style={{
-                                                                flex: 1,
-                                                                display: "flex",
-                                                                flexDirection: "column",
-                                                            }}
-                                                        >
-                                                            <Text
-                                                                fw={700}
-                                                                size="lg"
-                                                                mb="xs"
-                                                                lineClamp={2}
-                                                                style={{
-                                                                    minHeight: "56px",
-                                                                }}
-                                                            >
-                                                                {item.title}
-                                                            </Text>
 
-                                                            <Text
-                                                                size="sm"
-                                                                c="dimmed"
-                                                                mb="lg"
-                                                            >
-                                                                Gallery Photo & Media Link
-                                                            </Text>
-
-                                                            <Box style={{ flexGrow: 1 }} />
-
-                                                            <Button
-                                                                component="a"
-                                                                href={item.url}
-                                                                target="_blank"
+                                            <Stack gap={0}>
+                                                <Box
+                                                    style={{
+                                                        aspectRatio: "16 / 10",
+                                                        overflow: "hidden",
+                                                        background: "#f5f5f5",
+                                                        position: "relative",
+                                                    }}
+                                                >
+                                                    <Menu shadow="md" width={180} position="bottom-end">
+                                                        <Menu.Target>
+                                                            <ActionIcon
+                                                                variant="filled"
                                                                 radius="xl"
-                                                                size="md"
-                                                                fullWidth
                                                                 style={{
-                                                                    background:
-                                                                        "linear-gradient(135deg,#5c3de8,#7b5ef8)",
+                                                                    position: "absolute",
+                                                                    top: 12,
+                                                                    right: 12,
+                                                                    zIndex: 10,
+                                                                    background: "rgba(255,255,255,0.9)",
+                                                                    color: "#333",
                                                                 }}
                                                             >
-                                                                View Gallery
-                                                            </Button>
-                                                        </Box>
-                                                    </Stack>
-                                                
-                                            
+                                                                <IconDotsVertical size={16} />
+                                                            </ActionIcon>
+                                                        </Menu.Target>
+
+                                                        <Menu.Dropdown>
+                                                            <Menu.Item
+                                                                color="red"
+                                                                leftSection={<IconTrash size={16} />}
+                                                                onClick={() => {
+                                                                    setSelectedGallery(item);
+                                                                    setDeleteModalOpen(true);
+                                                                }}
+                                                            >
+                                                                Delete
+                                                            </Menu.Item>
+                                                        </Menu.Dropdown>
+                                                    </Menu>
+
+                                                    <img
+                                                        src={item.coverPhoto}
+                                                        alt={item.title}
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            objectFit: "cover",
+                                                            display: "block",
+                                                        }}
+                                                    />
+                                                </Box>
+                                                <Box
+                                                    p="lg"
+                                                    style={{
+                                                        flex: 1,
+                                                        display: "flex",
+                                                        flexDirection: "column",
+                                                    }}
+                                                >
+                                                    <Text
+                                                        fw={700}
+                                                        size="lg"
+                                                        mb="xs"
+                                                        lineClamp={2}
+                                                        style={{
+                                                            minHeight: "56px",
+                                                        }}
+                                                    >
+                                                        {item.title}
+                                                    </Text>
+
+                                                    <Text
+                                                        size="sm"
+                                                        c="dimmed"
+                                                        mb="lg"
+                                                    >
+                                                        Gallery Photo & Media Link
+                                                    </Text>
+
+                                                    <Box style={{ flexGrow: 1 }} />
+
+                                                    <Button
+                                                        component="a"
+                                                        href={item.url}
+                                                        target="_blank"
+                                                        radius="xl"
+                                                        size="md"
+                                                        fullWidth
+                                                        style={{
+                                                            background:
+                                                                "linear-gradient(135deg,#5c3de8,#7b5ef8)",
+                                                        }}
+                                                    >
+                                                        View Gallery
+                                                    </Button>
+                                                </Box>
+                                            </Stack>
+
+
                                         </Paper>
                                     </Grid.Col>
                                 ))}
@@ -569,6 +634,37 @@ export default function GalleryPage(props: {
                     )}
                 </>
             )}
+
+            <Modal
+                opened={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                title="Delete Gallery"
+                centered
+                radius="xl"
+            >
+                <Text mb="lg">
+                    Are you sure you want to delete this gallery item?
+                </Text>
+
+                <Group justify="flex-end">
+                    <Button
+                        variant="default"
+                        radius="xl"
+                        onClick={() => setDeleteModalOpen(false)}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        color="red"
+                        radius="xl"
+                        leftSection={<IconTrash size={16} />}
+                        onClick={handleDelete}
+                    >
+                        Delete
+                    </Button>
+                </Group>
+            </Modal>
 
             {/* DRAWER */}
 

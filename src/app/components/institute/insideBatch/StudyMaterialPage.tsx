@@ -33,6 +33,15 @@ import {
     IconSparkles,
 } from "@tabler/icons-react";
 
+import { Modal, Menu, ActionIcon } from "@mantine/core";
+
+import {
+    IconDotsVertical,
+    IconTrash,
+} from "@tabler/icons-react";
+
+import { DeleteNotes } from "@/axios/institute/InstituteDeleteApi";
+
 import { notifications } from "@mantine/notifications";
 
 import {
@@ -204,6 +213,11 @@ export default function StudyMaterialPage(props: {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+    const [selectedNote, setSelectedNote] =
+        useState<StudyMaterial | null>(null);
+
     const PAGE_SIZE = 6;
 
     const [addDrawerOpen, { open: openAdd, close: closeAdd }] =
@@ -253,6 +267,28 @@ export default function StudyMaterialPage(props: {
     useEffect(() => {
         fetchNotes();
     }, [props.batchId, setIsLoading]);
+
+    const handleDelete = async () => {
+        if (!selectedNote) return;
+
+        try {
+            await DeleteNotes(selectedNote.id);
+
+            SuccessNotification("Study Material Deleted!");
+
+            setDeleteModalOpen(false);
+
+            fetchNotes();
+        } catch (error) {
+            console.log(error);
+
+            notifications.show({
+                title: "Delete Failed",
+                message: "Unable to delete study material",
+                color: "red",
+            });
+        }
+    };
 
     // ───────────────── PAGINATION ─────────────────
 
@@ -473,21 +509,52 @@ export default function StudyMaterialPage(props: {
                                                     </div>
                                                 </Group>
 
-                                                <Button
-                                                    component="a"
-                                                    href={item.url || undefined}
-                                                    target="_blank"
-                                                    variant="subtle"
-                                                    radius="xl"
-                                                    color="violet"
-                                                    title={
-                                                        item.url === "#"
-                                                            ? "File is not available right now"
-                                                            : "Download Material"
-                                                    }
-                                                >
-                                                    <IconDownload size={20} />
-                                                </Button>
+                                                <Menu shadow="md" width={180} position="bottom-end">
+                                                    <Menu.Target>
+                                                        <ActionIcon
+                                                            variant="subtle"
+                                                            radius="xl"
+                                                            color="violet"
+                                                        >
+                                                            <IconDotsVertical size={18} />
+                                                        </ActionIcon>
+                                                    </Menu.Target>
+
+                                                    <Menu.Dropdown>
+                                                        <Menu.Item
+                                                            leftSection={<IconDownload size={16} />}
+                                                            onClick={async () => {
+                                                                const response = await fetch(item.url);
+                                                                const blob = await response.blob();
+
+                                                                const blobUrl = window.URL.createObjectURL(blob);
+
+                                                                const a = document.createElement("a");
+                                                                a.href = blobUrl;
+                                                                a.download = item.title || "file";
+
+                                                                document.body.appendChild(a);
+                                                                a.click();
+
+                                                                a.remove();
+                                                                window.URL.revokeObjectURL(blobUrl);
+                                                            }}
+                                                        >
+                                                            Download
+                                                        </Menu.Item>
+
+                                                        <Menu.Item
+                                                            color="red"
+                                                            leftSection={<IconTrash size={16} />}
+                                                            onClick={() => {
+                                                                setSelectedNote(item);
+                                                                setDeleteModalOpen(true);
+                                                            }}
+                                                        >
+                                                            Delete
+                                                        </Menu.Item>
+                                                    </Menu.Dropdown>
+                                                </Menu>
                                             </Group>
                                         </Paper>
                                     </Grid.Col>
@@ -542,6 +609,37 @@ export default function StudyMaterialPage(props: {
                     )}
                 </>
             )}
+
+            <Modal
+                opened={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                title="Delete Study Material"
+                centered
+                radius="xl"
+            >
+                <Text mb="lg">
+                    Are you sure you want to delete this study material?
+                </Text>
+
+                <Group justify="flex-end">
+                    <Button
+                        variant="default"
+                        radius="xl"
+                        onClick={() => setDeleteModalOpen(false)}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        color="red"
+                        radius="xl"
+                        leftSection={<IconTrash size={16} />}
+                        onClick={handleDelete}
+                    >
+                        Delete
+                    </Button>
+                </Group>
+            </Modal>
 
             {/* DRAWER */}
 
