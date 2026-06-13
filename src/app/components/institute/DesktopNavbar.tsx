@@ -65,6 +65,7 @@ import { CiMoneyCheck1 } from "react-icons/ci";
 // } from "@tabler/icons-react";
 import { TbPlugConnected } from "react-icons/tb";
 import { SignatureModal } from "./signaturemodal";
+import { AddEmailModal } from "./transport/AddEmail";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -89,6 +90,7 @@ export const DesktopNavbar = (props: {
   >("info");
   const [signatureModalOpen, setSignatureModalOpen] = useState(false);
   const [gstModalOpen, setGstModalOpen] = useState(false);
+  const [addEmailModalOpen, setAddEmailModalOpen] = useState(false);
 
   const [schoolName, setSchoolName] = useState("");
   const [email, setEmail] = useState("");
@@ -323,6 +325,24 @@ export const DesktopNavbar = (props: {
     Upload Transport Charges
   </Text>
 </Flex>
+<Flex
+  align="center"
+  gap={10}
+  style={{
+    padding: "10px",
+    borderRadius: "8px",
+    cursor: "pointer",
+  }}
+  onClick={() => {
+    setSettingsOpened(false);
+    setAddEmailModalOpen(true);
+  }}
+>
+  <FaUsers size={20} />
+  <Text size="sm" fw={500}>
+    Add Email
+  </Text>
+</Flex>
           </Stack>
 
           {/* RIGHT SIDE */}
@@ -498,6 +518,12 @@ export const DesktopNavbar = (props: {
   opened={transportUploadModal}
   onClose={() => setTransportUploadModal(false)}
   institute={institute}
+/>
+
+<AddEmailModal
+  opened={addEmailModalOpen}
+  onClose={() => setAddEmailModalOpen(false)}
+    institute={institute}
 />
 
       <Stack
