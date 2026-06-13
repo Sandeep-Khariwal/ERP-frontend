@@ -22,6 +22,8 @@ import {
 
 import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 
+import { Modal, Menu, ActionIcon } from "@mantine/core";
+
 import {
     IconPlus,
     IconBook,
@@ -29,7 +31,11 @@ import {
     IconX,
     IconUpload,
     IconSparkles,
+    IconDotsVertical,
+    IconTrash,
 } from "@tabler/icons-react";
+
+import { DeleteExamination } from "@/axios/institute/InstituteDeleteApi";
 
 import { notifications } from "@mantine/notifications";
 
@@ -185,7 +191,7 @@ function EntryForm({
 
 // ───────────────── MAIN ─────────────────
 
-export default function  ExaminationPage(props: {
+export default function ExaminationPage(props: {
     batchId: string;
 }) {
     const isMobile = useMediaQuery("(max-width: 768px)");
@@ -195,6 +201,11 @@ export default function  ExaminationPage(props: {
     const [page, setPage] = useState(1);
 
     const [isLoading, setIsLoading] = useState(false);
+
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+    const [selectedExam, setSelectedExam] =
+        useState<ExaminationItem | null>(null);
 
     const PAGE_SIZE = 6;
 
@@ -208,22 +219,22 @@ export default function  ExaminationPage(props: {
 
         setIsLoading(true);
 
-       GetExamination(props.batchId)
+        GetExamination(props.batchId)
             .then((res: any) => {
                 console.log("GET NOTES :", res);
 
-               const data =
-    res?.data?.examination ||
-    res?.data?.data?.examination ||
-    [];
+                const data =
+                    res?.data?.examination ||
+                    res?.data?.data?.examination ||
+                    [];
 
-               const formatted: ExaminationItem[] = data.map(
-    (item: any) => ({
-        _id: item._id,
-        title: item.title,
-        url: item.url,
-    })
-);
+                const formatted: ExaminationItem[] = data.map(
+                    (item: any) => ({
+                        _id: item._id,
+                        title: item.title,
+                        url: item.url,
+                    })
+                );
 
                 setEntries(formatted);
             })
@@ -244,8 +255,30 @@ export default function  ExaminationPage(props: {
     }, [props.batchId, setIsLoading]);
 
     useEffect(() => {
-       fetchExaminations();
+        fetchExaminations();
     }, [props.batchId, setIsLoading]);
+
+    const handleDelete = async () => {
+        if (!selectedExam) return;
+
+        try {
+            await DeleteExamination(selectedExam._id);
+
+            SuccessNotification("Examination Deleted!");
+
+            setDeleteModalOpen(false);
+
+            fetchExaminations();
+        } catch (error) {
+            console.log(error);
+
+            notifications.show({
+                title: "Delete Failed",
+                message: "Unable to delete examination",
+                color: "red",
+            });
+        }
+    };
 
     // ───────────────── PAGINATION ─────────────────
 
@@ -297,11 +330,11 @@ export default function  ExaminationPage(props: {
 
                             <div>
                                 <Title order={2} c="white">
-                                   Examination
+                                    Examination
                                 </Title>
 
                                 <Text c="rgba(255,255,255,0.8)">
-                                  Manage examination schedules and papers
+                                    Manage examination schedules and papers
                                 </Text>
                             </div>
                         </Group>
@@ -354,7 +387,7 @@ export default function  ExaminationPage(props: {
                             </ThemeIcon>
 
                             <Title order={3}>
-                               No Examination Found
+                                No Examination Found
                             </Title>
 
                             <Text c="dimmed" mt={6}>
@@ -441,8 +474,41 @@ export default function  ExaminationPage(props: {
                                                         aspectRatio: "16 / 10",
                                                         overflow: "hidden",
                                                         background: "#f5f5f5",
+                                                        position: "relative",
                                                     }}
                                                 >
+                                                    <Menu shadow="md" width={180} position="bottom-end">
+                                                        <Menu.Target>
+                                                            <ActionIcon
+                                                                variant="filled"
+                                                                radius="xl"
+                                                                style={{
+                                                                    position: "absolute",
+                                                                    top: 12,
+                                                                    right: 12,
+                                                                    zIndex: 10,
+                                                                    background: "rgba(255,255,255,0.9)",
+                                                                    color: "#333",
+                                                                }}
+                                                            >
+                                                                <IconDotsVertical size={16} />
+                                                            </ActionIcon>
+                                                        </Menu.Target>
+
+                                                        <Menu.Dropdown>
+                                                            <Menu.Item
+                                                                color="red"
+                                                                leftSection={<IconTrash size={16} />}
+                                                                onClick={() => {
+                                                                    setSelectedExam(item);
+                                                                    setDeleteModalOpen(true);
+                                                                }}
+                                                            >
+                                                                Delete
+                                                            </Menu.Item>
+                                                        </Menu.Dropdown>
+                                                    </Menu>
+
                                                     <img
                                                         src={item.url}
                                                         alt={item.title}
@@ -497,7 +563,7 @@ export default function  ExaminationPage(props: {
                                                                 "linear-gradient(135deg,#5c3de8,#7b5ef8)",
                                                         }}
                                                     >
-                                                       View Examination
+                                                        View Examination
                                                     </Button>
                                                 </Box>
                                             </Stack>
@@ -556,6 +622,37 @@ export default function  ExaminationPage(props: {
                     )}
                 </>
             )}
+
+            <Modal
+                opened={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                title="Delete Examination"
+                centered
+                radius="xl"
+            >
+                <Text mb="lg">
+                    Are you sure you want to delete this examination?
+                </Text>
+
+                <Group justify="flex-end">
+                    <Button
+                        variant="default"
+                        radius="xl"
+                        onClick={() => setDeleteModalOpen(false)}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        color="red"
+                        radius="xl"
+                        leftSection={<IconTrash size={16} />}
+                        onClick={handleDelete}
+                    >
+                        Delete
+                    </Button>
+                </Group>
+            </Modal>
 
             {/* DRAWER */}
 
