@@ -242,7 +242,7 @@ export function CreateExamination(data: {
       data
     )
       .then((response) => {
-        console.log("CREATE EXAMINATION SUCCESS :", response);
+
         resolve(response);
       })
       .catch((error: any) => {
@@ -270,5 +270,21 @@ export function CreateTimeTable(data: {
         console.log("CREATE TIMETABLE ERROR :", error?.response);
         reject(error);
       });
+  });
+}
+
+export function SetEmail(data: {
+ email_key: string;
+ email_password: string;
+
+
+},instituteId: string){
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/institute/api/v1/setEmail/${instituteId}`,
+      data
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
   });
 }
