@@ -219,6 +219,7 @@ const subjectOptions =
   // };
 console.log("props.teacherData._id: ", props.teacherData._id);
 console.log("props.teacherData.name: ", props.teacherData.name);
+console.log("FULL TEACHER DATA => ", props.teacherData);
 
   router.push(
     

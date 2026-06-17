@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AddNewStudentModal } from "../AddNewStudentModal";
 import { AddMoreDetails } from "../student/addMoreDetails/AddMoreDetails";
 import { StudentData, TeacherData } from "@/interfaces/batchInterface";
@@ -41,6 +41,7 @@ import GalleryPage from "./GalleryPage";
 import ExaminationPage from "./ExaminationPage";
 import TimeTablePage from "./TimeTablePage";
 import MeetingsPage from "../../meeting/MeetingPage";
+import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -147,6 +148,27 @@ export function InstituteInsideBatch(props: {
               phoneNumber: "",
             subjects: [],
   });
+
+  useEffect(() => {
+  if (!props.batchId) return;
+
+  GetAllTeachersFromBatch(props.batchId)
+    .then((res: any) => {
+      const firstTeacher = res?.teachers?.[0];
+
+      if (firstTeacher) {
+        settTeacherData({
+          _id: firstTeacher._id,
+          name: firstTeacher.name,
+          phoneNumber: firstTeacher.phoneNumber,
+          subjects: firstTeacher.subjects || [],
+        });
+      }
+    })
+    .catch((err) => {
+      console.log("Teacher Fetch Error:", err);
+    });
+}, [props.batchId]);
 
   
 
