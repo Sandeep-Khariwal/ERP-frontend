@@ -14,7 +14,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { AddNewStudentModal } from "../AddNewStudentModal";
 import { AddMoreDetails } from "../student/addMoreDetails/AddMoreDetails";
-import { StudentData } from "@/interfaces/batchInterface";
+import { StudentData, TeacherData } from "@/interfaces/batchInterface";
 import StudentSection from "./StudentSection";
 import FeeRecordSection from "../student/fees/FeeRecord";
 import OverView from "./OverView";
@@ -40,6 +40,7 @@ import SessionsPage from "./SessionsPage";
 import GalleryPage from "./GalleryPage";
 import ExaminationPage from "./ExaminationPage";
 import TimeTablePage from "./TimeTablePage";
+import MeetingsPage from "../../meeting/MeetingPage";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -111,6 +112,7 @@ export function InstituteInsideBatch(props: {
   subjects?: { _id: string; name: string }[];
   userType: UserType;
 }) {
+
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [selectedTeacherId, setSelectTeacherId] = useState<string>("");
   const [openAddStudentModal, setOpenAddStudentModal] =
@@ -138,6 +140,15 @@ export function InstituteInsideBatch(props: {
     phoneNumber: [],
     additionalPhoneNumbers: [],
   });
+
+    const [teacherData, settTeacherData] = useState<TeacherData>({
+              _id: "" ,
+              name: "",
+              phoneNumber: "",
+            subjects: [],
+  });
+
+  
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [students, setStudents] = useState<StudentsDataWithBatch[]>([]);
@@ -457,7 +468,7 @@ export function InstituteInsideBatch(props: {
 
         {Tabs.ASSIGNMENT === activeTab && (
           <Stack w={"100%"} mih={isMd ? "100vh" : "70vh"} bg={"white"} mt={20}>
-            <Text m={"auto"}>ASSIGNMENT coming soon</Text>
+            <MeetingsPage userType={props.userType} batchId={props.batchId} batchName={props.batchName} subjects={props.subjects} teacherData={teacherData}/>
           </Stack>
         )}
 

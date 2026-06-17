@@ -52,6 +52,8 @@ export enum StudentTabs {
   ATTENDANCE = "Attendance",
   TEST = "TEST",
   OTHER = "Other",
+  MEETNGS = "Meetings"
+
 }
 
 export const InstituteStudents = () => {
