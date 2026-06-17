@@ -15,9 +15,15 @@ export function GetAllSubjectsFromBatch(id:string) {
   });
 }
 export function GetTopClassPerformedStudents(id:string) {
-  
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/batch/getTopThreeStudentsFromBatch/${id}`)
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+export function GetUpCommingExams(id:string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(`${process.env.URL}/api/v1/batch/getAdmitCards/${id}`)
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });
