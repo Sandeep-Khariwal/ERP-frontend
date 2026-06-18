@@ -19,6 +19,9 @@ import {
   Grid,
   Loader,
   Avatar,
+  Modal,
+  Menu,
+  ActionIcon,
 } from "@mantine/core";
 
 import { useMediaQuery, useDisclosure } from "@mantine/hooks";
@@ -31,13 +34,15 @@ import {
   IconUpload,
   IconSparkles,
   IconDownload,
-  IconUser,
   IconPhone,
+  IconDotsVertical,
+  IconTrash,
 } from "@tabler/icons-react";
 
 import { notifications } from "@mantine/notifications";
 
 import { CreateExamination } from "@/axios/institute/InstitutePostApi";
+import { DeleteExamination } from "@/axios/institute/InstituteDeleteApi";
 import {
   GetAllStudentsFromBatch,
   GetExamination,
@@ -196,13 +201,16 @@ export default function ExaminationPage(props: { batchId: string }) {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const [isLoading, setIsLoading] = useState(false);
-  const [addDrawerOpen, { open: openAdd, close: closeAdd }] =
-    useDisclosure(false);
+  const [addDrawerOpen, { open: openAdd, close: closeAdd }] = useDisclosure(false);
 
   // States for Examination Collection
   const [entries, setEntries] = useState<ExaminationItem[]>([]);
   const [entryPage, setEntryPage] = useState(1);
   const EXAM_PAGE_SIZE = 6;
+
+  // States for Deletion
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedExam, setSelectedExam] = useState<ExaminationItem | null>(null);
 
   // States for Students/Admit Cards
   const [examsData, setExamsData] = useState<UpcomingExaminationData[]>([]);
@@ -217,7 +225,7 @@ export default function ExaminationPage(props: { batchId: string }) {
   const [studentPage, setStudentPage] = useState(1);
   const STUDENT_PAGE_SIZE = 9;
 
-  // ───────────────── FETCHING LOGIC ─────────────────
+  // ───────────────── FETCH LOGIC ─────────────────
 
   const fetchExaminations = useCallback(() => {
     if (!props.batchId) return;
@@ -280,7 +288,27 @@ export default function ExaminationPage(props: { batchId: string }) {
     }
   }, [props.batchId, fetchExaminations]);
 
-  // ───────────────── ADMIT CARD GENERATOR ─────────────────
+  // ───────────────── DELETE LOGIC ─────────────────
+
+  const handleDelete = async () => {
+    if (!selectedExam) return;
+
+    try {
+      await DeleteExamination(selectedExam._id);
+      SuccessNotification("Examination Deleted!");
+      setDeleteModalOpen(false);
+      fetchExaminations();
+    } catch (error) {
+      console.log(error);
+      notifications.show({
+        title: "Delete Failed",
+        message: "Unable to delete examination",
+        color: "red",
+      });
+    }
+  };
+
+  // ───────────────── ADMIT CARD LOGIC ─────────────────
 
   const downloadAdmitCard = (id: string) => {
     GetStudentForIdCard(id)
@@ -325,22 +353,16 @@ export default function ExaminationPage(props: { batchId: string }) {
 
   // ───────────────── PAGINATION COMPUTATIONS ─────────────────
 
-  const totalExamPages = Math.max(
-    1,
-    Math.ceil(entries.length / EXAM_PAGE_SIZE),
-  );
+  const totalExamPages = Math.max(1, Math.ceil(entries.length / EXAM_PAGE_SIZE));
   const paginatedEntries = entries.slice(
     (entryPage - 1) * EXAM_PAGE_SIZE,
-    entryPage * EXAM_PAGE_SIZE,
+    entryPage * EXAM_PAGE_SIZE
   );
 
-  const totalStudentPages = Math.max(
-    1,
-    Math.ceil(students.length / STUDENT_PAGE_SIZE),
-  );
+  const totalStudentPages = Math.max(1, Math.ceil(students.length / STUDENT_PAGE_SIZE));
   const paginatedStudents = students.slice(
     (studentPage - 1) * STUDENT_PAGE_SIZE,
-    studentPage * STUDENT_PAGE_SIZE,
+    studentPage * STUDENT_PAGE_SIZE
   );
 
   return (
@@ -364,7 +386,6 @@ export default function ExaminationPage(props: { batchId: string }) {
           boxShadow: "0 10px 30px rgba(92,61,232,0.2)",
         }}
       >
-        {/* Subtle Background Glow Elements */}
         <Box
           style={{
             position: "absolute",
@@ -378,10 +399,7 @@ export default function ExaminationPage(props: { batchId: string }) {
           }}
         />
 
-        <Group
-          justify="space-between"
-          style={{ position: "relative", zIndex: 1 }}
-        >
+        <Group justify="space-between" style={{ position: "relative", zIndex: 1 }}>
           <Stack gap={4}>
             <Group>
               <ThemeIcon size={54} radius="xl" color="white" variant="light">
@@ -421,6 +439,7 @@ export default function ExaminationPage(props: { batchId: string }) {
         </Flex>
       ) : (
         <Stack gap={40}>
+          
           {/* SECTION 1: EXAMINATION COLLECTION */}
           {entries.length === 0 ? (
             <Paper
@@ -520,8 +539,42 @@ export default function ExaminationPage(props: { batchId: string }) {
                             aspectRatio: "16 / 10",
                             overflow: "hidden",
                             background: "#f5f5f5",
+                            position: "relative",
                           }}
                         >
+                          {/* DELETE DROPDOWN MENU */}
+                          <Menu shadow="md" width={180} position="bottom-end">
+                            <Menu.Target>
+                              <ActionIcon
+                                variant="filled"
+                                radius="xl"
+                                style={{
+                                  position: "absolute",
+                                  top: 12,
+                                  right: 12,
+                                  zIndex: 10,
+                                  background: "rgba(255,255,255,0.9)",
+                                  color: "#333",
+                                }}
+                              >
+                                <IconDotsVertical size={16} />
+                              </ActionIcon>
+                            </Menu.Target>
+
+                            <Menu.Dropdown>
+                              <Menu.Item
+                                color="red"
+                                leftSection={<IconTrash size={16} />}
+                                onClick={() => {
+                                  setSelectedExam(item);
+                                  setDeleteModalOpen(true);
+                                }}
+                              >
+                                Delete
+                              </Menu.Item>
+                            </Menu.Dropdown>
+                          </Menu>
+
                           <img
                             src={item.url}
                             alt={item.title}
@@ -589,11 +642,8 @@ export default function ExaminationPage(props: { batchId: string }) {
                 >
                   <Text size="sm" c="dimmed">
                     Showing{" "}
-                    {Math.min(
-                      (entryPage - 1) * EXAM_PAGE_SIZE + 1,
-                      entries.length,
-                    )}{" "}
-                    to {Math.min(entryPage * EXAM_PAGE_SIZE, entries.length)} of{" "}
+                    {Math.min((entryPage - 1) * EXAM_PAGE_SIZE + 1, entries.length)} to{" "}
+                    {Math.min(entryPage * EXAM_PAGE_SIZE, entries.length)} of{" "}
                     {entries.length} resources
                   </Text>
 
@@ -642,8 +692,7 @@ export default function ExaminationPage(props: { batchId: string }) {
                   </Title>
 
                   <Text size="sm" c="dimmed" fw={500} mt={2}>
-                    Select a student to generate and download their upcoming
-                    admit card
+                    Select a student to generate and download their upcoming admit card
                   </Text>
                 </div>
                 <Box
@@ -662,12 +711,7 @@ export default function ExaminationPage(props: { batchId: string }) {
               </Group>
 
               {students.length === 0 ? (
-                <Paper
-                  radius="xl"
-                  p={60}
-                  ta="center"
-                  style={{ background: "#faf7ff" }}
-                >
+                <Paper radius="xl" p={60} ta="center" style={{ background: "#faf7ff" }}>
                   <Text c="dimmed">No students found in this batch.</Text>
                 </Paper>
               ) : (
@@ -710,8 +754,7 @@ export default function ExaminationPage(props: { batchId: string }) {
                             radius="xl"
                             color="violet"
                             style={{
-                              background:
-                                "linear-gradient(135deg, #e5dbff, #d1bfff)",
+                              background: "linear-gradient(135deg, #e5dbff, #d1bfff)",
                               color: "#5c3de8",
                             }}
                           >
@@ -765,20 +808,13 @@ export default function ExaminationPage(props: { batchId: string }) {
                   <Text size="sm" c="dimmed" fw={500}>
                     Showing{" "}
                     <span style={{ color: "#1a1a2e" }}>
-                      {Math.min(
-                        (studentPage - 1) * STUDENT_PAGE_SIZE + 1,
-                        students.length,
-                      )}
+                      {Math.min((studentPage - 1) * STUDENT_PAGE_SIZE + 1, students.length)}
                     </span>{" "}
                     to{" "}
                     <span style={{ color: "#1a1a2e" }}>
-                      {Math.min(
-                        studentPage * STUDENT_PAGE_SIZE,
-                        students.length,
-                      )}
+                      {Math.min(studentPage * STUDENT_PAGE_SIZE, students.length)}
                     </span>{" "}
-                    of{" "}
-                    <span style={{ color: "#1a1a2e" }}>{students.length}</span>{" "}
+                    of <span style={{ color: "#1a1a2e" }}>{students.length}</span>{" "}
                     students
                   </Text>
 
@@ -792,8 +828,7 @@ export default function ExaminationPage(props: { batchId: string }) {
                       control: {
                         border: "none",
                         "&[data-active]": {
-                          background:
-                            "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                          background: "linear-gradient(135deg, #5c3de8, #7b5ef8)",
                           boxShadow: "0 4px 10px rgba(92,61,232,0.3)",
                         },
                       },
@@ -805,6 +840,38 @@ export default function ExaminationPage(props: { batchId: string }) {
           )}
         </Stack>
       )}
+
+      {/* DELETE MODAL */}
+      <Modal
+        opened={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Delete Examination"
+        centered
+        radius="xl"
+      >
+        <Text mb="lg">
+          Are you sure you want to delete this examination?
+        </Text>
+
+        <Group justify="flex-end">
+          <Button
+            variant="default"
+            radius="xl"
+            onClick={() => setDeleteModalOpen(false)}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            color="red"
+            radius="xl"
+            leftSection={<IconTrash size={16} />}
+            onClick={handleDelete}
+          >
+            Delete
+          </Button>
+        </Group>
+      </Modal>
 
       {/* DRAWER FOR CREATING EXAM */}
       <Drawer
