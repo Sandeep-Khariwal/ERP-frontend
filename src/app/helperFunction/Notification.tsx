@@ -1,7 +1,6 @@
 import { notifications } from "@mantine/notifications";
 
 export function SuccessNotification(message: string) {
-
   notifications.show({
     color: "green",
     position: "top-center",
@@ -11,7 +10,6 @@ export function SuccessNotification(message: string) {
 }
 
 export function ErrorNotification(message: string) {
-
   notifications.show({
     color: "red",
     position: "top-center",
@@ -36,19 +34,19 @@ export function getOneYearPast(dateStr: string): string {
   date.setFullYear(date.getFullYear() - 1);
 
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+  const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 }
 
-  export function containsOnlyDigits(inputString: string) {
-    return /^\d+$/.test(inputString) || inputString === "";
-  }
+export function containsOnlyDigits(inputString: string) {
+  return /^\d+$/.test(inputString) || inputString === "";
+}
 
-  export const GetMonthYear = (dateString: string | Date): string => {
+export const GetMonthYear = (dateString: string | Date): string => {
   const date = new Date(dateString);
-  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
   return `${month}-${year}`;
 };
@@ -70,3 +68,23 @@ export const getBase64Image = async (url: string) => {
     reader.readAsDataURL(blob);
   });
 };
+
+export function getExamStartDate(date: any) {
+  const d = new Date(date);
+  return d.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+export function getExamStartTime(date: any) {
+  const d = new Date(date);
+
+  d.setMinutes(d.getMinutes() - 330); // 5h 30m = 330 minutes
+
+  return d.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
