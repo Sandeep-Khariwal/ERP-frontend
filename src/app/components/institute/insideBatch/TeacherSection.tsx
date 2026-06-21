@@ -35,6 +35,7 @@ import { GetAllTeacherStaff } from "@/axios/teacher/TeacherGetApi";
 import { Notifications } from "@mantine/notifications";
 import { FaUserCircle } from "react-icons/fa";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
+import { TeacherData } from "@/interfaces/batchInterface";
 
 const TeachersSection = (props: {
   batchId?: string;
@@ -276,15 +277,15 @@ const TeachersSection = (props: {
                 style={
                   item.isInActive
                     ? {
-                        textAlign: "center",
-                        fontFamily: "Nunito",
-                        padding: "1rem",
-                      }
+                      textAlign: "center",
+                      fontFamily: "Nunito",
+                      padding: "1rem",
+                    }
                     : {
-                        textAlign: "center",
-                        fontFamily: "Nunito",
-                        padding: "1rem",
-                      }
+                      textAlign: "center",
+                      fontFamily: "Nunito",
+                      padding: "1rem",
+                    }
                 }
               >
                 <Table.Td
