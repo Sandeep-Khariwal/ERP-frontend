@@ -11,7 +11,7 @@
   "dependencies": {
     "@mantine/carousel": "^8.3.16",
     "@mantine/core": "^7.14.1",
-    "@mantine/dates": "^7.15.3",
+    "@mantine/dates": "^7.17.8",
     "@mantine/form": "^8.2.1",
     "@mantine/hooks": "^7.14.1",
     "@mantine/modals": "^9.0.2",
@@ -23,7 +23,7 @@
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "cookie": "^1.0.2",
-    "dayjs": "^1.11.13",
+    "dayjs": "^1.11.21",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "file-saver": "^2.0.5",
@@ -42,7 +42,8 @@
     "react-phone-input-2": "^2.15.1",
     "react-redux": "^9.2.0",
     "recharts": "^3.8.0",
-    "socket.io-client": "^4.8.1",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "swiper": "^11.2.10",
     "xlsx": "^0.18.5"
   },

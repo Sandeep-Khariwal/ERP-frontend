@@ -13,6 +13,7 @@ import { GetStudentOverview } from "@/axios/student/StudentGetApi";
 import { UserType } from "../dashboard/InstituteBatchesSection";
 import StudentTestView from "./StudentTestView";
 import StudentTestCard from "./StudentTestCards";
+import StudentMeetingsPage from "./AllMeetings";
 
 export interface StudentOverView {
   _id: string;
@@ -254,6 +255,11 @@ const StudentPage = (props: {
             test={{}}
             batchId={student.batchId._id}
           />
+        </Stack>
+      )}
+       {StudentTabs.MEETNGS === activeTab && (
+        <Stack mt={10} w={"100%"} bg={"white"} py={10} px={4}>
+          <StudentMeetingsPage studentId={student._id}  batchId={student.batchId._id} student={student.name} />
         </Stack>
       )}
     </Stack>

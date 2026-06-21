@@ -56,3 +56,10 @@ export interface StudentPayload {
   admissionNumber?: string;
   motherName?: string;
 }
+
+export interface TeacherData {
+              _id: "" ,
+              name: "",
+              phoneNumber: "",
+            subjects: string[],
+}
