@@ -4,7 +4,7 @@
 import { SuccessNotification } from "@/app/helperFunction/Notification";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 import { CreateTest } from "@/axios/batch/BatchPostApi";
-import { StudentsDataWithBatch } from "@/interface/student.interface";
+import { StudentsDataWithBatch } from "@/interfaces/student.interface";
 import {
   Button,
   Flex,
