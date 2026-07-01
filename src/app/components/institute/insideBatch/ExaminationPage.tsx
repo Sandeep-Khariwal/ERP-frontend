@@ -259,6 +259,8 @@ export default function ExaminationPage(props: {
     }, [props.batchId, setIsLoading]);
 
     const handleDelete = async () => {
+        console.log("selectedexam : ", selectedExam);
+        
         if (!selectedExam) return;
 
         try {

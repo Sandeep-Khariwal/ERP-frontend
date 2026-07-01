@@ -272,6 +272,7 @@ export default function GalleryPage(props: {
     }, [props.batchId, setIsLoading]);
 
     const handleDelete = async () => {
+        console.log("DELETE ID =>", selectedGallery);
         if (!selectedGallery) return;
 
         try {

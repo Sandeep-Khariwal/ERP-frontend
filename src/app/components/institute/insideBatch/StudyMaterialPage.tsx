@@ -269,6 +269,8 @@ export default function StudyMaterialPage(props: {
     }, [props.batchId, setIsLoading]);
 
     const handleDelete = async () => {
+        console.log("selectednote: ", selectedNote);
+        
         if (!selectedNote) return;
 
         try {
