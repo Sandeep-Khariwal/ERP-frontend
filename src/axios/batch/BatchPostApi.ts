@@ -1,4 +1,4 @@
-import { AttendanceInterface } from "@/interface/student.interface";
+import { AttendanceInterface } from "@/interfaces/student.interface";
 import ApiHelper from "../../ApiHelper";
 
 export function CreateAttendance(batchId: string, data: AttendanceInterface[]) {

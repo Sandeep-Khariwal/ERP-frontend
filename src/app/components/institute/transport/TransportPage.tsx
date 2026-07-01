@@ -4,7 +4,7 @@ import {
   CreateVan,
   GetAllVans
 } from "@/axios/institute/transportApi";
-import { Van } from "@/interface/student.interface";
+import { Van } from "@/interfaces/student.interface";
 import {
   Button,
   Flex,

@@ -3,7 +3,7 @@
 import {
   AttendanceInterface,
   StudentsDataWithBatch,
-} from "@/interface/student.interface";
+} from "@/interfaces/student.interface";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AttendanceCard, {
   AttendanceStatus,
