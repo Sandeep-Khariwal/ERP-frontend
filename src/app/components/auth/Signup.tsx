@@ -99,8 +99,8 @@ export default function Signup(props: { onClickLogin: () => void }) {
       })
       .catch((e) => {
         console.log(e);
-        const {message} = e.response.data
         setIsLoading(false);
+        const {message} = e.response.data
         ErrorNotification(message);
       });
   };

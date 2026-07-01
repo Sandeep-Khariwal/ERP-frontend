@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
     URL: "https://server.shikshapay.cloud"
 
   },
-  
 };
 
 export default nextConfig;
