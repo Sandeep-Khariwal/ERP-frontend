@@ -39,6 +39,12 @@ export function generateCertificateHTML(data: any) {
       rel="stylesheet"
     />
     <style>
+
+    @page {
+    size: A4 portrait;
+    margin: 0;
+}
+    
       *,
       *::before,
       *::after {

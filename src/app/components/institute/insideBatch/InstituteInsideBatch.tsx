@@ -19,7 +19,7 @@ import StudentSection from "./StudentSection";
 import FeeRecordSection from "../student/fees/FeeRecord";
 import OverView from "./OverView";
 import { TakeAttendanceView } from "./TakeAttendanceView";
-import { StudentsDataWithBatch } from "@/interface/student.interface";
+import { StudentsDataWithBatch } from "@/interfaces/student.interface";
 import {
   SuccessNotification,
   ErrorNotification,
@@ -39,9 +39,10 @@ import StudyMaterialPage from "./StudyMaterialPage";
 import SessionsPage from "./SessionsPage";
 import GalleryPage from "./GalleryPage";
 import ExaminationPage from "./ExaminationPage";
-import TimeTablePage from "./TimeTablePage";
+
 import MeetingsPage from "../../meeting/MeetingPage";
 import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
+import TimetablePage from "./timetable/TimeTablePage";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -474,8 +475,11 @@ export function InstituteInsideBatch(props: {
 
         {Tabs.TIME_TABLE === activeTab && (
           <Stack w={"100%"}>
-            <TimeTablePage
+            <TimetablePage
               batchId={props.batchId}
+               subjects={props.subjects} 
+               teacherData={teacherData}
+                batchName={props.batchName}
             />
           </Stack>
         )}

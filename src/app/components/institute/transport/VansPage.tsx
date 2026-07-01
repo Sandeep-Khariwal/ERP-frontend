@@ -1,4 +1,4 @@
-import { Van } from "@/interface/student.interface";
+import { Van } from "@/interfaces/student.interface";
 import { Stack, Table } from "@mantine/core";
 import React from "react";
 

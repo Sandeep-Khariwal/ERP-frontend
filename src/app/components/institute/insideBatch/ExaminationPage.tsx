@@ -310,47 +310,82 @@ export default function ExaminationPage(props: { batchId: string }) {
 
   // ───────────────── ADMIT CARD LOGIC ─────────────────
 
+  // const downloadAdmitCard = (id: string) => {
+  //   GetStudentForIdCard(id)
+  //     .then(async (res: any) => {
+  //       const studentInfo = res.student;
+
+  //       const base64Profile = await getBase64Image(studentInfo.profilePic);
+  //       const base64Logo = await getBase64Image(studentInfo.instituteId.logo);
+
+  //   const handleDelete = async () => {
+  //       console.log("selectedexam : ", selectedExam);
+        
+  //       if (!selectedExam) return;
+
+  //       const printWindow = window.open("", "_blank");
+  //       if (printWindow) {
+  //         printWindow.document.open();
+  //         printWindow.document.write(idCardhtml);
+  //         printWindow.document.close();
+
+  //         setTimeout(() => {
+  //           printWindow.print();
+  //         }, 1000);
+  //       }
+  //     })
+  //     .catch((e: any) => {
+  //       console.log(e);
+  //     });
+  // };
+
   const downloadAdmitCard = (id: string) => {
-    GetStudentForIdCard(id)
-      .then(async (res: any) => {
-        const studentInfo = res.student;
+  GetStudentForIdCard(id)
+    .then(async (res: any) => {
 
-        const base64Profile = await getBase64Image(studentInfo.profilePic);
-        const base64Logo = await getBase64Image(studentInfo.instituteId.logo);
+      const studentInfo = res.student;
 
-        const idCardhtml = GenerateAdmitCard({
-          schoolName: studentInfo.instituteId.name,
-          schoolLogo: base64Logo,
-          schoolAddress: studentInfo.instituteId.address,
-          institutePhoneNumber: studentInfo.instituteId.institutePhoneNumber,
-          studentName: studentInfo.name,
-          studentPhoto: base64Profile,
-          className: studentInfo.batchId.name,
-          rollNo: studentInfo.rollNumber,
-          entrollmentNum: studentInfo.enrollmentNo,
-          dob: formatDate(studentInfo.dateOfBirth),
-          phone: studentInfo.phoneNumber,
-          address: studentInfo.address,
-          principalSignature: studentInfo.instituteId.signature,
-          examsData,
-        });
+      const base64Profile = await getBase64Image(studentInfo.profilePic);
+      const base64Logo = await getBase64Image(studentInfo.instituteId.logo);
 
-        const printWindow = window.open("", "_blank");
-        if (printWindow) {
-          printWindow.document.open();
-          printWindow.document.write(idCardhtml);
-          printWindow.document.close();
+    const idCardhtml = GenerateAdmitCard({
+  schoolName: studentInfo.instituteId.name,
+  schoolLogo: base64Logo,
+  schoolAddress: studentInfo.instituteId.address,
+  institutePhoneNumber: studentInfo.instituteId.phoneNumber,
 
-          setTimeout(() => {
-            printWindow.print();
-          }, 1000);
-        }
-      })
-      .catch((e: any) => {
-        console.log(e);
-      });
-  };
+  studentName: studentInfo.name,
+  studentPhoto: base64Profile,
 
+  className: studentInfo.batchId.name,
+  rollNo: studentInfo.rollNo,
+  entrollmentNum: studentInfo.entrollmentNum,
+
+  dob: studentInfo.dob,
+  phone: studentInfo.phoneNumber,
+  address: studentInfo.address,
+
+  principalSignature: studentInfo.instituteId.principalSignature,
+
+  examsData: examsData,
+});
+
+      const printWindow = window.open("", "_blank");
+
+      if (printWindow) {
+        printWindow.document.open();
+        printWindow.document.write(idCardhtml);
+        printWindow.document.close();
+
+        setTimeout(() => {
+          printWindow.print();
+        }, 1000);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
   // ───────────────── PAGINATION COMPUTATIONS ─────────────────
 
   const totalExamPages = Math.max(1, Math.ceil(entries.length / EXAM_PAGE_SIZE));
