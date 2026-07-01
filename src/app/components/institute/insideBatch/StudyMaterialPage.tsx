@@ -274,7 +274,7 @@ export default function StudyMaterialPage(props: {
         if (!selectedNote) return;
 
         try {
-            await DeleteNotes(selectedNote.id);
+            await DeleteNotes(selectedNote.id,props.batchId);
 
             SuccessNotification("Study Material Deleted!");
 
