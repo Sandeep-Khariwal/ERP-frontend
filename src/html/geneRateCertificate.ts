@@ -116,7 +116,7 @@ export function generateCertificateHTML(data: any) {
 }
 
 .logo-img {
-  width: calc(100% + 8px);
+  width: calc(100% + 5.5px);
   height: 100%;
   object-fit: cover;
   transform: translateX(-4px);
