@@ -62,7 +62,7 @@
 
 //     socket.on("disconnect", () => {
 //       console.log("disconected : ", socket.id);
-      
+
 //       setIsConnected(false)
 //     });
 
@@ -154,6 +154,7 @@
 //     socket: socketRef.current,
 //   };
 // };
+
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Socket } from "socket.io-client";
@@ -182,7 +183,6 @@ export const useMeetingSocket = ({
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [polls, setPolls] = useState<Poll[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-
   // कॉलबैक्स को Ref में स्टोर किया ताकि useEffect बार-बार ट्रिगर न हो
   const callbacksRef = useRef({ onMeetingStarted, onMeetingEnded });
   useEffect(() => {
@@ -221,48 +221,84 @@ export const useMeetingSocket = ({
     socket.on("disconnect", handleDisconnect);
 
     // इवेंट लिसनर्स
-    socket.on("participants-list", (data: Participant[]) => setParticipants(data));
-    
-    socket.on("chat-history", (data: ChatMessage[]) => {
-      console.log("CHAT HISTORY RECEIVED =>", data);
-      setMessages(data || []);
+    // FIX: Ensure state setters treat 'prev' as an array explicitly
+    socket.on("participants-list", (data: any) =>{
+      setParticipants(data.participants)
+    }
+    );
+
+    socket.on("chat-history", (data: any) => {
+      setMessages(data.chat || []);
     });
 
-    socket.on("polls-list", (data: Poll[]) => setPolls(data));
+    socket.on("polls-list", (data: any) => {
+      setPolls(data.polls)
+    });
 
+    // Inside your useMeetingSocket useEffect...
+
+    // 1. Fix for 'user-joined'
     socket.on("user-joined", (user: Participant) => {
-      setParticipants((prev) => {
-        if (prev.find((p) => p.userId === user.userId)) return prev;
-        return [...prev, user];
+      setParticipants((prev: Participant[]) => {
+        const current = Array.isArray(prev) ? prev : [];
+        if (current.length > 0 && current.find((p) => p.userId === user.userId))
+          return current;
+        return [...current, user];
       });
     });
 
-    socket.on("user-left", ({ userId: uid }: { userId: string; name: string }) => {
-      setParticipants((prev) => prev.filter((p) => p.userId !== uid));
-    });
+    // 2. Fix for 'user-left'
+    socket.on(
+      "user-left",
+      ({ userId: uid }: { userId: string; name: string }) => {
+        setParticipants((prev: Participant[]) => {
+          const current = Array.isArray(prev) ? prev : [];
+          return current.filter((p) => p.userId !== uid);
+        });
+      },
+    );
 
-    socket.on("new-message", (msg: ChatMessage) => {
-      console.log("NEW MESSAGE RECEIVED =>", msg);
-      setMessages((prev) => {
-        // डुप्लीकेट मैसेजेस को रोकने के लिए चेक
-        if (msg._id && prev.some((m) => m._id === msg._id)) return prev;
-        return [...prev, msg];
+    // 3. Fix for 'new-message'
+    // src/app/components/meeting/useMeetingSocket.ts
+
+    socket.on("new-message", (msg: any) => {
+      const originalMesg = msg.chatMessage
+      setMessages((prev: ChatMessage[]) => {
+        // 1. Ensure current is definitely an array
+        const current = Array.isArray(prev) ? prev : [];
+        // 2. Check for duplicates
+        if (originalMesg._id && current.some((m) => m._id === msg._id)) {
+          return current;
+        }
+
+        // 3. Use concat instead of spread syntax to avoid iterator issues
+        return current.concat(originalMesg);
       });
     });
 
-    socket.on("new-poll", (poll: Poll) => {
-      setPolls((prev) => [...prev, poll]);
+    // 4. Fix for 'poll-updated' and 'poll-closed'
+    socket.on("poll-updated", (updated: any) => {
+      const updatedPoll = updated.poll
+      setPolls((prev: Poll[]) => {
+        return prev.map((p) => (p._id === updatedPoll._id ? updatedPoll : p));
+      });
     });
 
-    socket.on("poll-updated", (updated: Poll) => {
-      setPolls((prev) => prev.map((p) => (p._id === updated._id ? updated : p)));
+    // 5. Fix for 'poll-updated' and 'new poll'
+    socket.on("new-poll", (poll: any) => {
+      const newPoll = poll.poll
+      setPolls((prev: Poll[]) => ([...prev,newPoll]));
     });
 
     socket.on("poll-closed", (updated: Poll) => {
-      setPolls((prev) => prev.map((p) => (p._id === updated._id ? updated : p)));
+      setPolls((prev: Poll[]) =>
+        (prev || []).map((p) => (p._id === updated._id ? updated : p)),
+      );
     });
 
-    socket.on("meeting-started", () => callbacksRef.current.onMeetingStarted?.());
+    socket.on("meeting-started", () =>
+      callbacksRef.current.onMeetingStarted?.(),
+    );
     socket.on("meeting-ended", () => callbacksRef.current.onMeetingEnded?.());
 
     // क्लीनअप टियरडाउन
@@ -285,9 +321,13 @@ export const useMeetingSocket = ({
   }, [meetingId, userId, name, role]); // यहाँ से कॉलबैक्स हटा दिए गए हैं ताकि बार-बार कनेक्शन रीसेट न हो
 
   const sendMessage = useCallback(
-    (message: string, type: "text" | "question" | "answer" = "text", replyTo?: string) => {
+    (
+      message: string,
+      type: "text" | "question" | "answer" = "text",
+      replyTo?: string,
+    ) => {
       if (!socketRef.current) return;
-      
+
       // मुकम्मल पेलोड स्ट्रक्चर ताकि सर्वर डेटा स्टोर कर सके
       const messagePayload = {
         meetingId,
@@ -297,13 +337,13 @@ export const useMeetingSocket = ({
         message,
         type,
         replyTo,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-console.log("messagePayload : ",messagePayload);
+      console.log("messagePayload : ", messagePayload);
 
       socketRef.current.emit("send-message", messagePayload);
     },
-    [meetingId, userId, name, role]
+    [meetingId, userId, name, role],
   );
 
   const createPoll = useCallback((question: string, options: string[]) => {
