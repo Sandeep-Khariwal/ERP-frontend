@@ -16,7 +16,7 @@ import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Not
 import { Meeting } from "../meeting/meeting.types";
 
 
-// Mock student user – replace with your auth context:
+// Mock student user – replace with your auth context
 // const STUDENT = {
 //   id: "student_001",
 //   name: "Priya Sharma",

@@ -21,7 +21,7 @@ import {
   getBase64Image,
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
-import { StudentsDataWithBatch } from "@/interface/student.interface";
+import { StudentsDataWithBatch } from "@/interfaces/student.interface";
 import Image from "next/image";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
 import { generateIdCardHTML } from "./IDCardHtml";

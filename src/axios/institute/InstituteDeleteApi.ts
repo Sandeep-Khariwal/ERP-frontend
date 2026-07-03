@@ -2,10 +2,10 @@ import ApiHelper from "../../ApiHelper";
 
 // ───────────────── NOTES ─────────────────
 
-export function DeleteNotes(id: string) {
+export function DeleteNotes(id: string,batchId:string) {
   return new Promise((resolve, reject) => {
     ApiHelper.delete(
-      `${process.env.URL}/api/v1/batch/notes/${id}`
+      `${process.env.URL}/api/v1/batch/notes/${id}/${batchId}`
     )
       .then((response) => {
         console.log("DELETE NOTES SUCCESS :", response);

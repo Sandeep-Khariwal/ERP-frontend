@@ -1,6 +1,6 @@
 "use client";
 
-import { AttendanceInterface } from "@/interface/student.interface";
+import { AttendanceInterface } from "@/interfaces/student.interface";
 import { Box, Center, Flex, Select, SimpleGrid, Text } from "@mantine/core";
 import { memo, useEffect, useState } from "react";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { StudentsDataWithBatch } from "@/interface/student.interface";
+import { StudentsDataWithBatch } from "@/interfaces/student.interface";
 import React, { useEffect, useState } from "react";
 import { Test } from "../InstituteInsideBatch";
 import {

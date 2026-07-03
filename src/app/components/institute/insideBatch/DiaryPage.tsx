@@ -661,13 +661,6 @@ useEffect(() => {
 
       setDeleteId(null);
       fetchDiary();   // 👈 ADD THIS
-
-      // notifications.show({
-      //   title: "Entry Deleted",
-      //   message: "The diary entry has been removed.",
-      //   color: "red",
-      //   icon: <IconTrash size={16} />,
-      // });
    SuccessNotification("Diary Deleted!!");
     })
     .catch((e: any) => {

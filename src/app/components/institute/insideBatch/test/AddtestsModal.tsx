@@ -5,7 +5,7 @@ import { ErrorNotification } from "@/app/helperFunction/Notification";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 import { CreateTest } from "@/axios/batch/BatchPostApi";
 import { CreateTestMeta, CreateTestQuestion } from "@/axios/tests/Tests.post";
-import { StudentsDataWithBatch } from "@/interface/student.interface";
+import { StudentsDataWithBatch } from "@/interfaces/student.interface";
 import {
   Box,
   Button,

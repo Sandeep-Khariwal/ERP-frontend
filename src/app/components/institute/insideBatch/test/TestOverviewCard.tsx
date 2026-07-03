@@ -43,6 +43,7 @@ import {
 import { log } from "console";
 import QuestionBankModal from "./QuestionBankModal";
 import UploadExcelQues from "./UploadExcelQues";
+import { getExamStartDate, getExamStartTime } from "@/app/helperFunction/Notification";
 
 // Types
 interface Subject {
@@ -423,7 +424,7 @@ export default function SimpleEditTestModal({
       <Text size="sm" c="dimmed" ff="Roboto">
         Duration: {testForm.duration} minutes | Max Marks: {maxMarks}
         {test?.startTime && (
-          <> | Start: {new Date(test.startTime).toLocaleString()}</>
+          <> | Start:  { getExamStartDate(test.startTime) + " | " + getExamStartTime(test.startTime)}</>
         )}
         {subjects.length > 0 && testForm.subjectId && (
           <>

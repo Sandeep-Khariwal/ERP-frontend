@@ -6,10 +6,11 @@ class MySocket {
   public URL: string;
 
   constructor() {
-    this.URL = "http://localhost:8080"; // Your backend URL
+    // this.URL = "http://localhost:8080";
+    this.URL = "https://server.shikshapay.cloud";
 
     this.socket = io(this.URL, {
-      autoConnect: false
+      autoConnect: false,
     });
 
     this.setupListeners();

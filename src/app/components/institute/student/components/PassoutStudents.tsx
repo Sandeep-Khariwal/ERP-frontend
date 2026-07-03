@@ -159,6 +159,9 @@ export default function PassOutStudents() {
         const url = `https://shikshapay.cloud/marksheet/${marksheet?._id}`;
         const qr = await QRCode.toDataURL(url);
 
+        console.log("add these images profilepic,logo and signature : ",student.profilePic,student.instituteId.logo, student.instituteId.signature);
+        
+
         // 3. Resolve all image assets to Base64 to guarantee they remain intact during download
         const base64Photo = await getBase64Image(student.profilePic);
         const base64Logo = await getBase64Image(student.instituteId.logo);
@@ -194,6 +197,7 @@ export default function PassOutStudents() {
           instituteContact:
             student.instituteId?.institutePhoneNumber || "+919416059799",
         };
+
 
         // 5. Generate the finalized, print-ready HTML template string
         const htmlContent = generateCertificateHTML(certificateArgs);

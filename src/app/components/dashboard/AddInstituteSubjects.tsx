@@ -116,8 +116,6 @@ export function AddInstituteSubjects(Props: {
 
     GetInstituteSubjects()
       .then((x: any) => {
-        console.log("Subjects API:", x);
-
         // assuming res.data me array aa rha hai
         setSubjects(x.subjects || []);
         setIsLoading(false);
@@ -205,7 +203,6 @@ export function AddInstituteSubjects(Props: {
                       color="red"
                       style={{ cursor: "pointer" }}
                       onClick={() => {
-                        console.log("Delete:", sub);
                         //    deleteSubject(sub._id);
 
                         setDeleteModalOpen(true);
