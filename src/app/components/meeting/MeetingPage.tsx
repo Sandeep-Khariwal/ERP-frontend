@@ -14,7 +14,7 @@ import {
   IconBook, IconLink,
 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { Meeting } from "./meeting.types";
 import { CancelMeeting, CreateMeeting, GetTeacherMeetings, GetUpcomingMeetings, } from "@/axios/institute/MeetingApi";
@@ -22,6 +22,7 @@ import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Not
 import { UserType } from "../dashboard/InstituteBatchesSection";
 import { TeacherData } from "@/interfaces/batchInterface";
 import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
+import { usePathname } from "next/navigation";
 
 
 // ── Status badge config ──────────────────────────────────────────────────────
@@ -33,13 +34,19 @@ const STATUS_CONFIG = {
 };
 
 export default function MeetingsPage(props: {
+ 
+
   userType: UserType;
   batchId: string;
   batchName: string;
   teacherData: TeacherData;
   subjects?: { _id: string; name: string }[];
 }) {
+    const pathname = usePathname();
+
+  console.log(pathname);
   console.log("propsusertype", props.userType);
+
   const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
@@ -47,6 +54,7 @@ export default function MeetingsPage(props: {
   const [submitting, setSubmitting] = useState(false);
   const [editMeeting, setEditMeeting] = useState<Meeting | null>(null);
   const [teacherData, settTeacherData] = useState<TeacherData[]>([]);
+  const [currentUrl, setCurrentUrl] = useState("");
 
 
   console.log("teacherData : ",teacherData);
@@ -81,6 +89,14 @@ const subjectOptions =
       scheduledAt: (v) => (!v ? "Please select date & time" : null),
     },
   });
+
+  
+  useEffect(() => {
+  setCurrentUrl(window.location.href);
+}, [pathname]);
+console.log("currentUrl:", currentUrl);
+
+
 
   const loadMeetings = () => {
     setLoading(true);
@@ -224,7 +240,7 @@ console.log("FULL TEACHER DATA => ", props.teacherData);
   router.push(
     
     
-  `/meeting/${meeting._id}?role=${props.userType === UserType.TEACHER ? "teacher" : "admin"}&userId=${props.teacherData._id}&name=${encodeURIComponent(props.teacherData.name)}`
+  `/meeting/${meeting._id}?role=${props.userType === UserType.TEACHER ? "teacher" : "admin"}&userId=${props.teacherData._id}&name=${encodeURIComponent(props.teacherData.name)}&redirect=${encodeURIComponent(currentUrl)}`
 );
   }
 
@@ -487,7 +503,7 @@ function MeetingCard({ meeting, role, onJoin, onCancel, onCopyCode }: MeetingCar
             style={{
               background: "var(--mantine-color-gray-1)",
               borderRadius: 8,
-              cursor: "pointer",
+              cursor: "inter",
               border: "1px dashed var(--mantine-color-gray-3)",
             }}
             onClick={onCopyCode}
