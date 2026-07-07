@@ -126,3 +126,19 @@ export function UploadStudentImage(file: File) {
       .catch((error) => reject(error));
   });
 }
+
+export function DeletePendingFeeRecords(
+  studentId: string,
+  feeRecordIds: string[],
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/feeRecords/${studentId}`,
+      {
+        feeRecordIds,
+      }
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
