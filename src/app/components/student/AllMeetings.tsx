@@ -9,20 +9,12 @@ import {
   IconKey, IconUsers, IconBook,
 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { GetClassMeetings, GetMeetingByCode } from "@/axios/institute/MeetingApi";
 import { ErrorNotification, SuccessNotification } from "@/app/helperFunction/Notification";
 import { Meeting } from "../meeting/meeting.types";
 
-
-// Mock student user – replace with your auth context
-// const STUDENT = {
-//   id: "student_001",
-//   name: "Priya Sharma",
-//   role: "student" as const,
-//   classId: "class_10A",
-// };
 
 
 const STATUS_CONFIG = {
@@ -39,6 +31,8 @@ export default function StudentMeetingsPage(Props:{studentId: string, batchId: s
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [codeInput, setCodeInput] = useState("");
   const [searching, setSearching] = useState(false);
+  const pathname = usePathname();
+  const [currentUrl, setCurrentUrl] = useState("");
 
   const STUDENT = {
   id: Props.studentId,
@@ -46,6 +40,12 @@ export default function StudentMeetingsPage(Props:{studentId: string, batchId: s
   role: "student" as const,
   classId: Props.batchId,
 };
+
+useEffect(() => {
+  setCurrentUrl(window.location.href);
+}, [pathname]);
+
+console.log("Current URL:", currentUrl);
 
 
 const loadMeetings = () => {
@@ -101,7 +101,7 @@ const joinByCode = () => {
       router.push(
         `/meetings/room/${meeting._id}?role=${STUDENT.role}&userId=${STUDENT.id}&name=${encodeURIComponent(
           STUDENT.name
-        )}`
+        )}&redirect=${encodeURIComponent(currentUrl)}`
       );
 
       setSearching(false);
@@ -128,7 +128,7 @@ const joinByCode = () => {
       return;
     }
     router.push(
-      `/meeting/${meeting._id}?role=${STUDENT.role}&userId=${STUDENT.id}&name=${encodeURIComponent(STUDENT.name)}`
+      `/meeting/${meeting._id}?role=${STUDENT.role}&userId=${STUDENT.id}&name=${encodeURIComponent(STUDENT.name)}&redirect=${encodeURIComponent(currentUrl)}`
     );
   };
 
