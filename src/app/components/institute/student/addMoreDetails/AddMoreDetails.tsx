@@ -161,8 +161,12 @@ export function AddMoreDetails(props: {
               : new Date(),
             van: student.van,
             rollNumber: student.rollNumber,
+            motherName: student.motherName || "",
+admissionNumber: student.admissionNumber || "",
+
 
           };
+          console.log("student :",student);
 
           const newInstallments = student.feeRecords.map((f: any) => {
             return {
