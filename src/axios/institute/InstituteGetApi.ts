@@ -222,3 +222,18 @@ export function GetTimeTable(id: string) {
       });
   });
 }
+
+
+export function GetDayWiseEarnings(
+  instituteId: string,
+  from: string,
+  to: string
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/institute/${instituteId}?from=${from}&to=${to}`
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

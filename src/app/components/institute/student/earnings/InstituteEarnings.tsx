@@ -40,6 +40,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { GetAllEarnings } from "@/axios/institute/InstituteGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
+import EarningsSummary from "./FilterFeesData";
 
 
 // ================= STATIC GRAPH =================
@@ -247,6 +248,11 @@ const monthlyData = Object.values(monthlyMap);
             </Grid.Col>
           ))}
         </Grid>
+
+        <EarningsSummary
+ 
+/>
+
 
         {/* ================= CHART ================= */}
         <Card radius="xl" p="xs" mb="md">
@@ -472,9 +478,6 @@ const monthlyData = Object.values(monthlyMap);
         </Flex>
       )}
     </Card>
-
-  
-   
 
   </Grid.Col>
 </Grid>
