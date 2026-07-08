@@ -26,14 +26,14 @@ import FeeRecordTable from "./FeeRecordTable";
 import { StudentFeesCards } from "./StudentFeesCard";
 import { Installment } from "@/interfaces/batchInterface";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
-import { UpdateMultipleFeeRecord } from "@/axios/student/StudentPut";
+import { DeletePendingFeeRecords, UpdateMultipleFeeRecord } from "@/axios/student/StudentPut";
 import {
   GetStudentFeeInstallments,
   GetStudentForPdf,
 } from "@/axios/student/StudentGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createFullFeeOverviewPdf } from "./HtmlToPdf";
-import { getBase64Image } from "@/app/helperFunction/Notification";
+import { ErrorNotification, getBase64Image, SuccessNotification } from "@/app/helperFunction/Notification";
 
 const convertHtmlIntoPdf = (html: string) => { };
 
@@ -81,6 +81,7 @@ const FeeRecordSection = (props: {
   const [openVanFareModal, setOpenVanFareModal] = useState(false);
 
   const [openPaymentModel, setOpenPaymentModel] = useState<boolean>(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [formValues, setFormValues] = useState<FormValues>({
     paymentDate: new Date(),
   });
@@ -128,6 +129,49 @@ const FeeRecordSection = (props: {
       });
     }
   };
+
+  const handleDeletePendingRecords = () => {
+  setIsLoading(true);
+
+  const feeRecordIds = installments.map((item: any) => item._id);
+
+  DeletePendingFeeRecords(props.studentId, feeRecordIds)
+    .then(() => {
+      setIsLoading(false);
+      setOpenDeleteModal(false);
+
+      GetStudentFeeInstallments(props.studentId)
+        .then((x: any) => {
+          console.log("delete: ",x);
+          
+          const { feeRecords, vanFares } = x.data;
+
+          setVanFares(vanFares || []);
+
+          const installments = feeRecords.map((f: any) => ({
+            _id: f._id,
+            name: f.name,
+            dueDate: f.dueDate,
+            amount: f.totalAmount,
+            amountPaid: f.amountPaid,
+            updatedAt: f.updatedAt,
+            status: f.status,
+          }));
+
+          setInstallments(installments);
+        });
+
+      SuccessNotification(
+         "Pending records deleted successfully.",
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+      setIsLoading(false);
+     ErrorNotification("Unable to delete records.");
+    
+    });
+};
 
   const handleSubmit = (event: React.FormEvent) => {
     if (!formValues.paymentDate) {
@@ -529,6 +573,19 @@ const FeeRecordSection = (props: {
             <Button radius={10} onClick={handleSubmit} type="submit">
               Payment
             </Button>
+            <Button
+  color="red"
+  radius={10}
+  onClick={() => {
+    setOpenPaymentModel(false);
+
+    setTimeout(() => {
+      setOpenDeleteModal(true);
+    }, 100);
+  }}
+>
+  DeletePendingRecords
+</Button>
           </Group>
         </Container>
       </Modal>
@@ -645,6 +702,36 @@ const FeeRecordSection = (props: {
           </Group>
         </Container>
       </Modal>
+      <Modal
+  opened={openDeleteModal}
+  onClose={() => setOpenDeleteModal(false)}
+  centered
+  title="Delete Pending Records"
+  size="sm"
+>
+  <Text mb="lg">
+    Are you sure to delete this records?
+  </Text>
+
+  <Group justify="right">
+    <Button
+  variant="outline"
+  onClick={() => {
+    setOpenDeleteModal(false);
+    setOpenPaymentModel(true);
+  }}
+>
+  No
+</Button>
+
+    <Button
+      color="red"
+      onClick={handleDeletePendingRecords}
+    >
+      Yes
+    </Button>
+  </Group>
+</Modal>
     </>
   );
 };
