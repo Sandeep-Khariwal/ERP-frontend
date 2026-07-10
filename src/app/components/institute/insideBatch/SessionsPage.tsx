@@ -31,19 +31,21 @@ import {
 
 const PAGE_SIZE = 10;
 
-const studentsData = Array.from({ length: 32 }).map((_, i) => ({
-  id: i + 1,
-  name: `Student ${i + 1}`,
-  contact: "9876543210",
-  father: "Ramesh Kumar",
-  totalFees: "₹25,000",
-  pendingFees: i % 2 === 0 ? "₹5,000" : "₹0",
-}));
+// const studentsData = Array.from({ length: 32 }).map((_, i) => ({
+//   id: i + 1,
+//   name: `Student ${i + 1}`,
+//   contact: "9876543210",
+//   father: "Ramesh Kumar",
+//   totalFees: "₹25,000",
+//   pendingFees: i % 2 === 0 ? "₹5,000" : "₹0",
+// }));
 
 export default function SessionsPage(props: {
   batchId: string;
 }) {
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const studentsData:any = []
 
   const [selectedSession, setSelectedSession] =
     useState("2025-26");
@@ -206,7 +208,7 @@ export default function SessionsPage(props: {
             </Table.Thead>
 
             <Table.Tbody>
-              {paginatedStudents.map((student) => (
+              {paginatedStudents.map((student:any) => (
                 <Table.Tr key={student.id}>
                   <Table.Td>
                     {student.name}

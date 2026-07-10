@@ -267,7 +267,7 @@ const FeeRecordTable = (props: {
           {(row.amountPaid ?? 0) > 0 && (
   <Flex justify="center" gap={8}>
     <IconEye
-      style={{ cursor: "pointer" }}
+      style={{ cursor: "pointer" , color:"#5e66de" }}
       onClick={() => setSelectedFeeRecord(row as any)}
     />
 
