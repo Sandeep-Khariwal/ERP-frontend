@@ -156,6 +156,9 @@ const FeeRecordSection = (props: {
             amountPaid: f.amountPaid,
             updatedAt: f.updatedAt,
             status: f.status,
+             paidHistory: f.paidHistory || [],
+
+             
           }));
 
           setInstallments(installments);
@@ -236,6 +239,7 @@ const FeeRecordSection = (props: {
               amountPaid: f.amountPaid,
               updatedAt: f.updatedAt,
               status: f.status,
+               paidHistory: f.paidHistory || [],
             }));
 
             setInstallments(installments);
@@ -253,9 +257,13 @@ const FeeRecordSection = (props: {
       GetStudentFeeInstallments(props.studentId)
         .then((x: any) => {
           const { feeRecords, vanFares } = x.data;
+         console.log("Complete Fee Response", x.data);
+console.log("Fee Records", feeRecords);
+          
 
           setVanFares(vanFares || []);
           const installments = feeRecords.map((f: any) => {
+             console.log("Single Fee Record", f);
             return {
               _id: f._id,
               name: f.name,
@@ -264,6 +272,7 @@ const FeeRecordSection = (props: {
               amountPaid: f.amountPaid,
               updatedAt: f.updatedAt,
               status: f.status,
+               paidHistory: f.paidHistory || [],
             };
           });
           setInstallments(installments);
