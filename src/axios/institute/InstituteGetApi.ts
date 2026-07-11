@@ -231,7 +231,7 @@ export function GetDayWiseEarnings(
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(
-      `${process.env.URL}/api/v1/institute/${instituteId}?from=${from}&to=${to}`
+      `${process.env.URL}/api/v1/institute/filterCollection/${instituteId}?from=${from}&to=${to}`
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));

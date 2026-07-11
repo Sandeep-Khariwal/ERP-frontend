@@ -20,22 +20,29 @@ import {
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { DateTimePicker } from "@mantine/dates";
-import { IconArrowLeft, IconCalendar } from "@tabler/icons-react";
+import { IconArrowLeft, IconCalendar, IconTrash } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
 import FeeRecordTable from "./FeeRecordTable";
 import { StudentFeesCards } from "./StudentFeesCard";
 import { Installment } from "@/interfaces/batchInterface";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
-import { DeletePendingFeeRecords, UpdateMultipleFeeRecord } from "@/axios/student/StudentPut";
+import {
+  DeletePendingFeeRecords,
+  UpdateMultipleFeeRecord,
+} from "@/axios/student/StudentPut";
 import {
   GetStudentFeeInstallments,
   GetStudentForPdf,
 } from "@/axios/student/StudentGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { createFullFeeOverviewPdf } from "./HtmlToPdf";
-import { ErrorNotification, getBase64Image, SuccessNotification } from "@/app/helperFunction/Notification";
+import {
+  ErrorNotification,
+  getBase64Image,
+  SuccessNotification,
+} from "@/app/helperFunction/Notification";
 
-const convertHtmlIntoPdf = (html: string) => { };
+const convertHtmlIntoPdf = (html: string) => {};
 
 interface FormValues {
   paymentDate: Date;
@@ -131,19 +138,18 @@ const FeeRecordSection = (props: {
   };
 
   const handleDeletePendingRecords = () => {
-  setIsLoading(true);
+    setIsLoading(true);
 
-  const feeRecordIds = installments.map((item: any) => item._id);
+    const feeRecordIds = installments.map((item: any) => item._id);
 
-  DeletePendingFeeRecords(props.studentId, feeRecordIds)
-    .then(() => {
-      setIsLoading(false);
-      setOpenDeleteModal(false);
+    DeletePendingFeeRecords(props.studentId, feeRecordIds)
+      .then(() => {
+        setIsLoading(false);
+        setOpenDeleteModal(false);
 
-      GetStudentFeeInstallments(props.studentId)
-        .then((x: any) => {
-          console.log("delete: ",x);
-          
+        GetStudentFeeInstallments(props.studentId).then((x: any) => {
+          console.log("delete: ", x);
+
           const { feeRecords, vanFares } = x.data;
 
           setVanFares(vanFares || []);
@@ -156,22 +162,20 @@ const FeeRecordSection = (props: {
             amountPaid: f.amountPaid,
             updatedAt: f.updatedAt,
             status: f.status,
+            paidHistory: f.paidHistory || [],
           }));
 
           setInstallments(installments);
         });
 
-      SuccessNotification(
-         "Pending records deleted successfully.",
-      );
-    })
-    .catch((err) => {
-      console.log(err);
-      setIsLoading(false);
-     ErrorNotification("Unable to delete records.");
-    
-    });
-};
+        SuccessNotification("Pending records deleted successfully.");
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsLoading(false);
+        ErrorNotification("Unable to delete records.");
+      });
+  };
 
   const handleSubmit = (event: React.FormEvent) => {
     if (!formValues.paymentDate) {
@@ -215,31 +219,31 @@ const FeeRecordSection = (props: {
       instituteDetails._id,
       vanFareRecordsMap,
       props.studentId,
-      "vanfare"
+      "vanfare",
     )
       .then(() => {
         setIsLoading(false);
         setOpenVanFareModal(false);
         setVanFareRecordsMap(new Map());
 
-        GetStudentFeeInstallments(props.studentId)
-          .then((x: any) => {
-            const { feeRecords, vanFares } = x.data;
+        GetStudentFeeInstallments(props.studentId).then((x: any) => {
+          const { feeRecords, vanFares } = x.data;
 
-            setVanFares(vanFares || []);
+          setVanFares(vanFares || []);
 
-            const installments = feeRecords.map((f: any) => ({
-              _id: f._id,
-              name: f.name,
-              dueDate: f.dueDate,
-              amount: f.totalAmount,
-              amountPaid: f.amountPaid,
-              updatedAt: f.updatedAt,
-              status: f.status,
-            }));
+          const installments = feeRecords.map((f: any) => ({
+            _id: f._id,
+            name: f.name,
+            dueDate: f.dueDate,
+            amount: f.totalAmount,
+            amountPaid: f.amountPaid,
+            updatedAt: f.updatedAt,
+            status: f.status,
+            paidHistory: f.paidHistory || [],
+          }));
 
-            setInstallments(installments);
-          });
+          setInstallments(installments);
+        });
       })
       .catch((e) => {
         console.log(e);
@@ -253,9 +257,12 @@ const FeeRecordSection = (props: {
       GetStudentFeeInstallments(props.studentId)
         .then((x: any) => {
           const { feeRecords, vanFares } = x.data;
+          console.log("Complete Fee Response", x.data);
+          console.log("Fee Records", feeRecords);
 
           setVanFares(vanFares || []);
           const installments = feeRecords.map((f: any) => {
+            console.log("Single Fee Record", f);
             return {
               _id: f._id,
               name: f.name,
@@ -264,6 +271,7 @@ const FeeRecordSection = (props: {
               amountPaid: f.amountPaid,
               updatedAt: f.updatedAt,
               status: f.status,
+              paidHistory: f.paidHistory || [],
             };
           });
           setInstallments(installments);
@@ -333,8 +341,6 @@ const FeeRecordSection = (props: {
                     console.log("FEE RECORDS", x.student.feeRecords);
                     const { student } = x;
 
-
-
                     let gst = instituteDetails.gst;
                     if (
                       instituteDetails?.gst?.sgst > 0 ||
@@ -382,7 +388,7 @@ const FeeRecordSection = (props: {
                       gst,
 
                       base64Signature,
-                      vanfarePayload
+                      vanfarePayload,
                     );
 
                     console.log("btn clicked......");
@@ -414,20 +420,20 @@ const FeeRecordSection = (props: {
 
               {(props.userType == UserType.OTHERS ||
                 props.userType == UserType.TEACHER) && (
-                  <Button
-                    onClick={() => {
-                      if (totalOverdue <= 0) {
-                        showNotification({
-                          message: "No Pending Payment ",
-                        });
-                        return;
-                      }
-                      setOpenPaymentModel(true);
-                    }}
-                  >
-                    Record Payment
-                  </Button>
-                )}
+                <Button
+                  onClick={() => {
+                    if (totalOverdue <= 0) {
+                      showNotification({
+                        message: "No Pending Payment ",
+                      });
+                      return;
+                    }
+                    setOpenPaymentModel(true);
+                  }}
+                >
+                  Record Payment
+                </Button>
+              )}
               <Button
                 color="orange"
                 onClick={() => {
@@ -485,7 +491,7 @@ const FeeRecordSection = (props: {
         onClose={() => setOpenPaymentModel(false)}
         title="Record Payment"
         centered
-        size="sm"
+        size="md"
         zIndex={999}
         styles={{
           title: {
@@ -574,18 +580,18 @@ const FeeRecordSection = (props: {
               Payment
             </Button>
             <Button
-  color="red"
-  radius={10}
-  onClick={() => {
-    setOpenPaymentModel(false);
+              color="red"
+              radius={10}
+              onClick={() => {
+                setOpenPaymentModel(false);
 
-    setTimeout(() => {
-      setOpenDeleteModal(true);
-    }, 100);
-  }}
->
-  DeletePendingRecords
-</Button>
+                setTimeout(() => {
+                  setOpenDeleteModal(true);
+                }, 100);
+              }}
+            >
+              <IconTrash color="#fff" size={20} style={{marginRight:5}} /> Pending Fees
+            </Button>
           </Group>
         </Container>
       </Modal>
@@ -696,42 +702,35 @@ const FeeRecordSection = (props: {
               Cancel
             </Button>
 
-            <Button onClick={handleVanFareSubmit}>
-              Update Van Fare
-            </Button>
+            <Button onClick={handleVanFareSubmit}>Update Van Fare</Button>
           </Group>
         </Container>
       </Modal>
       <Modal
-  opened={openDeleteModal}
-  onClose={() => setOpenDeleteModal(false)}
-  centered
-  title="Delete Pending Records"
-  size="sm"
->
-  <Text mb="lg">
-    Are you sure to delete this records?
-  </Text>
+        opened={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        centered
+        title="Delete Pending Records"
+        size="sm"
+      >
+        <Text mb="lg">Are you sure to delete this records?</Text>
 
-  <Group justify="right">
-    <Button
-  variant="outline"
-  onClick={() => {
-    setOpenDeleteModal(false);
-    setOpenPaymentModel(true);
-  }}
->
-  No
-</Button>
+        <Group justify="right">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setOpenDeleteModal(false);
+              setOpenPaymentModel(true);
+            }}
+          >
+            No
+          </Button>
 
-    <Button
-      color="red"
-      onClick={handleDeletePendingRecords}
-    >
-      Yes
-    </Button>
-  </Group>
-</Modal>
+          <Button color="red" onClick={handleDeletePendingRecords}>
+            Yes
+          </Button>
+        </Group>
+      </Modal>
     </>
   );
 };

@@ -17,6 +17,7 @@ import {
   IconArrowLeftFromArc,
   IconArrowUpFromArc,
   IconDownload,
+   IconEye,
 } from "@tabler/icons-react";
 import { Installment } from "@/interfaces/batchInterface";
 import { createReceiptPdf } from "./HtmlToPdf";
@@ -44,6 +45,12 @@ export interface FeeRecord {
     amount: number;
     paymentDate: Date;
   }[];
+  paidHistory: {
+  _id: string;
+  amount: number;
+  paidDate: Date;
+  description: string;
+}[];
 }
 
 const FeeRecordTable = (props: {
@@ -251,12 +258,25 @@ const FeeRecordTable = (props: {
             fontFamily: "sans-serif",
           }}
         >
-          {(row.amountPaid ?? 0) > 0 && (
+          {/* {(row.amountPaid ?? 0) > 0 && (
             <IconDownload
               style={{ cursor: "pointer" }}
               onClick={() => convertHtmlIntoPdf(row._id || "")}
             />
-          )}
+          )} */}
+          {(row.amountPaid ?? 0) > 0 && (
+  <Flex justify="center" gap={8}>
+    <IconEye
+      style={{ cursor: "pointer" , color:"#5e66de" }}
+      onClick={() => setSelectedFeeRecord(row as any)}
+    />
+
+    <IconDownload
+      style={{ cursor: "pointer" }}
+      onClick={() => convertHtmlIntoPdf(row._id || "")}
+    />
+  </Flex>
+)}
         </Table.Td>
         {/* <Table.Td style={{padding: isMd?"10px":"5px", textAlign: isMd?"center":"start" }}>
             {(row.amountPaid??0) > 0 ? (
@@ -403,45 +423,74 @@ const FeeRecordTable = (props: {
           </Box>
         </Box>
       </Stack>
-      <Modal
-        opened={selectedFeeRecord != null}
-        onClose={() => {
-          setSelectedFeeRecord(null);
-        }}
-      >
-        <Table style={{ padding: "5px" }}>
-          <thead>
-            <tr>
-              <th>S No.</th>
-              <th>Payment Date</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {selectedFeeRecord &&
-              selectedFeeRecord?.payments?.map(
-                (singlePaymentRecord: any, index: number) => {
-                  return (
-                    <tr key={index}>
-                      <td>Payment {index + 1}</td>
-                      <td>
-                        {
-                          new Date(singlePaymentRecord.paymentDate.toString())
-                            ?.toISOString()
-                            .split("T")[0]
-                        }
-                      </td>
-                      <td>{singlePaymentRecord.amount}</td>
-                      {singlePaymentRecord.amount > 0 ? <IconDownload /> : ""}
-                    </tr>
-                  );
-                },
-              )}
-          </tbody>
-        </Table>
-      </Modal>
+     <Modal
+  opened={selectedFeeRecord != null}
+  onClose={() => {
+    setSelectedFeeRecord(null);
+  }}
+  title={
+    <Text size="lg" fw={700} c="blue.7">
+      Paid History
+    </Text>
+  }
+  centered
+  size="lg"
+  radius="md" // Premium rounded corners ke liye
+  overlayProps={{
+    blur: 3, // Background ko blur karke modal ko pop karne ke liye
+  }}
+>
+  <Table 
+    horizontalSpacing="md" 
+    verticalSpacing="sm" 
+    striped 
+    highlightOnHover
+    style={{ tableLayout: 'fixed', width: '100%' }}
+  >
+    <thead>
+      <tr>
+        <th style={{ width: '15%', textAlign: 'left' }}>S No.</th>
+        <th style={{ width: '35%', textAlign: 'left' }}>Payment Date</th>
+        <th style={{ width: '25%', textAlign: 'left' }}>Amount</th>
+        <th style={{ width: '25%', textAlign: 'left' }}>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {selectedFeeRecord &&
+        selectedFeeRecord?.paidHistory?.map(
+          (singlePaymentRecord: any, index: number) => {
+            return (
+              <tr key={index}>
+                <td style={{ textAlign: 'left' }}>
+                  <Text size="sm" fw={500} c="dimmed">
+                    {index + 1}
+                  </Text>
+                </td>
+                <td style={{ textAlign: 'left' }}>
+                  <Text size="sm" fw={500}>
+                    {new Date(singlePaymentRecord.paidDate).toLocaleDateString()}
+                  </Text>
+                </td>
+                <td style={{ textAlign: 'left' }}>
+                  <Text size="sm" fw={600} c="green.7">
+                    ₹{singlePaymentRecord.amount}
+                  </Text>
+                </td>
+                <td style={{ textAlign: 'left' }}>
+                  <Text size="sm" c="dimmed" style={{ textTransform: 'capitalize' }}>
+                    {singlePaymentRecord.description || "-"}
+                  </Text>
+                </td>
+              </tr>
+            );
+          },
+        )}
+    </tbody>
+  </Table>
+</Modal>
     </>
   );
+  
 };
 
 export default FeeRecordTable;

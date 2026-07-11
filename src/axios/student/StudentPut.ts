@@ -133,7 +133,7 @@ export function DeletePendingFeeRecords(
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
-      `${process.env.URL}/api/v1/student/feeRecords/${studentId}`,
+      `${process.env.URL}/api/v1/student/deletefeeRecords/${studentId}`,
       {
         feeRecordIds,
       }
