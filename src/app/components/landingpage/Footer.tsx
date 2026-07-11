@@ -38,6 +38,7 @@ const Footer = () => {
     { label: "About", href: "#About" },
     { label: "Contact", href: "#Contact" },
     { label: "Features", href: "#Feature" },
+    { label: "Blog", href: "/blog" },
     // { label: "Payments", href: "/pricing" },
   ];
 
