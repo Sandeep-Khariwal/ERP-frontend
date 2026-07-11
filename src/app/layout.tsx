@@ -10,13 +10,23 @@ import { MantineProvider } from "@mantine/core";
 import { ReduxProvider } from "./redux/provider";
 import React from "react";
 import { ModalsProvider } from "@mantine/modals";
+import Script from "next/script";
+
+
+
 
 export const metadata: Metadata = {
   title: {
-    default:"shikshapay | Best ERP for school finance management",
-    template:"%s"
+    default: "shikshapay | Best ERP for school finance management",
+    template: "%s"
   },
+
   description: "Best - ERP software for records management",
+
+  verification: {
+    google: "puizxPp3UZNG7RVIzfXSuwCx2Jsp1OVkssyBS19kSbM",
+  },
+
   icons: {
     icon: [
       {
@@ -39,6 +49,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-DCCMSKS911"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-DCCMSKS911');
+    `}
+        </Script>
         {/* Roboto font */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -92,10 +116,10 @@ export default function RootLayout({
           }}
         >
           <ReduxProvider>
-             <ModalsProvider>
+            <ModalsProvider>
 
-            <React.StrictMode>{children}</React.StrictMode>
-             </ModalsProvider>
+              <React.StrictMode>{children}</React.StrictMode>
+            </ModalsProvider>
           </ReduxProvider>
         </MantineProvider>
       </body>
