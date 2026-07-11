@@ -66,6 +66,7 @@ import { CiMoneyCheck1 } from "react-icons/ci";
 import { TbPlugConnected } from "react-icons/tb";
 import { SignatureModal } from "./signaturemodal";
 import { AddEmailModal } from "./transport/AddEmail";
+import { AddPaymentKeysModal } from "./AddPaymentKeys";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -91,6 +92,7 @@ export const DesktopNavbar = (props: {
   const [signatureModalOpen, setSignatureModalOpen] = useState(false);
   const [gstModalOpen, setGstModalOpen] = useState(false);
   const [addEmailModalOpen, setAddEmailModalOpen] = useState(false);
+  const [addPaymentKeysModalOpen, setAddPaymentKeysModalOpen] = useState(false);
 
   const [schoolName, setSchoolName] = useState("");
   const [email, setEmail] = useState("");
@@ -304,45 +306,65 @@ export const DesktopNavbar = (props: {
                 Add Fees GST
               </Text>
 
-              
+
             </Flex>
 
-                      <Flex
-  align="center"
-  gap={10}
-  style={{
-    padding: "10px",
-    borderRadius: "8px",
-    cursor: "pointer",
-  }}
-  onClick={() => {
-    setSettingsOpened(false);
-    setTransportUploadModal(true);
-  }}
->
-  <LiaBusAltSolid size={20} />
-  <Text size="sm" fw={500}>
-    Upload Transport Charges
-  </Text>
-</Flex>
-<Flex
-  align="center"
-  gap={10}
-  style={{
-    padding: "10px",
-    borderRadius: "8px",
-    cursor: "pointer",
-  }}
-  onClick={() => {
-    setSettingsOpened(false);
-    setAddEmailModalOpen(true);
-  }}
->
-  <FaUsers size={20} />
-  <Text size="sm" fw={500}>
-    Add Email
-  </Text>
-</Flex>
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSettingsOpened(false);
+                setTransportUploadModal(true);
+              }}
+            >
+              <LiaBusAltSolid size={20} />
+              <Text size="sm" fw={500}>
+                Upload Transport Charges
+              </Text>
+            </Flex>
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSettingsOpened(false);
+                setAddEmailModalOpen(true);
+              }}
+            >
+              <FaUsers size={20} />
+              <Text size="sm" fw={500}>
+                Add Email
+              </Text>
+            </Flex>
+
+            <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSettingsOpened(false);
+                setAddPaymentKeysModalOpen(true);
+              }}
+            >
+              <CiMoneyCheck1 size={20} />
+              <Text size="sm" fw={500}>
+                Payment Keys
+              </Text>
+            </Flex>
+
           </Stack>
 
           {/* RIGHT SIDE */}
@@ -514,17 +536,24 @@ export const DesktopNavbar = (props: {
         institute={institute}
       />
 
-<TransportChargesUploadModal
-  opened={transportUploadModal}
-  onClose={() => setTransportUploadModal(false)}
-  institute={institute}
-/>
+      <TransportChargesUploadModal
+        opened={transportUploadModal}
+        onClose={() => setTransportUploadModal(false)}
+        institute={institute}
+      />
 
-<AddEmailModal
-  opened={addEmailModalOpen}
-  onClose={() => setAddEmailModalOpen(false)}
-    institute={institute}
-/>
+      <AddEmailModal
+        opened={addEmailModalOpen}
+        onClose={() => setAddEmailModalOpen(false)}
+        institute={institute}
+      />
+
+
+      <AddPaymentKeysModal
+        opened={addPaymentKeysModalOpen}
+        onClose={() => setAddPaymentKeysModalOpen(false)}
+        institute={institute}
+      />
 
       <Stack
         w={isMd ? "0px" : hovered ? "250px" : "80px"}
@@ -1030,7 +1059,7 @@ export const DesktopNavbar = (props: {
                 justify={!hovered ? "center" : "start"}
                 gap={hovered ? 12 : 0}
                 onClick={() => setOpenMarketing(!openMarketing)}
-                // direction={"column"}
+              // direction={"column"}
               >
                 <Box
                   style={{

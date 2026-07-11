@@ -288,3 +288,18 @@ export function SetEmail(data: {
       .catch((error: any) => reject(error));
   });
 }
+
+
+export function UpdatePaymentKeys(data: {
+  api_key: string;
+  api_secret: string;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/institute/updatePaymentKeys`,
+      data
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
