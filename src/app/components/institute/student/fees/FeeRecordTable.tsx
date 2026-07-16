@@ -24,6 +24,7 @@ import { createReceiptPdf } from "./HtmlToPdf";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { GetStudentForPdf } from "@/axios/student/StudentGetApi";
 import { getBase64Image } from "@/app/helperFunction/Notification";
+import { useAppSelector } from "@/app/redux/redux.hooks";
 
 export interface FeeRecord {
   _id: string;
@@ -78,6 +79,12 @@ const FeeRecordTable = (props: {
     null,
   );
 
+
+   const instituteDetails = useAppSelector(
+      (state: any) => state.instituteSlice.instituteDetails,
+    );
+
+  
   const convertHtmlIntoPdf = (id: string) => {
     setisLoading(true);
     GetStudentForPdf(props.studentId)
@@ -85,6 +92,8 @@ const FeeRecordTable = (props: {
         setisLoading(false);
         const { student } = x;
         const { feeRecords, instituteId } = student;
+        console.log("InstituteId =", instituteId);
+console.log("Institute GST =", instituteId.gst);
 
         const studentName = student.name;
         const date = new Date();
@@ -97,6 +106,20 @@ const FeeRecordTable = (props: {
         const receiptNo = "R-" + instituteId.receiptCount;
         let paymentRecords;
         let amountPaid;
+
+
+                    let gst = instituteDetails.gst;
+                    if (
+                      instituteDetails?.gst?.sgst > 0 ||
+                      instituteDetails?.gst?.cgst
+                    ) {
+                      gst = instituteDetails.gst;
+                    } else {
+                      gst = {
+                        sgst: 0,
+                        cgst: 0,
+                      };
+                    }
 
         if (id) {
           paymentRecords = feeRecords.filter((f: any) => f._id === id);
@@ -112,8 +135,9 @@ const FeeRecordTable = (props: {
         const base64Logo = await getBase64Image(instituteId.logo);
 
         const base64Signature = await getBase64Image(instituteId.signature);
-
+console.log("GST received in receipt:", gst);
         const receiptHtml = createReceiptPdf(
+          
           studentName,
           date,
           parentName,
@@ -126,6 +150,7 @@ const FeeRecordTable = (props: {
           receiptNo,
           props.batchName,
           base64Signature,
+           gst,
         );
 
         const printWindow = window.open("", "_blank");
@@ -453,6 +478,9 @@ const FeeRecordTable = (props: {
         <th style={{ width: '35%', textAlign: 'left' }}>Payment Date</th>
         <th style={{ width: '25%', textAlign: 'left' }}>Amount</th>
         <th style={{ width: '25%', textAlign: 'left' }}>Description</th>
+        <th style={{ width: '25%', textAlign: 'left' }}>Action</th>
+        
+
       </tr>
     </thead>
     <tbody>
@@ -479,7 +507,14 @@ const FeeRecordTable = (props: {
                 <td style={{ textAlign: 'left' }}>
                   <Text size="sm" c="dimmed" style={{ textTransform: 'capitalize' }}>
                     {singlePaymentRecord.description || "-"}
-                  </Text>
+                  </Text>    
+                </td>
+                <td style={{ textAlign: 'left' }}>
+  <IconDownload
+    style={{ cursor: "pointer" }}
+    onClick={() => convertHtmlIntoPdf(selectedFeeRecord?._id || "")}
+  />
+                  
                 </td>
               </tr>
             );
