@@ -16,6 +16,7 @@ export function GetStudentForPdf(id: string) {
       .catch((error: any) => reject(error));
   });
 }
+
 export function PayRecordWithNumber(
   id: string,
   data: {

@@ -18,7 +18,14 @@ export function createReceiptPdf(
   receiptNo: string,
   batchName: string,
   signature: string,
-  gstPercent: number = 0,
+  // gstPercent: number = 0,
+
+
+ gst: {
+    sgst: number;
+    cgst: number;
+  },
+
   vanfareRecords: {
     amountPaid: number;
     totalAmount: number;
@@ -27,6 +34,7 @@ export function createReceiptPdf(
 ) {
   const formatCurrency = (num: number) =>
     "₹" + num.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+  const gstPercent = (gst?.cgst || 0) + (gst?.sgst || 0);
 
   // 1. Calculate GST breakdown for CURRENT amount paid
   const currentTaxableValue = amountPaid / (1 + gstPercent / 100);
@@ -144,11 +152,11 @@ export function createReceiptPdf(
           <span>₹${currentTaxableValue.toFixed(2)}</span>
         </div>
         <div class="calc-row gst-detail">
-          <span>CGST (${gstPercent / 2}%)</span>
+       <span>CGST (${gst.cgst}%)</span>
           <span>₹${currentSplitGst.toFixed(2)}</span>
         </div>
         <div class="calc-row gst-detail">
-          <span>SGST (${gstPercent / 2}%)</span>
+          <span>SGST (${gst.sgst}%)</span>
           <span>₹${currentSplitGst.toFixed(2)}</span>
         </div>
         <div class="calc-row" style="color: #e74c3c; font-weight:bold; border-top: 1px solid #000;">
