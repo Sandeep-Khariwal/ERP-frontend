@@ -29,7 +29,7 @@ export function CreateClassManagement(
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(
-      `${process.env.URL}/api/class-management`,
+      `${process.env.URL}/api/v1/class-management/create`,
       data
     )
       .then((response) => resolve(response))
@@ -43,7 +43,7 @@ export function BulkCreateClassManagement(
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(
-      `${process.env.URL}/api/class-management/bulk`,
+      `${process.env.URL}/api/v1/class-management/bulk-create`,
       data
     )
       .then((response) => resolve(response))
@@ -73,7 +73,7 @@ export function GetFreeTeachers(query: {
     }
 
     ApiHelper.get(
-      `${process.env.URL}/api/class-management/free-teachers?${params.toString()}`
+      `${process.env.URL}/api/v1/class-management/free-teachers?${params.toString()}`
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
@@ -97,7 +97,7 @@ export function GetAllClassManagement(filters?: {
     });
 
     ApiHelper.get(
-      `${process.env.URL}/api/class-management?${params.toString()}`
+      `${process.env.URL}/api/v1/class-management/all/?${params.toString()}`
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
@@ -108,7 +108,7 @@ export function GetAllClassManagement(filters?: {
 export function GetClassManagementById(id: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(
-      `${process.env.URL}/api/class-management/${id}`
+      `${process.env.URL}/api/v1/class-management/${id}`
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
@@ -121,8 +121,9 @@ export function UpdateClassManagement(
   data: Partial<CreateClassManagementPayload>
 ) {
   return new Promise((resolve, reject) => {
-    ApiHelper.put(
-      `${process.env.URL}/api/class-management/${id}`,
+    // change put to patch
+    ApiHelper.patch(
+      `${process.env.URL}/api/v1/class-management/update/${id}`,
       data
     )
       .then((response) => resolve(response))
@@ -134,7 +135,7 @@ export function UpdateClassManagement(
 export function CancelClassManagement(id: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.delete(
-      `${process.env.URL}/api/class-management/${id}`
+      `${process.env.URL}/api/v1/class-management/delete/${id}`
     )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
