@@ -89,8 +89,7 @@ const handleSubmit = (values: CreateTimetablePayload) => {
     });
 };
   return (
-    <Modal opened={opened} onClose={onClose} size="md" title={<Title order={4}>Add Timetable Slot</Title>}>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+<Modal opened={opened} onClose={onClose} size="md" title="Add Timetable Slot">      <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="sm">
           {error && (
             <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
