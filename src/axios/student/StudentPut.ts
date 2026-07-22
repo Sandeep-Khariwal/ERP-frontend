@@ -142,3 +142,36 @@ export function DeletePendingFeeRecords(
       .catch((error: any) => reject(error));
   });
 }
+  
+
+// added new 2 function  AssignStudentBatch, UnassignStudentBatch
+
+export function AssignStudentBatch(
+  studentId: string,
+  batchId: string,
+  batchName: string,
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/assignBatch/${studentId}`,
+      { batchId, batchName },
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function UnassignStudentBatch(
+  studentId: string,
+  batchId: string,
+  batchName: string,
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/unassignBatch/${studentId}`,
+      { batchId, batchName },
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

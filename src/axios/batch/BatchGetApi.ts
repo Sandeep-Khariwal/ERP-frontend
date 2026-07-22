@@ -28,3 +28,14 @@ export function GetUpCommingExams(id:string) {
       .catch((error: any) => reject(error));
   });
 }
+
+// new 
+export function GetAllInstituteBatches(instituteId: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/batch/allByInstitute/${instituteId}`
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}

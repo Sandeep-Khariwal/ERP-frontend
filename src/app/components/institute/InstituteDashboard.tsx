@@ -2,6 +2,7 @@
 
 import {
   Button,
+  Card,
   Flex,
   LoadingOverlay,
   Modal,
@@ -41,6 +42,7 @@ import { UserTypes } from "@/enums";
 import { usePathname, useRouter } from "next/navigation";
 import NoticeBoard from "./notice/NoticeBoard";
 import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi"; //data fetch krne liye subject
+import { InstituteStudentsPage } from "../institute/student/InstituteStudentsPage";
 
 export interface Batch {
   id: string;
@@ -76,6 +78,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [batchDeleteWarning, setBatchDeleteWarning] = useState<boolean>(false);
   const [editBatchDetails, setEditBatchDetails] = useState<boolean>(false);
   const [editBatchId, setEditBatchId] = useState<string>("");
+  const [openStudentsPage, setOpenStudentsPage] = useState<boolean>(false);
   const navigation = useRouter();
 
   const pathname = usePathname();
@@ -354,7 +357,17 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     <>
       <Notifications />
       <LoadingOverlay visible={isLoading} />
-      {(batchId === null || openEditCourseFee) && (
+      {openStudentsPage && (
+        <Stack w={"100%"} mih={"100%"} py={10}>
+          <Flex w={isMd ? "95%" : "80%"} mx={"auto"}>
+            <Button variant="subtle" color="dark" px={0} onClick={() => setOpenStudentsPage(false)}>
+              ← Back to Dashboard
+            </Button>
+          </Flex>
+          <InstituteStudentsPage instituteId={institute?._id ?? ""} />
+        </Stack>
+      )}
+      {!openStudentsPage && (batchId === null || openEditCourseFee) && (
         <Stack w={"100%"} mih={"100%"} py={20}>
           {props.isShowTopCard !== false && (
             <InstituteDetailsCards instituteId={institute?._id || ""} />
@@ -372,6 +385,34 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               // getInstituteInfo();
             }}
           />
+
+          <Card
+            w={isMd ? "95%" : "80%"}
+            mx={"auto"}
+            shadow="0px 0px 30px 0px rgba(0, 0, 0, 0.10)"
+            radius={10}
+            p={20}
+          >
+            <Flex ml={5} align="center" direction={isMd ? "column" : "row"}>
+              <Text fz={18} fw={700} c={"#1B1212"} ff={"Roboto"}>
+                Students Database
+              </Text>
+              <Flex gap="sm" ml="lg" direction="row" style={{ marginTop: isMd ? "10px" : 0 }} wrap="wrap">
+                <Button
+                  onClick={() => setOpenStudentsPage(true)}
+                  size="md"
+                  variant="default"
+                  fw={700}
+                  px={16}
+                  py={8}
+                  style={{ fontSize: "16px", borderRadius: "24px", whiteSpace: "nowrap" }}
+                  w={isMd ? "100%" : "auto"}
+                >
+                  Database of All Students
+                </Button>
+              </Flex>
+            </Flex>
+          </Card>
 
           <Flex align={"center"} w={isMd ? "95%" : "80%"} mx={"auto"}>
             <Text
@@ -463,7 +504,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         </Stack>
       )}
 
-      {batchId != null && !openEditCourseFee && (
+      {!openStudentsPage && batchId != null && !openEditCourseFee && (
         <Stack
           w={"100%"}
           h={"100%"}

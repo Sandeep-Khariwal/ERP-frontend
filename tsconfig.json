@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "src/app/components/institute/student/InstituteStudentsPage.tsx"  ],
   "exclude": [
     "node_modules"
   ]
