@@ -278,6 +278,7 @@ export const InstituteStudents = () => {
   }
 
   // View Mode 2: Passout Students Screen
+  // console.log("showPassoutScreen : ", showPassoutScreen);
   if (showPassoutScreen) {
     return (
       <Stack
@@ -296,7 +297,7 @@ export const InstituteStudents = () => {
             color="indigo"
             onClick={() => setShowPassoutScreen(false)}
           >
-            Back to Directory
+            Back to Directory 
           </Button>
         </Flex>
         <PassOutStudents />
