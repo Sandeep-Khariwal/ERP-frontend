@@ -65,12 +65,19 @@ export function GetVanLiveLocation() {
 
 // new funtion added  GetAllInstituteStudents,  GetStudentBatchHistory
 
-export function GetAllInstituteStudents(batchId?: string, search?: string) {
+export function GetAllInstituteStudents(
+  batchId?: string,
+  search?: string,
+  page: number = 1,
+  limit: number = 10,
+) {
   return new Promise((resolve, reject) => {
     let url = `${process.env.URL}/api/v1/student/allByInstitute/me`;
     const params: string[] = [];
     if (batchId) params.push(`batchId=${encodeURIComponent(batchId)}`);
     if (search) params.push(`search=${encodeURIComponent(search)}`);
+    params.push(`page=${page}`);   // NEW
+    params.push(`limit=${limit}`); // NEW
     if (params.length) url += `?${params.join("&")}`;
 
     ApiHelper.get(url)

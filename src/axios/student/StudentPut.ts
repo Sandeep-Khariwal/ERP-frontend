@@ -175,3 +175,36 @@ export function UnassignStudentBatch(
       .catch((error: any) => reject(error));
   });
 }
+
+
+// new bulk functions — AssignStudentBatchMultiple, UnassignStudentBatchMultiple
+
+export function AssignStudentBatchMultiple(
+  studentIds: string[],
+  batchId: string,
+  batchName: string,
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/assignBatchMultiple`,
+      { studentIds, batchId, batchName },
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+export function UnassignStudentBatchMultiple(
+  studentIds: string[],
+  batchId: string,
+  batchName: string,
+) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.put(
+      `${process.env.URL}/api/v1/student/removeBatchMultiple`,
+      { studentIds, batchId, batchName },
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
