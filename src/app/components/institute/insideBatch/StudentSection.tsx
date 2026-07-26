@@ -1,3 +1,4 @@
+
 "use client";
 
 import { GetAllStudentsFromBatch } from "@/axios/institute/InstituteGetApi";
@@ -51,7 +52,6 @@ const StudentSection = (props: {
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
-  console.log("props stdents : ", props.students);
 
   const [students, setStudents] = useState<
     {
@@ -65,48 +65,73 @@ const StudentSection = (props: {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // ✅ FIX 2: dedup instead of blind append — avoids duplicate rows
+  // and avoids re-adding stale props.students after a batch switch.
   useEffect(() => {
-    setStudents((prev) => [...prev, ...props.students]);
+    if (!props.students || props.students.length === 0) return;
+
+    setStudents((prev) => {
+      const existingIds = new Set(prev.map((s) => s._id));
+      const newOnes = props.students.filter((s) => !existingIds.has(s._id));
+      return newOnes.length > 0 ? [...prev, ...newOnes] : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.students]);
 
+  // ✅ FIX 1: race-condition safe fetch on batchId change.
+  // Clears stale data immediately on switch, and ignores any
+  // late-arriving response from a batch the user has already left.
   useEffect(() => {
-    if (props.batchId) {
-      setIsLoading(true);
-      GetAllStudentsFromBatch(props.batchId)
-        .then((x: any) => {
-          setIsLoading(false);
-          const { students } = x.students;
-          const studentData = students.map((s: any) => {
-            const totals = s.feeRecords.reduce(
-              (acc: any, record: any) => {
-                acc.totalAmount += record.totalAmount;
-                acc.amountPaid += record.amountPaid;
-                return acc;
-              },
-              { totalAmount: 0, amountPaid: 0 },
-            );
+    if (!props.batchId) return;
 
-            return {
-              _id: s._id,
-              name: s.name,
-              phoneNumber: s.phoneNumber,
-              parentName: s.parentName,
-              feeStatus:
-                totals.totalAmount === totals.amountPaid &&
-                totals.amountPaid > 0
-                  ? "Paid"
-                  : totals.amountPaid === 0
-                    ? "Not Paid"
-                    : "Partial Paid",
-            };
-          });
-          props.setStudents(students);
-          setStudents(studentData);
-        })
-        .catch((e) => {
-          console.log(e);
+    let isCurrent = true;
+
+    setIsLoading(true);
+    setStudents([]); // clear previous batch's data immediately so it never flashes
+
+    GetAllStudentsFromBatch(props.batchId)
+      .then((x: any) => {
+        if (!isCurrent) return; // stale response from a batch we've already left — ignore
+
+        const { students } = x.students;
+        const studentData = students.map((s: any) => {
+          const totals = s.feeRecords.reduce(
+            (acc: any, record: any) => {
+              acc.totalAmount += record.totalAmount;
+              acc.amountPaid += record.amountPaid;
+              return acc;
+            },
+            { totalAmount: 0, amountPaid: 0 },
+          );
+
+          return {
+            _id: s._id,
+            name: s.name,
+            phoneNumber: s.phoneNumber,
+            parentName: s.parentName,
+            feeStatus:
+              totals.totalAmount === totals.amountPaid &&
+              totals.amountPaid > 0
+                ? "Paid"
+                : totals.amountPaid === 0
+                  ? "Not Paid"
+                  : "Partial Paid",
+          };
         });
-    }
+
+        props.setStudents(students);
+        setStudents(studentData);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        if (isCurrent) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrent = false; // cleanup — invalidate this effect run's response when batchId changes/unmounts
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.batchId]);
 
   const [showWarning, setShowWarning] = useState<boolean>(false);
@@ -131,11 +156,6 @@ const StudentSection = (props: {
     GetStudentForIdCard(id)
       .then(async (res: any) => {
         const studentInfo = res.student;
-        console.log(
-          "studentInfo.rollNumber : ",
-          studentInfo.rollNumber,
-          studentInfo.profilePic,
-        );
 
         const base64Profile = await getBase64Image(studentInfo.profilePic);
         const base64Logo = await getBase64Image(studentInfo.instituteId.logo);
@@ -274,7 +294,7 @@ const StudentSection = (props: {
             {students.map((item: any, index: number) => {
               return (
                 <Table.Tr
-                  key={index}
+                  key={item._id ?? index}
                   style={
                     item.isInActive
                       ? {
@@ -376,8 +396,6 @@ const StudentSection = (props: {
                             props.setSelectedStudentId(item._id);
                             props.setEditStudentDetails(true);
                             props.setShowSelectedScreen(Screen.ADDMORESCREEN);
-                            // setSelectedStudent(item);
-                            // setEditStudentFee(true);
                           }}
                         >
                           {" "}
@@ -386,8 +404,6 @@ const StudentSection = (props: {
                         <Menu.Item
                           onClick={() => {
                             downloadIdCard(item._id);
-                            // setSelectedStudent(item);
-                            // setEditStudentFee(true);
                           }}
                         >
                           {" "}
@@ -396,9 +412,6 @@ const StudentSection = (props: {
                         {props.userType !== UserType.TEACHER && (
                           <Menu.Item
                             onClick={() => {
-                              // setSelectedStudent(item);
-                              // setStudentActiveTab("Fee Records");
-                              // setEditStudentFee(false);
                               props.setSelectedStudentId(item._id);
                               props.setShowSelectedScreen(
                                 Screen.VIEWFEEDETAILS,
@@ -409,17 +422,6 @@ const StudentSection = (props: {
                             View Fee Details
                           </Menu.Item>
                         )}
-                        {/* <Menu.Item
-                                      onClick={() => {
-                                        downloadBatchCombineFee(
-                                          item._id,
-                                          item.feeRecords,
-                                          item
-                                        );
-                                      }}
-                                    >
-                                      Download Receipt
-                                    </Menu.Item> */}
                         <Menu.Item
                           onClick={() => {
                             setShowWarning(true);
