@@ -385,10 +385,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.04)",
               transition: "all 0.3s ease",
               cursor: "pointer",
-            }}
-            onClick={() => setOpenStudentsPage(true)}
-            sx={{
-              "&:hover": {
+                            "&:hover": {
                 transform: "translateY(-4px)",
                 borderColor: "#8B5CF6",
                 boxShadow: "0px 12px 28px rgba(139, 92, 246, 0.12)",
@@ -399,6 +396,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                 },
               },
             }}
+            onClick={() => setOpenStudentsPage(true)}
           >
             {/* Subtle light background accent dot */}
             <div
