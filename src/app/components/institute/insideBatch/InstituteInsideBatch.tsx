@@ -114,7 +114,6 @@ export function InstituteInsideBatch(props: {
   subjects?: { _id: string; name: string }[];
   userType: UserType;
 }) {
-
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [selectedTeacherId, setSelectTeacherId] = useState<string>("");
   const [openAddStudentModal, setOpenAddStudentModal] =
@@ -143,35 +142,33 @@ export function InstituteInsideBatch(props: {
     additionalPhoneNumbers: [],
   });
 
-    const [teacherData, settTeacherData] = useState<TeacherData>({
-              _id: "" ,
-              name: "",
-              phoneNumber: "",
-            subjects: [],
+  const [teacherData, settTeacherData] = useState<TeacherData>({
+    _id: "",
+    name: "",
+    phoneNumber: "",
+    subjects: [],
   });
 
   useEffect(() => {
-  if (!props.batchId) return;
+    if (!props.batchId) return;
 
-  GetAllTeachersFromBatch(props.batchId)
-    .then((res: any) => {
-      const firstTeacher = res?.teachers?.[0];
+    GetAllTeachersFromBatch(props.batchId)
+      .then((res: any) => {
+        const firstTeacher = res?.teachers?.[0];
 
-      if (firstTeacher) {
-        settTeacherData({
-          _id: firstTeacher._id,
-          name: firstTeacher.name,
-          phoneNumber: firstTeacher.phoneNumber,
-          subjects: firstTeacher.subjects || [],
-        });
-      }
-    })
-    .catch((err) => {
-      console.log("Teacher Fetch Error:", err);
-    });
-}, [props.batchId]);
-
-  
+        if (firstTeacher) {
+          settTeacherData({
+            _id: firstTeacher._id,
+            name: firstTeacher.name,
+            phoneNumber: firstTeacher.phoneNumber,
+            subjects: firstTeacher.subjects || [],
+          });
+        }
+      })
+      .catch((err) => {
+        console.log("Teacher Fetch Error:", err);
+      });
+  }, [props.batchId]);
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [students, setStudents] = useState<StudentsDataWithBatch[]>([]);
@@ -395,7 +392,7 @@ export function InstituteInsideBatch(props: {
                 dateOfJoining={new Date()}
                 batch={props?.batchId}
                 studentId={selectedStudentId}
-                onPaymentClick={() => { }}
+                onPaymentClick={() => {}}
                 onClickBack={() => {
                   setSelectedStudentId("");
                   setShowSelectedScreen(Screen.NONE);
@@ -459,17 +456,13 @@ export function InstituteInsideBatch(props: {
 
         {Tabs.STUDY_MATERIAL === activeTab && (
           <Stack w={"100%"}>
-            <StudyMaterialPage
-              batchId={props.batchId}
-            />
+            <StudyMaterialPage batchId={props.batchId} />
           </Stack>
         )}
 
         {Tabs.GALLERY === activeTab && (
           <Stack w={"100%"}>
-            <GalleryPage
-              batchId={props.batchId}
-            />
+            <GalleryPage batchId={props.batchId} />
           </Stack>
         )}
 
@@ -477,35 +470,36 @@ export function InstituteInsideBatch(props: {
           <Stack w={"100%"}>
             <TimetablePage
               batchId={props.batchId}
-               subjects={props.subjects} 
-               teacherData={teacherData}
-                batchName={props.batchName}
+              subjects={props.subjects}
+              teacherData={teacherData}
+              batchName={props.batchName}
             />
           </Stack>
         )}
 
         {Tabs.EXAMINATION === activeTab && (
           <Stack w={"100%"}>
-            <ExaminationPage
-              batchId={props.batchId}
-            />
+            <ExaminationPage batchId={props.batchId} />
           </Stack>
         )}
 
         {Tabs.ASSIGNMENT === activeTab && (
           <Stack w={"100%"} mih={isMd ? "100vh" : "70vh"} bg={"white"} mt={20}>
-            <MeetingsPage userType={props.userType} batchId={props.batchId} batchName={props.batchName} subjects={props.subjects} teacherData={teacherData}/>
+            <MeetingsPage
+              userType={props.userType}
+              batchId={props.batchId}
+              batchName={props.batchName}
+              subjects={props.subjects}
+              teacherData={teacherData}
+            />
           </Stack>
         )}
 
         {Tabs.SESSIONS === activeTab && (
           <Stack w={"100%"}>
-            <SessionsPage
-              batchId={props.batchId}
-            />
+            <SessionsPage batchId={props.batchId} />
           </Stack>
         )}
-
       </Stack>
 
       {/* 🔹 Add Student Modal */}
