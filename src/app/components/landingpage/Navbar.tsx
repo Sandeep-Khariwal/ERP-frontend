@@ -23,6 +23,8 @@ const Navbar: React.FC = () => {
     { label: "About Us", href: "#About", isExternal: false },
     // { label: "Pricing", href: "/pricing", isExternal: true },
     { label: "Contact Us", href: "#Contact", isExternal: false },
+      { label: "Voucher", href: "/voucher", isExternal: true },
+
     { label: "Our Team", href: "#Team", isExternal: false },
   ];
 
