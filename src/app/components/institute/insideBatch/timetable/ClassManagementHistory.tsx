@@ -18,9 +18,11 @@ import { DatePickerInput } from "@mantine/dates";
 import { IconSearch, IconTrash, IconFilter } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 
-
 import { ClassManagement } from "./timetable.types";
-import { CancelClassManagement, GetAllClassManagement } from "@/axios/timetable/classManagement.api";
+import {
+  CancelClassManagement,
+  GetAllClassManagement,
+} from "@/axios/timetable/classManagement.api";
 
 interface Props {
   batchId?: string;
@@ -35,65 +37,80 @@ const STATUS_COLORS: Record<string, string> = {
 export function ClassManagementHistory({ batchId }: Props) {
   const [records, setRecords] = useState<ClassManagement[]>([]);
   const [loading, setLoading] = useState(false);
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
- const fetchRecords = () => {
-  setLoading(true);
+  const fetchRecords = () => {
+    setLoading(true);
 
-  const filters: any = {};
+    const filters: any = {};
 
-  if (batchId) filters.batchId = batchId;
+    if (batchId) filters.batchId = batchId;
 
-  if (dateRange[0]) {
-    filters.startDate = dateRange[0].toISOString().slice(0, 10);
-  }
+    if (dateRange[0]) {
+      filters.startDate = dateRange[0].toISOString().slice(0, 10);
+    }
 
-  if (dateRange[1]) {
-    filters.endDate = dateRange[1].toISOString().slice(0, 10);
-  }
+    if (dateRange[1]) {
+      filters.endDate = dateRange[1].toISOString().slice(0, 10);
+    }
 
-  GetAllClassManagement(filters)
-    .then((res: any) => {
-      console.log("GET MANAGEMENT RESPONSE 👉", res);
+    GetAllClassManagement(filters)
+      .then((res: any) => {
+        console.log("GET MANAGEMENT RESPONSE 👉", res);
 
-      const data = res?.data || [];
+        const data = res?.data || [];
 
-      const filteredData = statusFilter
-        ? data.filter((item: any) => item.status === statusFilter)
-        : data;
+        const filteredData = statusFilter
+          ? data.filter((item: any) => item.status === statusFilter)
+          : data;
 
-      setRecords(filteredData);
-    })
-    .catch((err: any) => {
-      console.log("GET MANAGEMENT ERROR ❌", err);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-};
+          console.log("filteredData : ",filteredData);
+          
 
- useEffect(() => {
-  fetchRecords();
-}, [batchId]);
+        const enriched = filteredData.map((t: any) => ({
+          ...t,
+          batchName: t.batchId?.name,
+          subjectName: t.subjectId?.name,
+          teacherName: t.teacherId?.name,
+          originalTeacherName: t.originalTeacherId?.name,
+          substituteTeacherName: t.substituteTeacherId?.name,
+        }));
 
-//Agar status/date change pe bhi auto load chahiye:
-// useEffect(() => {
-//   fetchRecords();
-// }, [batchId, statusFilter, dateRange]);
+        setRecords(enriched);
+      })
+      .catch((err: any) => {
+        console.log("GET MANAGEMENT ERROR ❌", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
-const handleCancel = (id: string) => {
-  if (!confirm("Cancel this management record?")) return;
+  useEffect(() => {
+    fetchRecords();
+  }, [batchId]);
 
-  CancelClassManagement(id)
-    .then((res: any) => {
-      console.log("CANCEL MANAGEMENT RESPONSE 👉", res);
-      fetchRecords();
-    })
-    .catch((err: any) => {
-      console.log("CANCEL MANAGEMENT ERROR ❌", err);
-    });
-};
+  //Agar status/date change pe bhi auto load chahiye:
+  // useEffect(() => {
+  //   fetchRecords();
+  // }, [batchId, statusFilter, dateRange]);
+
+  const handleCancel = (id: string) => {
+    if (!confirm("Cancel this management record?")) return;
+
+    CancelClassManagement(id)
+      .then((res: any) => {
+        console.log("CANCEL MANAGEMENT RESPONSE 👉", res);
+        fetchRecords();
+      })
+      .catch((err: any) => {
+        console.log("CANCEL MANAGEMENT ERROR ❌", err);
+      });
+  };
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -177,7 +194,9 @@ const handleCancel = (id: string) => {
                   <Text size="sm">{r.subjectName ?? r.subjectId}</Text>
                 </Table.Td>
                 <Table.Td>
-                  <Text size="sm">{r.originalTeacherName ?? r.originalTeacherId}</Text>
+                  <Text size="sm">
+                    {r.originalTeacherName ?? r.originalTeacherId}
+                  </Text>
                 </Table.Td>
                 <Table.Td>
                   <Text size="sm" fw={500} c="blue">

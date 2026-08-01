@@ -84,7 +84,7 @@ const CATEGORIES = [
     icon: FileText,
     title: 'Smart Documents',
     desc: 'Generate professional documents in a single click — no design skills needed.',
-    features: ['One-Click Marksheet Generator', 'Student ID Card Generator', 'Certificates & Documents'],
+    features: ['One-Click Marksheet Generator', 'Student ID Card Generator', 'Certificates & Documents', 'Fees Reciept Download'],
   },
   {
     id: 'communication',
@@ -874,12 +874,12 @@ function AdmissionsPipelineMockup() {
       </Group>
 
       <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-        {leads.map((col) => (
+        {leads.map((col:any) => (
           <Stack key={col.column} gap="sm">
             <Text size="10px" fw={700} c={col.color === 'gray' ? 'dimmed' : col.color} tt="uppercase" style={{ letterSpacing: '0.04em' }}>
               {col.column} ({col.count})
             </Text>
-            {col.cards.map((c) => (
+            {col.cards.map((c:any) => (
               <Card
                 key={c.name}
                 withBorder
