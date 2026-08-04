@@ -43,6 +43,7 @@ import ExaminationPage from "./ExaminationPage";
 import MeetingsPage from "../../meeting/MeetingPage";
 import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
 import TimetablePage from "./timetable/TimeTablePage";
+import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -129,6 +130,9 @@ export function InstituteInsideBatch(props: {
   const [editStudentDetails, setEditStudentDetails] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>(Tabs.OVERVIEW);
+  const [subjects, setSubject] = useState<{ _id: string; name: string }[]>(
+    props.subjects ?? [],
+  );
 
   const [studentData, setStudentData] = useState<StudentData>({
     name: "",
@@ -168,6 +172,14 @@ export function InstituteInsideBatch(props: {
       .catch((err) => {
         console.log("Teacher Fetch Error:", err);
       });
+
+    if (props.subjects?.length) return;
+
+    GetAllSubjectsFromBatch(props.batchId)
+      .then((res: any) => {
+        setSubject(res.subjects.subjects);
+      })
+      .catch((e: any) => {});
   }, [props.batchId]);
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
@@ -451,7 +463,7 @@ export function InstituteInsideBatch(props: {
           <Tests batchId={props.batchId} subjects={props.subjects ?? []} />
         )}
         {Tabs.DIARY === activeTab && (
-          <DiaryPage batchId={props.batchId} subjects={props.subjects ?? []} />
+          <DiaryPage batchId={props.batchId} subjects={subjects ?? []} />
         )}
 
         {Tabs.STUDY_MATERIAL === activeTab && (

@@ -53,8 +53,12 @@ import {
 import { DateValue } from "@mantine/dates";
 import { CreateDiary } from "@/axios/institute/InstitutePostApi";
 import { SuccessNotification } from "@/app/helperFunction/Notification";
-import { GetAllDiary, GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
+import {
+  GetAllDiary,
+  GetAllTeachersFromBatch,
+} from "@/axios/institute/InstituteGetApi";
 import { DeleteDiary, updateDiary } from "@/axios/institute/InstitutePutApi";
+import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -121,7 +125,8 @@ function getSubjectIcon(subject: string) {
   if (s.includes("science")) return <IconFlask size={16} />;
   if (s.includes("english")) return <IconLanguage size={16} />;
   if (s.includes("social")) return <IconGlobe size={16} />;
-  if (s.includes("computer") || s.includes("c")) return <IconDeviceDesktop size={16} />;
+  if (s.includes("computer") || s.includes("c"))
+    return <IconDeviceDesktop size={16} />;
   if (s.includes("hindi")) return <IconLetterA size={16} />;
 
   return <IconBook size={16} />; // default icon
@@ -237,32 +242,44 @@ interface EntryFormProps {
   teacher?: string;
   batchId: string;
   subjects: { _id: string; name: string }[];
-    id?: string; 
-    isLoading?: boolean;
-setIsLoading?: (v: boolean) => void;
-fetchDiary: () => void;
+  id?: string;
+  isLoading?: boolean;
+  setIsLoading?: (v: boolean) => void;
+  fetchDiary: () => void;
 }
 
-function EntryForm({ initial, onSave, onCancel, teacher, batchId, subjects, id,  isLoading, setIsLoading, fetchDiary }: EntryFormProps) {
+function EntryForm({
+  initial,
+  onSave,
+  onCancel,
+  teacher,
+  batchId,
+  subjects,
+  id,
+  isLoading,
+  setIsLoading,
+  fetchDiary,
+}: EntryFormProps) {
   const [subject, setSubject] = useState<string>(initial?.subject ?? "");
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [date, setDate] = useState<DateValue>(
-    initial?.date ? new Date(initial.date) : new Date()
+    initial?.date ? new Date(initial.date) : new Date(),
   );
-//  const [teacherName,setteacherName] = useState<string>("")
-const [teacherName, setteacherName] = useState<string>(initial?.teacher ?? "")
+  //  const [teacherName,setteacherName] = useState<string>("")
+  const [teacherName, setteacherName] = useState<string>(
+    initial?.teacher ?? "",
+  );
 
   useEffect(() => {
-  if (initial) {
-    setSubject(initial.subject ?? "");
-    setTitle(initial.title ?? "");
-    setDescription(initial.description ?? "");
-    setDate(initial.date ? new Date(initial.date) : new Date());
-    setteacherName(initial.teacher ?? "");
-  }
-}, [initial]);
-
+    if (initial) {
+      setSubject(initial.subject ?? "");
+      setTitle(initial.title ?? "");
+      setDescription(initial.description ?? "");
+      setDate(initial.date ? new Date(initial.date) : new Date());
+      setteacherName(initial.teacher ?? "");
+    }
+  }, [initial]);
 
   const handleSave = () => {
     if (!subject || !title || !description || !date) {
@@ -274,48 +291,44 @@ const [teacherName, setteacherName] = useState<string>(initial?.teacher ?? "")
       });
       return;
     }
-setIsLoading?.(true);
+    setIsLoading?.(true);
 
-     const payload = {
-    subject: subject as Subject,
-    title,
-    description,
-    date: (date as Date).toISOString().split("T")[0],
-    time: new Date().toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-  };
+    const payload = {
+      subject: subject as Subject,
+      title,
+      description,
+      date: (date as Date).toISOString().split("T")[0],
+      time: new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
 
-  // ✅ EDIT API CALL
-  if (id) {
-    updateDiary(id, payload)
-      .then((res: any) => {
-        console.log("edit :", res);
-        
-        SuccessNotification("Diary updated!!");
-        fetchDiary();
-        onCancel(); 
+    // ✅ EDIT API CALL
+    if (id) {
+      updateDiary(id, payload)
+        .then((res: any) => {
+          console.log("edit :", res);
 
-        // onSave({
-        //   ...payload,
-        //   teacher: teacherName,
-        // });
-         setIsLoading?.(false);
-      })
-      .catch((e: any) => {
-        console.log(e);
-        
-      })
-       .finally(() => {
-      setIsLoading?.(false);
-    });
+          SuccessNotification("Diary updated!!");
+          fetchDiary();
+          onCancel();
 
-    return;
-  }
+          // onSave({
+          //   ...payload,
+          //   teacher: teacherName,
+          // });
+          setIsLoading?.(false);
+        })
+        .catch((e: any) => {
+          console.log(e);
+        })
+        .finally(() => {
+          setIsLoading?.(false);
+        });
 
-
-
+      return;
+    }
 
     CreateDiary({
       subject: subject as Subject,
@@ -327,14 +340,13 @@ setIsLoading?.(true);
       time: new Date().toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
-      })
+      }),
     })
       .then((res: any) => {
         console.log("resdiary :", res);
 
-  fetchDiary();   // ✅ UI तुरंत update
-  onCancel();     // ✅ Drawer close
-        
+        fetchDiary(); // ✅ UI तुरंत update
+        onCancel(); // ✅ Drawer close
 
         // onSave({
         //   subject: res.diary.subject,
@@ -348,16 +360,14 @@ setIsLoading?.(true);
         //   }),
         // });
 
-        SuccessNotification("Diary created!!")
-         setIsLoading?.(false);
+        SuccessNotification("Diary created!!");
+        setIsLoading?.(false);
       })
       .catch((e: any) => {
         console.log(e);
-         setIsLoading?.(false);
-      })
-
+        setIsLoading?.(false);
+      });
   };
-
 
   return (
     <Stack gap="md">
@@ -374,13 +384,11 @@ setIsLoading?.(true);
         label="Subject"
         placeholder="Select Subject"
         data={subjects.map((sub) => ({
-          value: sub.name,   // ✅ id use karo
-          label: sub.name   // ✅ name show karo
+          value: sub.name, // ✅ id use karo
+          label: sub.name, // ✅ name show karo
         }))}
         value={subject}
-        onChange={(v) =>
-          setSubject(v ?? "")
-        }
+        onChange={(v) => setSubject(v ?? "")}
         rightSection={<IconChevronDown size={14} />}
         styles={{ input: { borderRadius: 8 } }}
         required
@@ -390,9 +398,9 @@ setIsLoading?.(true);
         label="Teacher"
         value={teacherName}
         placeholder="Enter teacher name "
-         onChange={(e) => setteacherName(e.currentTarget.value)}
-      styles={{ input: { borderRadius: 8 } }}
-      required
+        onChange={(e) => setteacherName(e.currentTarget.value)}
+        styles={{ input: { borderRadius: 8 } }}
+        required
       />
 
       <TextInput
@@ -421,8 +429,8 @@ setIsLoading?.(true);
         <Button
           onClick={handleSave}
           radius="md"
-            loading={isLoading} // 👈 ये add करो
-  disabled={isLoading} // optional but best
+          loading={isLoading} // 👈 ये add करो
+          disabled={isLoading} // optional but best
           style={{ background: "#5c3de8" }}
           leftSection={<IconCheck size={16} />}
         >
@@ -442,8 +450,6 @@ interface EntryCardProps {
 }
 
 function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
-
-  
   return (
     <Card
       withBorder
@@ -541,10 +547,12 @@ export default function DiaryPage(props: {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Drawer / Modal state
-  const [addDrawerOpen, { open: openAdd, close: closeAdd }] = useDisclosure(false);
+  const [addDrawerOpen, { open: openAdd, close: closeAdd }] =
+    useDisclosure(false);
   const [editEntry, setEditEntry] = useState<DiaryEntry | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [deleteModalOpen, { open: openDelete, close: closeDelete }] = useDisclosure(false);
+  const [deleteModalOpen, { open: openDelete, close: closeDelete }] =
+    useDisclosure(false);
 
   // Unique teachers
   const allTeachers = Array.from(new Set(entries.map((e) => e.teacher)));
@@ -559,61 +567,58 @@ export default function DiaryPage(props: {
     const matchTeacher = !teacherFilter || e.teacher === teacherFilter;
     // return matchSearch && matchSubject && matchTeacher;
     // filter kiya hai diary purani diary date pe dikhehi
-      // ✅ DATE FILTER ADD
-  const matchDate =
-    !selectedDate ||
-    new Date(e.date).toDateString() ===
-      new Date(selectedDate as Date).toDateString();
+    // ✅ DATE FILTER ADD
+    const matchDate =
+      !selectedDate ||
+      new Date(e.date).toDateString() ===
+        new Date(selectedDate as Date).toDateString();
 
-  return matchSearch && matchSubject && matchTeacher && matchDate;
-
+    return matchSearch && matchSubject && matchTeacher && matchDate;
   });
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-
-
   const fetchDiary = useCallback(() => {
-  if (!props.batchId) return;
+    if (!props.batchId) return;
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  GetAllDiary(props.batchId)
-    .then((res: any) => {
-      console.log("GET DIARY RESPONSE 👉", res);
+    GetAllDiary(props.batchId)
+      .then((res: any) => {
+        console.log("GET DIARY RESPONSE 👉", res);
 
-      const data = res?.diary || []; // ✅ FIXED
+        const data = res?.diary || []; // ✅ FIXED
 
-      const formatted: DiaryEntry[] = data.map((item: any) => ({
-        id: item._id,
-        subject: item.subject,
-        teacher: item.teacher,
-        title: item.title,
-        description: item.description,
-        date: item.date,
-        time: new Date(item.createdAt).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      }));
+        const formatted: DiaryEntry[] = data.map((item: any) => ({
+          id: item._id,
+          subject: item.subject,
+          teacher: item.teacher,
+          title: item.title,
+          description: item.description,
+          date: item.date,
+          time: new Date(item.createdAt).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        }));
 
-      console.log("FORMATTED DATA 👉", formatted); // 👈 DEBUG
+        console.log("FORMATTED DATA 👉", formatted); // 👈 DEBUG
 
-      setEntries(formatted);
-    })
-    .catch((err: any) => {
-      console.log("GET DIARY ERROR ❌", err);
-    })
-    .finally(() => {
-      setIsLoading(false);
-    });
-}, [props.batchId]);
+        setEntries(formatted);
+      })
+      .catch((err: any) => {
+        console.log("GET DIARY ERROR ❌", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
+  }, [props.batchId]);
 
-useEffect(() => {
-  fetchDiary();
-}, [props.batchId]);
+  useEffect(() => {
+    fetchDiary();
+  }, [props.batchId]);
 
   // Handlers
   const handleAddSave = useCallback(
@@ -628,14 +633,14 @@ useEffect(() => {
         icon: <IconCheck size={16} />,
       });
     },
-    [closeAdd]
+    [closeAdd],
   );
 
   const handleEditSave = useCallback(
     (data: Omit<DiaryEntry, "id">) => {
       if (!editEntry) return;
       setEntries((prev) =>
-        prev.map((e) => (e.id === editEntry.id ? { ...data, id: e.id } : e))
+        prev.map((e) => (e.id === editEntry.id ? { ...data, id: e.id } : e)),
       );
       setEditEntry(null);
       notifications.show({
@@ -645,30 +650,29 @@ useEffect(() => {
         icon: <IconCheck size={16} />,
       });
     },
-    [editEntry]
+    [editEntry],
   );
 
- const handleDeleteConfirm = useCallback(() => {
-  if (!deleteId) return;
+  const handleDeleteConfirm = useCallback(() => {
+    if (!deleteId) return;
     setIsLoading(true);
 
-  // ✅ API CALL
-  DeleteDiary(deleteId)
-    .then((res: any) => {
-      // ✅ UI update (existing logic)
-      setEntries((prev) => prev.filter((e) => e.id !== deleteId));
-      closeDelete();
+    // ✅ API CALL
+    DeleteDiary(deleteId)
+      .then((res: any) => {
+        // ✅ UI update (existing logic)
+        setEntries((prev) => prev.filter((e) => e.id !== deleteId));
+        closeDelete();
 
-      setDeleteId(null);
-      fetchDiary();   // 👈 ADD THIS
-   SuccessNotification("Diary Deleted!!");
-    })
-    .catch((e: any) => {
-      console.log(e);
-      setIsLoading(false)
-    });
-
-}, [deleteId, closeDelete]);
+        setDeleteId(null);
+        fetchDiary(); // 👈 ADD THIS
+        SuccessNotification("Diary Deleted!!");
+      })
+      .catch((e: any) => {
+        console.log(e);
+        setIsLoading(false);
+      });
+  }, [deleteId, closeDelete]);
 
   const requestDelete = (id: string) => {
     setDeleteId(id);
@@ -677,10 +681,10 @@ useEffect(() => {
 
   const formattedDate = selectedDate
     ? (selectedDate as Date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    })
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })
     : "Select Date";
 
   return (
@@ -708,7 +712,11 @@ useEffect(() => {
         >
           <Stack gap={2}>
             <Group gap="xs">
-              <ThemeIcon size={36} radius="xl" style={{ background: "#5c3de822" }}>
+              <ThemeIcon
+                size={36}
+                radius="xl"
+                style={{ background: "#5c3de822" }}
+              >
                 <IconCalendar size={20} color="#5c3de8" />
               </ThemeIcon>
               <Title order={3} style={{ color: "#1a1a2e", fontWeight: 700 }}>
@@ -759,13 +767,17 @@ useEffect(() => {
 
       {/* Filters Row */}
 
-
       {/* Table / Card View */}
       {isMobile ? (
         /* Mobile: Card Grid */
         <Stack gap="sm">
           {paginated.length === 0 ? (
-            <Paper radius="xl" p="xl" withBorder style={{ textAlign: "center" }}>
+            <Paper
+              radius="xl"
+              p="xl"
+              withBorder
+              style={{ textAlign: "center" }}
+            >
               <Text c="dimmed">No diary entries found.</Text>
             </Paper>
           ) : (
@@ -784,7 +796,11 @@ useEffect(() => {
         <Paper
           radius="xl"
           withBorder
-          style={{ borderColor: "#e9ecef", background: "#fff", overflow: "hidden" }}
+          style={{
+            borderColor: "#e9ecef",
+            background: "#fff",
+            overflow: "hidden",
+          }}
         >
           <ScrollArea>
             <Table
@@ -795,29 +811,37 @@ useEffect(() => {
             >
               <Table.Thead>
                 <Table.Tr style={{ background: "#f5f0ff" }}>
-                  {["Subject", "Teacher", "Title", "Description", "Date", "Action"].map(
-                    (h) => (
-                      <Table.Th
-                        key={h}
-                        style={{
-                          color: "#5c3de8",
-                          fontWeight: 600,
-                          fontSize: 13,
-                          letterSpacing: 0.3,
-                          padding: "14px 20px",
-                        }}
-                      >
-                        {h}
-                      </Table.Th>
-                    )
-                  )}
+                  {[
+                    "Subject",
+                    "Teacher",
+                    "Title",
+                    "Description",
+                    "Date",
+                    "Action",
+                  ].map((h) => (
+                    <Table.Th
+                      key={h}
+                      style={{
+                        color: "#5c3de8",
+                        fontWeight: 600,
+                        fontSize: 13,
+                        letterSpacing: 0.3,
+                        padding: "14px 20px",
+                      }}
+                    >
+                      {h}
+                    </Table.Th>
+                  ))}
                 </Table.Tr>
               </Table.Thead>
 
               <Table.Tbody>
                 {paginated.length === 0 ? (
                   <Table.Tr>
-                    <Table.Td colSpan={6} style={{ textAlign: "center", padding: 40 }}>
+                    <Table.Td
+                      colSpan={6}
+                      style={{ textAlign: "center", padding: 40 }}
+                    >
                       <Text c="dimmed">No diary entries found.</Text>
                     </Table.Td>
                   </Table.Tr>
@@ -829,7 +853,7 @@ useEffect(() => {
                     >
                       <Table.Td style={{ padding: "12px 20px" }}>
                         <Group gap="sm">
-                         {getSubjectIcon(entry.subject)}
+                          {getSubjectIcon(entry.subject)}
                           <Text fw={500} size="sm">
                             {entry.subject}
                           </Text>
@@ -915,7 +939,8 @@ useEffect(() => {
       >
         <Text size="sm" c="dimmed">
           Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)} to{" "}
-          {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} entries
+          {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}{" "}
+          entries
         </Text>
         <Pagination
           total={totalPages}
@@ -940,7 +965,11 @@ useEffect(() => {
         onClose={closeAdd}
         title={
           <Group gap="xs">
-            <ThemeIcon size={28} radius="xl" style={{ background: "#5c3de822" }}>
+            <ThemeIcon
+              size={28}
+              radius="xl"
+              style={{ background: "#5c3de822" }}
+            >
               <IconCalendar size={14} color="#5c3de8" />
             </ThemeIcon>
             <Text fw={700} size="md" style={{ color: "#1a1a2e" }}>
@@ -960,7 +989,7 @@ useEffect(() => {
           onCancel={closeAdd}
           batchId={props.batchId}
           subjects={props.subjects}
-           fetchDiary={fetchDiary}
+          fetchDiary={fetchDiary}
         />
       </Drawer>
 
@@ -970,7 +999,11 @@ useEffect(() => {
         onClose={() => setEditEntry(null)}
         title={
           <Group gap="xs">
-            <ThemeIcon size={28} radius="xl" style={{ background: "#0984e322" }}>
+            <ThemeIcon
+              size={28}
+              radius="xl"
+              style={{ background: "#0984e322" }}
+            >
               <IconEdit size={14} color="#0984e3" />
             </ThemeIcon>
             <Text fw={700} size="md" style={{ color: "#1a1a2e" }}>
@@ -987,15 +1020,14 @@ useEffect(() => {
       >
         {editEntry && (
           <EntryForm
-           id={editEntry.id}
+            id={editEntry.id}
             initial={editEntry}
             onSave={handleEditSave}
             onCancel={() => setEditEntry(null)}
             teacher={editEntry.teacher}
             batchId={props.batchId}
             subjects={props.subjects}
-              fetchDiary={fetchDiary}
-
+            fetchDiary={fetchDiary}
           />
         )}
       </Drawer>
@@ -1022,7 +1054,13 @@ useEffect(() => {
             <Button variant="default" radius="md" onClick={closeDelete}>
               Cancel
             </Button>
-            <Button color="red" loading={isLoading} radius="md" onClick={handleDeleteConfirm} leftSection={<IconTrash size={14} />}>
+            <Button
+              color="red"
+              loading={isLoading}
+              radius="md"
+              onClick={handleDeleteConfirm}
+              leftSection={<IconTrash size={14} />}
+            >
               Delete
             </Button>
           </Group>
