@@ -22,6 +22,7 @@ export function createReceiptPdf(
   signature: string,
   // gstPercent: number = 0,
 
+  totalRemaining:number,
 
   gst: {
     sgst: number;
@@ -168,8 +169,12 @@ export function createReceiptPdf(
           <span>₹${currentSplitGst.toFixed(2)}</span>
         </div>
         <div class="calc-row" style="color: #e74c3c; font-weight:bold; border-top: 1px solid #000;">
-          <span>Pending Course Fee</span>
+          <span>Pending Installment Fee</span>
           <span>${formatCurrency(remainingFee)}</span>
+        </div>
+        <div class="calc-row" style="color: #e74c3c; font-weight:bold; ">
+          <span>Total Pending Fee</span>
+          <span>${formatCurrency(totalRemaining)}</span>
         </div>
         <div class="calc-row" style="color: #e74c3c; font-weight:bold;">
           <span>Pending Vanfare</span>

@@ -79,16 +79,11 @@ const FeeRecordTable = (props: {
     null,
   );
 
-
   const instituteDetails = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
 
-
-  const convertSinglePaymentPdf = (
-    installment: any,
-    payment: any
-  ) => {
+  const convertSinglePaymentPdf = (installment: any, payment: any) => {
     setisLoading(true);
 
     GetStudentForPdf(props.studentId)
@@ -96,7 +91,7 @@ const FeeRecordTable = (props: {
         setisLoading(false);
 
         const { student } = x;
-        const { instituteId } = student;
+        const { feeRecords, instituteId } = student;
 
         const studentName = student.name;
         const parentName = student.parentName;
@@ -110,8 +105,7 @@ const FeeRecordTable = (props: {
         let gst = instituteDetails.gst;
 
         if (
-          !(instituteDetails?.gst?.sgst > 0 ||
-            instituteDetails?.gst?.cgst > 0)
+          !(instituteDetails?.gst?.sgst > 0 || instituteDetails?.gst?.cgst > 0)
         ) {
           gst = {
             sgst: 0,
@@ -122,13 +116,13 @@ const FeeRecordTable = (props: {
         // Batch ki total fee
         const batchTotalFee = props.data.reduce(
           (sum, item) => sum + item.amount,
-          0
+          0,
         );
 
         // Student ne ab tak total kitna pay kiya
         const totalPaidTillNow = props.data.reduce(
           (sum, item) => sum + (item.amountPaid || 0),
-          0
+          0,
         );
 
         const paymentRecords = [
@@ -142,7 +136,7 @@ const FeeRecordTable = (props: {
               installment.paidHistory
                 .filter(
                   (p: any) =>
-                    new Date(p.paidDate) <= new Date(payment.paidDate)
+                    new Date(p.paidDate) <= new Date(payment.paidDate),
                 )
                 .reduce((sum: number, p: any) => sum + p.amount, 0),
             description: payment.description,
@@ -150,10 +144,22 @@ const FeeRecordTable = (props: {
           },
         ];
 
-        const base64Logo = await getBase64Image(instituteId.logo);
-        const base64Signature = await getBase64Image(
-          instituteId.signature
+        const totalAmount = feeRecords.reduce((sum: number, acc: any) => {
+          sum += acc.totalAmount;
+          return sum;
+        }, 0);
+        const totalPendingAmount = feeRecords.reduce(
+          (sum: number, acc: any) => {
+            sum += acc.amountPaid;
+            return sum;
+          },
+          0,
         );
+
+        const totalRemaining = totalAmount - totalPendingAmount;
+
+        const base64Logo = await getBase64Image(instituteId.logo);
+        const base64Signature = await getBase64Image(instituteId.signature);
 
         const receiptHtml = createReceiptPdf(
           studentName,
@@ -162,7 +168,7 @@ const FeeRecordTable = (props: {
 
           payment.amount,
 
-          totalPaidTillNow,   // ✅
+          totalPaidTillNow, // ✅
 
           paymentRecords,
 
@@ -173,7 +179,8 @@ const FeeRecordTable = (props: {
           receiptNo,
           props.batchName,
           base64Signature,
-          gst
+          totalRemaining,
+          gst,
         );
 
         const printWindow = window.open("", "_blank");
@@ -199,7 +206,6 @@ const FeeRecordTable = (props: {
       });
   };
 
-
   const convertHtmlIntoPdf = (id: string) => {
     setisLoading(true);
     GetStudentForPdf(props.studentId)
@@ -222,12 +228,8 @@ const FeeRecordTable = (props: {
         let paymentRecords;
         let amountPaid;
 
-
         let gst = instituteDetails.gst;
-        if (
-          instituteDetails?.gst?.sgst > 0 ||
-          instituteDetails?.gst?.cgst
-        ) {
+        if (instituteDetails?.gst?.sgst > 0 || instituteDetails?.gst?.cgst) {
           gst = instituteDetails.gst;
         } else {
           gst = {
@@ -241,9 +243,7 @@ const FeeRecordTable = (props: {
             .filter((f: any) => f._id === id)
             .map((record: any) => ({
               ...record,
-              remainingAmount:
-                record.totalAmount -
-                (record.amountPaid || 0),
+              remainingAmount: record.totalAmount - (record.amountPaid || 0),
             }));
           amountPaid = paymentRecords[0].amountPaid;
         } else {
@@ -254,6 +254,20 @@ const FeeRecordTable = (props: {
           }, 0);
         }
 
+        const totalAmount = feeRecords.reduce((sum: number, acc: any) => {
+          sum += acc.totalAmount;
+          return sum;
+        }, 0);
+        const totalPendingAmount = feeRecords.reduce(
+          (sum: number, acc: any) => {
+            sum += acc.amountPaid;
+            return sum;
+          },
+          0,
+        );
+
+        const totalRemaining = totalAmount - totalPendingAmount;
+
         const base64Logo = await getBase64Image(instituteId.logo);
 
         const base64Signature = await getBase64Image(instituteId.signature);
@@ -263,7 +277,7 @@ const FeeRecordTable = (props: {
           date,
           parentName,
           amountPaid,
-          paymentRecords[0].amountPaid,   // <-- NEW
+          paymentRecords[0].amountPaid, // <-- NEW
           paymentRecords,
           InstituteName,
           base64Logo,
@@ -272,6 +286,7 @@ const FeeRecordTable = (props: {
           receiptNo,
           props.batchName,
           base64Signature,
+          totalRemaining,
           gst,
         );
 
@@ -592,17 +607,15 @@ const FeeRecordTable = (props: {
           verticalSpacing="sm"
           striped
           highlightOnHover
-          style={{ tableLayout: 'fixed', width: '100%' }}
+          style={{ tableLayout: "fixed", width: "100%" }}
         >
           <thead>
             <tr>
-              <th style={{ width: '15%', textAlign: 'left' }}>S No.</th>
-              <th style={{ width: '35%', textAlign: 'left' }}>Payment Date</th>
-              <th style={{ width: '25%', textAlign: 'left' }}>Amount</th>
-              <th style={{ width: '25%', textAlign: 'left' }}>Description</th>
-              <th style={{ width: '25%', textAlign: 'left' }}>Action</th>
-
-
+              <th style={{ width: "15%", textAlign: "left" }}>S No.</th>
+              <th style={{ width: "35%", textAlign: "left" }}>Payment Date</th>
+              <th style={{ width: "25%", textAlign: "left" }}>Amount</th>
+              <th style={{ width: "25%", textAlign: "left" }}>Description</th>
+              <th style={{ width: "25%", textAlign: "left" }}>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -611,37 +624,42 @@ const FeeRecordTable = (props: {
                 (singlePaymentRecord: any, index: number) => {
                   return (
                     <tr key={index}>
-                      <td style={{ textAlign: 'left' }}>
+                      <td style={{ textAlign: "left" }}>
                         <Text size="sm" fw={500} c="dimmed">
                           {index + 1}
                         </Text>
                       </td>
-                      <td style={{ textAlign: 'left' }}>
+                      <td style={{ textAlign: "left" }}>
                         <Text size="sm" fw={500}>
-                          {new Date(singlePaymentRecord.paidDate).toLocaleDateString()}
+                          {new Date(
+                            singlePaymentRecord.paidDate,
+                          ).toLocaleDateString()}
                         </Text>
                       </td>
-                      <td style={{ textAlign: 'left' }}>
+                      <td style={{ textAlign: "left" }}>
                         <Text size="sm" fw={600} c="green.7">
                           ₹{singlePaymentRecord.amount}
                         </Text>
                       </td>
-                      <td style={{ textAlign: 'left' }}>
-                        <Text size="sm" c="dimmed" style={{ textTransform: 'capitalize' }}>
+                      <td style={{ textAlign: "left" }}>
+                        <Text
+                          size="sm"
+                          c="dimmed"
+                          style={{ textTransform: "capitalize" }}
+                        >
                           {singlePaymentRecord.description || "-"}
                         </Text>
                       </td>
-                      <td style={{ textAlign: 'left' }}>
+                      <td style={{ textAlign: "left" }}>
                         <IconDownload
                           style={{ cursor: "pointer" }}
                           onClick={() =>
                             convertSinglePaymentPdf(
                               selectedFeeRecord,
-                              singlePaymentRecord
+                              singlePaymentRecord,
                             )
                           }
                         />
-
                       </td>
                     </tr>
                   );
@@ -652,7 +670,6 @@ const FeeRecordTable = (props: {
       </Modal>
     </>
   );
-
 };
 
 export default FeeRecordTable;
