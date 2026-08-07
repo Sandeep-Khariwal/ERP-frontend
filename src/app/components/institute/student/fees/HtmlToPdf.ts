@@ -2,12 +2,14 @@ export function createReceiptPdf(
   studentName: string,
   date: Date,
   parentName: string,
-  amountPaid: number, // Current payment amount
+  amountPaid: number,      // Current payment
+  totalPaidSoFar: number,  // <-- ADD THIS
   paymentRecords: {
     amountPaid: number;
     updatedAt: Date;
     name: string;
     totalAmount: number;
+    remainingAmount?: number;
     description?: string;
     dueDate: Date;
   }[],
@@ -20,8 +22,9 @@ export function createReceiptPdf(
   signature: string,
   // gstPercent: number = 0,
 
+  totalRemaining:number,
 
- gst: {
+  gst: {
     sgst: number;
     cgst: number;
   },
@@ -43,8 +46,14 @@ export function createReceiptPdf(
 
   // 2. Academic Fee Totals
   const totalFeeWithGst = paymentRecords[0]?.totalAmount || 0;
-  const totalPaidSoFar = paymentRecords.reduce((sum, record) => sum + (record.amountPaid || 0), 0);
-  const remainingFee = totalFeeWithGst - totalPaidSoFar;
+
+  const remainingFee =
+    paymentRecords[0]?.remainingAmount ??
+    Math.max(
+      totalFeeWithGst -
+      paymentRecords[0].amountPaid,
+      0
+    );
 
   // 3. Vanfare calculations
   const totalVanfare = vanfareRecords.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
@@ -160,8 +169,12 @@ export function createReceiptPdf(
           <span>₹${currentSplitGst.toFixed(2)}</span>
         </div>
         <div class="calc-row" style="color: #e74c3c; font-weight:bold; border-top: 1px solid #000;">
-          <span>Pending Course Fee</span>
+          <span>Pending Installment Fee</span>
           <span>${formatCurrency(remainingFee)}</span>
+        </div>
+        <div class="calc-row" style="color: #e74c3c; font-weight:bold; ">
+          <span>Total Pending Fee</span>
+          <span>${formatCurrency(totalRemaining)}</span>
         </div>
         <div class="calc-row" style="color: #e74c3c; font-weight:bold;">
           <span>Pending Vanfare</span>
