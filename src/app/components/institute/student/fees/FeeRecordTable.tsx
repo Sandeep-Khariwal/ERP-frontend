@@ -23,7 +23,7 @@ import { Installment } from "@/interfaces/batchInterface";
 import { createReceiptPdf } from "./HtmlToPdf";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { GetStudentForPdf } from "@/axios/student/StudentGetApi";
-import { getBase64Image } from "@/app/helperFunction/Notification";
+import { formatDateDDMMYY, getBase64Image } from "@/app/helperFunction/Notification";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 
 export interface FeeRecord {
@@ -347,7 +347,7 @@ const FeeRecordTable = (props: {
           fontFamily: "sans-serif",
         }}
       >
-        {`${new Date(row.dueDate).toLocaleDateString()}`}
+        {formatDateDDMMYY(`${new Date(row.dueDate).toLocaleDateString()}`)}
       </Table.Td>
       <Table.Td
         style={{
@@ -407,7 +407,7 @@ const FeeRecordTable = (props: {
         }}
       >
         {(row.amountPaid ?? 0) > 0
-          ? `${new Date(row.updatedAt || 0).toLocaleDateString()}`
+          ? formatDateDDMMYY(`${new Date(row.updatedAt || 0).toLocaleDateString()}`)
           : "N/A"}
       </Table.Td>
       {/* {props.userType === UserType.TEACHER && ( */}
@@ -631,9 +631,9 @@ const FeeRecordTable = (props: {
                       </td>
                       <td style={{ textAlign: "left" }}>
                         <Text size="sm" fw={500}>
-                          {new Date(
+                          {formatDateDDMMYY(new Date(
                             singlePaymentRecord.paidDate,
-                          ).toLocaleDateString()}
+                          ).toLocaleDateString())}
                         </Text>
                       </td>
                       <td style={{ textAlign: "left" }}>

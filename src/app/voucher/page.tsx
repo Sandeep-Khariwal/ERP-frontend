@@ -1814,7 +1814,7 @@ export default function Voucher() {
                     Lifetime Ownership
                   </Badge>
                   <Group align="flex-end" gap={4}>
-                    <Title order={1} c="dark.9">₹30,000</Title>
+                    <Title order={1} c="dark.9">₹30,000 + 10k Parent App</Title>
                     <Text size="sm" c="dimmed" mb={6}>one-time</Text>
                   </Group>
                   <Text size="sm" c="violet" fw={600}>+ ₹1,000/month maintenance</Text>

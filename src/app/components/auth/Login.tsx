@@ -149,6 +149,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
           );
         })
         .catch((e) => {
+           setIsLoading(false);
           console.log("e: ", e);
           const { message } = e?.response?.data;
           ErrorNotification(message);
@@ -156,7 +157,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
             navigation.push("/pricing");
           }
 
-          setIsLoading(false);
         });
     }
 
@@ -191,13 +191,12 @@ export default function Login(props: { onCreateAccount: () => void }) {
           navigation.push(`/user/${user._id}/${user.name}`);
         })
         .catch((e) => {
+           setIsLoading(false);
           if (e?.response) {
             const { message } = e?.response?.data;
             ErrorNotification(message);
             // SuccessNotification("error found!!");
           }
-
-          setIsLoading(false);
         });
     }
     // for student login
@@ -211,10 +210,10 @@ export default function Login(props: { onCreateAccount: () => void }) {
           setIsLoading(false);
         })
         .catch((e: any) => {
+          setIsLoading(false);
           const { message } = e.response.data;
           ErrorNotification(message);
           console.log(e);
-          setIsLoading(false);
         });
     }
     // for teacher login
@@ -247,11 +246,11 @@ export default function Login(props: { onCreateAccount: () => void }) {
           navigation.push(`/teacher/${teacher._id}/${teacher.name}`);
         })
         .catch((e: any) => {
+          setIsLoading(false);
           const { message } = e.response.data;
           ErrorNotification(message);
           // SuccessNotification("error found!!");
           console.log(e);
-          setIsLoading(false);
         });
     }
   };

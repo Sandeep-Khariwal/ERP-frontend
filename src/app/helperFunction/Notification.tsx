@@ -88,3 +88,11 @@ export function getExamStartTime(date: any) {
     hour12: true,
   });
 }
+
+export function formatDateDDMMYY(date: string) {
+  if (!date) return "";
+
+  const [day, month, year] = date.split("/");
+
+  return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+}
