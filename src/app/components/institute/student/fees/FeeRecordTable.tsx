@@ -17,7 +17,7 @@ import {
   IconArrowLeftFromArc,
   IconArrowUpFromArc,
   IconDownload,
-   IconEye,
+  IconEye,
 } from "@tabler/icons-react";
 import { Installment } from "@/interfaces/batchInterface";
 import { createReceiptPdf } from "./HtmlToPdf";
@@ -47,11 +47,11 @@ export interface FeeRecord {
     paymentDate: Date;
   }[];
   paidHistory: {
-  _id: string;
-  amount: number;
-  paidDate: Date;
-  description: string;
-}[];
+    _id: string;
+    amount: number;
+    paidDate: Date;
+    description: string;
+  }[];
 }
 
 const FeeRecordTable = (props: {
@@ -79,12 +79,133 @@ const FeeRecordTable = (props: {
     null,
   );
 
+  const instituteDetails = useAppSelector(
+    (state: any) => state.instituteSlice.instituteDetails,
+  );
 
-   const instituteDetails = useAppSelector(
-      (state: any) => state.instituteSlice.instituteDetails,
-    );
+  const convertSinglePaymentPdf = (installment: any, payment: any) => {
+    setisLoading(true);
 
-  
+    GetStudentForPdf(props.studentId)
+      .then(async (x: any) => {
+        setisLoading(false);
+
+        const { student } = x;
+        const { feeRecords, instituteId } = student;
+
+        const studentName = student.name;
+        const parentName = student.parentName;
+        const date = new Date(payment.paidDate);
+
+        const InstituteName = instituteId.name;
+        const address = instituteId.address;
+        const phoneNumber = instituteId.institutePhoneNumber;
+        const receiptNo = "R-" + instituteId.receiptCount;
+
+        let gst = instituteDetails.gst;
+
+        if (
+          !(instituteDetails?.gst?.sgst > 0 || instituteDetails?.gst?.cgst > 0)
+        ) {
+          gst = {
+            sgst: 0,
+            cgst: 0,
+          };
+        }
+
+        // Batch ki total fee
+        const batchTotalFee = props.data.reduce(
+          (sum, item) => sum + item.amount,
+          0,
+        );
+
+        // Student ne ab tak total kitna pay kiya
+        const totalPaidTillNow = props.data.reduce(
+          (sum, item) => sum + (item.amountPaid || 0),
+          0,
+        );
+
+        const paymentRecords = [
+          {
+            amountPaid: payment.amount,
+            updatedAt: payment.paidDate,
+            name: installment.name,
+            totalAmount: installment.totalAmount ?? installment.amount,
+            remainingAmount:
+              (installment.totalAmount ?? installment.amount) -
+              installment.paidHistory
+                .filter(
+                  (p: any) =>
+                    new Date(p.paidDate) <= new Date(payment.paidDate),
+                )
+                .reduce((sum: number, p: any) => sum + p.amount, 0),
+            description: payment.description,
+            dueDate: installment.dueDate,
+          },
+        ];
+
+        const totalAmount = feeRecords.reduce((sum: number, acc: any) => {
+          sum += acc.totalAmount;
+          return sum;
+        }, 0);
+        const totalPendingAmount = feeRecords.reduce(
+          (sum: number, acc: any) => {
+            sum += acc.amountPaid;
+            return sum;
+          },
+          0,
+        );
+
+        const totalRemaining = totalAmount - totalPendingAmount;
+
+        const base64Logo = await getBase64Image(instituteId.logo);
+        const base64Signature = await getBase64Image(instituteId.signature);
+
+        const receiptHtml = createReceiptPdf(
+          studentName,
+          date,
+          parentName,
+
+          payment.amount,
+
+          totalPaidTillNow, // ✅
+
+          paymentRecords,
+
+          InstituteName,
+          base64Logo,
+          address,
+          phoneNumber,
+          receiptNo,
+          props.batchName,
+          base64Signature,
+          totalRemaining,
+          gst,
+        );
+
+        const printWindow = window.open("", "_blank");
+
+        if (printWindow) {
+          printWindow.document.open();
+          printWindow.document.write(receiptHtml);
+          printWindow.document.close();
+
+          setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+
+            printWindow.onafterprint = () => {
+              printWindow.close();
+            };
+          }, 500);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+        setisLoading(false);
+      });
+  };
+
   const convertHtmlIntoPdf = (id: string) => {
     setisLoading(true);
     GetStudentForPdf(props.studentId)
@@ -93,7 +214,7 @@ const FeeRecordTable = (props: {
         const { student } = x;
         const { feeRecords, instituteId } = student;
         console.log("InstituteId =", instituteId);
-console.log("Institute GST =", instituteId.gst);
+        console.log("Institute GST =", instituteId.gst);
 
         const studentName = student.name;
         const date = new Date();
@@ -107,22 +228,23 @@ console.log("Institute GST =", instituteId.gst);
         let paymentRecords;
         let amountPaid;
 
-
-                    let gst = instituteDetails.gst;
-                    if (
-                      instituteDetails?.gst?.sgst > 0 ||
-                      instituteDetails?.gst?.cgst
-                    ) {
-                      gst = instituteDetails.gst;
-                    } else {
-                      gst = {
-                        sgst: 0,
-                        cgst: 0,
-                      };
-                    }
+        let gst = instituteDetails.gst;
+        if (instituteDetails?.gst?.sgst > 0 || instituteDetails?.gst?.cgst) {
+          gst = instituteDetails.gst;
+        } else {
+          gst = {
+            sgst: 0,
+            cgst: 0,
+          };
+        }
 
         if (id) {
-          paymentRecords = feeRecords.filter((f: any) => f._id === id);
+          paymentRecords = feeRecords
+            .filter((f: any) => f._id === id)
+            .map((record: any) => ({
+              ...record,
+              remainingAmount: record.totalAmount - (record.amountPaid || 0),
+            }));
           amountPaid = paymentRecords[0].amountPaid;
         } else {
           paymentRecords = feeRecords;
@@ -132,16 +254,30 @@ console.log("Institute GST =", instituteId.gst);
           }, 0);
         }
 
+        const totalAmount = feeRecords.reduce((sum: number, acc: any) => {
+          sum += acc.totalAmount;
+          return sum;
+        }, 0);
+        const totalPendingAmount = feeRecords.reduce(
+          (sum: number, acc: any) => {
+            sum += acc.amountPaid;
+            return sum;
+          },
+          0,
+        );
+
+        const totalRemaining = totalAmount - totalPendingAmount;
+
         const base64Logo = await getBase64Image(instituteId.logo);
 
         const base64Signature = await getBase64Image(instituteId.signature);
-console.log("GST received in receipt:", gst);
+        console.log("GST received in receipt:", gst);
         const receiptHtml = createReceiptPdf(
-          
           studentName,
           date,
           parentName,
           amountPaid,
+          paymentRecords[0].amountPaid, // <-- NEW
           paymentRecords,
           InstituteName,
           base64Logo,
@@ -150,7 +286,8 @@ console.log("GST received in receipt:", gst);
           receiptNo,
           props.batchName,
           base64Signature,
-           gst,
+          totalRemaining,
+          gst,
         );
 
         const printWindow = window.open("", "_blank");
@@ -290,18 +427,18 @@ console.log("GST received in receipt:", gst);
             />
           )} */}
           {(row.amountPaid ?? 0) > 0 && (
-  <Flex justify="center" gap={8}>
-    <IconEye
-      style={{ cursor: "pointer" , color:"#5e66de" }}
-      onClick={() => setSelectedFeeRecord(row as any)}
-    />
+            <Flex justify="center" gap={8}>
+              <IconEye
+                style={{ cursor: "pointer", color: "#5e66de" }}
+                onClick={() => setSelectedFeeRecord(row as any)}
+              />
 
-    <IconDownload
-      style={{ cursor: "pointer" }}
-      onClick={() => convertHtmlIntoPdf(row._id || "")}
-    />
-  </Flex>
-)}
+              <IconDownload
+                style={{ cursor: "pointer" }}
+                onClick={() => convertHtmlIntoPdf(row._id || "")}
+              />
+            </Flex>
+          )}
         </Table.Td>
         {/* <Table.Td style={{padding: isMd?"10px":"5px", textAlign: isMd?"center":"start" }}>
             {(row.amountPaid??0) > 0 ? (
@@ -448,84 +585,91 @@ console.log("GST received in receipt:", gst);
           </Box>
         </Box>
       </Stack>
-     <Modal
-  opened={selectedFeeRecord != null}
-  onClose={() => {
-    setSelectedFeeRecord(null);
-  }}
-  title={
-    <Text size="lg" fw={700} c="blue.7">
-      Paid History
-    </Text>
-  }
-  centered
-  size="lg"
-  radius="md" // Premium rounded corners ke liye
-  overlayProps={{
-    blur: 3, // Background ko blur karke modal ko pop karne ke liye
-  }}
->
-  <Table 
-    horizontalSpacing="md" 
-    verticalSpacing="sm" 
-    striped 
-    highlightOnHover
-    style={{ tableLayout: 'fixed', width: '100%' }}
-  >
-    <thead>
-      <tr>
-        <th style={{ width: '15%', textAlign: 'left' }}>S No.</th>
-        <th style={{ width: '35%', textAlign: 'left' }}>Payment Date</th>
-        <th style={{ width: '25%', textAlign: 'left' }}>Amount</th>
-        <th style={{ width: '25%', textAlign: 'left' }}>Description</th>
-        <th style={{ width: '25%', textAlign: 'left' }}>Action</th>
-        
-
-      </tr>
-    </thead>
-    <tbody>
-      {selectedFeeRecord &&
-        selectedFeeRecord?.paidHistory?.map(
-          (singlePaymentRecord: any, index: number) => {
-            return (
-              <tr key={index}>
-                <td style={{ textAlign: 'left' }}>
-                  <Text size="sm" fw={500} c="dimmed">
-                    {index + 1}
-                  </Text>
-                </td>
-                <td style={{ textAlign: 'left' }}>
-                  <Text size="sm" fw={500}>
-                    {new Date(singlePaymentRecord.paidDate).toLocaleDateString()}
-                  </Text>
-                </td>
-                <td style={{ textAlign: 'left' }}>
-                  <Text size="sm" fw={600} c="green.7">
-                    ₹{singlePaymentRecord.amount}
-                  </Text>
-                </td>
-                <td style={{ textAlign: 'left' }}>
-                  <Text size="sm" c="dimmed" style={{ textTransform: 'capitalize' }}>
-                    {singlePaymentRecord.description || "-"}
-                  </Text>    
-                </td>
-                <td style={{ textAlign: 'left' }}>
-  <IconDownload
-    style={{ cursor: "pointer" }}
-    onClick={() => convertHtmlIntoPdf(selectedFeeRecord?._id || "")}
-  />
-                  
-                </td>
-              </tr>
-            );
-          },
-        )}
-    </tbody>
-  </Table>
-</Modal>
+      <Modal
+        opened={selectedFeeRecord != null}
+        onClose={() => {
+          setSelectedFeeRecord(null);
+        }}
+        title={
+          <Text size="lg" fw={700} c="blue.7">
+            Paid History
+          </Text>
+        }
+        centered
+        size="lg"
+        radius="md" // Premium rounded corners ke liye
+        overlayProps={{
+          blur: 3, // Background ko blur karke modal ko pop karne ke liye
+        }}
+      >
+        <Table
+          horizontalSpacing="md"
+          verticalSpacing="sm"
+          striped
+          highlightOnHover
+          style={{ tableLayout: "fixed", width: "100%" }}
+        >
+          <thead>
+            <tr>
+              <th style={{ width: "15%", textAlign: "left" }}>S No.</th>
+              <th style={{ width: "35%", textAlign: "left" }}>Payment Date</th>
+              <th style={{ width: "25%", textAlign: "left" }}>Amount</th>
+              <th style={{ width: "25%", textAlign: "left" }}>Description</th>
+              <th style={{ width: "25%", textAlign: "left" }}>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedFeeRecord &&
+              selectedFeeRecord?.paidHistory?.map(
+                (singlePaymentRecord: any, index: number) => {
+                  return (
+                    <tr key={index}>
+                      <td style={{ textAlign: "left" }}>
+                        <Text size="sm" fw={500} c="dimmed">
+                          {index + 1}
+                        </Text>
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        <Text size="sm" fw={500}>
+                          {new Date(
+                            singlePaymentRecord.paidDate,
+                          ).toLocaleDateString()}
+                        </Text>
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        <Text size="sm" fw={600} c="green.7">
+                          ₹{singlePaymentRecord.amount}
+                        </Text>
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        <Text
+                          size="sm"
+                          c="dimmed"
+                          style={{ textTransform: "capitalize" }}
+                        >
+                          {singlePaymentRecord.description || "-"}
+                        </Text>
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        <IconDownload
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            convertSinglePaymentPdf(
+                              selectedFeeRecord,
+                              singlePaymentRecord,
+                            )
+                          }
+                        />
+                      </td>
+                    </tr>
+                  );
+                },
+              )}
+          </tbody>
+        </Table>
+      </Modal>
     </>
   );
-  
 };
 
 export default FeeRecordTable;
