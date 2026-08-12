@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ReactQueryProvider from "./react-query-provider";
 import "./globals.css";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
@@ -11,7 +12,7 @@ import { ReduxProvider } from "./redux/provider";
 import React from "react";
 import { ModalsProvider } from "@mantine/modals";
 import Script from "next/script";
-
+import SessionRestore from "./components/SessionRestore";
 
 
 
@@ -116,11 +117,16 @@ export default function RootLayout({
           }}
         >
           <ReduxProvider>
-            <ModalsProvider>
+  <ReactQueryProvider>
+    <ModalsProvider>
+      <React.StrictMode>
+        <SessionRestore />
 
-              <React.StrictMode>{children}</React.StrictMode>
-            </ModalsProvider>
-          </ReduxProvider>
+        {children}
+      </React.StrictMode>
+    </ModalsProvider>
+  </ReactQueryProvider>
+</ReduxProvider>
         </MantineProvider>
       </body>
     </html>
