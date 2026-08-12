@@ -233,6 +233,9 @@ export default function Login(props: { onCreateAccount: () => void }) {
             })
           );
           dispatch(saveToken(token));
+          localStorage.setItem(LocalStorageKey.Token, token);   // ⬅️ NAYI LINE
+      localStorage.setItem("teacherId", teacher._id);       // ⬅️ NAYI LINE
+      localStorage.setItem("userType", "teacher"); 
 
           const instituteDetails = {
             name: teacher.instituteId.name,

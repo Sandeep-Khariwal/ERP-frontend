@@ -99,6 +99,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     GetAccountByToken()
       .then((x: any) => {
         const { data } = x;
+
         setIsLoading(false);
         dispatch(
           setAdminDetails({
