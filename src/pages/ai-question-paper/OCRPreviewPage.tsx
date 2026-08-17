@@ -343,7 +343,7 @@ interface OCRPreviewCardProps {
 }
 
 function OCRPreviewCard({ docId, index, instituteId, onTextChange }: OCRPreviewCardProps) {
-  const { data, isLoading } = useOCRDocument(docId, instituteId);
+  const { data, isLoading }:any = useOCRDocument(docId, instituteId);
   const updateMutation = useUpdateOCRText();
   const [editMode, setEditMode] = useState(false);
   const [localText, setLocalText] = useState("");
@@ -516,7 +516,7 @@ function OCRPreviewCard({ docId, index, instituteId, onTextChange }: OCRPreviewC
 export default function OCRPreviewPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const idsParam = searchParams.get("ids") || "";
+  const idsParam = searchParams?.get("ids") || "";
   const docIds = idsParam.split(",").filter(Boolean);
 
   // Real institute data from Redux — NOT a hardcoded placeholder.

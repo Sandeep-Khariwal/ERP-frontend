@@ -83,7 +83,7 @@ export const DesktopNavbar = (props: {
 
   const [openBusiness, setOpenBusiness] = useState(false);
   const [openMarketing, setOpenMarketing] = useState(false);
-  const [hovered, setHovered] = useState(false);
+  const hovered = !props.isCollapsed;
   const [settingsOpened, setSettingsOpened] = useState(false);
   const [logoModalOpen, setLogoModalOpen] = useState(false);
   const [activeSettingTab, setActiveSettingTab] = useState<
@@ -556,17 +556,11 @@ export const DesktopNavbar = (props: {
       />
 
       <Stack
-        w={isMd ? "0px" : hovered ? "250px" : "80px"}
+        w="100%"
         h={"100vh"}
         style={{
-          position: "fixed",
-          left: 0,
-          top: 0,
-          zIndex: 1000, // 🔥 ADD THIS
           transition: "width 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         p={0}
       >
         <Stack

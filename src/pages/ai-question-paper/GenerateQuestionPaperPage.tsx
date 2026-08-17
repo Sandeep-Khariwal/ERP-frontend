@@ -402,7 +402,7 @@ import { useAppSelector } from "@/app/redux/redux.hooks";
 export default function GenerateQuestionPaperPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const idsParam = searchParams.get("ids") || "";
+  const idsParam = searchParams?.get("ids") || "";
   const docIds = idsParam.split(",").filter(Boolean);
 
   // Real institute/teacher data from Redux — not hardcoded placeholders.

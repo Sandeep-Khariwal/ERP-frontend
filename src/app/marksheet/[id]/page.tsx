@@ -56,9 +56,9 @@ function Page() {
   const [data, setData] = useState<MarksheetData | null>(null);
 
   useEffect(() => {
-    if (!params.id) return;
+    if (!params?.id) return;
 
-    GetMarksheetVerify(params.id.toString())
+    GetMarksheetVerify(params?.id.toString())
       .then((res: any) => {
         const marksheet = res.marksheet;
         GetStudentDetail(marksheet.student._id).then((studentRes: any) => {
@@ -87,7 +87,7 @@ function Page() {
         });
       })
       .catch(() => setLoading(false));
-  }, [params.id]);
+  }, [params?.id]);
 
   if (loading)
     return (

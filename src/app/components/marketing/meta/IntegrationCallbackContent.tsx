@@ -67,9 +67,9 @@ export function IntegrationsCallbackContent() {
   const notifiedRef  = useRef(false); // prevent double notification in strict mode
 
   // ── Read params — exactly matching what your backend sends ───────
-  const success = searchParams.get("success"); // "meta_connected" | null
-  const error   = searchParams.get("error");   // see ERROR_MAP keys above | null
-  const pages   = searchParams.get("pages");   // number string e.g. "3" | null
+  const success = searchParams?.get("success"); // "meta_connected" | null
+  const error   = searchParams?.get("error");   // see ERROR_MAP keys above | null
+  const pages   = searchParams?.get("pages");   // number string e.g. "3" | null
 
   const isSuccess = success === "meta_connected";
   const isError   = !!error;

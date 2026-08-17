@@ -743,6 +743,7 @@ import {
   ScrollArea,
   Paper,
   Menu,
+  Center,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -1088,7 +1089,7 @@ function EditQuestionModal({
 export default function QuestionEditorPage() {
   const params = useParams();
   const router = useRouter();
-  const paperId = params.id as string;
+  const paperId = params?.id as string;
 
   // Real institute/teacher data from Redux — not hardcoded placeholders.
   const institute = useAppSelector(
@@ -1102,7 +1103,7 @@ export default function QuestionEditorPage() {
   // Use the real institute name for PDF generation instead of a hardcoded one.
   const instituteName = institute?.name || "";
 
-  const { data, isLoading } = useQuestionPaper(paperId, instituteId);
+  const { data, isLoading }:any = useQuestionPaper(paperId, instituteId);
   const updatePaperMutation = useUpdatePaper();
   const generatePDFMutation = useGeneratePDF();
   const publishMutation = usePublishExam();
@@ -1171,14 +1172,14 @@ export default function QuestionEditorPage() {
   };
 
   const handleSaveEditedQuestion = (updated: Question) => {
-    const newList = currentQuestions.map((q) =>
+    const newList = currentQuestions.map((q:any) =>
       q._id === updated._id ? updated : q
     );
     setQuestions(newList);
   };
 
   const handleDeleteQuestion = (id: string) => {
-    setQuestions(currentQuestions.filter((q) => q._id !== id));
+    setQuestions(currentQuestions.filter((q:any) => q._id !== id));
   };
 
   const handleDuplicateQuestion = (q: Question) => {
@@ -1191,7 +1192,7 @@ export default function QuestionEditorPage() {
   };
 
   const moveQuestion = (id: string, dir: "up" | "down") => {
-    const idx = currentQuestions.findIndex((q) => q._id === id);
+    const idx = currentQuestions.findIndex((q:any) => q._id === id);
     if (idx < 0) return;
     const next = dir === "up" ? idx - 1 : idx + 1;
     if (next < 0 || next >= currentQuestions.length) return;
@@ -1274,10 +1275,10 @@ export default function QuestionEditorPage() {
     }
   };
 
-  const mcqs = currentQuestions.filter((q) => q.type === "mcq");
-  const shorts = currentQuestions.filter((q) => q.type === "short");
-  const longs = currentQuestions.filter((q) => q.type === "long");
-  const veryLongs = currentQuestions.filter((q) => q.type === "very_long");
+  const mcqs = currentQuestions.filter((q:any) => q.type === "mcq");
+  const shorts = currentQuestions.filter((q:any) => q.type === "short");
+  const longs = currentQuestions.filter((q:any) => q.type === "long");
+  const veryLongs = currentQuestions.filter((q:any) => q.type === "very_long");
 
   return (
     <Container size="xl" py="xl">
@@ -1380,7 +1381,7 @@ export default function QuestionEditorPage() {
               const tabQuestions =
                 tab === "all"
                   ? currentQuestions
-                  : currentQuestions.filter((q) => q.type === tab);
+                  : currentQuestions.filter((q:any) => q.type === tab);
 
               return (
                 <Tabs.Panel key={tab} value={tab} pt="md">
@@ -1395,7 +1396,7 @@ export default function QuestionEditorPage() {
                           </Stack>
                         </Card>
                       )}
-                      {tabQuestions.map((q, i) => (
+                      {tabQuestions.map((q:any, i:number) => (
                         <QuestionCard
                           key={q._id}
                           question={q}

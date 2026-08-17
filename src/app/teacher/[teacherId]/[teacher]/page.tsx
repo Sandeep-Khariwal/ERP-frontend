@@ -20,8 +20,8 @@ import {
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
 import { LogOut } from "@/axios/LocalStorageUtility";
 import { GetTeachersAllBatches } from "@/axios/teacher/TeacherGetApi";
-import { LoadingOverlay, SimpleGrid, Stack, Text } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
+import { LoadingOverlay, SimpleGrid, Stack, Text, AppShell, Group, Burger } from "@mantine/core";
+import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 import { IconCircle0 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -33,6 +33,7 @@ const Teacher = () => {
   );
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const isLg = useMediaQuery(`(max-width: 1024px)`);
+  const [opened, { toggle }] = useDisclosure();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>();
   const [batchId, setBatchId] = useState<string | null>(null);
@@ -103,17 +104,31 @@ const Teacher = () => {
   };
 
   return (
-    <Stack
-      w={"100%"}
-      mih={"100vh"}
+    <AppShell
+      header={{ height: 60 }}
+      padding={0}
+      style={{ minHeight: "100vh" }}
       bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
     >
-      <LoadingOverlay visible={isLoading} />
-      <TeacherProfile
-        teacherId={selectedTeacherId}
-        onClickBack={() => {}}
-        userType={UserType.TEACHER}
-      />
+      <AppShell.Header style={{ display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
+        <Group>
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+          <Text fw={700} fz="1.1rem">Shikshapay Teacher</Text>
+        </Group>
+      </AppShell.Header>
+      
+      <AppShell.Main>
+        <Stack
+          w={"100%"}
+          mih={"100vh"}
+          bg={"transparent"}
+        >
+          <LoadingOverlay visible={isLoading} />
+          <TeacherProfile
+            teacherId={selectedTeacherId}
+            onClickBack={() => {}}
+            userType={UserType.TEACHER}
+          />
       {/* {batchId === null && (
         <Stack w={!isMd ? "80%" : "100%"} h={"100%"} mx={"auto"} p={20}>
           <Text
@@ -231,7 +246,9 @@ const Teacher = () => {
           Log out
         </Text>
       </Stack> */}
-    </Stack>
+        </Stack>
+      </AppShell.Main>
+    </AppShell>
   );
 };
 

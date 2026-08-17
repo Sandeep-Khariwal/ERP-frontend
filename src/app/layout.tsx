@@ -4,7 +4,7 @@ import "./globals.css";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
 import "@mantine/carousel/styles.css";
 
 import { MantineProvider } from "@mantine/core";
@@ -14,12 +14,10 @@ import { ModalsProvider } from "@mantine/modals";
 import Script from "next/script";
 import SessionRestore from "./components/SessionRestore";
 
-
-
 export const metadata: Metadata = {
   title: {
     default: "shikshapay | Best ERP for school finance management",
-    template: "%s"
+    template: "%s",
   },
 
   description: "Best - ERP software for records management",
@@ -50,7 +48,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-DCCMSKS911"
           strategy="afterInteractive"
@@ -117,16 +114,16 @@ export default function RootLayout({
           }}
         >
           <ReduxProvider>
-  <ReactQueryProvider>
-    <ModalsProvider>
-      <React.StrictMode>
-        <SessionRestore />
+            <ReactQueryProvider>
+              <ModalsProvider>
+                <React.StrictMode>
+                  <SessionRestore />
 
-        {children}
-      </React.StrictMode>
-    </ModalsProvider>
-  </ReactQueryProvider>
-</ReduxProvider>
+                  {children}
+                </React.StrictMode>
+              </ModalsProvider>
+            </ReactQueryProvider>
+          </ReduxProvider>
         </MantineProvider>
       </body>
     </html>

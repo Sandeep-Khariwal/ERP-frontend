@@ -1,9 +1,10 @@
 "use client";
 
-import { Box, Divider, Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
+import { Box, Divider, Flex, LoadingOverlay, Stack, Text, AppShell, Burger, Group, Button } from "@mantine/core";
+import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { StudentTabs } from "../institute/InstituteStudents";
 import FeeRecordSection from "../institute/student/fees/FeeRecord";
 import StudentOverview from "./StudentOverview";
@@ -56,14 +57,32 @@ export interface ChartData {
   datasets: Dataset[];
 }
 
-const StudentPage = (props: {
-  onClickBack: () => void;
-  activeTab: StudentTabs;
+export interface StudentPageProps {
   studentId: string;
+  onClickBack: () => void;
   userType: UserType;
-}) => {
+  activeTab?: StudentTabs;
+  onLogout?: () => void;
+}
+
+const StudentPage = (props: StudentPageProps) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
-  const [activeTab, setActiveTab] = useState<StudentTabs>(props.activeTab);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const tabQuery = searchParams?.get("studentTab") as StudentTabs | null;
+  const urlTab = tabQuery && Object.values(StudentTabs).includes(tabQuery) ? tabQuery : null;
+  const [activeTabState, setActiveTabState] = useState<StudentTabs>(props.activeTab || StudentTabs.OVERVIEW);
+
+  const activeTab = urlTab || activeTabState;
+
+  const setActiveTab = (val: StudentTabs) => {
+    setActiveTabState(val);
+    const newParams = new URLSearchParams(searchParams?.toString());
+    newParams.set("studentTab", val);
+    router.push(`${pathname}?${newParams.toString()}`);
+  };
 
   const [student, setStudent] = useState<StudentOverView>({
     _id: "",
@@ -154,7 +173,7 @@ const StudentPage = (props: {
       });
   };
 
-  return (
+  const content = (
     <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
@@ -181,41 +200,42 @@ const StudentPage = (props: {
           </>
         )}
       </Flex>
-      <Flex mt={isMd ? 10 : 20}>
-        {Object.values(StudentTabs)
-          .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
-          .map((item: StudentTabs, i: number) => {
-            return (
-              <Box key={i}>
-                {!(
-                  item === StudentTabs.FEES &&
-                  UserType.TEACHER === props.userType
-                ) && (
-                  <Text
-                    key={i}
-                    onClick={() => setActiveTab(item)}
-                    mx={isMd ? 14 : 30}
-                    c={activeTab === item ? "#1B1212" : "#2F4F4F"}
-                    fw={600}
-                    style={{
-                      cursor: "pointer",
-                      whiteSpace: "nowrap",
-                      border: "none",
-                      borderBottom: "2px solid",
-                      borderColor: activeTab === item ? "#4B65F6" : "white",
-                    }}
-                    fz={16}
-                    ff={"Roboto"}
-                    w={"auto"}
-                  >
-                    {item}
-                    {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
-                  </Text>
-                )}
-              </Box>
-            );
-          })}
-      </Flex>
+      {props.userType !== UserType.STUDENT && (
+        <Flex mt={isMd ? 10 : 20}>
+          {Object.values(StudentTabs)
+            .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
+            .map((item: StudentTabs, i: number) => {
+              return (
+                <Box key={i}>
+                  {!(
+                    item === StudentTabs.FEES &&
+                    UserType.TEACHER === props.userType
+                  ) && (
+                    <Text
+                      key={i}
+                      onClick={() => setActiveTab(item)}
+                      mx={isMd ? 14 : 30}
+                      c={activeTab === item ? "#1B1212" : "#2F4F4F"}
+                      fw={600}
+                      style={{
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        border: "none",
+                        borderBottom: "2px solid",
+                        borderColor: activeTab === item ? "#4B65F6" : "white",
+                      }}
+                      fz={16}
+                      ff={"Roboto"}
+                      w={"auto"}
+                    >
+                      {item}
+                    </Text>
+                  )}
+                </Box>
+              );
+            })}
+        </Flex>
+      )}
 
       <Divider c={"gray"} />
       {StudentTabs.OVERVIEW === activeTab && (
@@ -264,6 +284,63 @@ const StudentPage = (props: {
       )}
     </Stack>
   );
+
+  const [opened, { toggle }] = useDisclosure();
+  
+  if (props.userType === UserType.STUDENT) {
+    return (
+      <AppShell
+        header={{ height: 60 }}
+        navbar={{
+          width: 250,
+          breakpoint: 'sm',
+          collapsed: { mobile: !opened },
+        }}
+        padding="md"
+        bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+      >
+        <AppShell.Header style={{ display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
+          <Group>
+            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+            <Text fw={700} fz="1.2rem">Student Dashboard - {student.name}</Text>
+          </Group>
+          {props.onLogout && (
+            <Button color="red" variant="light" onClick={props.onLogout}>
+              Logout
+            </Button>
+          )}
+        </AppShell.Header>
+        <AppShell.Navbar p="md">
+          <Stack>
+            {Object.values(StudentTabs)
+              .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
+              .map((item: StudentTabs, i: number) => (
+                <Text
+                  key={i}
+                  onClick={() => { setActiveTab(item); toggle(); }}
+                  c={activeTab === item ? "#4B65F6" : "#2F4F4F"}
+                  fw={600}
+                  style={{
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    background: activeTab === item ? "#E8EDFF" : "transparent"
+                  }}
+                  fz={16}
+                >
+                  {item}
+                </Text>
+              ))}
+          </Stack>
+        </AppShell.Navbar>
+        <AppShell.Main>
+           {content}
+        </AppShell.Main>
+      </AppShell>
+    );
+  }
+
+  return content;
 };
 
 export default StudentPage;

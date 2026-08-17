@@ -70,7 +70,7 @@ export function AppLayout({ children }: Props) {
                 <ThemeIcon
                   size={28}
                   radius="sm"
-                  variant={pathname.startsWith(item.href) ? "filled" : "light"}
+                  variant={pathname?.startsWith(item.href) ? "filled" : "light"}
                   color="blue"
                 >
                   <item.icon size={15} />
@@ -83,7 +83,7 @@ export function AppLayout({ children }: Props) {
                   </Badge>
                 ) : null
               }
-              active={pathname.startsWith(item.href)}
+              active={pathname?.startsWith(item.href)}
               styles={{
                 root: { borderRadius: "var(--mantine-radius-md)", marginBottom: 4 },
               }}

@@ -1028,18 +1028,18 @@ const HOVER_TINT = "rgba(124,108,240,0.14)";
 
 export default function MeetingRoomPage() {
   
-  const params = useParams();
+  const params:any = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const meetingId = params.id as string;
+  const meetingId = params?.id as string;
 
-  const redirectUrl = searchParams.get("redirect");
+  const redirectUrl = searchParams?.get("redirect");
 
   console.log("Redirect URL:", redirectUrl);
 
-  const role = (searchParams.get("role") || "student") as UserRole;
-  const userId = searchParams.get("userId") || "user_" + Date.now();
-  const userName = decodeURIComponent(searchParams.get("name") || "Unknown");
+  const role = (searchParams?.get("role") || "student") as UserRole;
+  const userId = searchParams?.get("userId") || "user_" + Date.now();
+  const userName = decodeURIComponent(searchParams?.get("name") || "Unknown");
   const isTeacher = role === "teacher" || role === "admin";
 
   const [meeting, setMeeting] = useState<Meeting | null>(null);

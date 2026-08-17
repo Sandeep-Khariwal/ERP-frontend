@@ -95,22 +95,16 @@ const Student = () => {
   };
 
   return (
-    <Stack w={"95%"} mx={"auto"} pt={30}>
+    <>
       <LoadingOverlay visible={isLoading} />
-
-      <Group justify="flex-end">
-        <Button color="red" onClick={handleLogout}>
-          Logout
-        </Button>
-      </Group>
-
       <StudentPage
         studentId={selectedStudentId}
         onClickBack={() => {}}
         userType={UserType.STUDENT}
         activeTab={StudentTabs.OVERVIEW}
+        onLogout={handleLogout}
       />
-    </Stack>
+    </>
   );
 };
 

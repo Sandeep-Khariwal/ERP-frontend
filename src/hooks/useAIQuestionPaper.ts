@@ -39,7 +39,7 @@ export function useOCRDocument(id: string, instituteId: string) {
     queryKey: ["ocr-document", id],
     queryFn: () => getOCRDocument(id, instituteId),
     enabled: !!id && !!instituteId,
-    refetchInterval: (query) => {
+    refetchInterval: (query:any) => {
       const status = query.state.data?.data?.status;
       if (status === "pending" || status === "processing") return 3000;
       return false;

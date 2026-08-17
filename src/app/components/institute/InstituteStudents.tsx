@@ -204,12 +204,6 @@ export const InstituteStudents = () => {
 
   const addPayment = () => {
     const studentIds = pendingStudents.map((stud: any) => stud.studentId);
-    console.log(
-      "adding payment : ",
-      fees,
-      pendingFilters.phoneNumber,
-      studentIds,
-    );
     setIsLoading(true);
     PayRecordWithNumber(institute._id, {
       fees,
@@ -586,7 +580,7 @@ export const InstituteStudents = () => {
           Students Directory
         </Text>
         <Flex align={"center"} gap={10}>
-          {institute.isAcadmy && (
+          {institute?.isAcadmy && (
             <Button
               onClick={() => setShowPassoutScreen(true)}
               styles={{

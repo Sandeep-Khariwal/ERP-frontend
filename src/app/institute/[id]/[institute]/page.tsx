@@ -18,15 +18,13 @@ import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
 import { LocalStorageKey } from "@/axios/LocalStorageUtility";
 import { Tabs } from "@/enums";
-import { Box, Flex, LoadingOverlay } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
+import { Box, Flex, LoadingOverlay, AppShell, Burger, Group, Text } from "@mantine/core";
+import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 import { Notifications } from "@mantine/notifications";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const dashboard = () => {
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
-  const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
 
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -36,6 +34,17 @@ const dashboard = () => {
 
   const dispatch = useAppDispatch();
   const navigation = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const tabQuery = searchParams?.get("tab") as Tabs | null;
+  const selectedTab = tabQuery && Object.values(Tabs).includes(tabQuery) ? tabQuery : Tabs.DASHBOARD;
+
+  const handleSelectTab = (val: Tabs) => {
+    const newParams = new URLSearchParams(searchParams?.toString());
+    newParams.set("tab", val);
+    navigation.push(`${pathname}?${newParams.toString()}`);
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -82,61 +91,76 @@ const dashboard = () => {
       });
   }, []);
 
-  const [hovered, setHovered] = useState(false);
+  const [opened, { toggle }] = useDisclosure();
 
   return (
     <>
       <Notifications />
-      <div style={{ width: "100%", minHeight: "100vh" }}>
+      <AppShell
+        header={{ height: isMd ? 60 : 0 }}
+        navbar={{
+          width: isMd ? 80 : 260,
+          breakpoint: 'sm',
+          collapsed: { mobile: !opened },
+        }}
+        padding={0}
+        style={{ minHeight: "100vh" }}
+      >
         <LoadingOverlay visible={isLoading} />
+        <AppShell.Header style={{ display: isMd ? 'flex' : 'none', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
+          <Group>
+            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+            <Text fw={700} fz="1.1rem">Shikshapay</Text>
+          </Group>
+        </AppShell.Header>
 
-        {!isMd && (
-          <DesktopNavbar
-            isCollapsed={hovered}
-            onClickCollapse={() => {
-              setHovered(!hovered);
-            }}
-            onSelectTab={(val: Tabs) => {
-              setSelectedTab(val);
-            }}
-            activeTab={selectedTab}
-          />
-        )}
-
-        <Box style={{ display: !isMd ? "none" : "block" }}>
-          <MobileNavbar
-            onClickCollapse={() => {
-              setIsCollapsed(!isCollapsed);
-            }}
-            onSelectTab={(val: Tabs) => {
-              setSelectedTab(val);
-            }}
-          />
-        </Box>
-        <Box
-          style={{
-            marginLeft: isMd ? "0px" : hovered ? "250px" : "80px",
-            transition: "all 0.3s ease",
-            minHeight: "100vh",
-            overflowY: "auto",
-          }}
-          bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
-        >
-          {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
-          {Tabs.STUDENT === selectedTab && <InstituteStudents />}
-          {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
-          {Tabs.EARNING === selectedTab && <InstituteEarnings />}
-          {Tabs.LEADS === selectedTab && <LeadsPage />}
-          {Tabs.WHATSAPPLEADS === selectedTab && <WhatsAppPage />}
-          {Tabs.INTEGRATION === selectedTab && <IntegrationsPage />}
-
-          {Tabs.TEACHER === selectedTab && (
-            <InstituteTeachers userType={UserType.OTHERS} />
+        <AppShell.Navbar p={0} style={{ borderRight: "none", zIndex: 1000 }}>
+          {!isMd && (
+            <DesktopNavbar
+              isCollapsed={false}
+              onClickCollapse={() => {}}
+              onSelectTab={handleSelectTab}
+              activeTab={selectedTab}
+            />
           )}
-          {institute?.featureAccess?.transportManagement &&
-            Tabs.TRANSPORT === selectedTab && <TransportPage />}
-        </Box>
-      </div>
+          {isMd && (
+            <DesktopNavbar
+              isCollapsed={opened}
+              onClickCollapse={toggle}
+              onSelectTab={(val: Tabs) => {
+                handleSelectTab(val);
+                toggle();
+              }}
+              activeTab={selectedTab}
+            />
+          )}
+        </AppShell.Navbar>
+
+        <AppShell.Main bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}>
+          <Box
+            style={{
+              transition: "all 0.3s ease",
+              minHeight: "100vh",
+              overflowY: "auto",
+            }}
+            p="md"
+          >
+            {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
+            {Tabs.STUDENT === selectedTab && <InstituteStudents />}
+            {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
+            {Tabs.EARNING === selectedTab && <InstituteEarnings />}
+            {Tabs.LEADS === selectedTab && <LeadsPage />}
+            {Tabs.WHATSAPPLEADS === selectedTab && <WhatsAppPage />}
+            {Tabs.INTEGRATION === selectedTab && <IntegrationsPage />}
+
+            {Tabs.TEACHER === selectedTab && (
+              <InstituteTeachers userType={UserType.OTHERS} />
+            )}
+            {institute?.featureAccess?.transportManagement &&
+              Tabs.TRANSPORT === selectedTab && <TransportPage />}
+          </Box>
+        </AppShell.Main>
+      </AppShell>
     </>
   );
 };
