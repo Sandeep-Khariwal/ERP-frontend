@@ -297,7 +297,7 @@ const StudentPage = (props: StudentPageProps) => {
           collapsed: { mobile: !opened },
         }}
         padding="md"
-        bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+        bg={"transparent"}
       >
         <AppShell.Header style={{ display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
           <Group>

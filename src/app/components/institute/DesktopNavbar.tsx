@@ -67,6 +67,8 @@ import { TbPlugConnected } from "react-icons/tb";
 import { SignatureModal } from "./signaturemodal";
 import { AddEmailModal } from "./transport/AddEmail";
 import { AddPaymentKeysModal } from "./AddPaymentKeys";
+import { Switch } from "@mantine/core";
+import { FaTrophy, FaMoon } from "react-icons/fa6";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -104,6 +106,7 @@ export const DesktopNavbar = (props: {
   const [sgst, setSgst] = useState<number>(0);
 
   const [transportUploadModal, setTransportUploadModal] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handleUpdateSchool = () => {
     // ❌ agar kuch bhi change nahi hua
@@ -565,18 +568,23 @@ export const DesktopNavbar = (props: {
       >
         <Stack
           w={"100%"}
-          c={"white"}
+          c={"#1B2559"}
           h={"100vh"}
-          style={{ borderRadius: "0px" }}
-          bg={"linear-gradient(135deg, #9C27B0, #3F51B5)"}
+          style={{
+            borderRadius: "0px",
+            borderRight: "none",
+            boxShadow: "1px 0 0 0 #F1F4F9",
+          }}
+          bg={"#FFFFFF"}
         >
           <Flex
             align="center"
-            justify="center"
-            direction="column"
+            justify={hovered ? "start" : "center"}
+            direction="row"
+            gap={10}
+            pl={hovered ? 18 : 0}
             style={{
               height: "80px",
-              textAlign: "center",
               transition: "all 0.3s ease",
             }}
           >
@@ -585,30 +593,35 @@ export const DesktopNavbar = (props: {
               src="/logo1.png"
               alt="logo"
               style={{
-                width: "40px",
-                height: "40px",
-                marginBottom: hovered ? "6px" : "0px",
+                width: "38px",
+                height: "38px",
                 transition: "all 0.3s ease",
                 transform: hovered ? "scale(1.05)" : "scale(1)",
               }}
             />
 
             {/* TEXT */}
-            <Text
-              fw={700}
-              fz="1.1rem"
+            <Flex
+              direction="column"
               style={{
                 opacity: hovered ? 1 : 0,
-                height: hovered ? "auto" : "0px",
+                width: hovered ? "auto" : "0px",
                 overflow: "hidden",
                 transition: "all 0.3s ease",
+                whiteSpace: "nowrap",
               }}
             >
-              Shikshapay
-            </Text>
+              <Text fw={700} fz="1.15rem" style={{ lineHeight: 1.1 }}>
+                <span style={{ color: "#1B2559" }}>Shiksha</span>
+                <span style={{ color: "#2F6FED" }}>Pay</span>
+              </Text>
+              <Text fz={11} fw={500} c="#94A3C4">
+                Smart Learning Platform
+              </Text>
+            </Flex>
           </Flex>
 
-          <Divider size={2} color="gray" />
+          <Divider size={1} color="#EDF1F7" />
           <Stack h={"90%"} align="center" justify="space-between">
             <Box w={"90%"}>
               {/* <Flex
@@ -657,31 +670,31 @@ export const DesktopNavbar = (props: {
 
                   background:
                     props.activeTab === Tabs.DASHBOARD
-                      ? "rgba(255,255,255,0.08)"
+                      ? "#EEF3FF"
                       : "transparent",
 
                   border:
                     props.activeTab === Tabs.DASHBOARD
-                      ? "1px solid rgba(255,255,255,0.2)"
+                      ? "1px solid #DCE7FF"
                       : "1px solid transparent",
 
                   boxShadow:
                     props.activeTab === Tabs.DASHBOARD
-                      ? "0 0 12px rgba(255,215,0,0.6)"
+                      ? "0 0 0 1px #DCE7FF"
                       : "none",
 
                   backdropFilter:
                     props.activeTab === Tabs.DASHBOARD ? "blur(10px)" : "none",
 
-                  color: "white",
+                  color: "#33415C",
                   borderRadius: "12px",
                   padding: "8px",
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.background = "#EEF3FF";
                   e.currentTarget.style.boxShadow =
-                    "0 0 8px rgba(255,255,255,0.3)";
+                    "0 0 8px rgba(47,111,237,0.18)";
                 }}
                 onMouseLeave={(e) => {
                   if (props.activeTab !== Tabs.DASHBOARD) {
@@ -736,31 +749,31 @@ export const DesktopNavbar = (props: {
 
                   background:
                     props.activeTab === Tabs.STUDENT
-                      ? "rgba(255,255,255,0.08)"
+                      ? "#EEF3FF"
                       : "transparent",
 
                   border:
                     props.activeTab === Tabs.STUDENT
-                      ? "1px solid rgba(255,255,255,0.2)"
+                      ? "1px solid #DCE7FF"
                       : "1px solid transparent",
 
                   boxShadow:
                     props.activeTab === Tabs.STUDENT
-                      ? "0 0 12px rgba(255,215,0,0.6)"
+                      ? "0 0 0 1px #DCE7FF"
                       : "none",
 
                   backdropFilter:
                     props.activeTab === Tabs.STUDENT ? "blur(10px)" : "none",
 
-                  color: "white",
+                  color: "#33415C",
                   borderRadius: "12px",
                   padding: "8px",
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.background = "#EEF3FF";
                   e.currentTarget.style.boxShadow =
-                    "0 0 8px rgba(255,255,255,0.3)";
+                    "0 0 8px rgba(47,111,237,0.18)";
                 }}
                 onMouseLeave={(e) => {
                   if (props.activeTab !== Tabs.STUDENT) {
@@ -815,31 +828,31 @@ export const DesktopNavbar = (props: {
 
                   background:
                     props.activeTab === Tabs.TEACHER
-                      ? "rgba(255,255,255,0.08)"
+                      ? "#EEF3FF"
                       : "transparent",
 
                   border:
                     props.activeTab === Tabs.TEACHER
-                      ? "1px solid rgba(255,255,255,0.2)"
+                      ? "1px solid #DCE7FF"
                       : "1px solid transparent",
 
                   boxShadow:
                     props.activeTab === Tabs.TEACHER
-                      ? "0 0 12px rgba(255,215,0,0.6)"
+                      ? "0 0 0 1px #DCE7FF"
                       : "none",
 
                   backdropFilter:
                     props.activeTab === Tabs.TEACHER ? "blur(10px)" : "none",
 
-                  color: "white",
+                  color: "#33415C",
                   borderRadius: "12px",
                   padding: "8px",
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.background = "#EEF3FF";
                   e.currentTarget.style.boxShadow =
-                    "0 0 8px rgba(255,255,255,0.3)";
+                    "0 0 8px rgba(47,111,237,0.18)";
                 }}
                 onMouseLeave={(e) => {
                   if (props.activeTab !== Tabs.TEACHER) {
@@ -894,20 +907,20 @@ export const DesktopNavbar = (props: {
                   cursor: "pointer",
 
                   background: openBusiness
-                    ? "rgba(255,255,255,0.08)"
+                    ? "#EEF3FF"
                     : "transparent",
 
                   border: openBusiness
-                    ? "1px solid rgba(255,255,255,0.2)"
+                    ? "1px solid #DCE7FF"
                     : "1px solid transparent",
 
                   boxShadow: openBusiness
-                    ? "0 0 12px rgba(255,215,0,0.6)"
+                    ? "0 0 0 1px #DCE7FF"
                     : "none",
 
                   backdropFilter: openBusiness ? "blur(10px)" : "none",
 
-                  color: "white",
+                  color: "#33415C",
                   borderRadius: "12px",
                   padding: "8px",
                   transition: "all 0.3s ease",
@@ -976,10 +989,10 @@ export const DesktopNavbar = (props: {
                       cursor: "pointer",
                       background:
                         props.activeTab === Tabs.EXPENSE
-                          ? "rgba(255,255,255,0.08)"
+                          ? "#EEF3FF"
                           : "transparent",
 
-                      color: "white",
+                      color: "#33415C",
                       borderRadius: "8px",
                       padding: "6px",
                     }}
@@ -1002,10 +1015,10 @@ export const DesktopNavbar = (props: {
                       cursor: "pointer",
                       background:
                         props.activeTab === Tabs.EARNING
-                          ? "rgba(255,255,255,0.08)"
+                          ? "#EEF3FF"
                           : "transparent",
 
-                      color: "white",
+                      color: "#33415C",
                       borderRadius: "8px",
                       padding: "6px",
                     }}
@@ -1030,20 +1043,20 @@ export const DesktopNavbar = (props: {
                   cursor: "pointer",
 
                   background: openMarketing
-                    ? "rgba(255,255,255,0.08)"
+                    ? "#EEF3FF"
                     : "transparent",
 
                   border: openMarketing
-                    ? "1px solid rgba(255,255,255,0.2)"
+                    ? "1px solid #DCE7FF"
                     : "1px solid transparent",
 
                   boxShadow: openMarketing
-                    ? "0 0 12px rgba(255,215,0,0.6)"
+                    ? "0 0 0 1px #DCE7FF"
                     : "none",
 
                   backdropFilter: openMarketing ? "blur(10px)" : "none",
 
-                  color: "white",
+                  color: "#33415C",
                   borderRadius: "12px",
                   padding: "8px",
                   transition: "all 0.3s ease",
@@ -1106,10 +1119,10 @@ export const DesktopNavbar = (props: {
                       cursor: "pointer",
                       background:
                         props.activeTab === Tabs.LEADS
-                          ? "rgba(255,255,255,0.08)"
+                          ? "#EEF3FF"
                           : "transparent",
 
-                      color: "white",
+                      color: "#33415C",
                       borderRadius: "8px",
                       padding: "6px",
                     }}
@@ -1125,10 +1138,10 @@ export const DesktopNavbar = (props: {
                       cursor: "pointer",
                       background:
                         props.activeTab === Tabs.WHATSAPPLEADS
-                          ? "rgba(255,255,255,0.08)"
+                          ? "#EEF3FF"
                           : "transparent",
 
-                      color: "white",
+                      color: "#33415C",
                       borderRadius: "8px",
                       padding: "6px",
                     }}
@@ -1146,10 +1159,10 @@ export const DesktopNavbar = (props: {
                       cursor: "pointer",
                       background:
                         props.activeTab === Tabs.INTEGRATION
-                          ? "rgba(255,255,255,0.08)"
+                          ? "#EEF3FF"
                           : "transparent",
 
-                      color: "white",
+                      color: "#33415C",
                       borderRadius: "8px",
                       padding: "6px",
                     }}
@@ -1169,17 +1182,17 @@ export const DesktopNavbar = (props: {
 
                     background:
                       props.activeTab === Tabs.TRANSPORT
-                        ? "rgba(255,255,255,0.08)"
+                        ? "#EEF3FF"
                         : "transparent",
 
                     border:
                       props.activeTab === Tabs.TRANSPORT
-                        ? "1px solid rgba(255,255,255,0.2)"
+                        ? "1px solid #DCE7FF"
                         : "1px solid transparent",
 
                     boxShadow:
                       props.activeTab === Tabs.TRANSPORT
-                        ? "0 0 12px rgba(255,215,0,0.6)"
+                        ? "0 0 0 1px #DCE7FF"
                         : "none",
 
                     backdropFilter:
@@ -1187,15 +1200,15 @@ export const DesktopNavbar = (props: {
                         ? "blur(10px)"
                         : "none",
 
-                    color: "white",
+                    color: "#33415C",
                     borderRadius: "12px",
                     padding: "8px",
                     transition: "all 0.3s ease",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                    e.currentTarget.style.background = "#EEF3FF";
                     e.currentTarget.style.boxShadow =
-                      "0 0 8px rgba(255,255,255,0.3)";
+                      "0 0 8px rgba(47,111,237,0.18)";
                   }}
                   onMouseLeave={(e) => {
                     if (props.activeTab !== Tabs.TRANSPORT) {
@@ -1248,6 +1261,107 @@ export const DesktopNavbar = (props: {
             </Box>
 
             <Box w={"100%"} px={10} pb={15}>
+              {hovered ? (
+                <Box
+                  mb={14}
+                  p={16}
+                  style={{
+                    borderRadius: "16px",
+                    background:
+                      "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                    boxShadow: "0px 10px 24px rgba(47,111,237,0.28)",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigation.push("/pricing")}
+                >
+                  <Flex align="center" gap={10} mb={8}>
+                    <Box
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: "10px",
+                        background: "rgba(255,255,255,0.18)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <FaTrophy size={16} color="#FFD54F" />
+                    </Box>
+                    <Text fw={700} fz={14} c="white">
+                      Upgrade to Premium
+                    </Text>
+                  </Flex>
+                  <Text fz={12} c="rgba(255,255,255,0.85)" mb={12} lh={1.4}>
+                    Unlock all features and get unlimited access.
+                  </Text>
+                  <Button
+                    fullWidth
+                    size="xs"
+                    radius="xl"
+                    styles={{
+                      root: {
+                        background: "white",
+                        color: "#2F6FED",
+                        fontWeight: 700,
+                        "&:hover": { background: "#F5F8FF" },
+                      },
+                    }}
+                  >
+                    Upgrade Now
+                  </Button>
+                </Box>
+              ) : (
+                <Flex
+                  justify="center"
+                  mb={14}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigation.push("/pricing")}
+                >
+                  <Box
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "10px",
+                      background:
+                        "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <FaTrophy size={18} color="#FFD54F" />
+                  </Box>
+                </Flex>
+              )}
+
+              <Flex
+                align="center"
+                justify={hovered ? "space-between" : "center"}
+                px={hovered ? 6 : 0}
+                mb={16}
+              >
+                <Flex align="center" gap={10}>
+                  <FaMoon size={16} color="#7C8DB5" />
+                  {hovered && (
+                    <Text fz={14} fw={500} c="#33415C">
+                      Dark Mode
+                    </Text>
+                  )}
+                </Flex>
+                {hovered && (
+                  <Switch
+                    checked={isDarkMode}
+                    onChange={(e) => setIsDarkMode(e.currentTarget.checked)}
+                    color="blue"
+                    size="sm"
+                  />
+                )}
+              </Flex>
+
+              <Divider size={1} color="#EDF1F7" mb={10} />
+
               {/* <Flex
                 style={{ cursor: "pointer" }}
                 my={10}

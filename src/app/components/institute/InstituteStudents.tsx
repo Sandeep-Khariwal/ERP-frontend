@@ -246,7 +246,7 @@ export const InstituteStudents = () => {
         w={isMd ? "95%" : "90%"}
         mih={"100vh"}
         mx={"auto"}
-        bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+        bg={"transparent"}
         mb={isMd ? 100 : 0}
       >
         <LoadingOverlay visible={isLoading} />
@@ -279,7 +279,7 @@ export const InstituteStudents = () => {
         w={isMd ? "95%" : "90%"}
         mih={"100vh"}
         mx={"auto"}
-        bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+        bg={"transparent"}
         pt={20}
         mb={isMd ? 100 : 0}
       >
@@ -306,7 +306,7 @@ export const InstituteStudents = () => {
         w={isMd ? "95%" : "90%"}
         mih={"100vh"}
         mx={"auto"}
-        bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+        bg={"transparent"}
         mb={isMd ? 100 : 0}
       >
         <LoadingOverlay visible={isLoading} />
@@ -561,7 +561,7 @@ export const InstituteStudents = () => {
       w={isMd ? "95%" : "90%"}
       mih={"100vh"}
       mx={"auto"}
-      bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+      bg={"transparent"}
       mb={isMd ? 100 : 0}
     >
       <LoadingOverlay visible={isLoading} />

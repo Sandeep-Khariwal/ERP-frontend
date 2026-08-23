@@ -114,7 +114,7 @@ function page() {
           )}
         </AppShell.Navbar>
 
-        <AppShell.Main bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}>
+        <AppShell.Main bg={"linear-gradient(160deg, #F1EEFF 0%, #F7F9FC 22%, #F7F9FC 100%)"}>
           <Box
             style={{
               transition: "all 0.3s ease",

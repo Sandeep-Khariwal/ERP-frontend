@@ -1,7 +1,7 @@
 import { GetInstituteOverview } from "@/axios/institute/InstituteGetApi";
-import { Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Card, Flex, LoadingOverlay, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import Image from "next/image";
+import { GraduationCap, Building2, IndianRupee, FileWarning } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatNumberInK } from "../institute/helperFunctions";
 
@@ -11,11 +11,11 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
   const [totalTeachers, setTotalTeachers] = useState<number>(0);
   const [totalEarnings, setTotalEarnings] = useState<number>(0);
   const [totalExpanses, setTotalExpanses] = useState<number>(0);
-  const [isLoading,setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (props.instituteId) {
-      setIsLoading(true)
+      setIsLoading(true);
       GetInstituteOverview(props.instituteId)
         .then((x: any) => {
           const { institute } = x;
@@ -23,103 +23,97 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
           setTotalTeachers(institute.teachers.length);
           setTotalEarnings(institute.earnings);
           setTotalExpanses(institute.expanses);
-          setIsLoading(false)
+          setIsLoading(false);
         })
         .catch((e) => {
           console.log(e);
-          setIsLoading(false)
+          setIsLoading(false);
         });
     }
   }, [props.instituteId]);
+
+  const stats = [
+    {
+      label: "Students",
+      value: formatNumberInK(totalStudents),
+      icon: <GraduationCap size={26} />,
+      color: "#8B5CF6",
+      bg: "#F1EBFF",
+    },
+    {
+      label: "Teachers",
+      value: `${totalTeachers}`,
+      icon: <Building2 size={26} />,
+      color: "#2F6FED",
+      bg: "#EAF1FF",
+    },
+    {
+      label: "Earnings",
+      value: formatNumberInK(totalEarnings),
+      icon: <IndianRupee size={26} />,
+      color: "#0EA872",
+      bg: "#E6F8F1",
+    },
+    {
+      label: "Expenses",
+      value: formatNumberInK(totalExpanses),
+      icon: <FileWarning size={26} />,
+      color: "#F43F5E",
+      bg: "#FFEBEE",
+    },
+  ];
+
   return (
     <>
-    <LoadingOverlay visible={isLoading} />
-      <Flex
-        w={isMd ? "95%" : "80%"}
+      <LoadingOverlay visible={isLoading} />
+      <SimpleGrid
+        w={isMd ? "95%" : "92%"}
         mx={"auto"}
-        mt={"2rem"}
-        align={"center"}
-        gap={15}
-        justify={"space-between"}
-        wrap={"wrap"}
+        mt={"1.5rem"}
+        cols={isMd ? 2 : 4}
+        spacing={20}
+        verticalSpacing={20}
       >
-        <Flex
-          p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={"10rem"}
-          gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={"center"}
-        >
-          <Image src={"/student.png"} alt="Not found" width={40} height={40} />
-          <Stack align={"center"} justify={"start"} gap={1.4}>
-            <Text lh={1.4} fz={"0.8rem"} fw={600} c={"#BFBFBF "}>
-              Students
-            </Text>
-            <Text lh={1} fw={700} fz={"1.3rem"} c={"#4F4F4F"}>
-              {formatNumberInK(totalStudents)}
-            </Text>
-          </Stack>
-        </Flex>
-        <Flex
-          p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={"10rem"}
-          gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={"center"}
-        >
-          <Image src={"/teacher.png"} alt="Not found" width={40} height={40} />
-          <Stack align={"center"} justify={"start"} gap={1}>
-            <Text lh={1.4} fz={"0.8rem"} c={"#BFBFBF "} fw={600}>
-              Teachers
-            </Text>
-            <Text lh={1} fw={700} fz={"1.3rem"} c={"#4F4F4F"}>
-              {totalTeachers}
-            </Text>
-          </Stack>
-        </Flex>
-        <Flex
-          p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={"10rem"}
-          gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={"center"}
-        >
-          <Image src={"/earnings.jpg"} alt="Not found" width={40} height={40} />
-          <Stack align={"center"} justify={"start"} gap={1}>
-            <Text lh={1.4} fz={"0.8rem"} c={"#BFBFBF "} fw={600}>
-              Earnings
-            </Text>
-            <Text lh={1} fw={700} fz={"1.3rem"} c={"#4F4F4F "}>
-              {formatNumberInK(totalEarnings)}
-            </Text>
-          </Stack>
-        </Flex>
-        <Flex
-          p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={"10rem"}
-          gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={"center"}
-        >
-          <Image src={"/expenses.jpg"} alt="Not found" width={40} height={40} />
-          <Stack align={"center"} justify={"start"} gap={1}>
-            <Text lh={1.4} fz={"0.8rem"} c={"#BFBFBF "} fw={600}>
-              Expanses
-            </Text>
-            <Text lh={1} fw={700} fz={"1.3rem"} c={"#4F4F4F "}>
-              {formatNumberInK(totalExpanses)}
-            </Text>
-          </Stack>
-        </Flex>
-      </Flex>
+        {stats.map((stat) => (
+          <Card
+            key={stat.label}
+            radius={18}
+            p={22}
+            shadow="0px 8px 24px rgba(15, 23, 42, 0.06)"
+            style={{ border: "1px solid #F1F4F9" }}
+          >
+            <Flex align={"center"} gap={16}>
+              <Flex
+                align={"center"}
+                justify={"center"}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "16px",
+                  background: stat.bg,
+                  color: stat.color,
+                  flexShrink: 0,
+                }}
+              >
+                {stat.icon}
+              </Flex>
+              <Stack gap={4}>
+                <Text
+                  fz={12}
+                  fw={700}
+                  c={"#8B96AD"}
+                  style={{ letterSpacing: "0.04em", textTransform: "uppercase" }}
+                >
+                  {stat.label}
+                </Text>
+                <Text lh={1} fw={700} fz={"1.7rem"} c={"#1B2559"}>
+                  {stat.value}
+                </Text>
+              </Stack>
+            </Flex>
+          </Card>
+        ))}
+      </SimpleGrid>
     </>
   );
 }

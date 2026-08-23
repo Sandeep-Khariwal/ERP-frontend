@@ -132,7 +132,7 @@ export function InstituteProfile(props: InstituteProfileProps) {
 
   return (
     <Card
-      w={isMd ? "95%" : "80%"}
+      w={isMd ? "95%" : "92%"}
       mx={"auto"}
       mt={"2rem"}
       shadow="0px 0px 30px 0px rgba(0, 0, 0, 0.10)"

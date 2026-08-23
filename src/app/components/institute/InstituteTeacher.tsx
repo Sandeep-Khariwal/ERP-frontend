@@ -143,7 +143,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
     <Stack
       w={"100%"}
       mih={"100vh"}
-      bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+      bg={"transparent"}
       mb={isMd ? 100 : 0}
     >
       <LoadingOverlay visible={isLoading} />

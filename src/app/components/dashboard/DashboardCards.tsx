@@ -20,6 +20,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { UserType } from "./InstituteBatchesSection";
 import { PromoteBatch, SetPassoutBatch } from "@/axios/batch/BatchPutApi";
+import { getBatchIconStyle } from "./batchIconMap";
+import { Plus } from "lucide-react";
 
 export function SingleBatchCard(props: {
   id: string;
@@ -115,7 +117,7 @@ export function SingleBatchCard(props: {
   return (
     <>
       <Card
-        shadow="0px 0px 30px 0px rgba(0, 0, 0, 0.10)"
+        shadow="0px 6px 20px rgba(15, 23, 42, 0.06)"
         bg={"#FFFFFF"}
         h={"100%"}
         p={20}
@@ -126,8 +128,10 @@ export function SingleBatchCard(props: {
           props.onbatchCardClick();
         }}
         style={{
-          borderRadius: "10px",
+          borderRadius: "16px",
           cursor: "pointer",
+          border: "1px solid #F1F4F9",
+          transition: "box-shadow 0.2s ease, transform 0.2s ease",
         }}
       >
         <Modal
@@ -410,15 +414,33 @@ export function SingleBatchCard(props: {
             </Button>
           </Flex>
         </Modal>
+        {(() => {
+          const iconStyle = getBatchIconStyle(props.name, props.subjects);
+          return (
+            <Flex
+              align="center"
+              justify="center"
+              mb={14}
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: "14px",
+                background: iconStyle.bg,
+              }}
+            >
+              {iconStyle.icon}
+            </Flex>
+          );
+        })()}
         {
           props.userType === UserType.OTHERS &&
 
           <Flex justify="space-between" align="center" ml={5} mr={5}>
             {!isnameEdit && (
               <Text
-                fz={22}
-                fw={500}
-                c={"#36431F"}
+                fz={19}
+                fw={700}
+                c={"#1B2559"}
                 style={{
                   whiteSpace: "nowrap",
                   maxWidth: "70%",
@@ -756,35 +778,45 @@ export function AddCardWithButton(props: {
   return (
     <>
       <Card
-        radius={10}
+        radius={16}
         bg={"#FFFFFF"}
         h={"100%"}
         p={20}
-        shadow="0px 0px 30px 0px rgba(0, 0, 0, 0.10)"
+        shadow="0px 6px 20px rgba(15, 23, 42, 0.06)"
+        style={{
+          border: "1.5px dashed #D6E0F5",
+          cursor: "pointer",
+        }}
+        onClick={props.onAddBatchButtonClick}
       >
-        <Center mt={30}>
+        <Center h={"100%"} mt={10}>
           <Flex direction="column" justify="center" align="center">
             <Image
               src={"/classroom.png"}
-              width={70}
-              height={70}
+              width={64}
+              height={64}
               alt="classroom"
             />
-            <Button
-              size="sm"
+            <Flex
+              align="center"
+              justify="center"
+              mt={14}
               style={{
-                backgroundColor: "#f7f7ff",
-                color: "black",
-                borderRadius: "20px",
-                border: "1px solid #808080",
-                marginTop: "10px",
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: "#EAF1FF",
+                border: "1px solid #D6E0F5",
               }}
-              onClick={props.onAddBatchButtonClick}
             >
-              <Text fz={16} fw={700} c={"#353935"} ff={"Poppins"}>
-                Add Batch
-              </Text>
-            </Button>
+              <Plus size={20} color="#2F6FED" />
+            </Flex>
+            <Text fz={16} fw={700} c={"#1B2559"} ff={"Poppins"} mt={10}>
+              Add New Batch
+            </Text>
+            <Text fz={13} c={"#8B96AD"} mt={2}>
+              Create a new batch
+            </Text>
           </Flex>
         </Center>
       </Card>

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Box,
   Button,
   Card,
   Flex,
@@ -43,6 +44,8 @@ import { usePathname, useRouter } from "next/navigation";
 import NoticeBoard from "./notice/NoticeBoard";
 import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi";
 import { InstituteStudentsPage } from "../institute/student/InstituteStudentsPage";
+import { GetAllNotice } from "@/axios/notice/NoticeGetApi";
+import { Bell, Search, Layers, UsersRound, GraduationCap } from "lucide-react";
 
 export interface Batch {
   id: string;
@@ -79,6 +82,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [editBatchDetails, setEditBatchDetails] = useState<boolean>(false);
   const [editBatchId, setEditBatchId] = useState<string>("");
   const [openStudentsPage, setOpenStudentsPage] = useState<boolean>(false);
+  const [batchSearch, setBatchSearch] = useState<string>("");
+  const [noticeCount, setNoticeCount] = useState<number>(0);
   const navigation = useRouter();
 
   const pathname = usePathname();
@@ -127,6 +132,16 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       getSubjects();
     }
   }, [openAddBatchModal]);
+
+  useEffect(() => {
+    if (!institute?._id) return;
+    GetAllNotice(institute._id)
+      .then((res: any) => {
+        const list = res?.data?.notices || res?.notices || [];
+        setNoticeCount(Array.isArray(list) ? list.length : 0);
+      })
+      .catch(() => {});
+  }, [institute]);
 
   const [data, setData] = useState<{ value: string; label: string }[]>([
     { value: "Hindi", label: "Hindi" },
@@ -339,7 +354,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       {/* Students Page View */}
       {openStudentsPage && (
         <Stack w={"100%"} mih={"100%"} py={10}>
-          <Flex w={isMd ? "95%" : "80%"} mx={"auto"}>
+          <Flex w={isMd ? "95%" : "92%"} mx={"auto"}>
             <Button
               variant="subtle"
               color="dark"
@@ -356,6 +371,116 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       {/* Main Dashboard View */}
       {!openStudentsPage && (batchId === null || openEditCourseFee) && (
         <Stack w={"100%"} mih={"100%"} py={20}>
+          {/* ── Top Header: Title + Search + Notifications + Profile ── */}
+          <Flex
+            w={isMd ? "95%" : "92%"}
+            mx={"auto"}
+            align={isMd ? "flex-start" : "center"}
+            justify="space-between"
+            direction={isMd ? "column" : "row"}
+            gap={16}
+            mb={4}
+          >
+            <Stack gap={2}>
+              <Text fz={26} fw={700} c="#1B2559" style={{ fontFamily: "sans-serif" }}>
+                All Batches
+              </Text>
+              <Text fz={13} c="#8B96AD">
+                Manage all your classes and batches
+              </Text>
+            </Stack>
+
+            <Flex align="center" gap={14} wrap="wrap">
+              <TextInput
+                value={batchSearch}
+                onChange={(e) => setBatchSearch(e.currentTarget.value)}
+                placeholder="Search batches..."
+                leftSection={<Search size={16} color="#8B96AD" />}
+                radius="xl"
+                w={isMd ? "100%" : 240}
+                styles={{
+                  input: {
+                    backgroundColor: "#F7F9FC",
+                    border: "1px solid #EDF1F7",
+                  },
+                }}
+              />
+
+              <Box style={{ position: "relative", cursor: "pointer" }}>
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: "#F7F9FC",
+                    border: "1px solid #EDF1F7",
+                  }}
+                >
+                  <Bell size={18} color="#5B6B8C" />
+                </Flex>
+                {noticeCount > 0 && (
+                  <Flex
+                    align="center"
+                    justify="center"
+                    style={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                      minWidth: 18,
+                      height: 18,
+                      borderRadius: "50%",
+                      background: "#EF4444",
+                      color: "white",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: "0 4px",
+                    }}
+                  >
+                    {noticeCount > 9 ? "9+" : noticeCount}
+                  </Flex>
+                )}
+              </Box>
+
+              <Flex
+                align="center"
+                gap={10}
+                py={6}
+                px={12}
+                style={{
+                  borderRadius: "999px",
+                  border: "1px solid #EDF1F7",
+                  background: "#FFFFFF",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    background: "#EAF1FF",
+                    color: "#2F6FED",
+                    fontWeight: 700,
+                    fontSize: 14,
+                  }}
+                >
+                  {(adminDetails?.name || "A").charAt(0).toUpperCase()}
+                </Flex>
+                <Stack gap={0}>
+                  <Text fz={13} fw={700} c="#1B2559" style={{ lineHeight: 1.1 }}>
+                    {adminDetails?.name || "Admin"}
+                  </Text>
+                  <Text fz={11} c="#8B96AD" style={{ lineHeight: 1.1 }}>
+                    {adminDetails?.role || "Admin"}
+                  </Text>
+                </Stack>
+              </Flex>
+            </Flex>
+          </Flex>
+
           {props.isShowTopCard !== false && (
             <InstituteDetailsCards instituteId={institute?._id || ""} />
           )}
@@ -374,7 +499,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
 
           {/* ── Students Database Card (Neat & Animated Redesign) ── */}
           <Card
-            w={isMd ? "95%" : "80%"}
+            w={isMd ? "95%" : "92%"}
             mx={"auto"}
             radius={16}
             p={{ base: 20, sm: 24 }}
@@ -538,7 +663,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
           </Card>
 
           {/* ── Batches Section ── */}
-          <Flex align={"center"} w={isMd ? "95%" : "80%"} mx={"auto"}>
+          <Flex align={"center"} w={isMd ? "95%" : "92%"} mx={"auto"}>
             <Text
               w={"100%"}
               fz={18}
@@ -570,22 +695,28 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
 
           <SimpleGrid
             cols={isMd ? 1 : isLg ? 2 : 4}
-            w={isMd ? "95%" : "80%"}
+            w={isMd ? "95%" : "92%"}
             mx={"auto"}
-            spacing={20}
-            verticalSpacing={20}
+            spacing={24}
+            verticalSpacing={24}
             mb={isMd ? 100 : 0}
           >
             <InstituteBatchesSection
-              batches={batches.map((batch: any) => ({
-                id: batch?.id || "",
-                name: batch?.name || "",
-                subjects: batch?.subjects || [],
-                noOfTeachers: batch?.noOfTeachers || 0,
-                noOfStudents: batch?.noOfStudents || 0,
-                firstThreeStudents: batch?.firstThreeStudents || [],
-                firstThreeTeachers: batch?.firstThreeTeachers || [],
-              }))}
+              batches={batches
+                .filter((batch: any) =>
+                  (batch?.name || "")
+                    .toLowerCase()
+                    .includes(batchSearch.trim().toLowerCase()),
+                )
+                .map((batch: any) => ({
+                  id: batch?.id || "",
+                  name: batch?.name || "",
+                  subjects: batch?.subjects || [],
+                  noOfTeachers: batch?.noOfTeachers || 0,
+                  noOfStudents: batch?.noOfStudents || 0,
+                  firstThreeStudents: batch?.firstThreeStudents || [],
+                  firstThreeTeachers: batch?.firstThreeTeachers || [],
+                }))}
               allBatches={batches.map((batch: any) => ({
                 id: batch?.id || "",
                 name: batch?.name || "",
@@ -615,6 +746,72 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             />
           </SimpleGrid>
 
+          {/* ── Bottom Metrics Bar ── */}
+          <Card
+            w={isMd ? "95%" : "92%"}
+            mx={"auto"}
+            radius={16}
+            p={{ base: 16, sm: 20 }}
+            shadow="0px 6px 20px rgba(15, 23, 42, 0.06)"
+            style={{ border: "1px solid #F1F4F9" }}
+          >
+            <SimpleGrid cols={isMd ? 2 : 4} spacing={20}>
+              {[
+                {
+                  label: "Total Batches",
+                  value: batches.length,
+                  color: "#2F6FED",
+                  bg: "#EAF1FF",
+                  icon: <Layers size={20} />,
+                },
+                {
+                  label: "Total Teachers",
+                  value: batches.reduce(
+                    (sum, b: any) => sum + (b?.noOfTeachers || 0),
+                    0,
+                  ),
+                  color: "#0EA872",
+                  bg: "#E6F8F1",
+                  icon: <UsersRound size={20} />,
+                },
+                {
+                  label: "Total Students",
+                  value: batches.reduce(
+                    (sum, b: any) => sum + (b?.noOfStudents || 0),
+                    0,
+                  ),
+                  color: "#8B5CF6",
+                  bg: "#F1EBFF",
+                  icon: <GraduationCap size={20} />,
+                },
+              ].map((stat) => (
+                <Flex key={stat.label} align="center" gap={12}>
+                  <Flex
+                    align="center"
+                    justify="center"
+                    style={{
+                      width: 42,
+                      height: 42,
+                      borderRadius: "12px",
+                      background: stat.bg,
+                      color: stat.color,
+                    }}
+                  >
+                    {stat.icon}
+                  </Flex>
+                  <Stack gap={0}>
+                    <Text fz={18} fw={700} c="#1B2559" style={{ lineHeight: 1.1 }}>
+                      {stat.value}
+                    </Text>
+                    <Text fz={12} c="#8B96AD">
+                      {stat.label}
+                    </Text>
+                  </Stack>
+                </Flex>
+              ))}
+            </SimpleGrid>
+          </Card>
+
           <Flex w={"100%"} align="center" justify={"center"}>
             <NoticeBoard userType={userType} />
           </Flex>
@@ -626,7 +823,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         <Stack
           w={"100%"}
           h={"100%"}
-          bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+          bg={"transparent"}
         >
           <InstituteInsideBatch
             userType={UserType.OTHERS}
