@@ -1,7 +1,5 @@
 import ApiHelper from "../../ApiHelper";
 
-
-
 export function CreateAdmin(data:{
   name:string,
   phone:string,
