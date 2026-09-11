@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Badge,
   Box,
   Button,
   Center,
@@ -16,7 +17,7 @@ import { useEffect, useState } from "react";
 import { IconArrowLeftFromArc } from "@tabler/icons-react";
 import { Menu, ActionIcon } from "@mantine/core";
 
-import { IconDownload, IconTrash, IconDotsVertical } from "@tabler/icons-react";
+import { IconDownload, IconTrash, IconDotsVertical, IconClipboardList } from "@tabler/icons-react";
 import { Modal } from "@mantine/core";
 import { Image, Group } from "@mantine/core";
 import SingleStudentModal from "./SingleStudentModal";
@@ -424,58 +425,109 @@ const Marksheet = (props: {
   return (
     <>
       <Stack w={"100%"} mt={20}>
-        <Text fw={700} fz={22}>
-          Marksheet
-        </Text>
+        <Box
+          p={20}
+          style={{
+            borderRadius: "16px",
+            background: "#EEF3FF",
+            border: "1px solid #DCE7FF",
+          }}
+        >
+          <Flex
+            justify="space-between"
+            align={isMobile ? "flex-start" : "center"}
+            direction={isMobile ? "column" : "row"}
+            gap={16}
+          >
+            <Flex align="center" gap={14}>
+              <Flex
+                align="center"
+                justify="center"
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: "12px",
+                  background: "#FFFFFF",
+                }}
+              >
+                <IconClipboardList size={22} color="#2F6FED" />
+              </Flex>
+              <Stack gap={2}>
+                <Text fw={700} fz={22} c="#1B2559">
+                  Marksheet
+                </Text>
+                <Text fz={13} c="#5B6B8C">
+                  Review results, publish marks, and manage student records.
+                </Text>
+              </Stack>
+            </Flex>
+
+            <Flex
+              gap={10}
+              direction={isMobile ? "column" : "row"}
+              w={isMobile ? "100%" : "auto"}
+            >
+              <Button
+                variant="default"
+                radius={10}
+                fullWidth={isMobile}
+                styles={{
+                  root: {
+                    border: "1px solid #E2E8F0",
+                    fontWeight: 600,
+                    color: "#33415C",
+                  },
+                }}
+                onClick={() => setOpenUploadModal(true)}
+              >
+                Upload File
+              </Button>
+              <Button
+                radius={10}
+                fullWidth={isMobile}
+                styles={{
+                  root: {
+                    background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                    border: 0,
+                    fontWeight: 600,
+                  },
+                }}
+                onClick={() => setOpenSingleStudentModal(true)}
+              >
+                + Single Student
+              </Button>
+            </Flex>
+          </Flex>
+        </Box>
 
         {/* 🔹 Top Buttons */}
         <Flex
-          justify="space-between"
+          justify="flex-end"
           align="center"
-          mt={10}
+          mt={4}
           direction={isMobile ? "column" : "row"}
           gap={isMobile ? 10 : 0}
         >
-          {/* Left buttons */}
-          <Flex
-            gap={10}
-            direction={isMobile ? "column" : "row"}
-            w={isMobile ? "100%" : "auto"}
-          >
-            <Button
-              variant="outline"
-              fullWidth={isMobile}
-              c={"#111"}
-              style={{ borderColor: "#111" }}
-              onClick={() => setOpenSingleStudentModal(true)}
-            >
-              + Single Student
-            </Button>
-
-            <Button
-              variant="outline"
-              fullWidth={isMobile}
-              c={"#111"}
-              style={{ borderColor: "#111" }}
-              onClick={() => setOpenUploadModal(true)}
-            >
-              Upload File
-            </Button>
-          </Flex>
-
           {/* Right dropdown */}
           <Select
             placeholder="Select Exam"
             data={["Mid TERM", "Annual TERM"]}
             value={filterExam}
             onChange={setFilterExam}
+            radius={10}
             // w={200}
             w={isMobile ? "100%" : 200}
           />
         </Flex>
 
         {/* 🔹 Table Container */}
-        <Box style={{ overflowX: "auto" }}>
+        <Box
+          style={{
+            overflowX: "auto",
+            borderRadius: "16px",
+            border: "1px solid #F1F4F9",
+          }}
+        >
           <Table
             w={"100%"}
             mt={8}
@@ -490,11 +542,9 @@ const Marksheet = (props: {
           >
             {/* 🔹 Table Header */}
             <Table.Thead
-              bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}
+              bg={"#F7F9FC"}
               style={{
-                border: "2px solid transparent",
-                borderTopLeftRadius: "1rem",
-                borderTopRightRadius: "1rem",
+                borderBottom: "1px solid #EEF1F6",
               }}
             >
               <Table.Tr>
@@ -502,9 +552,9 @@ const Marksheet = (props: {
                   ta="left"
                   style={{
                     fontFamily: "Roboto",
-                    fontWeight: 700,
-                    color: "#2F4F4F",
-                    fontSize: 18,
+                    fontWeight: 600,
+                    color: "#64748B",
+                    fontSize: 13,
                   }}
                 >
                   Name
@@ -513,9 +563,9 @@ const Marksheet = (props: {
                   ta="center"
                   style={{
                     fontFamily: "Roboto",
-                    fontWeight: 700,
-                    color: "#2F4F4F",
-                    fontSize: 18,
+                    fontWeight: 600,
+                    color: "#64748B",
+                    fontSize: 13,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -525,9 +575,9 @@ const Marksheet = (props: {
                   ta="center"
                   style={{
                     fontFamily: "Roboto",
-                    fontWeight: 700,
-                    color: "#2F4F4F",
-                    fontSize: 18,
+                    fontWeight: 600,
+                    color: "#64748B",
+                    fontSize: 13,
                   }}
                 >
                   Status
@@ -536,9 +586,9 @@ const Marksheet = (props: {
                   ta="center"
                   style={{
                     fontFamily: "Roboto",
-                    fontWeight: 700,
-                    color: "#2F4F4F",
-                    fontSize: 18,
+                    fontWeight: 600,
+                    color: "#64748B",
+                    fontSize: 13,
                   }}
                 >
                   Grade
@@ -547,9 +597,9 @@ const Marksheet = (props: {
                   ta="center"
                   style={{
                     fontFamily: "Roboto",
-                    fontWeight: 700,
-                    color: "#2F4F4F",
-                    fontSize: 18,
+                    fontWeight: 600,
+                    color: "#64748B",
+                    fontSize: 13,
                   }}
                 >
                   Action
@@ -571,18 +621,16 @@ const Marksheet = (props: {
                   <Table.Tr
                     key={index}
                     style={{
-                      backgroundColor: "#FAFCFF",
                       textAlign: "center",
                       fontFamily: "Nunito",
-                      padding: "1rem",
+                      borderBottom: "1px solid #F1F5F9",
                     }}
                   >
                     <Table.Td
                       ta="left"
                       style={{
-                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                        color: "#00000098",
-                        fontWeight: 500,
+                        color: "#1B2559",
+                        fontWeight: 600,
                         padding: "1rem",
                       }}
                     >
@@ -591,8 +639,7 @@ const Marksheet = (props: {
                     <Table.Td
                       ta="center"
                       style={{
-                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                        color: "#00000098",
+                        color: "#64748B",
                         fontWeight: 500,
                         padding: "1rem",
                       }}
@@ -602,24 +649,45 @@ const Marksheet = (props: {
                     <Table.Td
                       ta="center"
                       style={{
-                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                        color: "#00000098",
-                        fontWeight: 500,
                         padding: "1rem",
                       }}
                     >
-                      {item.status}
+                      <Badge
+                        variant="light"
+                        radius="xl"
+                        size="lg"
+                        styles={{
+                          root: {
+                            textTransform: "none",
+                            backgroundColor:
+                              item.status === "Pass" ? "#EAF7EE" : "#FDEDED",
+                            color:
+                              item.status === "Pass" ? "#1E8E3E" : "#D93025",
+                          },
+                        }}
+                      >
+                        {item.status}
+                      </Badge>
                     </Table.Td>
                     <Table.Td
                       ta="center"
                       style={{
-                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                        color: "#00000098",
-                        fontWeight: 500,
                         padding: "1rem",
                       }}
                     >
-                      {item.overallGrade}
+                      <Badge
+                        variant="light"
+                        radius="xl"
+                        size="lg"
+                        color="grape"
+                        styles={{
+                          root: {
+                            textTransform: "none",
+                          },
+                        }}
+                      >
+                        {item.overallGrade}
+                      </Badge>
                     </Table.Td>
                     {/* <Table.Td
                       ta="center"

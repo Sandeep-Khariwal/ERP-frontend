@@ -40,11 +40,20 @@ const OverView = (props: { batchId: string }) => {
   return (
     <Stack w={"100%"} mt={20} p={15}>
       <LoadingOverlay visible={isLoading} />
-      <Stack w={"100%"} bg={"white"} p={20} style={{ borderRadius: "1rem" }}>
-        <Text fw={900} fz={isMd ? 18 : 24}>
+      <Stack
+        w={"100%"}
+        bg={"white"}
+        p={20}
+        style={{
+          borderRadius: "16px",
+          border: "1px solid #F1F4F9",
+          boxShadow: "0px 6px 20px rgba(15,23,42,0.05)",
+        }}
+      >
+        <Text fw={700} fz={isMd ? 18 : 22} c="#1B2559">
           View your batch details here!
         </Text>
-        <Flex c={"#BFBFBF "}>
+        <Flex c={"#8B96AD"}>
           {subjectNames.map((s,i:number) => (
             <Text key={i} >{s + ", "} </Text>
           ))}

@@ -187,7 +187,7 @@ export default function InstituteExpanse() {
         <Container size="xl" py="md">
             <Group justify="space-between" mb="md">
                 <Title order={2}>Expense Analytics</Title>
-                <Button radius="xl" onClick={() => setOpened(true)}>
+                <Button radius="md" onClick={() => setOpened(true)}>
                     + Add Expense
                 </Button>
 
@@ -210,7 +210,7 @@ export default function InstituteExpanse() {
                 </Modal>
             </Group>
 
-            <Card shadow="sm" radius="xl" mb="md">
+            <Card shadow="sm" radius="md" mb="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                 <Group>
                     <DateInput
                         placeholder="Start Date"
@@ -255,25 +255,25 @@ export default function InstituteExpanse() {
 
             <Grid mb="md">
                 <Grid.Col span={3}>
-                    <Card radius="xl" shadow="md">
+                    <Card radius="md" shadow="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                         <Text c="dimmed">Total Expense</Text>
                         <Text size="xl" fw={700}>₹{totalExpense}</Text>
                     </Card>
                 </Grid.Col>
                 <Grid.Col span={3}>
-                    <Card radius="xl" shadow="md">
+                    <Card radius="md" shadow="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                         <Text c="dimmed">Monthly Expense</Text>
                         <Text size="xl" fw={700}>₹{monthlyExpense}</Text>
                     </Card>
                 </Grid.Col>
                 <Grid.Col span={3}>
-                    <Card radius="xl" shadow="md">
+                    <Card radius="md" shadow="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                         <Text c="dimmed">Top Category</Text>
                         <Text size="xl" fw={700}>{topCategory}</Text>
                     </Card>
                 </Grid.Col>
                 <Grid.Col span={3}>
-                    <Card radius="xl" shadow="md">
+                    <Card radius="md" shadow="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                         <Text c="dimmed">Avg Expense</Text>
                         <Text size="xl" fw={700}>₹{avgExpense.toFixed(0)}</Text>
                     </Card>
@@ -282,7 +282,7 @@ export default function InstituteExpanse() {
 
             <Grid>
                 <Grid.Col span={6}>
-                    <Card radius="xl" shadow="md">
+                    <Card radius="md" shadow="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                         <Text mb="sm">Monthly Trend</Text>
                         <LineChart width={400} height={250} data={monthlyData}>
                             <XAxis dataKey="name" />
@@ -294,7 +294,7 @@ export default function InstituteExpanse() {
                 </Grid.Col>
 
                 <Grid.Col span={6}>
-                    <Card radius="xl" shadow="md">
+                    <Card radius="md" shadow="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                         <Text mb="sm">Category Distribution</Text>
                         <PieChart width={350} height={300}>
                             <Pie
@@ -320,7 +320,7 @@ export default function InstituteExpanse() {
 
             <Grid mt="md">
                 <Grid.Col span={12}>
-                    <Card radius="xl" shadow="md">
+                    <Card radius="md" shadow="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                         <Text mb="sm">Weekly Expense</Text>
                         <BarChart width={600} height={250} data={weeklyData}>
                             <XAxis dataKey="name" />
@@ -333,7 +333,7 @@ export default function InstituteExpanse() {
             </Grid>
             <Grid mt="md">
                 <Grid.Col span={12}>
-                    <Card radius="xl" shadow="md" p="lg">
+                    <Card radius="md" shadow="md" p="lg" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
 
                         {/* Header */}
                         <Group justify="space-between" mb="md">

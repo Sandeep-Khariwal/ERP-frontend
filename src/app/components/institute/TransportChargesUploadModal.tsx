@@ -167,7 +167,7 @@ export const TransportChargesUploadModal = ({
       size="lg"
       title={
         <Group gap="sm">
-          <ThemeIcon size={36} radius="md" variant="light" color="violet">
+          <ThemeIcon size={36} radius="md" variant="light" color="blue">
             <IconFileSpreadsheet size={20} />
           </ThemeIcon>
 
@@ -201,7 +201,7 @@ export const TransportChargesUploadModal = ({
               borderRadius: "16px",
               padding: "50px",
               cursor: "pointer",
-              background: "#faf5ff",
+              background: "#EAF1FF",
               transition: "0.3s",
             }}
           >
@@ -211,7 +211,7 @@ export const TransportChargesUploadModal = ({
                   size={70}
                   radius={100}
                   variant="light"
-                  color="violet"
+                  color="blue"
                 >
                   <IconUpload size={34} />
                 </ThemeIcon>
@@ -226,7 +226,7 @@ export const TransportChargesUploadModal = ({
 
                 <Button
                   variant="light"
-                  color="violet"
+                  color="blue"
                   radius="md"
                   leftSection={<IconFileSpreadsheet size={18} />}
                 >
@@ -320,7 +320,7 @@ export const TransportChargesUploadModal = ({
             Cancel
           </Button>
 
-          <Button color="violet" disabled={!file} onClick={handleUpload}>
+          <Button color="blue" disabled={!file} onClick={handleUpload}>
             Upload Transport File
           </Button>
         </Group>

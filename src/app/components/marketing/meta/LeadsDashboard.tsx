@@ -84,7 +84,7 @@ export default function LeadsPage() {
 
   // ── Render ───────────────────────────────────────────────────────
   return (
-    <Stack gap="lg"  w={"98%"} ml={10}>
+    <Stack gap="lg" w={"92%"} mx={"auto"}>
       {/* Page header */}
       <Group justify="space-between" align="flex-end">
         <Box>

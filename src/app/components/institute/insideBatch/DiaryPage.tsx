@@ -431,7 +431,7 @@ function EntryForm({
           radius="md"
           loading={isLoading} // 👈 ये add करो
           disabled={isLoading} // optional but best
-          style={{ background: "#5c3de8" }}
+          style={{ background: "#2F6FED" }}
           leftSection={<IconCheck size={16} />}
         >
           Save Entry
@@ -464,7 +464,7 @@ function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
             <Text
               fw={600}
               size="sm"
-              style={{ color: "#5c3de8", cursor: "pointer" }}
+              style={{ color: "#2F6FED", cursor: "pointer" }}
             >
               {entry.title}
             </Text>
@@ -715,9 +715,9 @@ export default function DiaryPage(props: {
               <ThemeIcon
                 size={36}
                 radius="xl"
-                style={{ background: "#5c3de822" }}
+                style={{ background: "#2F6FED22" }}
               >
-                <IconCalendar size={20} color="#5c3de8" />
+                <IconCalendar size={20} color="#2F6FED" />
               </ThemeIcon>
               <Title order={3} style={{ color: "#1a1a2e", fontWeight: 700 }}>
                 Diary
@@ -733,16 +733,16 @@ export default function DiaryPage(props: {
             <DatePickerInput
               value={selectedDate}
               onChange={setSelectedDate}
-              leftSection={<IconCalendar size={16} color="#5c3de8" />}
-              rightSection={<IconChevronDown size={14} color="#5c3de8" />}
+              leftSection={<IconCalendar size={16} color="#2F6FED" />}
+              rightSection={<IconChevronDown size={14} color="#2F6FED" />}
               styles={{
                 input: {
                   borderRadius: 24,
-                  border: "1.5px solid #e0d6ff",
-                  color: "#5c3de8",
+                  border: "1.5px solid #DCE7FF",
+                  color: "#2F6FED",
                   fontWeight: 600,
                   paddingRight: 36,
-                  background: "#f5f0ff",
+                  background: "#EAF1FF",
                   minWidth: isMobile ? "auto" : 160,
                   cursor: "pointer",
                 },
@@ -754,7 +754,7 @@ export default function DiaryPage(props: {
               leftSection={<IconPlus size={16} />}
               radius="xl"
               style={{
-                background: "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                background: "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                 flex: isMobile ? 1 : "unset",
               }}
               onClick={openAdd}
@@ -810,7 +810,7 @@ export default function DiaryPage(props: {
               style={{ minWidth: 700 }}
             >
               <Table.Thead>
-                <Table.Tr style={{ background: "#f5f0ff" }}>
+                <Table.Tr style={{ background: "#EAF1FF" }}>
                   {[
                     "Subject",
                     "Teacher",
@@ -822,7 +822,7 @@ export default function DiaryPage(props: {
                     <Table.Th
                       key={h}
                       style={{
-                        color: "#5c3de8",
+                        color: "#2F6FED",
                         fontWeight: 600,
                         fontSize: 13,
                         letterSpacing: 0.3,
@@ -868,7 +868,7 @@ export default function DiaryPage(props: {
                         <Text
                           size="sm"
                           fw={600}
-                          style={{ color: "#5c3de8", cursor: "pointer" }}
+                          style={{ color: "#2F6FED", cursor: "pointer" }}
                         >
                           {entry.title}
                         </Text>
@@ -951,8 +951,8 @@ export default function DiaryPage(props: {
           styles={{
             control: {
               "&[data-active]": {
-                background: "#5c3de8",
-                borderColor: "#5c3de8",
+                background: "#2F6FED",
+                borderColor: "#2F6FED",
               },
             },
           }}
@@ -968,9 +968,9 @@ export default function DiaryPage(props: {
             <ThemeIcon
               size={28}
               radius="xl"
-              style={{ background: "#5c3de822" }}
+              style={{ background: "#2F6FED22" }}
             >
-              <IconCalendar size={14} color="#5c3de8" />
+              <IconCalendar size={14} color="#2F6FED" />
             </ThemeIcon>
             <Text fw={700} size="md" style={{ color: "#1a1a2e" }}>
               Add Diary Entry

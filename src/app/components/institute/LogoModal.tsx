@@ -65,7 +65,7 @@ export const LogoModal = ({ opened, onClose, institute }: Props) => {
               borderRadius: "8px",
             }}
           >
-            <IconUpload size={18} color="#7c3aed" />
+            <IconUpload size={18} color="#2F6FED" />
           </Box>
           <Text fw={600}>Upload Institute Logo</Text>
         </Group>
@@ -92,12 +92,12 @@ export const LogoModal = ({ opened, onClose, institute }: Props) => {
               borderRadius: "14px",
               padding: "45px",
               cursor: "pointer",
-              background: "#faf5ff", // light purple bg
+              background: "#EAF1FF", // light purple bg
             }}
           >
             <Center>
               <Stack align="center" gap="xs">
-                <IconUpload size={40} color="#7c3aed" />
+                <IconUpload size={40} color="#2F6FED" />
 
                 <Text fw={500}>Drag & drop your logo here</Text>
                 <Text size="sm" c="dimmed">

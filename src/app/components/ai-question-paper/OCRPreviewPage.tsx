@@ -298,7 +298,6 @@
 
 
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -331,7 +330,7 @@ import {
   IconArrowRight,
   IconFileText,
 } from "@tabler/icons-react";
-import { useOCRDocument, useUpdateOCRText } from "../../hooks/useAIQuestionPaper";
+import { useOCRDocument, useUpdateOCRText } from "../../../hooks/useAIQuestionPaper";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 

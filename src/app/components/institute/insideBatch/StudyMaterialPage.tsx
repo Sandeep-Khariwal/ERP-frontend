@@ -190,7 +190,7 @@ function EntryForm({
                     leftSection={<IconCheck size={18} />}
                     style={{
                         background:
-                            "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                            "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                     }}
                 >
                     Upload Material
@@ -322,7 +322,7 @@ export default function StudyMaterialPage(props: {
                 mb="xl"
                 style={{
                     background:
-                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                     color: "white",
                     overflow: "hidden",
                     position: "relative",
@@ -358,7 +358,7 @@ export default function StudyMaterialPage(props: {
                         size="md"
                         onClick={openAdd}
                         color="white"
-                        c="#5c3de8"
+                        c="#2F6FED"
                     >
                         Upload Material
                     </Button>
@@ -369,7 +369,7 @@ export default function StudyMaterialPage(props: {
 
             {isLoading ? (
                 <Flex justify="center" mt={80}>
-                    <Loader color="violet" size="lg" />
+                    <Loader color="blue" size="lg" />
                 </Flex>
             ) : (
                 <>
@@ -392,7 +392,7 @@ export default function StudyMaterialPage(props: {
                                 mb="md"
                                 style={{
                                     background:
-                                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                                 }}
                             >
                                 <IconBook size={40} />
@@ -413,7 +413,7 @@ export default function StudyMaterialPage(props: {
                                 onClick={openAdd}
                                 style={{
                                     background:
-                                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                                 }}
                             >
                                 Upload Material
@@ -457,7 +457,7 @@ export default function StudyMaterialPage(props: {
                                     leftSection={<IconDownload size={16} />}
                                     radius="xl"
                                     variant="light"
-                                    color="violet"
+                                    color="blue"
                                 >
                                     Download All
                                 </Button>
@@ -486,7 +486,7 @@ export default function StudyMaterialPage(props: {
                                                         size={48}
                                                         radius="xl"
                                                         variant="light"
-                                                        color="violet"
+                                                        color="blue"
                                                     >
                                                         <IconFileDescription size={22} />
                                                     </ThemeIcon>
@@ -516,7 +516,7 @@ export default function StudyMaterialPage(props: {
                                                         <ActionIcon
                                                             variant="subtle"
                                                             radius="xl"
-                                                            color="violet"
+                                                            color="blue"
                                                         >
                                                             <IconDotsVertical size={18} />
                                                         </ActionIcon>
@@ -599,8 +599,8 @@ export default function StudyMaterialPage(props: {
                                         styles={{
                                             control: {
                                                 "&[data-active]": {
-                                                    background: "#5c3de8",
-                                                    borderColor: "#5c3de8",
+                                                    background: "#2F6FED",
+                                                    borderColor: "#2F6FED",
                                                 },
                                             },
                                         }}
@@ -655,7 +655,7 @@ export default function StudyMaterialPage(props: {
                             radius="xl"
                             style={{
                                 background:
-                                    "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                    "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                             }}
                         >
                             <IconBook size={18} />

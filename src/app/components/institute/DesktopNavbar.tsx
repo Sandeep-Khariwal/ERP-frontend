@@ -55,20 +55,13 @@ import { MdOutlineImage } from "react-icons/md";
 import { FaSignature } from "react-icons/fa";
 import { CiMoneyCheck1 } from "react-icons/ci";
 
-// import {
-//   IconUsers,
-//   IconPlugConnected,
-//   IconLayoutDashboard,
-//   IconMoon,
-//   IconSun,
-//   IconBuildingSkyscraper,
-// } from "@tabler/icons-react";
 import { TbPlugConnected } from "react-icons/tb";
 import { SignatureModal } from "./signaturemodal";
 import { AddEmailModal } from "./transport/AddEmail";
 import { AddPaymentKeysModal } from "./AddPaymentKeys";
 import { Switch } from "@mantine/core";
-import { FaTrophy, FaMoon } from "react-icons/fa6";
+import { FaMoon } from "react-icons/fa6";
+import { Receipt, Wallet } from "lucide-react";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -190,12 +183,12 @@ export const DesktopNavbar = (props: {
           <Flex align="center" gap={10}>
             <Box
               style={{
-                background: "#f3e8ff",
+                background: "#EAF1FF",
                 borderRadius: "50%",
                 padding: "8px",
               }}
             >
-              <IoSettingsOutline size={20} color="#7c3aed" />
+              <IoSettingsOutline size={20} color="#2F6FED" />
             </Box>
 
             <Box>
@@ -235,7 +228,7 @@ export const DesktopNavbar = (props: {
                 borderRadius: "8px",
                 cursor: "pointer",
                 background:
-                  activeSettingTab === "info" ? "#f3e8ff" : "transparent",
+                  activeSettingTab === "info" ? "#EAF1FF" : "transparent",
               }}
               onClick={() => setActiveSettingTab("info")}
             >
@@ -254,7 +247,7 @@ export const DesktopNavbar = (props: {
                 borderRadius: "8px",
                 cursor: "pointer",
                 background:
-                  activeSettingTab === "logo" ? "#f3e8ff" : "transparent",
+                  activeSettingTab === "logo" ? "#EAF1FF" : "transparent",
               }}
               onClick={() => {
                 setSettingsOpened(false);
@@ -275,7 +268,7 @@ export const DesktopNavbar = (props: {
                 borderRadius: "8px",
                 cursor: "pointer",
                 background:
-                  activeSettingTab === "sign" ? "#f3e8ff" : "transparent",
+                  activeSettingTab === "sign" ? "#EAF1FF" : "transparent",
               }}
               onClick={() => {
                 setSettingsOpened(false);
@@ -296,7 +289,7 @@ export const DesktopNavbar = (props: {
                 borderRadius: "8px",
                 cursor: "pointer",
                 background:
-                  activeSettingTab === "gst" ? "#f3e8ff" : "transparent",
+                  activeSettingTab === "gst" ? "#EAF1FF" : "transparent",
               }}
               onClick={() => {
                 // setSettingsOpened(false);
@@ -395,9 +388,9 @@ export const DesktopNavbar = (props: {
                   align="center"
                   p="md"
                   style={{
-                    border: "1px dashed #c084fc",
+                    border: "1px dashed #A0B7FF",
                     borderRadius: "10px",
-                    background: "#faf5ff",
+                    background: "#EAF1FF",
                   }}
                 >
                   <Box>
@@ -409,7 +402,7 @@ export const DesktopNavbar = (props: {
 
                   <Button
                     variant="outline"
-                    color="violet"
+                    color="blue"
                     onClick={() => {
                       setSettingsOpened(false);
                       setLogoModalOpen(true);
@@ -462,7 +455,7 @@ export const DesktopNavbar = (props: {
                   </Button>
 
                   <Button
-                    color="violet"
+                    color="blue"
                     loading={isLoading}
                     onClick={handleUpdateSchool}
                   >
@@ -514,7 +507,7 @@ export const DesktopNavbar = (props: {
                   </Button>
 
                   <Button
-                    color="violet"
+                    color="blue"
                     loading={isLoading}
                     onClick={handleUpdateGST}
                   >
@@ -583,8 +576,10 @@ export const DesktopNavbar = (props: {
             direction="row"
             gap={10}
             pl={hovered ? 18 : 0}
+            pt={18}
+            pb={10}
             style={{
-              height: "80px",
+              minHeight: "88px",
               transition: "all 0.3s ease",
             }}
           >
@@ -983,7 +978,7 @@ export const DesktopNavbar = (props: {
               {/* DROPDOWN ITEMS */}
               {openBusiness && hovered && (
                 <Stack pl={30} gap={5}>
-                  {/* LEads */}
+                  {/* Expenses */}
                   <Flex
                     style={{
                       cursor: "pointer",
@@ -1000,16 +995,11 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EXPENSE)}
                   >
-                    <Image
-                      src="/expense.png"
-                      width={25}
-                      height={25}
-                      alt="not found"
-                    />
+                    <Receipt size={20} color="#5B6B8C" />
                     <Text fw={500}>Expanse</Text>
                   </Flex>
 
-                  {/* INTEGRATION */}
+                  {/* Earnings */}
                   <Flex
                     style={{
                       cursor: "pointer",
@@ -1026,12 +1016,7 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EARNING)}
                   >
-                    <Image
-                      src="/earnings.png"
-                      width={25}
-                      height={25}
-                      alt="not found"
-                    />
+                    <Wallet size={20} color="#5B6B8C" />
                     <Text fw={500}>Earnings</Text>
                   </Flex>
                 </Stack>
@@ -1261,86 +1246,12 @@ export const DesktopNavbar = (props: {
             </Box>
 
             <Box w={"100%"} px={10} pb={15}>
-              {hovered ? (
-                <Box
-                  mb={14}
-                  p={16}
-                  style={{
-                    borderRadius: "16px",
-                    background:
-                      "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
-                    boxShadow: "0px 10px 24px rgba(47,111,237,0.28)",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => navigation.push("/pricing")}
-                >
-                  <Flex align="center" gap={10} mb={8}>
-                    <Box
-                      style={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: "10px",
-                        background: "rgba(255,255,255,0.18)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <FaTrophy size={16} color="#FFD54F" />
-                    </Box>
-                    <Text fw={700} fz={14} c="white">
-                      Upgrade to Premium
-                    </Text>
-                  </Flex>
-                  <Text fz={12} c="rgba(255,255,255,0.85)" mb={12} lh={1.4}>
-                    Unlock all features and get unlimited access.
-                  </Text>
-                  <Button
-                    fullWidth
-                    size="xs"
-                    radius="xl"
-                    styles={{
-                      root: {
-                        background: "white",
-                        color: "#2F6FED",
-                        fontWeight: 700,
-                        "&:hover": { background: "#F5F8FF" },
-                      },
-                    }}
-                  >
-                    Upgrade Now
-                  </Button>
-                </Box>
-              ) : (
-                <Flex
-                  justify="center"
-                  mb={14}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigation.push("/pricing")}
-                >
-                  <Box
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "10px",
-                      background:
-                        "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <FaTrophy size={18} color="#FFD54F" />
-                  </Box>
-                </Flex>
-              )}
-
               <Flex
                 align="center"
                 justify={hovered ? "space-between" : "center"}
                 px={hovered ? 6 : 0}
                 mb={16}
+                mt={hovered ? 6 : 6}
               >
                 <Flex align="center" gap={10}>
                   <FaMoon size={16} color="#7C8DB5" />

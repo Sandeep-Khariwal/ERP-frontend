@@ -11,7 +11,7 @@ import { WhatsAppIntegrationPanel } from "../whatsapp/WhatsAppIntegrationPanel";
 
 export default function IntegrationsPage() {
   return (
-    <Stack gap="lg" w={"98%"} ml={10} >
+    <Stack gap="lg" w={"92%"} mx={"auto"} >
       {/* Header */}
       <Box>
         <Title order={2} fw={800}>Integrations</Title>

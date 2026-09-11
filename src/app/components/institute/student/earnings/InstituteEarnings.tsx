@@ -229,9 +229,9 @@ const monthlyData = Object.values(monthlyMap);
             },
           ].map((item, i) => (
             <Grid.Col span={isMobile ? 6 : 2.4} key={i}>
-              <Card radius="xl" shadow="sm" p="md">
+              <Card radius="md" shadow="sm" p="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                 <Group>
-                  <ThemeIcon color={item.color} size={42} radius="xl">
+                  <ThemeIcon color={item.color} size={42} radius="md">
                     <item.icon size={20} />
                   </ThemeIcon>
 
@@ -255,7 +255,7 @@ const monthlyData = Object.values(monthlyMap);
 
 
         {/* ================= CHART ================= */}
-        <Card radius="xl" p="xs" mb="md">
+        <Card radius="md" p="xs" mb="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
           <Text fw={600} mb="xs">
             Monthly Earnings
           </Text>
@@ -271,7 +271,7 @@ const monthlyData = Object.values(monthlyMap);
             </BarChart>
           </ResponsiveContainer>
         </Card>
-        <Card radius="xl" p="md" mb="md">
+        <Card radius="md" p="md" mb="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
   <Flex justify="space-between" align="center">
     <Text fw={700}>Upcoming Fees</Text>
 
@@ -356,7 +356,7 @@ const monthlyData = Object.values(monthlyMap);
       <Grid>
   {/* LEFT */}
   <Grid.Col span={4} {...(isMobile && { span: 12 })}>
-    <Card radius="xl" p="md" shadow="sm">
+    <Card radius="md" p="md" shadow="sm" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
       
       {/* HEADER */}
       <Flex justify="space-between" align="center">
@@ -424,7 +424,7 @@ const monthlyData = Object.values(monthlyMap);
   <Grid.Col span={8} {...(isMobile && { span: 12 })}>
     
     {/* ✅ BATCH TABLE */}
-    <Card radius="xl" p="md">
+    <Card radius="md" p="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
       <Flex justify="space-between" align="center">
         <Text fw={700}>Batch-wise Earnings</Text>
 

@@ -1,23 +1,25 @@
 "use client";
 
 import {
+  Avatar,
+  Badge,
+  Box,
   Button,
-  Divider,
   Flex,
   LoadingOverlay,
   Modal,
+  Pagination,
   Select,
   Stack,
+  Table,
   Text,
   TextInput,
 } from "@mantine/core";
 import {
   IconSearch,
-  IconUserSquareRounded,
   IconArrowLeft,
   IconDownload,
 } from "@tabler/icons-react";
-import StudentListCard from "./student/components/StudentListCard";
 import StudentProfilePage from "./student/components/StudentProfilePage";
 import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
@@ -86,6 +88,11 @@ export const InstituteStudents = () => {
     phoneNumber: "",
     batchId: "",
   });
+  const ROWS_PER_PAGE = 6;
+  const [activePage, setActivePage] = useState(1);
+  useEffect(() => {
+    setActivePage(1);
+  }, [filteredStudents]);
 
   const HandleSearchPendingFees = () => {
     if (!institute?._id) return;
@@ -243,7 +250,7 @@ export const InstituteStudents = () => {
   if (StudentTabs.OTHER !== activeTab) {
     return (
       <Stack
-        w={isMd ? "95%" : "90%"}
+        w={isMd ? "95%" : "92%"}
         mih={"100vh"}
         mx={"auto"}
         bg={"transparent"}
@@ -252,7 +259,7 @@ export const InstituteStudents = () => {
         <LoadingOverlay visible={isLoading} />
         <Stack
           w={"100%"}
-          style={{ borderRadius: "1rem" }}
+          style={{ borderRadius: "1rem", border: "1px solid #F1F4F9", boxShadow: "0px 6px 20px rgba(15,23,42,0.05)" }}
           bg={"white"}
           align={"center"}
           justify={"space-between"}
@@ -276,7 +283,7 @@ export const InstituteStudents = () => {
   if (showPassoutScreen) {
     return (
       <Stack
-        w={isMd ? "95%" : "90%"}
+        w={isMd ? "95%" : "92%"}
         mih={"100vh"}
         mx={"auto"}
         bg={"transparent"}
@@ -303,7 +310,7 @@ export const InstituteStudents = () => {
   if (showPendingFeeScreen) {
     return (
       <Stack
-        w={isMd ? "95%" : "90%"}
+        w={isMd ? "95%" : "92%"}
         mih={"100vh"}
         mx={"auto"}
         bg={"transparent"}
@@ -315,7 +322,7 @@ export const InstituteStudents = () => {
           bg={"white"}
           p={15}
           mt={10}
-          style={{ borderRadius: "1rem" }}
+          style={{ borderRadius: "1rem", border: "1px solid #F1F4F9", boxShadow: "0px 6px 20px rgba(15,23,42,0.05)" }}
         >
           <Flex
             w={"100%"}
@@ -415,7 +422,7 @@ export const InstituteStudents = () => {
               onClick={HandleSearchPendingFees}
               styles={{
                 root: {
-                  background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                  background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                   border: 0,
                   borderRadius: "10px",
                   height: "44px",
@@ -430,7 +437,7 @@ export const InstituteStudents = () => {
                 onClick={() => setAddPayment(true)}
                 styles={{
                   root: {
-                    background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                    background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                     border: 0,
                     borderRadius: "10px",
                     height: "44px",
@@ -460,7 +467,7 @@ export const InstituteStudents = () => {
                 onClick={addPayment}
                 styles={{
                   root: {
-                    background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                    background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                     border: 0,
                     borderRadius: "10px",
                     height: "44px",
@@ -491,7 +498,7 @@ export const InstituteStudents = () => {
                 >
                   <thead
                     style={{
-                      background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                      background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                       color: "white",
                     }}
                   >
@@ -556,247 +563,222 @@ export const InstituteStudents = () => {
   }
 
   // View Mode 4: Main Active Students Directory Default Screen
+  const pagedStudents = filteredStudents.slice(
+    (activePage - 1) * ROWS_PER_PAGE,
+    activePage * ROWS_PER_PAGE,
+  );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredStudents.length / ROWS_PER_PAGE),
+  );
+
   return (
     <Stack
-      w={isMd ? "95%" : "90%"}
+      w={isMd ? "95%" : "92%"}
       mih={"100vh"}
       mx={"auto"}
       bg={"transparent"}
       mb={isMd ? 100 : 0}
+      py={20}
     >
       <LoadingOverlay visible={isLoading} />
 
-      <Flex
-        w={"100%"}
-        style={{ borderRadius: "1rem" }}
-        bg={"white"}
-        align={"center"}
-        justify={"space-between"}
-        p={10}
-        py={20}
-        mt={10}
-      >
-        <Text fw={600} style={{ fontFamily: "sans-serif" }} fz={22}>
-          Students Directory
-        </Text>
-        <Flex align={"center"} gap={10}>
-          {institute?.isAcadmy && (
+      {!selectedStudentId && (
+        <Flex
+          w={"100%"}
+          align={isMd ? "flex-start" : "center"}
+          justify="space-between"
+          direction={isMd ? "column" : "row"}
+          gap={16}
+        >
+          <Stack gap={2}>
+            <Text fz={26} fw={700} c="#1B2559" style={{ fontFamily: "sans-serif" }}>
+              Students Directory
+            </Text>
+            <Text fz={13} c="#8B96AD">
+              View and manage all your students in one place
+            </Text>
+          </Stack>
+
+          <Flex align={"center"} gap={10} wrap="wrap">
+            {institute?.isAcadmy && (
+              <Button
+                onClick={() => setShowPassoutScreen(true)}
+                radius={10}
+                styles={{
+                  root: {
+                    background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                    border: 0,
+                  },
+                }}
+              >
+                Passout Students
+              </Button>
+            )}
             <Button
-              onClick={() => setShowPassoutScreen(true)}
+              onClick={() => setShowPendingFeeScreen(true)}
+              radius={10}
               styles={{
                 root: {
-                  background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                  background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                   border: 0,
-                  borderRadius: "8px",
                 },
               }}
             >
-              Passout Students
+              Pending Fees
             </Button>
-          )}
-          <Button
-            onClick={() => setShowPendingFeeScreen(true)}
-            styles={{
-              root: {
-                background: "linear-gradient(135deg, #C850C0, #4158D0)",
-                border: 0,
-                borderRadius: "8px",
-              },
+          </Flex>
+        </Flex>
+      )}
+
+      {!selectedStudentId ? (
+        <Stack
+          w={"100%"}
+          bg={"white"}
+          style={{
+            borderRadius: "1rem",
+            border: "1px solid #F1F4F9",
+            boxShadow: "0px 6px 20px rgba(15,23,42,0.05)",
+          }}
+          p={16}
+          py={20}
+        >
+          <Flex w={"100%"} align={"end"} gap={20} wrap="wrap">
+            <TextInput
+              label="Search students"
+              placeholder="search by name"
+              leftSection={<IconSearch size={16} color="#8B96AD" />}
+              onChange={(e) => setSearch(e.target.value)}
+              radius={10}
+              w={isMd ? "100%" : 280}
+              styles={{
+                input: {
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                },
+              }}
+            />
+            <Select
+              label="Batch"
+              placeholder="Filter with batch"
+              w={isMd ? "100%" : 220}
+              radius={10}
+              data={Array.from(batchMap.entries()).map(([key, value]) => ({
+                label: value,
+                value: key,
+              }))}
+              value={selectedBatchId}
+              onChange={(value: any) => setSelectedBatchId(value)}
+            />
+          </Flex>
+
+          <Box
+            style={{
+              borderRadius: "16px",
+              border: "1px solid #F1F4F9",
+              overflow: "hidden",
+              marginTop: 10,
             }}
           >
-            Pending Fees
+            <Table verticalSpacing="md" horizontalSpacing="xl" bg={"white"} fz={15}>
+              <Table.Thead bg={"#EEF3FF"}>
+                <Table.Tr>
+                  <Table.Th style={{ color: "#33415C", fontWeight: 700, fontSize: 14 }}>
+                    Student
+                  </Table.Th>
+                  <Table.Th style={{ color: "#33415C", fontWeight: 700, fontSize: 14 }}>
+                    Roll No.
+                  </Table.Th>
+                  <Table.Th style={{ color: "#33415C", fontWeight: 700, fontSize: 14 }}>
+                    Batch
+                  </Table.Th>
+                  <Table.Th style={{ color: "#33415C", fontWeight: 700, fontSize: 14 }}>
+                    Year Joined
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <tbody>
+                {pagedStudents.map((s: StudentList) => (
+                  <Table.Tr
+                    key={s._id}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setSelectedStudentId(s._id)}
+                  >
+                    <Table.Td>
+                      <Flex align="center" gap={10}>
+                        <Avatar src={s.profilePic} radius="xl" size={36} color="blue">
+                          {(s.name || "?").charAt(0).toUpperCase()}
+                        </Avatar>
+                        <Text fw={600} c="#1B2559" fz={14}>
+                          {s.name}
+                        </Text>
+                      </Flex>
+                    </Table.Td>
+                    <Table.Td c="#5B6B8C" fz={14}>
+                      {s.uniqueRoll}
+                    </Table.Td>
+                    <Table.Td>
+                      <Badge variant="light" color="blue" radius="sm">
+                        {s.batchId?.name}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td c="#5B6B8C" fz={14}>
+                      {s.dateOfJoining}
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </tbody>
+            </Table>
+          </Box>
+
+          {filteredStudents.length === 0 && (
+            <Stack align="center" py={40}>
+              <Image src={"/empty.png"} alt="empty image" width={120} height={110} />
+              <Text fw={600} c={"#8B96AD"}>
+                No students found
+              </Text>
+            </Stack>
+          )}
+
+          {filteredStudents.length > ROWS_PER_PAGE && (
+            <Flex justify="flex-end" mt={6}>
+              <Pagination
+                total={totalPages}
+                value={activePage}
+                onChange={setActivePage}
+                color="blue"
+                radius="md"
+              />
+            </Flex>
+          )}
+        </Stack>
+      ) : (
+        <Stack
+          w={"100%"}
+          bg={"white"}
+          style={{
+            borderRadius: "1rem",
+            border: "1px solid #F1F4F9",
+            boxShadow: "0px 6px 20px rgba(15,23,42,0.05)",
+          }}
+        >
+          <Button
+            variant="subtle"
+            color="gray"
+            onClick={() => setSelectedStudentId("")}
+            m={10}
+            w={140}
+            leftSection={<IconArrowLeft size={14} />}
+          >
+            Back to Directory
           </Button>
-          <IconUserSquareRounded />
-        </Flex>
-      </Flex>
-
-      <Flex w={"100%"} h={"100%"} gap={10} mt={10}>
-        {isMd ? (
-          /* Mobile Single Column Layout Toggle */
-          !selectedStudentId ? (
-            <Stack
-              w={"100%"}
-              bg={"white"}
-              h={"100%"}
-              style={{ borderRadius: "0.5rem" }}
-              p={10}
-            >
-              <Text fw={600} style={{ fontFamily: "sans-serif" }} fz={22}>
-                Students
-              </Text>
-              <TextInput
-                placeholder="search name or phone"
-                leftSection={<IconSearch />}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Select
-                my={10}
-                w={"80%"}
-                label="Filter with Batch"
-                placeholder="Filter with batch"
-                data={Array.from(batchMap.entries()).map(([key, value]) => ({
-                  label: value,
-                  value: key,
-                }))}
-                value={selectedBatchId}
-                onChange={(value: any) => setSelectedBatchId(value)}
-              />
-              <Divider c={"gray"} w={"100%"} />
-              {/* Header List Meta Row */}
-              <Flex w={"100%"} px={5} py={10}>
-                <Flex w={"10%"}>
-                  <Text fz={14} c={"#4F4F4F"}>
-                    Pic
-                  </Text>
-                </Flex>
-                <Flex w={"50%"}>
-                  <Text fz={14} c={"#4F4F4F"}>
-                    Name
-                  </Text>
-                </Flex>
-                <Flex w={"20%"} justify="center">
-                  <Text fz={14} c={"#4F4F4F"}>
-                    Roll No.
-                  </Text>
-                </Flex>
-                <Flex w={"20%"} justify="center">
-                  <Text fz={14} c={"#4F4F4F"}>
-                    Year
-                  </Text>
-                </Flex>
-              </Flex>
-              {filteredStudents.map((s: StudentList) => (
-                <StudentListCard
-                  key={s._id}
-                  student={s}
-                  onClickStudent={(id: string) => setSelectedStudentId(id)}
-                  id={selectedStudentId}
-                  selectedStudentId={selectedStudentId}
-                />
-              ))}
-            </Stack>
-          ) : (
-            <Stack
-              w={"100%"}
-              h={"100%"}
-              bg={"white"}
-              style={{ borderRadius: "0.5rem" }}
-            >
-              <Button
-                variant="subtle"
-                color="gray"
-                onClick={() => setSelectedStudentId("")}
-                m={10}
-                w={100}
-                leftSection={<IconArrowLeft size={14} />}
-              >
-                Back
-              </Button>
-              <StudentProfilePage
-                selectedStudentId={selectedStudentId}
-                onClickAction={(val: StudentTabs) => setActiveTab(val)}
-              />
-            </Stack>
-          )
-        ) : (
-          /* Desktop Split View Column Layout Layout */
-          <>
-            <Stack
-              w={"30%"}
-              bg={"white"}
-              h={"100%"}
-              style={{ borderRadius: "0.5rem" }}
-              p={10}
-            >
-              <Text fw={600} style={{ fontFamily: "sans-serif" }} fz={22}>
-                Students
-              </Text>
-              <TextInput
-                placeholder="search name or phone"
-                leftSection={<IconSearch />}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Select
-                my={10}
-                w={"50%"}
-                label="Filter with Batch"
-                placeholder="Filter with batch"
-                data={Array.from(batchMap.entries()).map(([key, value]) => ({
-                  label: value,
-                  value: key,
-                }))}
-                value={selectedBatchId}
-                onChange={(e: any) => setSelectedBatchId(e)}
-              />
-              <Divider c={"gray"} w={"100%"} />
-              <Flex w={"100%"} px={5} py={10}>
-                <Flex w={"10%"}>
-                  <Text fz={14} c={"#4F4F4F"}>
-                    Pic
-                  </Text>
-                </Flex>
-                <Flex w={"50%"}>
-                  <Text fz={14} c={"#4F4F4F"}>
-                    Name
-                  </Text>
-                </Flex>
-                <Flex w={"20%"} justify="center">
-                  <Text fz={14} c={"#4F4F4F"}>
-                    Roll No.
-                  </Text>
-                </Flex>
-                <Flex w={"20%"} justify="center">
-                  <Text fz={14} c={"#4F4F4F"}>
-                    Year
-                  </Text>
-                </Flex>
-              </Flex>
-              {filteredStudents.map((s: StudentList) => (
-                <StudentListCard
-                  key={s._id}
-                  student={s}
-                  onClickStudent={(id: string) => setSelectedStudentId(id)}
-                  id={selectedStudentId}
-                  selectedStudentId={selectedStudentId}
-                />
-              ))}
-            </Stack>
-
-            <Stack
-              w={"70%"}
-              bg={"white"}
-              h={"100%"}
-              style={{ borderRadius: "0.5rem" }}
-              p={10}
-            >
-              {selectedStudentId ? (
-                <StudentProfilePage
-                  selectedStudentId={selectedStudentId}
-                  onClickAction={(val: StudentTabs) => setActiveTab(val)}
-                />
-              ) : (
-                <Stack
-                  w={"100%"}
-                  h={"100%"}
-                  m={"auto"}
-                  align={"center"}
-                  justify={"center"}
-                >
-                  <Image
-                    src={"/empty.png"}
-                    alt="empty image"
-                    width={150}
-                    height={140}
-                  />
-                  <Text fw={600} c={"#4F4F4F"}>
-                    Select a student
-                  </Text>
-                </Stack>
-              )}
-            </Stack>
-          </>
-        )}
-      </Flex>
+          <StudentProfilePage
+            selectedStudentId={selectedStudentId}
+            onClickAction={(val: StudentTabs) => setActiveTab(val)}
+          />
+        </Stack>
+      )}
     </Stack>
   );
 };
+

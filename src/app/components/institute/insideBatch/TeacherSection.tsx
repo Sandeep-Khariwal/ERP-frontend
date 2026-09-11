@@ -5,6 +5,8 @@ import {
   GetAllTeachersFromBatch,
 } from "@/axios/institute/InstituteGetApi";
 import {
+  Avatar,
+  Badge,
   Box,
   Button,
   Flex,
@@ -12,13 +14,14 @@ import {
   Menu,
   Modal,
   MultiSelect,
+  Pagination,
   Stack,
   Table,
   Text,
   TextInput,
 } from "@mantine/core";
 import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
 import {
   containsOnlyDigits,
@@ -36,6 +39,9 @@ import { Notifications } from "@mantine/notifications";
 import { FaUserCircle } from "react-icons/fa";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
 import { TeacherData } from "@/interfaces/batchInterface";
+import { subjectBadge } from "../../dashboard/subjectColorMap";
+
+const ROWS_PER_PAGE = 6;
 
 const TeachersSection = (props: {
   batchId?: string;
@@ -72,6 +78,9 @@ const TeachersSection = (props: {
     >
   >;
   setSelectTeacherId?: React.Dispatch<React.SetStateAction<string>>;
+  // Optional batchId -> batch name lookup, used to render a "Classes"
+  // column in the main Teacher Directory table.
+  batchMap?: Map<string, string>;
 
   //   setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
   //   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
@@ -104,6 +113,18 @@ const TeachersSection = (props: {
     name: string;
     phone: string;
   }>({ name: "", phone: "" });
+  const [activePage, setActivePage] = useState(1);
+
+  useEffect(() => {
+    setActivePage(1);
+  }, [teachers]);
+
+  const pagedTeachers = useMemo(() => {
+    const start = (activePage - 1) * ROWS_PER_PAGE;
+    return teachers.slice(start, start + ROWS_PER_PAGE);
+  }, [teachers, activePage]);
+
+  const totalPages = Math.max(1, Math.ceil(teachers.length / ROWS_PER_PAGE));
 
   useEffect(() => {
     if (props.isTeacherDashboard) {
@@ -210,27 +231,32 @@ const TeachersSection = (props: {
 
   // const isMd = useMediaQuery(`(max-width: 968px)`);
   return (
-    <Stack mah={"70vh"} style={{ overflowY: "scroll" }}>
+    <Stack style={{ overflowY: "visible" }}>
       <Notifications />
       <LoadingOverlay visible={isLoading} />
-      <Table
-        mt={8}
-        verticalSpacing="md"
-        horizontalSpacing="xl"
-        bg={"white"}
-        fz={18}
+      <Box
+        style={{
+          borderRadius: "16px",
+          border: "1px solid #F1F4F9",
+          overflow: "hidden",
+        }}
       >
+        <Table
+          verticalSpacing="md"
+          horizontalSpacing="xl"
+          bg={"white"}
+          fz={15}
+        >
         <Table.Thead
-          bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}
-          style={{ position: "sticky", top: 0 }}
+          bg={"#F7F9FC"}
         >
           <Table.Tr>
             <Table.Th
               style={{
                 fontFamily: "Roboto",
-                fontWeight: 700,
-                color: "#2F4F4F",
-                fontSize: 18,
+                fontWeight: 600,
+                color: "#64748B",
+                fontSize: 13,
               }}
             >
               Name
@@ -239,18 +265,42 @@ const TeachersSection = (props: {
               style={{
                 fontFamily: "Roboto",
                 fontWeight: 600,
-                color: "#2F4F4F",
-                fontSize: 18,
+                color: "#64748B",
+                fontSize: 13,
               }}
             >
               Phone Number
             </Table.Th>
+            {props.batchMap && (
+              <Table.Th
+                style={{
+                  fontFamily: "Roboto",
+                  fontWeight: 600,
+                  color: "#64748B",
+                  fontSize: 13,
+                }}
+              >
+                Subject
+              </Table.Th>
+            )}
+            {props.batchMap && (
+              <Table.Th
+                style={{
+                  fontFamily: "Roboto",
+                  fontWeight: 600,
+                  color: "#64748B",
+                  fontSize: 13,
+                }}
+              >
+                Classes
+              </Table.Th>
+            )}
             <Table.Th
               style={{
                 fontFamily: "Roboto",
                 fontWeight: 600,
-                color: "#2F4F4F",
-                fontSize: 18,
+                color: "#64748B",
+                fontSize: 13,
               }}
             >
               Message
@@ -260,8 +310,9 @@ const TeachersSection = (props: {
                 style={{
                   fontFamily: "Roboto",
                   fontWeight: 600,
-                  color: "#2F4F4F",
-                  fontSize: 18,
+                  color: "#64748B",
+                  fontSize: 13,
+
                 }}
               >
                 Action
@@ -270,48 +321,85 @@ const TeachersSection = (props: {
           </Table.Tr>
         </Table.Thead>
         <tbody>
-          {teachers.map((item: any, index: number) => {
+          {pagedTeachers.map((item: any, index: number) => {
             return (
               <Table.Tr
                 key={index}
-                style={
-                  item.isInActive
-                    ? {
-                      textAlign: "center",
-                      fontFamily: "Nunito",
-                      padding: "1rem",
-                    }
-                    : {
-                      textAlign: "center",
-                      fontFamily: "Nunito",
-                      padding: "1rem",
-                    }
-                }
+                style={{
+                  fontFamily: "Nunito",
+                  borderBottom: "1px solid #F1F5F9",
+                }}
               >
                 <Table.Td
                   style={{
-                    color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                    fontWeight: 500,
+                    color: item.isInActive ? "#bebebe" : "#33415C",
+                    fontWeight: 600,
                     padding: "1rem",
                   }}
                   ta={"start"}
                 >
-                  {item.name}
+                  <Flex align="center" gap={10}>
+                    <Avatar radius="xl" size={36} color="blue">
+                      {(item.name || "?").charAt(0).toUpperCase()}
+                    </Avatar>
+                    {item.name}
+                  </Flex>
                 </Table.Td>
                 <Table.Td
                   style={{
-                    color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                    color: item.isInActive ? "#bebebe" : "#5B6B8C",
                     fontWeight: 500,
                   }}
                   ta={"start"}
                 >
                   {item.phoneNumber[0]}
                 </Table.Td>
+                {props.batchMap && (
+                  <Table.Td ta={"start"}>
+                    <Flex gap={6} wrap="wrap">
+                      {(item.subjects || []).slice(0, 2).map((sub: any, i: number) => {
+                        const style = subjectBadge(sub.name);
+                        return (
+                          <Badge
+                            key={i}
+                            variant="light"
+                            radius="sm"
+                            styles={{
+                              root: {
+                                backgroundColor: style.bg,
+                                color: style.fg,
+                              },
+                            }}
+                          >
+                            {sub.name}
+                          </Badge>
+                        );
+                      })}
+                    </Flex>
+                  </Table.Td>
+                )}
+                {props.batchMap && (
+                  <Table.Td ta={"start"} c={"#5B6B8C"} fz={13}>
+                    {(item.instituteBatches || [])
+                      .map((id: string) => props.batchMap!.get(id))
+                      .filter(Boolean)
+                      .join(", ") || "—"}
+                  </Table.Td>
+                )}
                 <Table.Td ta={"start"}>
                   <a href={`sms:${item.phoneNumber[0]}?body=Hello!, `}>
-                    <div>
-                      <IconMessage cursor="pointer" color="#7D7D7D" />
-                    </div>
+                    <Flex
+                      align="center"
+                      justify="center"
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: "10px",
+                        background: "#EAF1FF",
+                      }}
+                    >
+                      <IconMessage size={17} cursor="pointer" color="#2F6FED" />
+                    </Flex>
                   </a>
                 </Table.Td>
                 {props.userType === UserType.OTHERS && (
@@ -430,6 +518,18 @@ const TeachersSection = (props: {
           })}
         </tbody>
       </Table>
+      </Box>
+      {teachers.length > ROWS_PER_PAGE && (
+        <Flex justify="flex-end" mt={14}>
+          <Pagination
+            total={totalPages}
+            value={activePage}
+            onChange={setActivePage}
+            color="blue"
+            radius="md"
+          />
+        </Flex>
+      )}
       <Modal
         centered
         title="Warning"

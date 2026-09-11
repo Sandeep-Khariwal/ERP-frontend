@@ -66,7 +66,7 @@ const AllVans = (props: { instituteId: string }) => {
     <Stack w={"100%"} mih={"100vh"}>
       <Table highlightOnHover withTableBorder stripedColor="#F5F5F5">
         <Table.Thead
-          bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}
+          bg={"#EEF3FF"}
           style={{
             border: "2px solid transparent",
             borderTopLeftRadius: "1rem",

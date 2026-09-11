@@ -131,7 +131,16 @@ export function SingleBatchCard(props: {
           borderRadius: "16px",
           cursor: "pointer",
           border: "1px solid #F1F4F9",
+          position: "relative",
           transition: "box-shadow 0.2s ease, transform 0.2s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0px 14px 32px rgba(15,23,42,0.10)";
+          e.currentTarget.style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "0px 6px 20px rgba(15, 23, 42, 0.06)";
+          e.currentTarget.style.transform = "translateY(0px)";
         }}
       >
         <Modal
@@ -243,9 +252,9 @@ export function SingleBatchCard(props: {
           closeOnClickOutside={false}
           closeButtonProps={{
             style: {
-              background: "#F3E8FF",
+              background: "#EAF1FF",
               borderRadius: "50%",
-              color: "#7E57C2",
+              color: "#2F6FED",
             },
           }}
           padding={30}
@@ -323,13 +332,13 @@ export function SingleBatchCard(props: {
                       style={{
                         border:
                           selectedNextBatchId === batch.id
-                            ? "2px solid #7E57C2"
+                            ? "2px solid #2F6FED"
                             : "1px solid #ECECEC",
                         borderRadius: "16px",
                         cursor: "pointer",
                         background:
                           selectedNextBatchId === batch.id
-                            ? "#F5EEFF"
+                            ? "#EAF1FF"
                             : "#FFFFFF",
                         transition: "0.2s ease",
                         minHeight: "85px",
@@ -369,7 +378,7 @@ export function SingleBatchCard(props: {
                           borderRadius: "50%",
                           border:
                             selectedNextBatchId === batch.id
-                              ? "7px solid #7E57C2"
+                              ? "7px solid #2F6FED"
                               : "2px solid #D1D1D1",
                           transition: "0.2s ease",
                           flexShrink: 0,
@@ -435,7 +444,7 @@ export function SingleBatchCard(props: {
         {
           props.userType === UserType.OTHERS &&
 
-          <Flex justify="space-between" align="center" ml={5} mr={5}>
+          <Flex justify="space-between" align="flex-start" ml={5} mr={5}>
             {!isnameEdit && (
               <Text
                 fz={19}
@@ -468,7 +477,12 @@ export function SingleBatchCard(props: {
                     props.showVerticalIcon ?
 
                       <Flex
-                        style={{ cursor: "pointer" }}
+                        style={{
+                          cursor: "pointer",
+                          position: "absolute",
+                          top: 14,
+                          right: 14,
+                        }}
                         justify="center"
                         onClick={(e) => {
                           e.stopPropagation();

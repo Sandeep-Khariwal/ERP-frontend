@@ -4,7 +4,6 @@ import "./globals.css";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
-import "leaflet/dist/leaflet.css";
 import "@mantine/carousel/styles.css";
 
 import { MantineProvider } from "@mantine/core";
@@ -61,25 +60,15 @@ export default function RootLayout({
       gtag('config', 'G-DCCMSKS911');
     `}
         </Script>
-        {/* Roboto font */}
+        {/* Fonts: Roboto, Poppins, Nunito — combined into a single request
+            (previously 3 separate, overlapping stylesheet requests each
+            re-fetching Roboto/Poppins) to cut render-blocking round trips */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
-          rel="stylesheet"
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
         />
-
-        {/* poppins fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
-          rel="stylesheet"
-        />
-
-        {/* Nunito font  */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
           href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"

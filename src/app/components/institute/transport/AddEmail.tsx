@@ -81,7 +81,7 @@ export function AddEmailModal({
       }}
       title={
         <Box>
-          <Text fw={700} size="lg" c="#7C3AED">
+          <Text fw={700} size="lg" c="#2F6FED">
             Email Configuration
           </Text>
           <Text size="xs" c="dimmed">
@@ -96,7 +96,7 @@ export function AddEmailModal({
           placeholder="email_key"
           value={email_key}
           onChange={(e) => setEmailKey(e.currentTarget.value)}
-          leftSection={<IconMail size={16} color="#7C3AED" />}
+          leftSection={<IconMail size={16} color="#2F6FED" />}
           radius="md"
           styles={{
             input: {
@@ -114,7 +114,7 @@ export function AddEmailModal({
           placeholder="email_password"
           value={email_password}
           onChange={(e) => setEmailPassword(e.currentTarget.value)}
-          leftSection={<IconKey size={16} color="#7C3AED" />}
+          leftSection={<IconKey size={16} color="#2F6FED" />}
           radius="md"
           styles={{
             input: {
@@ -137,7 +137,7 @@ export function AddEmailModal({
           styles={{
             root: {
               background:
-                "linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)",
+                "linear-gradient(135deg, #8B5CF6 0%, #2F6FED 100%)",
               border: "none",
               fontWeight: 600,
               boxShadow: "0 4px 14px rgba(124,58,237,0.25)",

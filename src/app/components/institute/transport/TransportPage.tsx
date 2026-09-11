@@ -156,7 +156,8 @@ function TransportPage() {
     <Stack w={"100%"} mih={"100vh"} p={"20px"}>
       <LoadingOverlay visible={isLoading} />
       <Flex
-        w={"80%"}
+        w={"92%"}
+        mx={"auto"}
         align={"center"}
         direction={isMd ? "column" : "row"}
         justify={"space-between"}
@@ -193,7 +194,7 @@ function TransportPage() {
         </Flex>
       </Flex>
 
-      <Stack w={"100%"}>
+      <Stack w={"92%"} mx={"auto"}>
         <Tabs color="teal" defaultValue="drivers">
           <Tabs.List>
             <Tabs.Tab value="drivers">Drivers</Tabs.Tab>

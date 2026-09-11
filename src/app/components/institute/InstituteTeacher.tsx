@@ -1,31 +1,36 @@
 "use client";
 
 import {
+  Avatar,
+  Box,
   Button,
-  Center,
   Flex,
   LoadingOverlay,
   Select,
   Stack,
   Text,
+  TextInput,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
-import { LiaChalkboardTeacherSolid } from "react-icons/lia";
+import { useEffect, useMemo, useState } from "react";
 import TeachersSection from "./insideBatch/TeacherSection";
 import { GetAllTeacherStaff } from "@/axios/teacher/TeacherGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
-import { IconFilterCheck } from "@tabler/icons-react";
+import { IconFilterCheck, IconSearch, IconSchool, IconBook } from "@tabler/icons-react";
+import { Bell } from "lucide-react";
 import TeacherProfile from "./teacher/TeacherProfile";
 import { useMediaQuery } from "@mantine/hooks";
 import { UserType } from "../dashboard/InstituteBatchesSection";
+import { GetAllNotice } from "@/axios/notice/NoticeGetApi";
 
 export const InstituteTeachers = (props: { userType: UserType }) => {
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectTeacherId, setSelectTeacherId] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
+  const [noticeCount, setNoticeCount] = useState<number>(0);
   const [originalArrayOfTeachers, setOriginalArrayOfTeachers] = useState<
     {
       _id: string;
@@ -51,6 +56,15 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
   const institute = useAppSelector(
     (state) => state.instituteSlice.instituteDetails
   );
+  const adminDetails = useAppSelector(
+    (state: any) => state.adminSlice.adminDetails
+  );
+
+  const batchMap = useMemo(() => {
+    const map = new Map<string, string>();
+    batches.forEach((b) => map.set(b._id, b.name));
+    return map;
+  }, [batches]);
 
   useEffect(() => {
     if (selectedClass) {
@@ -95,10 +109,41 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
     }
   }, [selectedSubject]);
 
+  // Real client-side search across name / phone / subject name.
+  useEffect(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) {
+      if (!selectedClass && !selectedSubject) setTeachers(originalArrayOfTeachers);
+      return;
+    }
+    const base = selectedClass
+      ? originalArrayOfTeachers.filter((t) => t.instituteBatches.includes(selectedClass))
+      : originalArrayOfTeachers;
+
+    setTeachers(
+      base.filter(
+        (t) =>
+          t.name.toLowerCase().includes(term) ||
+          (t.phoneNumber || "").toLowerCase().includes(term) ||
+          t.subjects.some((s) => s.name.toLowerCase().includes(term))
+      )
+    );
+  }, [search]);
+
   useEffect(() => {
     getAllTeachers();
     getAllInstituteBatches();
   }, [institute?._id]);
+
+  useEffect(() => {
+    if (!institute?._id) return;
+    GetAllNotice(institute._id)
+      .then((res: any) => {
+        const list = res?.data?.notices || res?.notices || [];
+        setNoticeCount(Array.isArray(list) ? list.length : 0);
+      })
+      .catch(() => {});
+  }, [institute]);
 
   const getAllTeachers = () => {
     setIsLoading(true);
@@ -145,103 +190,202 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
       mih={"100vh"}
       bg={"transparent"}
       mb={isMd ? 100 : 0}
+      py={20}
     >
       <LoadingOverlay visible={isLoading} />
-      <Flex
-        w={"90%"}
-        style={{
-          borderRadius: "1rem",
-          position: "sticky",
-          top: 10,
-          zIndex: 123,
-        }}
-        bg={"white"}
-        align={"center"}
-        justify={"space-between"}
-        p={10}
-        py={20}
-        mt={10}
-        mx={"auto"}
-      >
-        <Text
-          bg={"white"}
-          fw={600}
-          style={{ fontFamily: "sans-serif" }}
-          fz={22}
-        >
-          Teacher
-        </Text>
-        <LiaChalkboardTeacherSolid size={30} />
-      </Flex>
 
       {!selectTeacherId ? (
-        <Stack
-          w={"90%"}
-          style={{ borderRadius: "1rem" }}
-          bg={"white"}
-          p={10}
-          py={20}
-          mt={10}
-          mx={"auto"}
-        >
-          <Flex w={"100%"} align={"center"} gap={20}>
-            <Select
-              placeholder="Select Class"
-              label="Select Teacher by class"
-              value={selectedClass}
-              data={[{ _id: "", name: "Select Class" }, ...batches].map(
-                (batch) => ({
-                  value: batch._id,
-                  label: batch.name,
-                })
-              )}
-              onChange={(selectedValues) => {
-                setSelectedClass(selectedValues!!);
-              }}
-            />
-            {/* <Text>And</Text> */}
-            <Select
-              disabled={!selectedClass}
-              placeholder="Select Subject"
-              label="Select Teacher by Subject"
-              value={selectedSubject}
-              data={[{ _id: "", name: "Select Subject" }, ...subjects].map(
-                (subject) => ({
-                  value: subject._id,
-                  label: subject.name,
-                })
-              )}
-              defaultValue={selectedSubject}
-              onChange={(selectedValues) => {
-                setSelectedSubject(selectedValues!!);
-              }}
-            />
-            <Button
-              variant="outline"
-              style={{ alignSelf: "end" }}
-              onClick={() => {
-                // setSelectedSubject("");
-                setSelectedClass("");
-              }}
-            >
-              <IconFilterCheck size={18} style={{ margin: "0px 4px" }} />
-              Clear filter
-            </Button>
+        <>
+          {/* ── Top Header: Title + Search + Notifications + Profile ── */}
+          <Flex
+            w={isMd ? "95%" : "92%"}
+            mx={"auto"}
+            align={isMd ? "flex-start" : "center"}
+            justify="space-between"
+            direction={isMd ? "column" : "row"}
+            gap={16}
+          >
+            <Stack gap={2}>
+              <Text fz={26} fw={700} c="#1B2559" style={{ fontFamily: "sans-serif" }}>
+                Teacher Directory
+              </Text>
+              <Text fz={13} c="#8B96AD">
+                Manage and view all your teachers in one place
+              </Text>
+            </Stack>
+
+            <Flex align="center" gap={14} wrap="wrap">
+              <TextInput
+                value={search}
+                onChange={(e) => setSearch(e.currentTarget.value)}
+                placeholder="Search teachers by name, phone or subject..."
+                leftSection={<IconSearch size={16} color="#8B96AD" />}
+                radius={12}
+                w={isMd ? "100%" : 300}
+                styles={{
+                  input: {
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #E2E8F0",
+                    boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                    height: 42,
+                  },
+                }}
+              />
+
+              <Box style={{ position: "relative" }}>
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: "12px",
+                    background: "#FFFFFF",
+                    border: "1px solid #E2E8F0",
+                    boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                  }}
+                >
+                  <Bell size={18} color="#5B6B8C" />
+                </Flex>
+                {noticeCount > 0 && (
+                  <Flex
+                    align="center"
+                    justify="center"
+                    style={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                      minWidth: 18,
+                      height: 18,
+                      borderRadius: "50%",
+                      background: "#EF4444",
+                      color: "white",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: "0 4px",
+                      border: "2px solid white",
+                    }}
+                  >
+                    {noticeCount > 9 ? "9+" : noticeCount}
+                  </Flex>
+                )}
+              </Box>
+
+              <Flex
+                align="center"
+                gap={10}
+                py={6}
+                px={12}
+                style={{
+                  borderRadius: "12px",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                  background: "#FFFFFF",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    background: "#EAF1FF",
+                    color: "#2F6FED",
+                    fontWeight: 700,
+                    fontSize: 14,
+                  }}
+                >
+                  {(adminDetails?.name || "A").charAt(0).toUpperCase()}
+                </Flex>
+                <Stack gap={0}>
+                  <Text fz={13} fw={700} c="#1B2559" style={{ lineHeight: 1.1 }}>
+                    {adminDetails?.name || "Admin"}
+                  </Text>
+                  <Text fz={11} c="#8B96AD" style={{ lineHeight: 1.1 }}>
+                    {adminDetails?.role || "Admin"}
+                  </Text>
+                </Stack>
+              </Flex>
+            </Flex>
           </Flex>
-          <Stack w={"100%"}>
-            <TeachersSection
-              userType={props.userType}
-              teachers={teachers}
-              batchId={selectedClass}
-              isTeacherDashboard={true}
-              setOriginalArrayOfTeachers={setOriginalArrayOfTeachers}
-              setTeachersInDashboard={setTeachers}
-              setSelectTeacherId={setSelectTeacherId}
-            />
+
+          <Stack
+            w={isMd ? "95%" : "92%"}
+            style={{
+              borderRadius: "1rem",
+              border: "1px solid #F1F4F9",
+              boxShadow: "0px 6px 20px rgba(15,23,42,0.05)",
+            }}
+            bg={"white"}
+            p={16}
+            py={20}
+            mx={"auto"}
+          >
+            <Flex w={"100%"} align={"end"} gap={20} wrap="wrap">
+              <Select
+                placeholder="Select Class"
+                label="Select Teacher by class"
+                leftSection={<IconSchool size={16} color="#8B96AD" />}
+                value={selectedClass}
+                radius={10}
+                data={[{ _id: "", name: "Select Class" }, ...batches].map(
+                  (batch) => ({
+                    value: batch._id,
+                    label: batch.name,
+                  })
+                )}
+                onChange={(selectedValues) => {
+                  setSelectedClass(selectedValues!!);
+                }}
+              />
+              <Select
+                disabled={!selectedClass}
+                placeholder="Select Subject"
+                label="Select Teacher by Subject"
+                leftSection={<IconBook size={16} color="#8B96AD" />}
+                value={selectedSubject}
+                radius={10}
+                data={[{ _id: "", name: "Select Subject" }, ...subjects].map(
+                  (subject) => ({
+                    value: subject._id,
+                    label: subject.name,
+                  })
+                )}
+                defaultValue={selectedSubject}
+                onChange={(selectedValues) => {
+                  setSelectedSubject(selectedValues!!);
+                }}
+              />
+              <Button
+                variant="outline"
+                color="blue"
+                radius={10}
+                onClick={() => {
+                  setSelectedClass("");
+                  setSearch("");
+                }}
+              >
+                <IconFilterCheck size={18} style={{ margin: "0px 4px" }} />
+                Clear Filter
+              </Button>
+            </Flex>
+            <Stack w={"100%"}>
+              <TeachersSection
+                userType={props.userType}
+                teachers={teachers}
+                batchId={selectedClass}
+                isTeacherDashboard={true}
+                batchMap={batchMap}
+                setOriginalArrayOfTeachers={setOriginalArrayOfTeachers}
+                setTeachersInDashboard={setTeachers}
+                setSelectTeacherId={setSelectTeacherId}
+              />
+            </Stack>
           </Stack>
-        </Stack>
+        </>
       ) : (
-        <Flex  w={"100%"} align={"center"} justify={"center"}>
+        <Flex w={"100%"} align={"center"} justify={"center"}>
           <TeacherProfile
             teacherId={selectTeacherId}
             onClickBack={() => setSelectTeacherId("")}

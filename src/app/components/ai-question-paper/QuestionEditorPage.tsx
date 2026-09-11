@@ -716,7 +716,6 @@
 // }
      
 
-
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
@@ -768,8 +767,8 @@ import {
   useGeneratePDF,
   usePublishExam,
   useCreateExam,
-} from "../../hooks/useAIQuestionPaper";
-import { Question } from "../../axios/aiQuestionPaper/aiQuestionPaper.api";
+} from "../../../hooks/useAIQuestionPaper";
+import { Question } from "../../../axios/aiQuestionPaper/aiQuestionPaper.api";
 import { useParams, useRouter } from "next/navigation";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 

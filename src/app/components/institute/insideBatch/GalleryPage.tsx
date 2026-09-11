@@ -191,7 +191,7 @@ function EntryForm({
                     leftSection={<IconCheck size={18} />}
                     style={{
                         background:
-                            "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                            "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                     }}
                 >
                     Create Gallery
@@ -324,7 +324,7 @@ export default function GalleryPage(props: {
                 mb="xl"
                 style={{
                     background:
-                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                     color: "white",
                     overflow: "hidden",
                     position: "relative",
@@ -360,7 +360,7 @@ export default function GalleryPage(props: {
                         size="md"
                         onClick={openAdd}
                         color="white"
-                        c="#5c3de8"
+                        c="#2F6FED"
                     >
                         Add Gallery
                     </Button>
@@ -371,7 +371,7 @@ export default function GalleryPage(props: {
 
             {isLoading ? (
                 <Flex justify="center" mt={80}>
-                    <Loader color="violet" size="lg" />
+                    <Loader color="blue" size="lg" />
                 </Flex>
             ) : (
                 <>
@@ -394,7 +394,7 @@ export default function GalleryPage(props: {
                                 mb="md"
                                 style={{
                                     background:
-                                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                                 }}
                             >
                                 <IconBook size={40} />
@@ -415,7 +415,7 @@ export default function GalleryPage(props: {
                                 onClick={openAdd}
                                 style={{
                                     background:
-                                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                                 }}
                             >
                                 Create Gallery
@@ -573,7 +573,7 @@ export default function GalleryPage(props: {
                                                         fullWidth
                                                         style={{
                                                             background:
-                                                                "linear-gradient(135deg,#5c3de8,#7b5ef8)",
+                                                                "linear-gradient(135deg,#2F6FED,#4F7CFB)",
                                                         }}
                                                     >
                                                         View Gallery
@@ -623,8 +623,8 @@ export default function GalleryPage(props: {
                                         styles={{
                                             control: {
                                                 "&[data-active]": {
-                                                    background: "#5c3de8",
-                                                    borderColor: "#5c3de8",
+                                                    background: "#2F6FED",
+                                                    borderColor: "#2F6FED",
                                                 },
                                             },
                                         }}
@@ -679,7 +679,7 @@ export default function GalleryPage(props: {
                             radius="xl"
                             style={{
                                 background:
-                                    "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                    "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                             }}
                         >
                             <IconBook size={18} />

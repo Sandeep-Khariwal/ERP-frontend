@@ -36,6 +36,7 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
     {
       label: "Students",
       value: formatNumberInK(totalStudents),
+      caption: "Total number of students enrolled in all batches.",
       icon: <GraduationCap size={26} />,
       color: "#8B5CF6",
       bg: "#F1EBFF",
@@ -43,6 +44,7 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
     {
       label: "Teachers",
       value: `${totalTeachers}`,
+      caption: "Total number of teachers managing batches.",
       icon: <Building2 size={26} />,
       color: "#2F6FED",
       bg: "#EAF1FF",
@@ -50,6 +52,7 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
     {
       label: "Earnings",
       value: formatNumberInK(totalEarnings),
+      caption: "Total earnings from all courses and batches.",
       icon: <IndianRupee size={26} />,
       color: "#0EA872",
       bg: "#E6F8F1",
@@ -57,6 +60,7 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
     {
       label: "Expenses",
       value: formatNumberInK(totalExpanses),
+      caption: "Total expenses recorded across all activities.",
       icon: <FileWarning size={26} />,
       color: "#F43F5E",
       bg: "#FFEBEE",
@@ -80,9 +84,20 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
             radius={18}
             p={22}
             shadow="0px 8px 24px rgba(15, 23, 42, 0.06)"
-            style={{ border: "1px solid #F1F4F9" }}
+            style={{
+              border: "1px solid #F1F4F9",
+              transition: "box-shadow 0.2s ease, transform 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = "0px 14px 32px rgba(15,23,42,0.10)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = "0px 8px 24px rgba(15, 23, 42, 0.06)";
+              e.currentTarget.style.transform = "translateY(0px)";
+            }}
           >
-            <Flex align={"center"} gap={16}>
+            <Flex align={"center"} gap={16} mb={12}>
               <Flex
                 align={"center"}
                 justify={"center"}
@@ -111,6 +126,9 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
                 </Text>
               </Stack>
             </Flex>
+            <Text fz={12} c={"#8B96AD"} lh={1.4}>
+              {stat.caption}
+            </Text>
           </Card>
         ))}
       </SimpleGrid>

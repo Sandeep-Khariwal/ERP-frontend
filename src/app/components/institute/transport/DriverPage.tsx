@@ -47,7 +47,7 @@ function DriverPage(props: { instituteId: string }) {
       <LoadingOverlay visible={isLoading} />
 
       <Table striped highlightOnHover withTableBorder withColumnBorders c={"gray"} >
-        <Table.Thead   bg={"linear-gradient(135deg, #D28BD9, #7585D8)"} c={"#333"}>
+        <Table.Thead   bg={"#EEF3FF"} c={"#333"}>
           <Table.Tr>
             <Table.Th>Name</Table.Th>
             <Table.Th>Phone</Table.Th>

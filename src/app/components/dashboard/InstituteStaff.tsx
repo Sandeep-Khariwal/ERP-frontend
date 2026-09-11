@@ -22,6 +22,7 @@ import { AddInstituteSubjects } from "./AddInstituteSubjects";
 import ReferCodeModal from "./ReferCodeModal";
 import axios from "axios";
 import { GetReferalCode } from "@/axios/institute/InstituteGetApi";
+import { BookOpen, UserPlus, Gift } from "lucide-react";
 
 interface InstituteProfileProps {
   users: {
@@ -135,58 +136,108 @@ export function InstituteProfile(props: InstituteProfileProps) {
       w={isMd ? "95%" : "92%"}
       mx={"auto"}
       mt={"2rem"}
-      shadow="0px 0px 30px 0px rgba(0, 0, 0, 0.10)"
-      radius={10}
-      p={20}
+      shadow="0px 10px 30px rgba(15,23,42,0.08)"
+      radius={18}
+      p={22}
+      style={{ border: "1px solid #F1F4F9" }}
     >
       <Stack
         bg={"#FFFFFF"}
         style={{ borderRadius: "10px", borderColor: "#0000001A" }}
       >
-        <Flex ml={5} align="center" direction={isMd ? "column" : "row"}>
-          <Text fz={18} fw={700} c={"#1B1212"} ff={"Roboto"}>
+        <Flex
+          ml={5}
+          align={isMd ? "flex-start" : "center"}
+          justify="space-between"
+          direction={isMd ? "column" : "row"}
+          gap={isMd ? 14 : 0}
+        >
+          <Text fz={18} fw={700} c={"#1B2559"} ff={"Roboto"}>
             Create/View Profile
           </Text>
           <Flex
             gap="sm"
-            ml="lg"
             direction="row"
-            style={{
-              marginTop: isMd ? "10px" : 0,
-            }}
             wrap="wrap"
+            w={isMd ? "100%" : "auto"}
           >
             <Button
               onClick={handleSubjectModal}
               size="md"
               variant="default"
-              fw={700}
-              px={16}
-              py={8}
-              style={{
-                fontSize: "16px",
-                borderRadius: "24px",
-                whiteSpace: "nowrap",
+              fw={600}
+              px={18}
+              py={10}
+              leftSection={
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: "8px",
+                    background: "#F1EBFF",
+                  }}
+                >
+                  <BookOpen size={14} color="#8B5CF6" />
+                </Flex>
+              }
+              styles={{
+                root: {
+                  fontSize: "15px",
+                  borderRadius: "12px",
+                  whiteSpace: "nowrap",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                  transition: "box-shadow 0.2s ease, transform 0.2s ease",
+                  "&:hover": {
+                    boxShadow: "0px 6px 16px rgba(15,23,42,0.10)",
+                    transform: "translateY(-1px)",
+                  },
+                },
               }}
               w={isMd ? "100%" : "auto"}
             >
-              {isMd ? "+ Subjects" : "+ Add Subjects"}
+              {isMd ? "Subjects" : "Add Subjects"}
             </Button>
             <Button
               onClick={handleOpenModal}
               size="md"
               variant="default"
-              fw={700}
-              px={16}
-              py={8}
-              style={{
-                fontSize: "16px",
-                borderRadius: "24px",
-                whiteSpace: "nowrap",
+              fw={600}
+              px={18}
+              py={10}
+              leftSection={
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: "8px",
+                    background: "#EAF1FF",
+                  }}
+                >
+                  <UserPlus size={14} color="#2F6FED" />
+                </Flex>
+              }
+              styles={{
+                root: {
+                  fontSize: "15px",
+                  borderRadius: "12px",
+                  whiteSpace: "nowrap",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                  transition: "box-shadow 0.2s ease, transform 0.2s ease",
+                  "&:hover": {
+                    boxShadow: "0px 6px 16px rgba(15,23,42,0.10)",
+                    transform: "translateY(-1px)",
+                  },
+                },
               }}
               w={isMd ? "100%" : "auto"}
             >
-              {isMd ? "+ Staff" : "+ Add Staff"}
+              {isMd ? "Staff" : "Add Staff"}
             </Button>
 
             <Button
@@ -194,17 +245,40 @@ export function InstituteProfile(props: InstituteProfileProps) {
               loading={isFetchingRef}
               size="md"
               variant="default"
-              fw={700}
-              px={16}
-              py={8}
-              style={{
-                fontSize: "16px",
-                borderRadius: "24px",
-                whiteSpace: "nowrap",
+              fw={600}
+              px={18}
+              py={10}
+              leftSection={
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: "8px",
+                    background: "#FFF4E0",
+                  }}
+                >
+                  <Gift size={14} color="#F59E0B" />
+                </Flex>
+              }
+              styles={{
+                root: {
+                  fontSize: "15px",
+                  borderRadius: "12px",
+                  whiteSpace: "nowrap",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                  transition: "box-shadow 0.2s ease, transform 0.2s ease",
+                  "&:hover": {
+                    boxShadow: "0px 6px 16px rgba(15,23,42,0.10)",
+                    transform: "translateY(-1px)",
+                  },
+                },
               }}
               w={isMd ? "100%" : "auto"}
             >
-              {isMd ? "Refer" : "Refer & Earn"}
+              Refer & Earn
             </Button>
           </Flex>
           <ReferCodeModal

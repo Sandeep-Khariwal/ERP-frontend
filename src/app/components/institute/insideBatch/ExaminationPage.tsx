@@ -185,7 +185,7 @@ function EntryForm({
           onClick={handleSave}
           leftSection={<IconCheck size={18} />}
           style={{
-            background: "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+            background: "linear-gradient(135deg, #2F6FED, #4F7CFB)",
           }}
         >
           Create Examination
@@ -410,57 +410,52 @@ export default function ExaminationPage(props: { batchId: string }) {
     >
       {/* HEADER BANNER */}
       <Paper
-        radius="28px"
+        radius="16px"
         p="xl"
         mb="xl"
         style={{
-          background: "linear-gradient(135deg, #5c3de8, #7b5ef8)",
-          color: "white",
-          overflow: "hidden",
-          position: "relative",
-          boxShadow: "0 10px 30px rgba(92,61,232,0.2)",
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
         }}
       >
-        <Box
-          style={{
-            position: "absolute",
-            top: -50,
-            right: -50,
-            width: 200,
-            height: 200,
-            background: "rgba(255,255,255,0.1)",
-            borderRadius: "50%",
-            filter: "blur(40px)",
-          }}
-        />
+        <Group justify="space-between">
+          <Group>
+            <Flex
+              align="center"
+              justify="center"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "12px",
+                background: "#FFFFFF",
+              }}
+            >
+              <IconSparkles size={22} color="#2F6FED" />
+            </Flex>
 
-        <Group justify="space-between" style={{ position: "relative", zIndex: 1 }}>
-          <Stack gap={4}>
-            <Group>
-              <ThemeIcon size={54} radius="xl" color="white" variant="light">
-                <IconSparkles size={28} />
-              </ThemeIcon>
+            <div>
+              <Title order={3} c="#1B2559">
+                Examinations
+              </Title>
 
-              <div>
-                <Title order={2} c="white">
-                  Examinations
-                </Title>
-
-                <Text c="rgba(255,255,255,0.8)">
-                  Manage exam schedules & admit cards
-                </Text>
-              </div>
-            </Group>
-          </Stack>
+              <Text c="#5B6B8C" fz={13}>
+                View examination schedules and exam cards.
+              </Text>
+            </div>
+          </Group>
 
           <Button
             leftSection={<IconPlus size={18} />}
-            radius="xl"
+            radius={10}
             size="md"
             onClick={openAdd}
-            color="white"
-            c="#5c3de8"
-            style={{ fontWeight: 600 }}
+            styles={{
+              root: {
+                background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                border: 0,
+                fontWeight: 600,
+              },
+            }}
           >
             New Examination
           </Button>
@@ -470,7 +465,7 @@ export default function ExaminationPage(props: { batchId: string }) {
       {/* LOADING STATE */}
       {isLoading ? (
         <Flex justify="center" mt={80}>
-          <Loader color="violet" size="lg" type="bars" />
+          <Loader color="blue" size="lg" type="bars" />
         </Flex>
       ) : (
         <Stack gap={40}>
@@ -478,39 +473,39 @@ export default function ExaminationPage(props: { batchId: string }) {
           {/* SECTION 1: EXAMINATION COLLECTION */}
           {entries.length === 0 ? (
             <Paper
-              radius="24px"
+              radius="16px"
               p={60}
               ta="center"
               style={{
-                background: "#faf7ff",
-                border: "1px dashed #cdbdff",
+                background: "#FAFCFF",
+                border: "1px dashed #DCE7FF",
               }}
             >
               <ThemeIcon
-                size={80}
+                size={72}
                 radius="100%"
                 mx="auto"
                 mb="md"
                 style={{
-                  background: "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                  background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                 }}
               >
-                <IconBook size={40} />
+                <IconBook size={36} />
               </ThemeIcon>
 
-              <Title order={3}>No Examination Found</Title>
+              <Title order={3} c="#1B2559">No Examination Found</Title>
 
-              <Text c="dimmed" mt={6}>
+              <Text c="#5B6B8C" mt={6}>
                 Upload examination schedules and notices
               </Text>
 
               <Button
                 mt="xl"
-                radius="xl"
+                radius={10}
                 leftSection={<IconPlus size={18} />}
                 onClick={openAdd}
                 style={{
-                  background: "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                  background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                 }}
               >
                 Create Examination
@@ -518,28 +513,27 @@ export default function ExaminationPage(props: { batchId: string }) {
             </Paper>
           ) : (
             <Paper
-              radius="24px"
+              radius="16px"
               p="lg"
               style={{
                 background: "#fff",
-                border: "1px solid #f1ebff",
-                boxShadow: "0 10px 30px rgba(92,61,232,0.05)",
+                border: "1px solid #F1F4F9",
               }}
             >
               <Group justify="space-between" mb="xl">
                 <div>
                   <Title
-                    order={2}
+                    order={3}
                     style={{
-                      color: "#1a1a2e",
+                      color: "#1B2559",
                       fontWeight: 700,
                     }}
                   >
-                    Examination Collection
+                    Examination collection
                   </Title>
 
-                  <Text size="sm" c="dimmed">
-                    {entries.length} Examinations Found
+                  <Text size="sm" c="#5B6B8C">
+                    {entries.length} examinations found
                   </Text>
                 </div>
               </Group>
@@ -555,13 +549,12 @@ export default function ExaminationPage(props: { batchId: string }) {
                     }}
                   >
                     <Paper
-                      radius="24px"
+                      radius="16px"
                       p={0}
                       style={{
                         overflow: "hidden",
                         background: "#ffffff",
-                        border: "1px solid #ede7ff",
-                        boxShadow: "0 12px 35px rgba(92,61,232,0.10)",
+                        border: "1px solid #F1F4F9",
                         transition: "all .3s ease",
                         height: "100%",
                         display: "flex",
@@ -650,12 +643,12 @@ export default function ExaminationPage(props: { batchId: string }) {
                             component="a"
                             href={item.url}
                             target="_blank"
-                            radius="xl"
+                            radius={10}
                             size="md"
                             fullWidth
                             style={{
                               background:
-                                "linear-gradient(135deg,#5c3de8,#7b5ef8)",
+                                "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                             }}
                           >
                             View Examination
@@ -691,8 +684,8 @@ export default function ExaminationPage(props: { batchId: string }) {
                     styles={{
                       control: {
                         "&[data-active]": {
-                          background: "#5c3de8",
-                          borderColor: "#5c3de8",
+                          background: "#2F6FED",
+                          borderColor: "#2F6FED",
                         },
                       },
                     }}
@@ -736,7 +729,7 @@ export default function ExaminationPage(props: { batchId: string }) {
                   style={{
                     background: "#f4f0ff",
                     borderRadius: "20px",
-                    color: "#5c3de8",
+                    color: "#2F6FED",
                     fontWeight: 600,
                     fontSize: "14px",
                   }}
@@ -787,10 +780,10 @@ export default function ExaminationPage(props: { batchId: string }) {
                           <Avatar
                             size="md"
                             radius="xl"
-                            color="violet"
+                            color="blue"
                             style={{
                               background: "linear-gradient(135deg, #e5dbff, #d1bfff)",
-                              color: "#5c3de8",
+                              color: "#2F6FED",
                             }}
                           >
                             {student.name.charAt(0).toUpperCase()}
@@ -814,7 +807,7 @@ export default function ExaminationPage(props: { batchId: string }) {
                           mt="md"
                           radius="xl"
                           variant="light"
-                          color="violet"
+                          color="blue"
                           leftSection={<IconDownload size={16} />}
                           onClick={() => downloadAdmitCard(student._id)}
                           style={{
@@ -863,7 +856,7 @@ export default function ExaminationPage(props: { batchId: string }) {
                       control: {
                         border: "none",
                         "&[data-active]": {
-                          background: "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                          background: "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                           boxShadow: "0 4px 10px rgba(92,61,232,0.3)",
                         },
                       },
@@ -918,7 +911,7 @@ export default function ExaminationPage(props: { batchId: string }) {
               size={34}
               radius="xl"
               style={{
-                background: "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                background: "linear-gradient(135deg, #2F6FED, #4F7CFB)",
               }}
             >
               <IconBook size={18} />

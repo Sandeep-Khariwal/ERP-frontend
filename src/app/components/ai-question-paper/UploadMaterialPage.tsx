@@ -30,7 +30,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useAppSelector } from "@/app/redux/redux.hooks";
-import { useUploadMaterial } from "../../hooks/useAIQuestionPaper";
+import { useUploadMaterial } from "../../../hooks/useAIQuestionPaper";
 import { useRouter } from "next/navigation";
 
 interface UploadedFile {

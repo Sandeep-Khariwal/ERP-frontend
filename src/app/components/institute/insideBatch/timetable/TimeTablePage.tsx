@@ -13,11 +13,12 @@ import {
   Badge,
   LoadingOverlay,
   ThemeIcon,
+  Box,
+  Flex,
 } from "@mantine/core";
 import {
   IconPlus,
   IconCalendar,
-  IconHistory,
   IconUserOff,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -231,147 +232,187 @@ export default function TimetablePage(props: {
   return (
     <Container size="xl" py="xl">
       {/* Header Panel */}
-      <Group justify="space-between" align="center" mb="xl">
-        <Stack gap={4}>
-          <Title order={1} fw={800} lts="-0.5px">
-            Timetable Management
-          </Title>
-          <Text c="dimmed" size="sm">
-            Configure weekly operational hours schedules and active teacher
-            deployments.
-          </Text>
-        </Stack>
-        <Button
-          leftSection={<IconPlus size={18} />}
-          onClick={() => setCreateOpen(true)}
-          size="md"
-          radius="md"
-          className="gradient-btn"
-          style={{ boxShadow: "var(--mantine-shadow-md)" }}
-        >
-          Add New Slot
-        </Button>
-      </Group>
-
-      {/* Control Actions & Filtering */}
-      <Paper p="md" withBorder mb="xl" radius="lg" shadow="sm">
+      <Box
+        p={20}
+        mb="xl"
+        style={{
+          borderRadius: "16px",
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
+        }}
+      >
         <Group justify="space-between" align="center">
-          <Group gap="md">
-            <Text size="sm" fw={600} c="dimmed">
-              Selected Target Class:
+          <Flex align="center" gap={14}>
+            <Flex
+              align="center"
+              justify="center"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "12px",
+                background: "#FFFFFF",
+              }}
+            >
+              <IconCalendar size={22} color="#2F6FED" />
+            </Flex>
+            <Stack gap={2}>
+              <Text fz={22} fw={700} c="#1B2559">
+                {props.batchName} timetable
+              </Text>
+              <Text c="#5B6B8C" size="sm">
+                Plan lessons, teacher cover, and weekly classroom schedules in
+                one place.
+              </Text>
+            </Stack>
+          </Flex>
+          <Button
+            leftSection={<IconPlus size={18} />}
+            onClick={() => setCreateOpen(true)}
+            size="md"
+            radius={10}
+            styles={{
+              root: {
+                background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                border: 0,
+                fontWeight: 600,
+              },
+            }}
+          >
+            Add new slot
+          </Button>
+        </Group>
+      </Box>
+
+      {/* Weekly schedule card */}
+      <Paper
+        radius="16px"
+        p="lg"
+        withBorder
+        shadow="none"
+        style={{ borderColor: "#F1F4F9" }}
+      >
+        <Flex
+          justify="space-between"
+          align={{ base: "flex-start", sm: "center" }}
+          direction={{ base: "column", sm: "row" }}
+          gap="md"
+          mb="lg"
+        >
+          <Stack gap={2}>
+            <Text fw={700} fz={18} c="#1B2559">
+              Weekly schedule
             </Text>
+            <Text fz={13} c="#5B6B8C">
+              Manage recurring weekly slots for {props.batchName}.
+            </Text>
+          </Stack>
+
+          <Group gap="sm">
             <Select
               placeholder="Pick target collection"
               data={batches.map((b) => ({ value: b._id, label: b.name }))}
               value={selectedBatchId}
               onChange={setSelectedBatchId}
-              style={{ minWidth: 220 }}
+              style={{ minWidth: 160 }}
               size="sm"
-              radius="md"
+              radius="xl"
               comboboxProps={{
                 transitionProps: { transition: "pop-top-left", duration: 200 },
               }}
             />
-          </Group>
-          {managedIds.size > 0 && (
-            <Badge
-              color="orange"
-              variant="light"
-              size="lg"
-              radius="md"
-              leftSection={<IconUserOff size={14} />}
-              p="md"
-            >
-              {managedIds.size} Sessions Overridden Today
-            </Badge>
-          )}
-        </Group>
-      </Paper>
-
-      {/* Tab Management Views */}
-      <Tabs
-        value={activeTab}
-        onChange={setActiveTab}
-        variant="outline"
-        radius="md"
-      >
-        <Tabs.List mb="lg">
-          <Tabs.Tab
-            value="grid"
-            leftSection={<IconCalendar size={16} />}
-            py="xs"
-          >
-            Weekly Schedule Matrix
-          </Tabs.Tab>
-          <Tabs.Tab
-            value="history"
-            leftSection={<IconHistory size={16} />}
-            py="xs"
-          >
-            Exception & Change Log
-          </Tabs.Tab>
-        </Tabs.List>
-
-        <Tabs.Panel value="grid">
-          <Paper
-            withBorder
-            radius="lg"
-            p="lg"
-            shadow="xs"
-            style={{ position: "relative", minHeight: "300px" }}
-          >
-            <LoadingOverlay
-              visible={loading}
-              overlayProps={{ blur: 2, opacity: 0.6 }}
-            />
-
-            {timetables.length === 0 && !loading ? (
-              <Stack align="center" justify="center" py="xl" gap="md">
-                <ThemeIcon size={64} radius="xl" variant="light" color="gray">
-                  <IconCalendar size={36} stroke={1.5} />
-                </ThemeIcon>
-                <Stack gap={2} align="center">
-                  <Text fw={600} size="lg">
-                    No Schedules Configured
-                  </Text>
-                  <Text
-                    c="dimmed"
-                    size="sm"
-                    ta="center"
-                    style={{ maxWidth: 360 }}
-                  >
-                    There are no operational slots setup for this batch yet. Get
-                    started by establishing the first slot.
-                  </Text>
-                </Stack>
-                <Button
-                  variant="light"
-                  leftSection={<IconPlus size={16} />}
-                  onClick={() => setCreateOpen(true)}
-                  mt="xs"
-                  radius="md"
-                >
-                  Create Anchor Allocation
-                </Button>
-              </Stack>
-            ) : (
-              <TimetableGrid
-                timetables={timetables}
-                managedTimetableIds={managedIds}
-                onDelete={handleDelete}
-                onManage={(slot) => setManageTarget(slot)}
-                isAdmin
-              />
+            {managedIds.size > 0 && (
+              <Badge
+                color="orange"
+                variant="light"
+                size="lg"
+                radius="xl"
+                leftSection={<IconUserOff size={14} />}
+              >
+                {managedIds.size} overridden today
+              </Badge>
             )}
-          </Paper>
-        </Tabs.Panel>
+          </Group>
+        </Flex>
 
-        <Tabs.Panel value="history">
-          <Paper withBorder radius="lg" p="lg" shadow="xs">
+        {/* Tab Management Views */}
+        <Tabs
+          value={activeTab}
+          onChange={setActiveTab}
+          variant="default"
+          radius="md"
+        >
+          <Tabs.List mb="lg">
+            <Tabs.Tab value="grid" py="xs">
+              Schedule matrix
+            </Tabs.Tab>
+            <Tabs.Tab
+              value="history"
+              py="xs"
+              rightSection={
+                managedIds.size > 0 ? (
+                  <Badge size="sm" circle variant="light" color="blue">
+                    {managedIds.size}
+                  </Badge>
+                ) : undefined
+              }
+            >
+              Exceptions
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="grid">
+            <Box style={{ position: "relative", minHeight: "300px" }}>
+              <LoadingOverlay
+                visible={loading}
+                overlayProps={{ blur: 2, opacity: 0.6 }}
+              />
+
+              {timetables.length === 0 && !loading ? (
+                <Stack align="center" justify="center" py="xl" gap="md">
+                  <ThemeIcon size={64} radius="xl" variant="light" color="gray">
+                    <IconCalendar size={36} stroke={1.5} />
+                  </ThemeIcon>
+                  <Stack gap={2} align="center">
+                    <Text fw={600} size="lg">
+                      No Schedules Configured
+                    </Text>
+                    <Text
+                      c="dimmed"
+                      size="sm"
+                      ta="center"
+                      style={{ maxWidth: 360 }}
+                    >
+                      There are no operational slots setup for this batch yet.
+                      Get started by establishing the first slot.
+                    </Text>
+                  </Stack>
+                  <Button
+                    variant="light"
+                    leftSection={<IconPlus size={16} />}
+                    onClick={() => setCreateOpen(true)}
+                    mt="xs"
+                    radius="md"
+                  >
+                    Create Anchor Allocation
+                  </Button>
+                </Stack>
+              ) : (
+                <TimetableGrid
+                  timetables={timetables}
+                  managedTimetableIds={managedIds}
+                  onDelete={handleDelete}
+                  onManage={(slot) => setManageTarget(slot)}
+                  isAdmin
+                />
+              )}
+            </Box>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="history">
             <ClassManagementHistory batchId={selectedBatchId ?? undefined} />
-          </Paper>
-        </Tabs.Panel>
-      </Tabs>
+          </Tabs.Panel>
+        </Tabs>
+      </Paper>
 
       {/* Overlays / Action Modals */}
       <CreateTimetableModal

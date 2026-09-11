@@ -395,7 +395,7 @@ import {
   IconCheck,
   IconBrain,
 } from "@tabler/icons-react";
-import { useGenerateQuestionPaper } from "../../hooks/useAIQuestionPaper";
+import { useGenerateQuestionPaper } from "../../../hooks/useAIQuestionPaper";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 

@@ -100,9 +100,9 @@ export default function NoticeBoard(props: { userType: string }) {
   };
 
   return (
-    <Stack w={"80%"}>
+    <Stack w={"92%"} mx={"auto"}>
       <LoadingOverlay visible={loading} />
-      <Flex w={"100%"} align={isMd?"flex-start":"center"} justify={"start"} gap={20}>
+      <Flex w={"100%"} align={isMd?"flex-start":"center"} justify={"space-between"} gap={20}>
         <Title order={2}>Notice Board</Title>
         {/* <CreateNoticeCard/> */}
         {props.userType === "admin" && (

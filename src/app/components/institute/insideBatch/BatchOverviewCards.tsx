@@ -1,6 +1,6 @@
-import { Flex, Stack, Text } from "@mantine/core";
+import { Card, Flex, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import Image from "next/image";
+import { GraduationCap, Users, FileText } from "lucide-react";
 
 export function BatchOverviewCards(props: {
   totalTests: number;
@@ -8,79 +8,78 @@ export function BatchOverviewCards(props: {
   totalTeachers: number;
 }) {
   const isMd = useMediaQuery(`(max-width: 968px)`);
+
+  const stats = [
+    {
+      label: "Students",
+      value: props.totalStudents,
+      icon: <GraduationCap size={26} />,
+      color: "#2F6FED",
+      bg: "#EAF1FF",
+    },
+    {
+      label: "Teachers",
+      value: props.totalTeachers,
+      icon: <Users size={26} />,
+      color: "#0EA872",
+      bg: "#E6F8F1",
+    },
+    {
+      label: "Tests",
+      value: props.totalTests,
+      icon: <FileText size={26} />,
+      color: "#8B5CF6",
+      bg: "#F1EBFF",
+    },
+  ];
+
   return (
-    <>
-      <Flex
-        w={isMd ? "95%" : "80%"}
-        mt={"2rem"}
-        align={"start"}
-        gap={20}
-        justify={isMd?"center":"start"}
-        wrap={"wrap"}
-      >
-        <Flex
-          p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={!isMd?"15rem":"20rem"}
-          gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={isMd?"space-between":"center"}
+    <SimpleGrid
+      w={isMd ? "95%" : "92%"}
+      mx={"auto"}
+      mt={"1.5rem"}
+      cols={isMd ? 1 : 3}
+      spacing={20}
+    >
+      {stats.map((stat) => (
+        <Card
+          key={stat.label}
+          radius={18}
+          p={22}
+          shadow="0px 6px 20px rgba(15,23,42,0.05)"
+          style={{ border: "1px solid #F1F4F9" }}
         >
-          <Stack align={"start"} justify={"start"} gap={1.4}>
-            <Text lh={1.4} fz={"1.2rem"} fw={500} c={"#BFBFBF "}>
-              Students
-            </Text>
-            <Text lh={1} fw={700} fz={"1.7rem"} c={"#4F4F4F"}>
-              {props.totalStudents}
-            </Text>
-          </Stack>
-          <Image src={"/student.png"} alt="Not found" width={70} height={70} />
-        </Flex>
-        <Flex
-          p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={!isMd?"15rem":"20rem"}
-          gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={isMd?"space-between":"center"}
-        >
-          <Stack align={"start"} justify={"start"} gap={1}>
-            <Text lh={1.4} fz={"1.2rem"} c={"#BFBFBF "} fw={500}>
-              Teachers
-            </Text>
-            <Text lh={1} fw={700} fz={"1.7rem"} c={"#4F4F4F"}>
-              {props.totalTeachers}
-            </Text>
-          </Stack>
-          <Image src={"/teacher.png"} alt="Not found" width={70} height={70} />
-        </Flex>
-        <Flex
-          p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={!isMd?"15rem":"20rem"}
-          gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={isMd?"space-between":"center"}
-        >
-          <Stack align={"start"} justify={"start"} gap={1}>
-            <Text lh={1.4} fz={"1.2rem"} c={"#BFBFBF "} fw={500}>
-              Tests
-            </Text>
-            <Text lh={1} fw={700} fz={"1.7rem"} c={"#4F4F4F "}>
-              {props.totalTests}
-            </Text>
-          </Stack>
-          <Image
-            src={"/assignment.png"}
-            alt="Not found"
-            width={70}
-            height={70}
-          />
-        </Flex>
-      </Flex>
-    </>
+          <Flex align={"center"} gap={16}>
+            <Flex
+              align={"center"}
+              justify={"center"}
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: "16px",
+                background: stat.bg,
+                color: stat.color,
+                flexShrink: 0,
+              }}
+            >
+              {stat.icon}
+            </Flex>
+            <Stack gap={4}>
+              <Text
+                fz={12}
+                fw={700}
+                c={"#8B96AD"}
+                style={{ letterSpacing: "0.04em", textTransform: "uppercase" }}
+              >
+                {stat.label}
+              </Text>
+              <Text lh={1} fw={700} fz={"1.7rem"} c={"#1B2559"}>
+                {stat.value}
+              </Text>
+            </Stack>
+          </Flex>
+        </Card>
+      ))}
+    </SimpleGrid>
   );
 }

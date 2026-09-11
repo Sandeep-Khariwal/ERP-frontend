@@ -34,8 +34,8 @@ import {
   IconArchive,
   IconFilter,
 } from "@tabler/icons-react";
-import { useQuestionPapers } from "../../hooks/useAIQuestionPaper";
-import { AIQuestionPaper, Question } from "../../axios/aiQuestionPaper/aiQuestionPaper.api";
+import { useQuestionPapers } from "../../../hooks/useAIQuestionPaper";
+import { AIQuestionPaper, Question } from "../../../axios/aiQuestionPaper/aiQuestionPaper.api";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { useAppSelector } from "@/app/redux/redux.hooks";
@@ -165,13 +165,15 @@ export default function AIQuestionPaperDashboard() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
-  // Real institute/teacher data from Redux — not hardcoded placeholders.
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails
   );
   const teacher = useAppSelector(
     (state: any) => state.teacherSlice.teacherDetails
   );
+// const instituteId = "";
+// const teacherId = undefined;
+
   const instituteId = institute?._id;
   const teacherId = teacher?._id;
 

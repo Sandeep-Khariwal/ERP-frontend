@@ -65,7 +65,7 @@ export default function WhatsAppPage() {
   };
 
   return (
-    <Stack gap="lg">
+    <Stack gap="lg" w={"92%"} mx={"auto"}>
       {/* Header */}
       <Group justify="space-between" align="flex-end">
         <Box>
