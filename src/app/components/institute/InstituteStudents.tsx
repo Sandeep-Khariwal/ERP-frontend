@@ -10,6 +10,7 @@ import {
   Stack,
   Text,
   TextInput,
+  Pagination,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -30,7 +31,6 @@ import {
   GetStudentsPendingFee,
 } from "@/axios/institute/InstituteGetApi";
 import { UserType } from "../dashboard/InstituteBatchesSection";
-import * as XLSX from "xlsx";
 import PassOutStudents from "./student/components/PassoutStudents";
 import { PayRecordWithNumber } from "@/axios/student/StudentGetApi";
 
@@ -80,6 +80,10 @@ export const InstituteStudents = () => {
   const [pendingStudents, setPendingStudents] = useState<any[]>([]);
   const [fees, setFees] = useState<number>(0);
 
+  // Pagination state for pending students table
+  const [pendingPage, setPendingPage] = useState<number>(1);
+  const [pendingItemsPerPage] = useState<number>(20);
+
   const [pendingFilters, setPendingFilters] = useState({
     address: "",
     studentName: "",
@@ -108,7 +112,10 @@ export const InstituteStudents = () => {
       });
   };
 
-  const HandleDownloadExcel = () => {
+  const HandleDownloadExcel = async () => {
+    // Dynamically import XLSX only when download is triggered
+    const XLSX = await import("xlsx");
+
     const excelData = pendingStudents.map((s: any) => ({
       Name: s.Name || "",
       Address: s.address || "",
@@ -506,7 +513,9 @@ export const InstituteStudents = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {pendingStudents.map((s: any, index: number) => (
+                    {pendingStudents
+                      .slice((pendingPage - 1) * pendingItemsPerPage, pendingPage * pendingItemsPerPage)
+                      .map((s: any, index: number) => (
                       <tr
                         key={index}
                         style={{
@@ -541,6 +550,13 @@ export const InstituteStudents = () => {
                     ))}
                   </tbody>
                 </table>
+                <Flex justify="center" mt="lg">
+                  <Pagination
+                    total={Math.ceil(pendingStudents.length / pendingItemsPerPage)}
+                    value={pendingPage}
+                    onChange={setPendingPage}
+                  />
+                </Flex>
               </div>
             ) : (
               <Stack align="center" py={40}>

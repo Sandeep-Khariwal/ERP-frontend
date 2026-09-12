@@ -7,6 +7,7 @@ import {
   Divider,
   Flex,
   Grid,
+    Box,          // 👈 ADD THIS LINE
   Group,
   LoadingOverlay,
   Modal,
@@ -440,6 +441,7 @@ const StudentOverview = (props: {
       </Flex>
 
       {/* Roll No Modal */}
+      <Box style={{ minHeight: openAddRollNoModal ? '200px' : 0 }}>
       <Modal
         opened={openAddRollNoModal}
         onClose={() => setOpenAddRollNoModal(false)}
@@ -457,6 +459,7 @@ const StudentOverview = (props: {
           </Button>
         </Stack>
       </Modal>
+      </Box>
     </Stack>
   );
 };

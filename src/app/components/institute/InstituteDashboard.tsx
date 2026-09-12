@@ -19,7 +19,7 @@ import {
   UserType,
 } from "../dashboard/InstituteBatchesSection";
 import { useMediaQuery } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   CreateBatchAndSubjects,
   EditBatchAndSubjects,
@@ -39,10 +39,11 @@ import { IconCaretDownFilled } from "@tabler/icons-react";
 import { DeleteTheBatch, EditTheBatchName } from "@/axios/batch/BatchPutApi";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 import { UserTypes } from "@/enums";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import NoticeBoard from "./notice/NoticeBoard";
 import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi";
 import { InstituteStudentsPage } from "../institute/student/InstituteStudentsPage";
+import { setDetails } from "@/app/redux/slices/instituteSlice";
 
 export interface Batch {
   id: string;
@@ -54,6 +55,20 @@ export interface Batch {
   firstThreeTeachers: string[];
   firstThreeStudents: string[];
 }
+
+// Single, reusable transformation for raw batch API objects -> UI Batch shape.
+// Uses the lightweight optimized backend fields (totalTeachers/totalStudents/
+// teachersPreview/studentsPreview) instead of full teachers/students arrays.
+const mapBatchResponse = (b: any): Batch => ({
+  id: b._id,
+  name: b.name,
+  subjects: b.subjects || [],
+  optionalSubjects: b.optionalSubjects || [],
+  noOfTeachers: b.totalTeachers || 0,
+  noOfStudents: b.totalStudents || 0,
+  firstThreeTeachers: b.teachersPreview || [],
+  firstThreeStudents: b.studentsPreview || [],
+});
 
 export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
@@ -79,11 +94,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [editBatchDetails, setEditBatchDetails] = useState<boolean>(false);
   const [editBatchId, setEditBatchId] = useState<string>("");
   const [openStudentsPage, setOpenStudentsPage] = useState<boolean>(false);
+  const [isDbCardHovered, setIsDbCardHovered] = useState<boolean>(false);
   const navigation = useRouter();
-
-  const pathname = usePathname();
-  const prefix = pathname ? pathname.split("-")[0] : null;
-  const typ = prefix?.split("/")[2];
 
   const adminDetails = useAppSelector(
     (state: any) => state.adminSlice.adminDetails,
@@ -99,7 +111,6 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     GetAccountByToken()
       .then((x: any) => {
         const { data } = x;
-
         setIsLoading(false);
         dispatch(
           setAdminDetails({
@@ -109,6 +120,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             institute: data.institute,
           }),
         );
+        dispatch(setDetails(data.institute));
       })
       .catch((e) => {
         setIsLoading(false);
@@ -116,37 +128,41 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       });
   };
 
+  // Single, non-paginated batches fetch. Institute ID is the only real
+  // dependency; `navigation` is a stable router instance.
+  const getAllInstituteBatches = useCallback(() => {
+    if (!institute?._id) return;
+    setIsLoading(true);
+    GetInstituteBatches(institute._id)
+      .then((x: any) => {
+        const { batches } = x;
+        setBatches((batches || []).map(mapBatchResponse));
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        setIsLoading(false);
+        console.log(e);
+        if (e.status === 404 || e.status === 401) {
+          navigation.push("/auth");
+        }
+        if (e.status === 403) {
+          ErrorNotification("Subscription has been expired!!");
+          navigation.push("/pricing");
+        }
+      });
+  }, [institute?._id, navigation]);
+
   useEffect(() => {
-    if (institute?._id!!) {
+    if (institute?._id) {
       getAllInstituteBatches();
     }
-  }, [institute]);
+  }, [institute?._id, getAllInstituteBatches]);
 
   useEffect(() => {
     if (openAddBatchModal) {
       getSubjects();
     }
   }, [openAddBatchModal]);
-
-  const [data, setData] = useState<{ value: string; label: string }[]>([
-    { value: "Hindi", label: "Hindi" },
-    { value: "English", label: "English" },
-    { value: "Science", label: "Science" },
-    { value: "Social science", label: "Social science" },
-    { value: "EVS", label: "EVS" },
-    { value: "G.K.", label: "G.K." },
-    { value: "Physics", label: "Physics" },
-    { value: "Chemistry", label: "Chemistry" },
-    { value: "Mathematics", label: "Mathematics" },
-    { value: "Biology", label: "Biology" },
-    { value: "IT", label: "IT" },
-    { value: "Punjabi", label: "Punjabi" },
-    { value: "Sanskrit", label: "Sanskrit" },
-    { value: "Geography", label: "Geography" },
-    { value: "Economics", label: "Economics" },
-    { value: "History", label: "History" },
-    { value: "Physical science", label: "Physical science" },
-  ]);
 
   const [subjectOptions, setSubjectOptions] = useState<
     { value: string; label: string }[]
@@ -163,42 +179,6 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         setSubjectOptions(formatted);
       })
       .catch((e) => console.log(e));
-  };
-
-  const getAllInstituteBatches = () => {
-    setIsLoading(true);
-    GetInstituteBatches(institute._id)
-      .then((x: any) => {
-        const { batches } = x;
-        setIsLoading(false);
-        const allBatches = batches.map((b: any) => {
-          return {
-            id: b._id,
-            name: b.name,
-            subjects: b.subjects,
-            optionalSubjects: b.optionalSubjects,
-            noOfTeachers: b.teachers.length,
-            noOfStudents: b.students.length,
-            firstThreeTeachers: b.teachers.slice(0, 2),
-            firstThreeStudents: b.students.slice(0, 2),
-          };
-        });
-        setBatches(allBatches);
-      })
-      .catch((e) => {
-        setIsLoading(false);
-        console.log(e);
-        if (e.status === 404) {
-          navigation.push("/auth");
-        }
-        if (e.status === 401) {
-          navigation.push("/auth");
-        }
-        if (e.status === 403) {
-          ErrorNotification("Subscription has been expired!!");
-          navigation.push("/pricing");
-        }
-      });
   };
 
   const createBatch = () => {
@@ -221,21 +201,18 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         .then((x: any) => {
           SuccessNotification("Batch updated!!");
           const { data } = x;
-          const newBatch = {
-            id: data._id,
-            name: data.name,
-            subjects: data.subjects,
-            noOfTeachers: data.teachers.length,
-            noOfStudents: data.students.length,
-            optionalSubjects: data.optionalSubjects,
-            firstThreeTeachers: data.teachers.splice(0, 3),
-            firstThreeStudents: data.students.splice(0, 3),
-          };
-          const editedBatch = batches.filter((b) => b.id !== editBatchId);
-          setBatches([...editedBatch, newBatch]);
+          if (data && data._id) {
+            const updatedBatch = mapBatchResponse(data);
+            setBatches((prev) =>
+              prev.map((b) => (b.id === updatedBatch.id ? updatedBatch : b)),
+            );
+          } else {
+            // Fallback only if the mutation response doesn't carry enough
+            // info to safely update local state.
+            getAllInstituteBatches();
+          }
           setOpenAddBatchModal(false);
           setIsLoading(false);
-          getAllInstituteBatches();
         })
         .catch((e) => {
           setOpenAddBatchModal(false);
@@ -253,22 +230,17 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         .then((x: any) => {
           SuccessNotification("Batch created!!");
           const { data } = x;
-          const newBatch = {
-            id: data._id,
-            name: data.name,
-            subjects: data.subjects,
-            noOfTeachers: data.teachers.length,
-            noOfStudents: data.students.length,
-            optionalSubjects: data.optionalSubjects,
-            firstThreeTeachers: data.teachers.splice(0, 3),
-            firstThreeStudents: data.students.splice(0, 3),
-          };
-          setBatches((prevBatches) => [...prevBatches, newBatch]);
-          setBatchId(data._id);
+          if (data && data._id) {
+            const newBatch = mapBatchResponse(data);
+            setBatches((prev) => [...prev, newBatch]);
+            setBatchId(newBatch.id);
+          } else {
+            getAllInstituteBatches();
+            setBatchId(data?._id ?? null);
+          }
           setOpenAddBatchModal(false);
           setOpenEditCourseFee(true);
           setIsLoading(false);
-          getAllInstituteBatches();
         })
         .catch((e) => {
           setOpenAddBatchModal(false);
@@ -288,9 +260,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       .then(() => {
         setBatchDeleteWarning(false);
         setIsLoading(false);
-        setBatches((prev) => {
-          return prev.filter((b) => b.id !== deleteBatchId);
-        });
+        setBatches((prev) => prev.filter((b) => b.id !== deleteBatchId));
         SuccessNotification("Batch deleted!!");
       })
       .catch((e) => {
@@ -304,13 +274,11 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     EditTheBatchName(id, name)
       .then(() => {
         setIsLoading(false);
-        const updatedBatches = batches.map((batch) => {
-          if (batch.id === id) {
-            return { ...batch, name: name };
-          }
-          return batch;
-        });
-        setBatches(updatedBatches);
+        setBatches((prev) =>
+          prev.map((batch) =>
+            batch.id === id ? { ...batch, name } : batch,
+          ),
+        );
         SuccessNotification("Batch name edited!!");
       })
       .catch((e) => {
@@ -329,6 +297,17 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
 
   const filteredOptionalSubjects = subjectOptions.filter(
     (sub) => !selectedSubjects.includes(sub.value),
+  );
+
+  // `batches` is already normalized by mapBatchResponse, so it's passed
+  // straight through — no redundant re-mapping on every render.
+  const allBatchesFormatted = useMemo(
+    () =>
+      batches.map((batch) => ({
+        id: batch.id,
+        name: batch.name,
+      })),
+    [batches],
   );
 
   return (
@@ -378,24 +357,21 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             mx={"auto"}
             radius={16}
             p={{ base: 20, sm: 24 }}
+            onMouseEnter={() => setIsDbCardHovered(true)}
+            onMouseLeave={() => setIsDbCardHovered(false)}
             style={{
               position: "relative",
               overflow: "hidden",
               backgroundColor: "#FFFFFF",
-              border: "1px solid #E2E8F0",
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.04)",
+              border: isDbCardHovered
+                ? "1px solid #8B5CF6"
+                : "1px solid #E2E8F0",
+              boxShadow: isDbCardHovered
+                ? "0px 12px 28px rgba(139, 92, 246, 0.12)"
+                : "0px 4px 20px rgba(0, 0, 0, 0.04)",
+              transform: isDbCardHovered ? "translateY(-4px)" : "none",
               transition: "all 0.3s ease",
               cursor: "pointer",
-                            "&:hover": {
-                transform: "translateY(-4px)",
-                borderColor: "#8B5CF6",
-                boxShadow: "0px 12px 28px rgba(139, 92, 246, 0.12)",
-                "& .db-icon-box": {
-                  transform: "scale(1.06) rotate(3deg)",
-                  backgroundColor: "#F3E8FF",
-                  borderColor: "#C084FC",
-                },
-              },
             }}
             onClick={() => setOpenStudentsPage(true)}
           >
@@ -492,16 +468,20 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               {/* Right Side Database Icon with Hover Animation */}
               {!isMd && (
                 <Flex
-                  className="db-icon-box"
                   align="center"
                   justify="center"
                   style={{
                     width: 80,
                     height: 80,
                     borderRadius: 20,
-                    background: "#F5F3FF",
-                    border: "1px solid #DDD6FE",
+                    background: isDbCardHovered ? "#F3E8FF" : "#F5F3FF",
+                    border: isDbCardHovered
+                      ? "1px solid #C084FC"
+                      : "1px solid #DDD6FE",
                     flexShrink: 0,
+                    transform: isDbCardHovered
+                      ? "scale(1.06) rotate(3deg)"
+                      : "none",
                     transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   }}
                 >
@@ -577,21 +557,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             mb={isMd ? 100 : 0}
           >
             <InstituteBatchesSection
-              batches={batches.map((batch: any) => ({
-                id: batch?.id || "",
-                name: batch?.name || "",
-                subjects: batch?.subjects || [],
-                noOfTeachers: batch?.noOfTeachers || 0,
-                noOfStudents: batch?.noOfStudents || 0,
-                firstThreeStudents: batch?.firstThreeStudents || [],
-                firstThreeTeachers: batch?.firstThreeTeachers || [],
-              }))}
-              allBatches={batches.map((batch: any) => ({
-                id: batch?.id || "",
-                name: batch?.name || "",
-              }))}
+              batches={batches}
+              allBatches={allBatchesFormatted}
               showAddBatch={true}
-              userType={2}
+              userType={UserType.OTHERS}
               setDeleteBatchId={(val: string) => {
                 setDeleteBatchId(val);
                 setBatchDeleteWarning(true);
@@ -609,6 +578,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                 setOpenEditCourseFee(true);
               }}
               onAddBatchButtonClick={() => {
+                setBatchName("");
+                setSelectedSubjects([]);
+                setSelectedOptionalSubjects([]);
+                setEditBatchDetails(false);
                 setOpenAddBatchModal(true);
               }}
               onEditBatchButtonClick={function (batchId: string): void {}}
@@ -631,8 +604,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
           <InstituteInsideBatch
             userType={UserType.OTHERS}
             batchId={batchId}
-            batchName={selectedBatch?.name!!}
-            instituteId={institute?._id!!}
+            batchName={selectedBatch?.name ?? ""}
+            instituteId={institute?._id ?? ""}
             onClickBack={() => {
               getAllInstituteBatches();
               setBatchId(null);
@@ -646,8 +619,15 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       {/* Add / Edit Batch Modal */}
       <Modal
         opened={openAddBatchModal}
-        onClose={() => setOpenAddBatchModal(false)}
-        title="Add Batch"
+        onClose={() => {
+          setOpenAddBatchModal(false);
+          setBatchName("");
+          setSelectedSubjects([]);
+          setSelectedOptionalSubjects([]);
+          setEditBatchDetails(false);
+          setEditBatchId("");
+        }}
+        title={editBatchDetails ? "Edit Batch" : "Add Batch"}
         centered
       >
         <Stack>
@@ -692,11 +672,11 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       </Modal>
 
       {/* Edit Course Fee Modal */}
-      {openEditCourseFee && (
+      {openEditCourseFee && batchId && (
         <EditCourseFeeModal
           isCourseFeesEdit={openEditCourseFee}
           isEditing={false}
-          batchId={batchId!!}
+          batchId={batchId}
           setisCourseFeesEdit={(val: null) => {
             setBatchId(null);
             setOpenEditCourseFee(false);

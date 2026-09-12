@@ -170,6 +170,8 @@ const HeroSection: React.FC = () => {
             border: "1px solid rgba(255,255,255,0.5)",
             backdropFilter: "blur(4px)",
             transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            minHeight: "400px",
+            aspectRatio: "5 / 4",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-8px)";

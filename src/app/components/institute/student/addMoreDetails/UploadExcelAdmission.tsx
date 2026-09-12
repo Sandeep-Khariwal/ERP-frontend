@@ -10,7 +10,6 @@ import {
   Image,
   LoadingOverlay,
 } from "@mantine/core";
-import * as XLSX from "xlsx";
 import {
   ErrorNotification,
   SuccessNotification,
@@ -48,10 +47,13 @@ function UploadExcelAdmission({
   const [loading, setLoading] = useState(false);
 
   // ✅ HANDLE FILE UPLOAD
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
+    // Dynamically import XLSX only when file upload happens
+    const XLSX = await import("xlsx");
+
     const reader = new FileReader();
 
-    reader.onload = (e: any) => {
+    reader.onload = async (e: any) => {
       const data = e.target.result;
 
       const workbook = XLSX.read(data, { type: "binary" });
@@ -60,7 +62,7 @@ function UploadExcelAdmission({
 
       let errorFound = false;
 
-      const payload = jsonData.map((student: any, index: number) => {
+      const payload = await Promise.all(jsonData.map(async (student: any, index: number) => {
         const name = student["name"];
         const phone = student["phoneNumber"];
 
@@ -82,10 +84,10 @@ function UploadExcelAdmission({
           gender: student["gender"],
           instituteId,
           batchId,
-          dateOfBirth: parseExcelDate(student["dateOfBirth"]),
-          dateOfJoining: parseExcelDate(student["dateOfJoining"]),
+          dateOfBirth: await parseExcelDate(student["dateOfBirth"]),
+          dateOfJoining: await parseExcelDate(student["dateOfJoining"]),
         };
-      });
+      }));
 
       const finalPayload = payload.filter((p: any) => p !== null);
 

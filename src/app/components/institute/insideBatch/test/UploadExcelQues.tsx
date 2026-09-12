@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import * as XLSX from "xlsx";
 import {
   Modal,
   Stack,
@@ -44,11 +43,14 @@ export default function UploadExcelQues({
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleUploadQuestions = () => {
+  const handleUploadQuestions = async () => {
     if (!file) {
       ErrorNotification("Please select excel file");
       return;
     }
+
+    // Dynamically import XLSX only when upload happens
+    const XLSX = await import("xlsx");
 
     const reader = new FileReader();
 

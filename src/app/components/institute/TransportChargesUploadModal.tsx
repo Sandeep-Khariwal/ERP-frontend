@@ -12,7 +12,6 @@ import {
   ThemeIcon,
 } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
-import * as XLSX from "xlsx";
 import {
   IconUpload,
   IconFileSpreadsheet,
@@ -54,6 +53,9 @@ export const TransportChargesUploadModal = ({
   // HANDLE FILE
   const handleFile = async (selected: File) => {
     setFile(selected);
+
+    // Dynamically import XLSX only when needed
+    const XLSX = await import("xlsx");
 
     const data = await selected.arrayBuffer();
     const workbook = XLSX.read(data);
@@ -160,6 +162,7 @@ export const TransportChargesUploadModal = ({
   }, [opened]);
 
   return (
+    <Box style={{ minHeight: opened ? '400px' : 0 }}>
     <Modal
       opened={opened}
       onClose={onClose}
@@ -326,5 +329,6 @@ export const TransportChargesUploadModal = ({
         </Group>
       </Stack>
     </Modal>
+    </Box>
   );
 };

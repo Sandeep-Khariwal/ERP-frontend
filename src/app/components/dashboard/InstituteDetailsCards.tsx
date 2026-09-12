@@ -1,122 +1,240 @@
+"use client";
+
 import { GetInstituteOverview } from "@/axios/institute/InstituteGetApi";
-import { Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
+import {
+  Flex,
+  LoadingOverlay,
+  Skeleton,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { formatNumberInK } from "../institute/helperFunctions";
 
-export function InstituteDetailsCards(props: { instituteId: string }) {
-  const isMd = useMediaQuery(`(max-width: 968px)`);
-  const [totalStudents, setTotalStudents] = useState<number>(0);
-  const [totalTeachers, setTotalTeachers] = useState<number>(0);
-  const [totalEarnings, setTotalEarnings] = useState<number>(0);
-  const [totalExpanses, setTotalExpanses] = useState<number>(0);
-  const [isLoading,setIsLoading] = useState<boolean>(false)
+interface InstituteOverview {
+  totalStudents: number;
+  totalTeachers: number;
+  earnings: number;
+  expanses: number;
+}
+
+interface InstituteOverviewResponse {
+  institute: InstituteOverview;
+}
+
+interface InstituteDetailsCardsProps {
+  instituteId: string;
+}
+
+export function InstituteDetailsCards({
+  instituteId,
+}: InstituteDetailsCardsProps) {
+  const isMd = useMediaQuery("(max-width: 968px)");
+
+  const [overview, setOverview] = useState<InstituteOverview | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (props.instituteId) {
-      setIsLoading(true)
-      GetInstituteOverview(props.instituteId)
-        .then((x: any) => {
-          const { institute } = x;
-          setTotalStudents(institute.students.length);
-          setTotalTeachers(institute.teachers.length);
-          setTotalEarnings(institute.earnings);
-          setTotalExpanses(institute.expanses);
-          setIsLoading(false)
-        })
-        .catch((e) => {
-          console.log(e);
-          setIsLoading(false)
-        });
+    if (!instituteId) {
+      setOverview(null);
+      setIsLoading(false);
+      return;
     }
-  }, [props.instituteId]);
+
+    let isCurrentRequest = true;
+
+    const fetchOverview = async () => {
+      setIsLoading(true);
+
+      try {
+        const response =
+          (await GetInstituteOverview(
+            instituteId,
+          )) as InstituteOverviewResponse;
+
+        if (!isCurrentRequest) return;
+
+        setOverview(response.institute);
+      } catch (error) {
+        if (!isCurrentRequest) return;
+
+        console.error("Failed to fetch institute overview:", error);
+        setOverview(null);
+      } finally {
+        if (isCurrentRequest) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchOverview();
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [instituteId]);
+
+ const renderValue = (
+  value: number | undefined,
+  formatter = false,
+) => {
+  const displayValue = formatter
+    ? formatNumberInK(value ?? 0)
+    : value ?? 0;
+
+  return (
+    <div
+      style={{
+        width: "80px",
+        minWidth: "80px",
+        height: "20px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {isLoading ? (
+        <Skeleton height={20} width={60} radius="sm" />
+      ) : (
+        <Text
+          lh={1}
+          fw={700}
+          fz="1.3rem"
+          c="#4F4F4F"
+          ta="center"
+          style={{ whiteSpace: "nowrap" }}
+        >
+          {displayValue}
+        </Text>
+      )}
+    </div>
+  );
+};
+
   return (
     <>
-    <LoadingOverlay visible={isLoading} />
+      <LoadingOverlay visible={isLoading} />
+
       <Flex
         w={isMd ? "95%" : "80%"}
-        mx={"auto"}
-        mt={"2rem"}
-        align={"center"}
+        mx="auto"
+        mt="2rem"
+        align="center"
         gap={15}
-        justify={"space-between"}
-        wrap={"wrap"}
+        justify="space-between"
+        wrap="wrap"
       >
         <Flex
           p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={"10rem"}
+          w="10rem"
           gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={"center"}
+          bg="white"
+          align="center"
+          justify="center"
+          style={{
+            borderRadius: "0.3rem",
+            fontFamily: "sans-serif",
+          }}
         >
-          <Image src={"/student.png"} alt="Not found" width={40} height={40} />
-          <Stack align={"center"} justify={"start"} gap={1.4}>
-            <Text lh={1.4} fz={"0.8rem"} fw={600} c={"#BFBFBF "}>
+          <Image
+            src="/student.png"
+            alt="Students"
+            width={40}
+            height={40}
+          />
+
+          <Stack align="center" justify="start" gap={1.4}>
+            <Text lh={1.4} fz="0.8rem" fw={600} c="#BFBFBF">
               Students
             </Text>
-            <Text lh={1} fw={700} fz={"1.3rem"} c={"#4F4F4F"}>
-              {formatNumberInK(totalStudents)}
-            </Text>
+
+            {renderValue(overview?.totalStudents, true)}
           </Stack>
         </Flex>
+
         <Flex
           p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={"10rem"}
+          w="10rem"
           gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={"center"}
+          bg="white"
+          align="center"
+          justify="center"
+          style={{
+            borderRadius: "0.3rem",
+            fontFamily: "sans-serif",
+          }}
         >
-          <Image src={"/teacher.png"} alt="Not found" width={40} height={40} />
-          <Stack align={"center"} justify={"start"} gap={1}>
-            <Text lh={1.4} fz={"0.8rem"} c={"#BFBFBF "} fw={600}>
+          <Image
+            src="/teacher.png"
+            alt="Teachers"
+            width={40}
+            height={40}
+          />
+
+          <Stack align="center" justify="start" gap={1}>
+            <Text lh={1.4} fz="0.8rem" c="#BFBFBF" fw={600}>
               Teachers
             </Text>
-            <Text lh={1} fw={700} fz={"1.3rem"} c={"#4F4F4F"}>
-              {totalTeachers}
-            </Text>
+
+            {renderValue(overview?.totalTeachers)}
           </Stack>
         </Flex>
+
         <Flex
           p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={"10rem"}
+          w="10rem"
           gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={"center"}
+          bg="white"
+          align="center"
+          justify="center"
+          style={{
+            borderRadius: "0.3rem",
+            fontFamily: "sans-serif",
+          }}
         >
-          <Image src={"/earnings.jpg"} alt="Not found" width={40} height={40} />
-          <Stack align={"center"} justify={"start"} gap={1}>
-            <Text lh={1.4} fz={"0.8rem"} c={"#BFBFBF "} fw={600}>
+          <Image
+            src="/earnings.jpg"
+            alt="Earnings"
+            width={40}
+            height={40}
+          />
+
+          <Stack align="center" justify="start" gap={1}>
+            <Text lh={1.4} fz="0.8rem" fw={600} c="#BFBFBF">
               Earnings
             </Text>
-            <Text lh={1} fw={700} fz={"1.3rem"} c={"#4F4F4F "}>
-              {formatNumberInK(totalEarnings)}
-            </Text>
+
+            {renderValue(overview?.earnings, true)}
           </Stack>
         </Flex>
+
         <Flex
           p={10}
-          style={{ borderRadius: "0.3rem", fontFamily: "sans-serif" }}
-          w={"10rem"}
+          w="10rem"
           gap={15}
-          bg={"white"}
-          align={"center"}
-          justify={"center"}
+          bg="white"
+          align="center"
+          justify="center"
+          style={{
+            borderRadius: "0.3rem",
+            fontFamily: "sans-serif",
+          }}
         >
-          <Image src={"/expenses.jpg"} alt="Not found" width={40} height={40} />
-          <Stack align={"center"} justify={"start"} gap={1}>
-            <Text lh={1.4} fz={"0.8rem"} c={"#BFBFBF "} fw={600}>
-              Expanses
+          <Image
+            src="/expenses.jpg"
+            alt="Expenses"
+            width={40}
+            height={40}
+          />
+
+          <Stack align="center" justify="start" gap={1}>
+            <Text lh={1.4} fz="0.8rem" fw={600} c="#BFBFBF">
+              Expenses
             </Text>
-            <Text lh={1} fw={700} fz={"1.3rem"} c={"#4F4F4F "}>
-              {formatNumberInK(totalExpanses)}
-            </Text>
+
+            {renderValue(overview?.expanses, true)}
           </Stack>
         </Flex>
       </Flex>

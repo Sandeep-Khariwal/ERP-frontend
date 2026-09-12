@@ -65,9 +65,11 @@ export function CreateBatchFee(data: {
       .catch((error: any) => reject(error));
   });
 }
-export function GetInstituteBatches(id:string) {
+export function GetInstituteBatches(id: string, page: number = 1, limit: number = 12) {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/institute/getBatches/${id}`)
+    ApiHelper.get(
+      `${process.env.URL}/api/v1/institute/getBatches/${id}?page=${page}&limit=${limit}`
+    )
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
   });

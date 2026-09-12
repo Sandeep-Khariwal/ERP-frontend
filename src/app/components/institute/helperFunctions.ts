@@ -1,5 +1,3 @@
-import * as XLSX from "xlsx";
-
 export const months = [
   "January",
   "February",
@@ -172,31 +170,76 @@ export function formatNumberInK(value: number): number | string {
   return "E";
 };
 
-export const parseExcelDate = (value: any) => {
+export const parseExcelDate = async (value: any) => {
   try {
     if (!value) return undefined;
 
-    // DD/MM/YYYY
+    // Handle string dates (DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, YYYY/MM/DD)
     if (typeof value === "string") {
-      const parts = value.trim().split("/");
+      const trimmed = value.trim();
 
-      if (parts.length !== 3) return undefined;
+      // Try "/" separator first (DD/MM/YYYY or YYYY/MM/DD)
+      if (trimmed.includes("/")) {
+        const parts = trimmed.split("/");
 
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
+        if (parts.length !== 3) return undefined;
 
-      const date = new Date(year, month, day);
+        // Check if it's DD/MM/YYYY or YYYY/MM/DD
+        if (parts[0].length === 4) {
+          // YYYY/MM/DD format
+          const year = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[2], 10);
 
-      if (isNaN(date.getTime())) {
-        return undefined;
+          const date = new Date(year, month, day);
+          if (isNaN(date.getTime())) return undefined;
+          return date;
+        } else {
+          // DD/MM/YYYY format
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const year = parseInt(parts[2], 10);
+
+          const date = new Date(year, month, day);
+          if (isNaN(date.getTime())) return undefined;
+          return date;
+        }
       }
 
-      return date;
+      // Try "-" separator (DD-MM-YYYY or YYYY-MM-DD)
+      if (trimmed.includes("-")) {
+        const parts = trimmed.split("-");
+
+        if (parts.length !== 3) return undefined;
+
+        // Check if it's DD-MM-YYYY or YYYY-MM-DD
+        if (parts[0].length === 4) {
+          // YYYY-MM-DD format
+          const year = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[2], 10);
+
+          const date = new Date(year, month, day);
+          if (isNaN(date.getTime())) return undefined;
+          return date;
+        } else {
+          // DD-MM-YYYY format
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const year = parseInt(parts[2], 10);
+
+          const date = new Date(year, month, day);
+          if (isNaN(date.getTime())) return undefined;
+          return date;
+        }
+      }
+
+      return undefined;
     }
 
-    // Excel serial date
+    // Excel serial date - dynamically load XLSX only when needed
     if (typeof value === "number") {
+      const XLSX = await import("xlsx");
       const parsed = XLSX.SSF.parse_date_code(value);
 
       if (!parsed) return undefined;

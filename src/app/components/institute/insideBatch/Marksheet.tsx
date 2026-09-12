@@ -21,7 +21,6 @@ import { Modal } from "@mantine/core";
 import { Image, Group } from "@mantine/core";
 import SingleStudentModal from "./SingleStudentModal";
 import { useMediaQuery } from "@mantine/hooks";
-import * as XLSX from "xlsx";
 import {
   CreateExamMarksheet,
   CreateExamMarksheetForExcel,
@@ -179,7 +178,10 @@ const Marksheet = (props: {
     };
   };
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
+    // Dynamically import XLSX only when file upload happens
+    const XLSX = await import("xlsx");
+
     const reader = new FileReader();
 
     reader.onload = (e: any) => {

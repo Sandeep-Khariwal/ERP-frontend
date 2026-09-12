@@ -6,7 +6,10 @@ import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { setTeacherDetails } from "@/app/redux/slices/teacherSlice";
 import { GetAccountByToken } from "@/axios/institute/instituteSlice";
 import { LocalStorageKey } from "@/axios/LocalStorageUtility";
+import { useRouter } from "next/navigation";
+import { ErrorNotification } from "@/app/helperFunction/Notification";
 
+import { setAdminDetails } from "@/app/redux/slices/adminSlice";
 /**
  * SessionRestore
  *
@@ -26,7 +29,7 @@ import { LocalStorageKey } from "@/axios/LocalStorageUtility";
  */
 export default function SessionRestore() {
   const dispatch = useAppDispatch();
-
+  const navigation = useRouter();   // ← ye line add karo
   useEffect(() => {
     const token = localStorage.getItem(LocalStorageKey.Token);
 
@@ -43,17 +46,31 @@ export default function SessionRestore() {
         if (!data) return;
 
         // Institute is nested under `instituteId`, not `institute`.
-        if (data.instituteId) {
-          const instituteDetails = {
-            name: data.instituteId.name,
-            _id: data.instituteId._id,
-            phoneNumber: data.instituteId.institutePhoneNumber || "",
-            address: data.instituteId.address,
-            featureAccess: data.instituteId.accessFeatures,
-            email: data.instituteId.email,
-          };
-          dispatch(setDetails(instituteDetails));
-        }
+        // if (data.instituteId) {
+        //   const instituteDetails = {
+        //     name: data.instituteId.name,
+        //     _id: data.instituteId._id,
+        //     phoneNumber: data.instituteId.institutePhoneNumber || "",
+        //     address: data.instituteId.address,
+        //     featureAccess: data.instituteId.accessFeatures,
+        //     email: data.instituteId.email,
+        //   };
+        //   dispatch(setDetails(instituteDetails));
+        // } 
+
+
+        if (data.institute) {
+  const instituteDetails = {
+    name: data.institute.name,
+    _id: data.institute._id,
+    phoneNumber: data.institute.institutePhoneNumber || "",
+    address: data.institute.address,
+    featureAccess: data.institute.accessFeatures,
+    email: data.institute.email,
+  };
+
+  dispatch(setDetails(instituteDetails));
+}
 
         // If the logged-in account is a teacher, this same response
         // already has all the teacher fields we need — no second API call.
@@ -72,6 +89,14 @@ export default function SessionRestore() {
         // Token expired/invalid ho sakta hai — ApiHelper ka 401 interceptor
         // already LogOut() call kar dega, isliye yaha sirf log karo.
         console.log("SESSION RESTORE ERROR :", error?.response || error);
+          if (error?.status === 401) {
+    navigation.push("/auth");
+  }
+  if (error?.status === 403) {
+    ErrorNotification("Subscription has been expired!!");
+    navigation.push("/pricing");
+  }
+        
       });
   }, [dispatch]);
 

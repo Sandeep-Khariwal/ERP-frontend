@@ -162,6 +162,7 @@ const Features: React.FC = () => {
             src={School_Fees_Management}
             alt="Student Fees Management"
             w={250}
+            h={250}
           />
           <h4
             style={{
@@ -190,6 +191,7 @@ const Features: React.FC = () => {
             src={Student_attendance_records}
             alt="Student attendance records"
             w={250}
+            h={250}
           />
           <h4
             style={{
@@ -214,7 +216,7 @@ const Features: React.FC = () => {
           w={"30%"}
           gap={"0.50rem"}
         >
-          <Image src={Test_Records} alt="Test Records" w={250} />
+          <Image src={Test_Records} alt="Test Records" w={250} h={250} />
           <h4
             style={{
               fontSize: "1.25rem",
@@ -242,6 +244,7 @@ const Features: React.FC = () => {
             src={Teacher_Salery_Management}
             alt="Teacher Salary Management"
             w={250}
+            h={250}
           />
           <h4
             style={{
@@ -267,7 +270,7 @@ const Features: React.FC = () => {
           gap={"0.50rem"}
           mt={"lg"}
         >
-          <Image src={Parents_access_test} alt="Parents Access Test" w={250} />
+          <Image src={Parents_access_test} alt="Parents Access Test" w={250} h={250} />
           <h4
             style={{
               fontSize: "1.25rem",
@@ -291,7 +294,7 @@ const Features: React.FC = () => {
           w={"30%"}
           gap={"0.50rem"}
         >
-          <Image src={Online_fee_recipt} alt="Online Fee Receipt" w={250} />
+          <Image src={Online_fee_recipt} alt="Online Fee Receipt" w={250} h={250} />
           <h4
             style={{
               fontSize: "1.25rem",
@@ -315,7 +318,7 @@ const Features: React.FC = () => {
           w={"30%"}
           gap={"0.50rem"}
         >
-          <Image src={quizicon} alt="Online Quiz System" w={250} />
+          <Image src={quizicon} alt="Online Quiz System" w={250} h={250} />
           <h4
             style={{
               fontSize: "1.25rem",
@@ -339,7 +342,7 @@ const Features: React.FC = () => {
           w={"30%"}
           gap={"0.50rem"}
         >
-          <Image src={"/marksheet_id.png"} alt="Marksheet & ID Card" w={250} />
+          <Image src={"/marksheet_id.png"} alt="Marksheet & ID Card" w={250} h={250} />
           <h4 style={{ fontSize: "1.25rem" }}>
             Automated Marksheet & ID Card Generation
           </h4>
@@ -354,7 +357,7 @@ const Features: React.FC = () => {
           w={"30%"}
           gap={"0.50rem"}
         >
-          <Image src={"/earning_dashboard.png"} alt="Earnings Dashboard" w={250} />
+          <Image src={"/earning_dashboard.png"} alt="Earnings Dashboard" w={250} h={250} />
           <h4 style={{ fontSize: "1.25rem" }}>
             Smart Earnings & Expense Dashboard
           </h4>
@@ -369,7 +372,7 @@ const Features: React.FC = () => {
           w={"30%"}
           gap={"0.50rem"}
         >
-          <Image src={"/leads_management.png"} alt="Leads Management" w={250} />
+          <Image src={"/leads_management.png"} alt="Leads Management" w={250} h={250} />
           <h4 style={{ fontSize: "1.25rem" }}>
             Lead Management with Meta Integration
           </h4>
@@ -384,7 +387,7 @@ const Features: React.FC = () => {
           w={"30%"}
           gap={"0.50rem"}
         >
-          <Image src={"/whatsapp_integration.png"} alt="WhatsApp Integration" w={250} />
+          <Image src={"/whatsapp_integration.png"} alt="WhatsApp Integration" w={250} h={250} />
           <h4 style={{ fontSize: "1.25rem" }}>
             WhatsApp Integration for Instant Communication
           </h4>

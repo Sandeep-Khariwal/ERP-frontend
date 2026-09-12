@@ -21,10 +21,11 @@ export function GetBatchFee(id: string) {
 })
       .catch((error: any) => reject(error));
   });
+
 }
-export function GetAllStudentsFromBatch(id: string) {
+export function GetAllStudentsFromBatch(id: string, page: number = 1, limit: number = 10) {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/institute/getStudentsFromBatch/${id}`)
+    ApiHelper.get(`${process.env.URL}/api/v1/institute/getStudentsFromBatch/${id}?page=${page}&limit=${limit}`)
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
   });

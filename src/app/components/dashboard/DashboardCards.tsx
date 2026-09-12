@@ -130,16 +130,17 @@ export function SingleBatchCard(props: {
           cursor: "pointer",
         }}
       >
-        <Modal
-          opened={passoutModal}
-          onClose={() => setPassoutModal(false)}
-          centered
-          closeOnClickOutside={false}
-          withCloseButton={false}
-          padding={30}
-          radius={20}
-        >
-          <Flex direction="column" align="center">
+        <Box style={{ minHeight: passoutModal ? '350px' : 0 }}>
+          <Modal
+            opened={passoutModal}
+            onClose={() => setPassoutModal(false)}
+            centered
+            closeOnClickOutside={false}
+            withCloseButton={false}
+            padding={30}
+            radius={20}
+          >
+            <Flex direction="column" align="center">
             <Box
               style={{
                 width: 85,
@@ -231,6 +232,8 @@ export function SingleBatchCard(props: {
             </Flex>
           </Flex>
         </Modal>
+        </Box>
+        <Box style={{ minHeight: promoteModal ? '400px' : 0 }}>
         <Modal
           opened={promoteModal}
           size={1100}
@@ -410,6 +413,7 @@ export function SingleBatchCard(props: {
             </Button>
           </Flex>
         </Modal>
+        </Box>
         {
           props.userType === UserType.OTHERS &&
 

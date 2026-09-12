@@ -158,6 +158,10 @@ const Navbar: React.FC = () => {
         const el = element as HTMLElement;
         const text = el.dataset.original || el.textContent || "";
         el.dataset.original = text;
+        const initialWidth = el.getBoundingClientRect().width;
+        if (initialWidth > 0) {
+          el.style.minWidth = `${initialWidth}px`;
+        }
         el.innerHTML = "";
 
         text.split("").forEach((char, i) => {
@@ -585,11 +589,6 @@ const Navbar: React.FC = () => {
 
         .nav-link:hover .underline {
           width: 100% !important;
-        }
-
-        /* Add some spacing for body content to account for fixed navbar */
-        body {
-          padding-top: 70px;
         }
       `}</style>
     </Box>

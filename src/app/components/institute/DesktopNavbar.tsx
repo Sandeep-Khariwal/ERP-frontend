@@ -175,6 +175,7 @@ export const DesktopNavbar = (props: {
   return (
     <>
       <Notifications />
+      <Box style={{ minHeight: settingsOpened ? '500px' : 0 }}>
       <Modal
         opened={settingsOpened}
         onClose={() => setSettingsOpened(false)}
@@ -523,6 +524,7 @@ export const DesktopNavbar = (props: {
           </Box>
         </Flex>
       </Modal>
+      </Box>
 
       <LogoModal
         opened={logoModalOpen}
