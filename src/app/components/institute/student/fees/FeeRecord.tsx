@@ -17,7 +17,7 @@ import {
   Box,
   TextInput,
 } from "@mantine/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { DateTimePicker } from "@mantine/dates";
 import { IconArrowLeft, IconCalendar, IconTrash } from "@tabler/icons-react";
@@ -100,6 +100,10 @@ const FeeRecordSection = (props: {
     Map<string, FeeRecordData>
   >(new Map());
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
+
+
 
   const handleChange = (key: string, value: any, field = "amount") => {
     if (key === "paymentDate") {
@@ -177,33 +181,141 @@ const FeeRecordSection = (props: {
       });
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    if (!formValues.paymentDate) {
-      showNotification({
-        message: "Select date please!!",
-      });
-      return;
-    }
-    setIsLoading(true);
-    console.log("feeRecordsMap", feeRecordsMap);
-    console.log("converted", Array.from(feeRecordsMap.entries()));
-    UpdateMultipleFeeRecord(
+  // const handleSubmit = (event: React.FormEvent) => {
+  //   if (!formValues.paymentDate) {
+  //     showNotification({
+  //       message: "Select date please!!",
+  //     });
+  //     return;
+  //   }
+  //   setIsLoading(true);
+  //   console.log("feeRecordsMap", feeRecordsMap);
+  //   console.log("converted", Array.from(feeRecordsMap.entries()));
+  //   UpdateMultipleFeeRecord(
+  //     instituteDetails._id,
+  //     feeRecordsMap,
+  //     props.studentId,
+  //   )
+  //     .then((resp) => {
+  //       setIsLoading(false);
+
+  //       setOpenPaymentModel(false);
+  //       setFeeRecordsMap(new Map());
+  //       // props.onPaymentClick();
+  //     })
+  //     .catch((e) => {
+  //       console.log(e);
+  //       setIsLoading(false);
+  //     });
+  // };
+
+//   const handleSubmit = (event: React.FormEvent) => {
+//   event.preventDefault();
+
+//   // Prevent double click / multiple submissions
+//   if (isSubmitting) return;
+
+//   if (!formValues.paymentDate) {
+//     showNotification({
+//       message: "Select date please!!",
+//     });
+//     return;
+//   }
+
+//   // Optional: agar koi payment amount enter hi nahi kiya
+//   const hasPayment = Array.from(feeRecordsMap.values()).some(
+//     (record) => Number(record.amount) > 0,
+//   );
+
+//   if (!hasPayment) {
+//     showNotification({
+//       message: "Please enter payment amount.",
+//     });
+//     return;
+//   }
+
+//   setIsSubmitting(true);
+//   setIsLoading(true);
+
+//   UpdateMultipleFeeRecord(
+//     instituteDetails._id,
+//     feeRecordsMap,
+//     props.studentId,
+//   )
+//     .then(() => {
+//       setOpenPaymentModel(false);
+//       setFeeRecordsMap(new Map());
+
+//       SuccessNotification(
+//         "Payment recorded successfully.",);
+//     })
+//     .catch((e) => {
+//       console.log(e);
+
+//       showNotification({
+//         message: "Unable to record payment.",
+//         color: "red",
+//       });
+//     })
+//     .finally(() => {
+//       setIsSubmitting(false);
+//       setIsLoading(false);
+//     });
+// };
+
+
+const handleSubmit = async (event: React.FormEvent) => {
+  event.preventDefault();
+
+  if (isSubmittingRef.current) return;
+
+  if (!formValues.paymentDate) {
+    showNotification({
+      message: "Select date please!!",
+    });
+    return;
+  }
+
+  const hasPayment = Array.from(feeRecordsMap.values()).some(
+    (record) => Number(record.amount) > 0,
+  );
+
+  if (!hasPayment) {
+    showNotification({
+      message: "Please enter payment amount.",
+    });
+    return;
+  }
+
+  // Ref immediately lock karega — re-render ka wait nahi
+  isSubmittingRef.current = true;
+  setIsSubmitting(true);
+  setIsLoading(true);
+
+  try {
+    await UpdateMultipleFeeRecord(
       instituteDetails._id,
       feeRecordsMap,
       props.studentId,
-    )
-      .then((resp) => {
-        setIsLoading(false);
+    );
 
-        setOpenPaymentModel(false);
-        setFeeRecordsMap(new Map());
-        // props.onPaymentClick();
-      })
-      .catch((e) => {
-        console.log(e);
-        setIsLoading(false);
-      });
-  };
+    setOpenPaymentModel(false);
+    setFeeRecordsMap(new Map());
+
+    SuccessNotification("Payment recorded successfully.");
+  } catch (e) {
+    console.log(e);
+
+    showNotification({
+      message: "Unable to record payment.",
+      color: "red",
+    });
+  } finally {
+    isSubmittingRef.current = false;
+    setIsSubmitting(false);
+    setIsLoading(false);
+  }
+};
 
   const handleVanFareSubmit = () => {
     if (!formValues.paymentDate) {
@@ -576,9 +688,19 @@ const FeeRecordSection = (props: {
             >
               Cancel
             </Button>
-            <Button radius={10} onClick={handleSubmit} type="submit">
+            {/* <Button radius={10} onClick={handleSubmit} type="submit">
               Payment
-            </Button>
+            </Button> */}
+          <Button
+  radius={10}
+  onClick={handleSubmit}
+  type="button"
+  loading={isSubmitting}
+  disabled={isSubmitting}
+>
+  {isSubmitting ? "Processing..." : "Payment"}
+</Button>
+
             <Button
               color="red"
               radius={10}

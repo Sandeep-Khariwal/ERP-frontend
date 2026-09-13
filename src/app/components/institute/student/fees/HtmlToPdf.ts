@@ -28,6 +28,7 @@ export function createReceiptPdf(
     sgst: number;
     cgst: number;
   },
+  isAcademy: boolean = false,
 
   vanfareRecords: {
     amountPaid: number;
@@ -234,11 +235,20 @@ export function createReceiptPdf(
       .sig-line { border-top: 1px solid #000; font-weight: 700; font-size: 9px; padding-top: 2px; }
     </style>
   </head>
+
   <body>
-    ${renderReceiptCard('Accountant Copy')}
-    <div class="receipt-divider"></div>
-    ${renderReceiptCard('Parent Copy')}
-  </body>
+  ${renderReceiptCard('Accountant Copy')}
+
+  ${
+    isAcademy
+      ? ""
+      : `
+        <div class="receipt-divider"></div>
+        ${renderReceiptCard('Parent Copy')}
+      `
+  }
+</body>
+
   </html>
   `;
 }
@@ -266,7 +276,8 @@ export function createFullFeeOverviewPdf(
     amountPaid: number;
     totalAmount: number;
     name: string;
-  }[] = []
+  }[] = [],
+    isAcademy: boolean = false
 ) {
   const totalFeeWithGst = paymentRecords.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
   const totalPaid = paymentRecords.reduce((sum, r) => sum + (r.amountPaid || 0), 0);
@@ -411,7 +422,11 @@ export function createFullFeeOverviewPdf(
   <head>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    @page { size: A4 portrait; margin: 6mm; }
+@page {
+  size: ${isAcademy ? "A5" : "A4"} portrait;
+  margin: ${isAcademy ? "5mm" : "6mm"};
+}
+
     body { font-family: 'Inter', sans-serif; margin: 0; padding: 3mm; color: #333; line-height: 1.3; font-size: 10px; }
     .header-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
     .logo { height: 60px; width: auto; }
@@ -437,11 +452,17 @@ export function createFullFeeOverviewPdf(
     .receipt-divider{ border-top:1px dashed #000; margin:3px 0; }
   </style>
   </head>
-  <body>
-    ${renderOverviewCard('Accountant Copy')}
-    <div class="receipt-divider"></div>
-    ${renderOverviewCard('Parent Copy')}
-  </body>
+${renderOverviewCard('Accountant Copy')}
+
+${
+  isAcademy
+    ? ""
+    : `
+      <div class="receipt-divider"></div>
+      ${renderOverviewCard('Parent Copy')}
+    `
+}
+
   </html>
   `;
 }

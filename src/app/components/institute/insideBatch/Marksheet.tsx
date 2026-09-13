@@ -55,6 +55,8 @@ const Marksheet = (props: {
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
+  console.log("institye :", institute);
+  
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
   const [batchStudents, setBatchStudents] = useState<
     { _id: string; name: string; rollNumber: number }[]
@@ -114,6 +116,8 @@ const Marksheet = (props: {
     //get all subjects
     GetAllStudentsFromBatch(props.batchId)
       .then((x: any) => {
+        console.log("student :",x);
+        
         const batchStudents = x.students.students.map((st: any) => {
           return {
             _id: st._id,
@@ -758,6 +762,8 @@ const Marksheet = (props: {
 
                               GetStudentDetail(item.student._id)
                                 .then(async (res: any) => {
+                                  console.log("detail :", res);
+                                  
                                   const student = res.student;
 
                                   const base64Photo = await getBase64Image(
