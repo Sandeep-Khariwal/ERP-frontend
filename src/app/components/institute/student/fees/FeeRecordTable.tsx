@@ -83,6 +83,9 @@ const FeeRecordTable = (props: {
     (state: any) => state.instituteSlice.instituteDetails,
   );
 
+  console.log("fees details :",  instituteDetails);
+
+
   const convertSinglePaymentPdf = (installment: any, payment: any) => {
     setisLoading(true);
 
@@ -181,6 +184,7 @@ const FeeRecordTable = (props: {
           base64Signature,
           totalRemaining,
           gst,
+           instituteDetails?.isAcadmy === true,
         );
 
         const printWindow = window.open("", "_blank");
@@ -288,6 +292,7 @@ const FeeRecordTable = (props: {
           base64Signature,
           totalRemaining,
           gst,
+           instituteDetails?.isAcadmy === true,
         );
 
         const printWindow = window.open("", "_blank");

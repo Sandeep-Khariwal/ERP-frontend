@@ -833,6 +833,8 @@ interface Institute {
   _id: string;
   name: string;
   address: string;
+  logo?: string;
+signature?: string;
 }
 
 interface Teacher {
@@ -1135,7 +1137,8 @@ const TeacherProfile = (props: {
           </Tabs.Panel>
           <Tabs.Panel value="history">
             <div style={{ padding: "24px" }}>
-              <SalaryCard teacherId={teacher._id} />
+              <SalaryCard teacherId={teacher._id}  instituteId={teacher.instituteId._id} teacherName={teacher.name}   instituteLogo={teacher.instituteId?.logo}
+  instituteSignature={teacher.instituteId?.signature} />
             </div>
           </Tabs.Panel>
         </Tabs>
