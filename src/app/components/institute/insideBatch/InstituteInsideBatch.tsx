@@ -39,15 +39,21 @@ import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 // Lazily loaded — each of these is only ever shown for one active tab at a
 // time, so there's no reason to ship all of their code (and their heavy
 // dependencies like PDF/QR generation, charts, etc.) in the initial bundle.
-const Tests = dynamic(() => import("./test/Tests"));
-const Marksheet = dynamic(() => import("./Marksheet"));
-const DiaryPage = dynamic(() => import("./DiaryPage"));
-const StudyMaterialPage = dynamic(() => import("./StudyMaterialPage"));
-const SessionsPage = dynamic(() => import("./SessionsPage"));
-const GalleryPage = dynamic(() => import("./GalleryPage"));
-const ExaminationPage = dynamic(() => import("./ExaminationPage"));
-const MeetingsPage = dynamic(() => import("../../meeting/MeetingPage"));
-const TimetablePage = dynamic(() => import("./timetable/TimeTablePage"));
+const tabLoading = () => (
+  <Flex justify="center" align="center" mih={300}>
+    <LoadingOverlay visible overlayProps={{ blur: 1 }} />
+  </Flex>
+);
+
+const Tests = dynamic(() => import("./test/Tests"), { loading: tabLoading });
+const Marksheet = dynamic(() => import("./Marksheet"), { loading: tabLoading });
+const DiaryPage = dynamic(() => import("./DiaryPage"), { loading: tabLoading });
+const StudyMaterialPage = dynamic(() => import("./StudyMaterialPage"), { loading: tabLoading });
+const SessionsPage = dynamic(() => import("./SessionsPage"), { loading: tabLoading });
+const GalleryPage = dynamic(() => import("./GalleryPage"), { loading: tabLoading });
+const ExaminationPage = dynamic(() => import("./ExaminationPage"), { loading: tabLoading });
+const MeetingsPage = dynamic(() => import("../../meeting/MeetingPage"), { loading: tabLoading });
+const TimetablePage = dynamic(() => import("./timetable/TimeTablePage"), { loading: tabLoading });
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -160,22 +166,34 @@ export function InstituteInsideBatch(props: {
   useEffect(() => {
     if (!props.batchId) return;
 
-    GetAllTeachersFromBatch(props.batchId)
-      .then((res: any) => {
-        const firstTeacher = res?.teachers?.[0];
+    // `teacherData` here is only ever consumed by the Time Table and
+    // Assignment tabs (see props passed to TimetablePage / MeetingsPage
+    // below) — both lazily loaded. Previously this fetched the entire
+    // teacher list on every batch page load regardless of which tab was
+    // open. Now it only fetches when one of those tabs is actually
+    // visited, and only once (guarded by teacherData._id already being
+    // set) rather than refetching every time the tab is revisited.
+    const needsTeacherData =
+      activeTab === Tabs.TIME_TABLE || activeTab === Tabs.ASSIGNMENT;
 
-        if (firstTeacher) {
-          settTeacherData({
-            _id: firstTeacher._id,
-            name: firstTeacher.name,
-            phoneNumber: firstTeacher.phoneNumber,
-            subjects: firstTeacher.subjects || [],
-          });
-        }
-      })
-      .catch((err) => {
-        console.log("Teacher Fetch Error:", err);
-      });
+    if (needsTeacherData && !teacherData._id) {
+      GetAllTeachersFromBatch(props.batchId)
+        .then((res: any) => {
+          const firstTeacher = res?.teachers?.[0];
+
+          if (firstTeacher) {
+            settTeacherData({
+              _id: firstTeacher._id,
+              name: firstTeacher.name,
+              phoneNumber: firstTeacher.phoneNumber,
+              subjects: firstTeacher.subjects || [],
+            });
+          }
+        })
+        .catch((err) => {
+          console.log("Teacher Fetch Error:", err);
+        });
+    }
 
     if (props.subjects?.length) return;
 
@@ -184,7 +202,7 @@ export function InstituteInsideBatch(props: {
         setSubject(res.subjects.subjects);
       })
       .catch((e: any) => {});
-  }, [props.batchId]);
+  }, [props.batchId, activeTab]);
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [students, setStudents] = useState<StudentsDataWithBatch[]>([]);

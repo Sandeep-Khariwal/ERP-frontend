@@ -108,9 +108,6 @@ const Marksheet = (props: {
     }[]
   >([]);
 
-  console.log("allMarksheet : ",allMarksheet);
-  
-
   useEffect(() => {
     //get all subjects
     GetAllStudentsFromBatch(props.batchId)

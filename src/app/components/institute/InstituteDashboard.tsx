@@ -20,7 +20,7 @@ import {
   UserType,
 } from "../dashboard/InstituteBatchesSection";
 import { useMediaQuery } from "@mantine/hooks";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CreateBatchAndSubjects,
   EditBatchAndSubjects,
@@ -192,8 +192,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             name: b.name,
             subjects: b.subjects,
             optionalSubjects: b.optionalSubjects,
-            noOfTeachers: b.teachers.length,
-            noOfStudents: b.students.length,
+            noOfTeachers: b.teachersCount,
+            noOfStudents: b.studentsCount,
             firstThreeTeachers: b.teachers.slice(0, 2),
             firstThreeStudents: b.students.slice(0, 2),
           };
@@ -345,30 +345,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const filteredOptionalSubjects = subjectOptions.filter(
     (sub) => !selectedSubjects.includes(sub.value),
   );
-const filteredBatches = useMemo(() => {
-  const search = batchSearch.trim().toLowerCase();
 
-  return batches
-    .filter((batch) =>
-      (batch?.name || "").toLowerCase().includes(search)
-    )
-    .map((batch) => ({
-      id: batch?.id || "",
-      name: batch?.name || "",
-      subjects: batch?.subjects || [],
-      noOfTeachers: batch?.noOfTeachers || 0,
-      noOfStudents: batch?.noOfStudents || 0,
-      firstThreeStudents: batch?.firstThreeStudents || [],
-      firstThreeTeachers: batch?.firstThreeTeachers || [],
-    }));
-}, [batches, batchSearch]);
-
-const allBatches = useMemo(() => {
-  return batches.map((batch) => ({
-    id: batch?.id || "",
-    name: batch?.name || "",
-  }));
-}, [batches]);
   return (
     <>
       <Notifications />
@@ -735,27 +712,25 @@ const allBatches = useMemo(() => {
             mb={isMd ? 100 : 0}
           >
             <InstituteBatchesSection
-              // batches={batches
-              //   .filter((batch: any) =>
-              //     (batch?.name || "")
-              //       .toLowerCase()
-              //       .includes(batchSearch.trim().toLowerCase()),
-              //   )
-              //   .map((batch: any) => ({
-              //     id: batch?.id || "",
-              //     name: batch?.name || "",
-              //     subjects: batch?.subjects || [],
-              //     noOfTeachers: batch?.noOfTeachers || 0,
-              //     noOfStudents: batch?.noOfStudents || 0,
-              //     firstThreeStudents: batch?.firstThreeStudents || [],
-              //     firstThreeTeachers: batch?.firstThreeTeachers || [],
-              //   }))}
-              // allBatches={batches.map((batch: any) => ({
-              //   id: batch?.id || "",
-              //   name: batch?.name || "",
-              // }))}
-                batches={filteredBatches}
-  allBatches={allBatches}
+              batches={batches
+                .filter((batch: any) =>
+                  (batch?.name || "")
+                    .toLowerCase()
+                    .includes(batchSearch.trim().toLowerCase()),
+                )
+                .map((batch: any) => ({
+                  id: batch?.id || "",
+                  name: batch?.name || "",
+                  subjects: batch?.subjects || [],
+                  noOfTeachers: batch?.noOfTeachers || 0,
+                  noOfStudents: batch?.noOfStudents || 0,
+                  firstThreeStudents: batch?.firstThreeStudents || [],
+                  firstThreeTeachers: batch?.firstThreeTeachers || [],
+                }))}
+              allBatches={batches.map((batch: any) => ({
+                id: batch?.id || "",
+                name: batch?.name || "",
+              }))}
               showAddBatch={true}
               userType={2}
               setDeleteBatchId={(val: string) => {

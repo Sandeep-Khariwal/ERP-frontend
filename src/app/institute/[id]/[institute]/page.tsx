@@ -19,21 +19,33 @@ import { useEffect, useState } from "react";
 // Lazily loaded — only the active tab is ever visible, so none of these
 // (and their heavy dependencies, e.g. charting/marketing SDKs) need to be
 // part of the JS that ships before the user has even picked a tab.
-const InstituteDashboard = dynamic(() =>
-  import("@/app/components/institute/InstituteDashboard").then((m) => m.InstituteDashboard),
+const tabLoading = () => (
+  <Flex justify="center" align="center" mih={400}>
+    <LoadingOverlay visible overlayProps={{ blur: 1 }} />
+  </Flex>
 );
-const InstituteStudents = dynamic(() =>
-  import("@/app/components/institute/InstituteStudents").then((m) => m.InstituteStudents),
+
+const InstituteDashboard = dynamic(
+  () =>
+    import("@/app/components/institute/InstituteDashboard").then((m) => m.InstituteDashboard),
+  { loading: tabLoading },
 );
-const InstituteTeachers = dynamic(() =>
-  import("@/app/components/institute/InstituteTeacher").then((m) => m.InstituteTeachers),
+const InstituteStudents = dynamic(
+  () =>
+    import("@/app/components/institute/InstituteStudents").then((m) => m.InstituteStudents),
+  { loading: tabLoading },
 );
-const InstituteEarnings = dynamic(() => import("@/app/components/institute/student/earnings/InstituteEarnings"));
-const InstituteExpanse = dynamic(() => import("@/app/components/institute/student/expense/InstituteExpense"));
-const TransportPage = dynamic(() => import("@/app/components/institute/transport/TransportPage"));
-const IntegrationsPage = dynamic(() => import("@/app/components/marketing/meta/IntegrationPage"));
-const LeadsPage = dynamic(() => import("@/app/components/marketing/meta/LeadsDashboard"));
-const WhatsAppPage = dynamic(() => import("@/app/components/marketing/whatsapp/WhatsappLeads"));
+const InstituteTeachers = dynamic(
+  () =>
+    import("@/app/components/institute/InstituteTeacher").then((m) => m.InstituteTeachers),
+  { loading: tabLoading },
+);
+const InstituteEarnings = dynamic(() => import("@/app/components/institute/student/earnings/InstituteEarnings"), { loading: tabLoading });
+const InstituteExpanse = dynamic(() => import("@/app/components/institute/student/expense/InstituteExpense"), { loading: tabLoading });
+const TransportPage = dynamic(() => import("@/app/components/institute/transport/TransportPage"), { loading: tabLoading });
+const IntegrationsPage = dynamic(() => import("@/app/components/marketing/meta/IntegrationPage"), { loading: tabLoading });
+const LeadsPage = dynamic(() => import("@/app/components/marketing/meta/LeadsDashboard"), { loading: tabLoading });
+const WhatsAppPage = dynamic(() => import("@/app/components/marketing/whatsapp/WhatsappLeads"), { loading: tabLoading });
 
 const dashboard = () => {
 
@@ -50,12 +62,6 @@ const dashboard = () => {
 
   const tabQuery = searchParams?.get("tab") as Tabs | null;
   const selectedTab = tabQuery && Object.values(Tabs).includes(tabQuery) ? tabQuery : Tabs.DASHBOARD;
-
-  const handleSelectTab = (val: Tabs) => {
-    const newParams = new URLSearchParams(searchParams?.toString());
-    newParams.set("tab", val);
-    navigation.push(`${pathname}?${newParams.toString()}`);
-  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -101,6 +107,12 @@ const dashboard = () => {
         setIsLoading(false);
       });
   }, []);
+
+  const handleSelectTab = (val: Tabs) => {
+    const newParams = new URLSearchParams(searchParams?.toString());
+    newParams.set("tab", val);
+    navigation.push(`${pathname}?${newParams.toString()}`);
+  };
 
   const [opened, { toggle }] = useDisclosure();
 
