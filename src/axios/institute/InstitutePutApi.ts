@@ -58,6 +58,11 @@ export function updateschooldetails(
     email: string;
     institutePhoneNumber: string;
     address: string;
+       gst?: {
+      number?: string;
+      sgst?: number;
+      cgst?: number;
+    };
   },
 ) {
   return new Promise((resolve, reject) => {

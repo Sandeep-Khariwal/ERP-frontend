@@ -225,88 +225,6 @@ useEffect(() => {
 }, [props.instituteId]);
 
 
-  // PDF Download Handler
-//   const handleDownloadSalarySlip = async (salaryItem: Salary) => {
-//     try {
-//       setDownloadingId(salaryItem._id || salaryItem.month);
-
-//       // const base64Logo = institute?.logo ? await getBase64Image(institute.logo) : "";
-//       // const base64Signature = institute?.signature ? await getBase64Image(institute.signature) : "";
-//       const base64Logo = props.instituteLogo
-//   ? await getBase64Image(props.instituteLogo)
-//   : "";
-
-// const base64Signature = props.instituteSignature
-//   ? await getBase64Image(props.instituteSignature)
-//   : "";
-
-//       const gstNo = typeof institute?.gst === "object"
-//         ? (institute?.gst?.gstNo || "N/A")
-//         : (institute?.gst || "N/A");
-//    console.log("========== SALARY SLIP DEBUG ==========");
-
-   
-//  console.log("🖼️ Original Logo URL:", props.instituteLogo);
-// console.log("🖼️ Base64 Logo:", base64Logo);
-
-// console.log("✍️ Original Signature URL:", props.instituteSignature);
-// console.log("✍️ Base64 Signature:", base64Signature);
-
-//     console.log("📦 Complete Salary Item:", salaryItem);
-
-//     console.log("========================================");
-//       const html = createSalarySlipPdf({
-//         instituteName: institute?.name || "Institute Name",
-//         instituteAddress: institute?.address || "",
-//         institutePhone: institute?.phoneNumber || "",
-//         instituteEmail: institute?.email || "",
-//         instituteLogo: base64Logo || institute?.logo,
-//         instituteSignature: base64Signature || institute?.signature,
-//         gstNo: gstNo,
-
-//       teacherName: props.teacherName || "N/A",
-//         teacherId: salaryItem.teacherId || props.teacherId,
-//         designation: props.designation || "Teacher",
-//         bankAccountNo: props.bankAccountNo || "N/A",
-//         payableDays: props.payableDays || 30,
-
-//         salaryMonth: salaryItem.month,
-//         salaryDate: salaryItem.salleryDate || salaryItem.createdAt,
-
-//         baseSalary: salaryItem.baseSalary,
-//         netSalary: salaryItem.netSalary,
-//         amountPaid: salaryItem.amountPaid,
-
-//         pfDeduction: salaryItem.deductions?.pf || 0,
-//         esiDeduction: salaryItem.deductions?.esi || 0,
-//         otherDeduction: salaryItem.deductions?.otherDeductions || 0,
-
-//         salleryStatus: salaryItem.salleryStatus,
-//         salleryMode: salaryItem.salleryMode,
-//         transactionReference: salaryItem.transactionReference,
-//       });
-
-//       const printWindow = window.open("", "_blank");
-
-//       if (printWindow) {
-//         printWindow.document.open();
-//         printWindow.document.write(html);
-//         printWindow.document.close();
-
-//         setTimeout(() => {
-//           printWindow.focus();
-//           printWindow.print();
-//           printWindow.onafterprint = () => {
-//             printWindow.close();
-//           };
-//         }, 500);
-//       }
-//     } catch (error) {
-//       console.error("Error generating Salary Slip PDF:", error);
-//     } finally {
-//       setDownloadingId(null);
-//     }
-//   };
 
 const handleDownloadSalarySlip = async (salaryItem: Salary) => {
   try {
@@ -334,10 +252,10 @@ const handleDownloadSalarySlip = async (salaryItem: Salary) => {
     // GST
     // -----------------------------------
 
-    const gstNo =
-      typeof instituteData?.gst === "object"
-        ? instituteData?.gst?.gstNo || "N/A"
-        : instituteData?.gst || "N/A";
+ const gstNo =
+  typeof instituteData?.gst === "object"
+    ? instituteData?.gst?.number || "N/A"
+    : instituteData?.gst || "N/A";
 
     // -----------------------------------
     // Debug

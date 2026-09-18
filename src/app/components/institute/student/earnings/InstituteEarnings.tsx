@@ -38,7 +38,7 @@ import {
 
 import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { GetAllEarnings } from "@/axios/institute/InstituteGetApi";
+import { GetAllEarnings, GetDayWiseEarnings } from "@/axios/institute/InstituteGetApi";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import EarningsSummary from "./FilterFeesData";
 
@@ -56,25 +56,76 @@ import EarningsSummary from "./FilterFeesData";
 export default function InstituteEarnings() {
   const isMobile = useMediaQuery("(max-width: 968px)");
   const [earningsData, setEarningsData] = useState<any>(null);
+  const [thisMonthEarnings, setThisMonthEarnings] = useState<number>(0);
   const [showAllDue, setShowAllDue] = useState(false);
   const [showAllBatch, setShowAllBatch] = useState(false);
   const [upcomingPage, setUpcomingPage] = useState(1);
+
 const itemsPerPage = 10;
    const institute = useAppSelector(
       (state: any) => state.instituteSlice.instituteDetails,
     );
 
   // ================= API =================
+  // useEffect(() => {
+  //   GetAllEarnings(institute._id)
+  //     .then((res: any) => {
+  //       console.log("API RESPONSE 👉", res);
+  //       setEarningsData(res);
+  //     })
+  //     .catch((err) => {
+  //       console.error("API ERROR ❌", err);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    GetAllEarnings(institute._id)
-      .then((res: any) => {
-        console.log("API RESPONSE 👉", res);
-        setEarningsData(res);
-      })
-      .catch((err) => {
-        console.error("API ERROR ❌", err);
-      });
-  }, []);
+  if (!institute?._id) return;
+
+  // ================= ALL EARNINGS =================
+  GetAllEarnings(institute._id)
+    .then((res: any) => {
+      console.log("ALL EARNINGS API RESPONSE 👉", res);
+      setEarningsData(res);
+    })
+    .catch((err) => {
+      console.error("ALL EARNINGS API ERROR ❌", err);
+    });
+
+  // ================= THIS MONTH EARNINGS =================
+  const fromDate = new Date();
+  fromDate.setDate(1);
+
+  const toDate = new Date();
+
+  const formattedFromDate = fromDate.toISOString().split("T")[0];
+  const formattedToDate = toDate.toISOString().split("T")[0];
+
+  console.log("MONTH FROM 👉", formattedFromDate);
+  console.log("MONTH TO 👉", formattedToDate);
+
+  GetDayWiseEarnings(
+    institute._id,
+    formattedFromDate,
+    formattedToDate
+  )
+    .then((res: any) => {
+      console.log("THIS MONTH API RESPONSE 👉", res);
+
+      const total = (res.data || []).reduce(
+        (sum: number, item: any) =>
+          sum + Number(item.paidFees || 0),
+        0
+      );
+
+      console.log("THIS MONTH EARNING 👉", total);
+
+      setThisMonthEarnings(total);
+    })
+    .catch((err: any) => {
+      console.error("THIS MONTH API ERROR ❌", err);
+      setThisMonthEarnings(0);
+    });
+}, [institute?._id]);
 
   // ================= SAFE DATA =================
   const apiData = earningsData?.data || {};
@@ -92,10 +143,30 @@ const itemsPerPage = 10;
     0
   );
 
-  const thisMonthEarnings = currentMonthRecords.reduce(
-    (sum: number, item: any) => sum + (item.amountPaid || 0),
-    0
-  );
+  // const thisMonthEarnings = currentMonthRecords.reduce(
+  //   (sum: number, item: any) => sum + (item.amountPaid || 0),
+  //   0
+  // );
+  // console.log("month earning",  thisMonthEarnings );
+  
+//   const now = new Date();
+
+// const thisMonthEarnings = allRecords.reduce(
+//   (sum: number, item: any) => {
+//     const paymentDate = new Date(item.createdAt);
+
+//     const isCurrentMonth =
+//       paymentDate.getMonth() === now.getMonth() &&
+//       paymentDate.getFullYear() === now.getFullYear();
+
+//     return isCurrentMonth
+//       ? sum + Number(item.amountPaid || 0)
+//       : sum;
+//   },
+//   0
+// );
+
+// console.log("THIS MONTH EARNING 👉", thisMonthEarnings);
 
   const todayEarnings = todayRecords.reduce(
     (sum: number, item: any) => sum + (item.amountPaid || 0),

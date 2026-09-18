@@ -98,6 +98,8 @@ export const DesktopNavbar = (props: {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [gstNumber, setGstNumber] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [cgst, setCgst] = useState<number>(0);
@@ -105,47 +107,111 @@ export const DesktopNavbar = (props: {
 
   const [transportUploadModal, setTransportUploadModal] = useState(false);
 
+  // const handleUpdateSchool = () => {
+  //   // ❌ agar kuch bhi change nahi hua
+  //   if (
+  //     schoolName === institute?.name &&
+  //     email === institute?.email &&
+  //     phone === institute?.PhoneNumber &&
+  //     address === institute?.address
+  //   ) {
+  //     ErrorNotification("No changes made!");
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+
+  //   updateschooldetails(institute?._id, {
+  //     name: schoolName,
+  //     email: email,
+  //     institutePhoneNumber: phone,
+  //     address: address,
+  //       gst: {
+  //   number: gstNumber,
+  // },
+  //   })
+  //     .then((res: any) => {
+  //       console.log("update school :", res);
+        
+  //       SuccessNotification("Changes Updated Successfully ✅");
+  //       dispatch(
+  //         setDetails({
+  //           ...institute,
+  //           name: schoolName,
+  //           email: email,
+  //           phoneNumber: phone,
+  //           address: address,
+  //            gst: {
+  //     ...institute?.gst,
+  //     number: gstNumber,
+  //   },
+  //         }),
+  //       );
+
+  //       setIsLoading(false);
+  //       setSettingsOpened(false); // modal close
+  //     })
+  //     .catch((err: any) => {
+  //       console.log(err);
+  //       ErrorNotification("Something went wrong ❌");
+  //       setIsLoading(false);
+  //     });
+  // };
   const handleUpdateSchool = () => {
-    // ❌ agar kuch bhi change nahi hua
-    if (
-      schoolName === institute?.name &&
-      email === institute?.email &&
-      phone === institute?.PhoneNumber &&
-      address === institute?.address
-    ) {
-      ErrorNotification("No changes made!");
-      return;
-    }
+  // ❌ agar kuch bhi change nahi hua
+  if (
+    schoolName === institute?.name &&
+    email === institute?.email &&
+    phone === institute?.PhoneNumber &&
+    address === institute?.address
+  ) {
+    console.log("❌ NO CHANGES MADE");
+    return;
+  }
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    updateschooldetails(institute?._id, {
-      name: schoolName,
-      email: email,
-      institutePhoneNumber: phone,
-      address: address,
-    })
-      .then((res: any) => {
-        SuccessNotification("Changes Updated Successfully ✅");
-        dispatch(
-          setDetails({
-            ...institute,
-            name: schoolName,
-            email: email,
-            phoneNumber: phone,
-            address: address,
-          }),
-        );
-
-        setIsLoading(false);
-        setSettingsOpened(false); // modal close
-      })
-      .catch((err: any) => {
-        console.log(err);
-        ErrorNotification("Something went wrong ❌");
-        setIsLoading(false);
-      });
+  // 3️⃣ API ko exactly kya payload bhej rahe hain?
+  const payload = {
+    name: schoolName,
+    email: email,
+    institutePhoneNumber: phone,
+    address: address,
+    gst: {
+      number: gstNumber,
+    },
   };
+
+  updateschooldetails(institute?._id, payload)
+    .then((res: any) => {
+    console.log("update gst :", res);
+    
+      SuccessNotification("Changes Updated Successfully ✅");
+
+      dispatch(
+        setDetails({
+          ...institute,
+          name: schoolName,
+          email: email,
+          phoneNumber: phone,
+          address: address,
+          gst: {
+            ...institute?.gst,
+            number: gstNumber,
+          },
+        }),
+      );
+
+      setIsLoading(false);
+      setSettingsOpened(false);
+    })
+    .catch((err: any) => {
+
+      ErrorNotification("Something went wrong ❌");
+      setIsLoading(false);
+    });
+};
+
 
   useEffect(() => {
     if (institute) {
@@ -153,6 +219,7 @@ export const DesktopNavbar = (props: {
       setEmail(institute.email || "");
       setPhone(institute.phoneNumber || "");
       setAddress(institute.address || "");
+        setGstNumber(institute?.gst?.number || "");
       setCgst(institute?.gst?.cgst ?? 0);
       setSgst(institute?.gst?.sgst ?? 0);
     }
@@ -440,6 +507,15 @@ export const DesktopNavbar = (props: {
                   radius="md"
                   onChange={(e) => setPhone(e.currentTarget.value)}
                 />
+
+                <TextInput
+  label="GST Number"
+  placeholder="Enter GST number"
+  value={gstNumber}
+  radius="md"
+  onChange={(e) => setGstNumber(e.currentTarget.value.toUpperCase())}
+/>
+
 
                 <Textarea
                   label="Change Address"
