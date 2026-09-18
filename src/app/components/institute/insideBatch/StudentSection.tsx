@@ -4,6 +4,7 @@
 import { GetAllStudentsFromBatch } from "@/axios/institute/InstituteGetApi";
 import {
   Badge,
+  Box,
   Button,
   Flex,
   LoadingOverlay,
@@ -14,7 +15,7 @@ import {
   Text,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
+import { IconDotsVertical, IconMessage, IconUsers } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { Screen } from "./InstituteInsideBatch";
 import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
@@ -199,7 +200,43 @@ const StudentSection = (props: {
   return (
     <Stack w={"100%"} pb={100}>
       <LoadingOverlay visible={isLoading} />
+      {/* Header styled to match the Test section's master container. */}
+      <Box
+        p={20}
+        style={{
+          borderRadius: "16px",
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
+        }}
+      >
+        <Flex align="center" gap={14}>
+          <Flex
+            align="center"
+            justify="center"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "12px",
+              background: "#FFFFFF",
+              flexShrink: 0,
+            }}
+          >
+            <IconUsers size={22} color="#2F6FED" />
+          </Flex>
+          <Stack gap={2} style={{ minWidth: 0 }}>
+            <Text fz={isMd ? 18 : 22} fw={700} c="#1B2559">
+              Students
+            </Text>
+            <Text fz={13} c="#5B6B8C">
+              Manage students enrolled in this batch.
+            </Text>
+          </Stack>
+        </Flex>
+      </Box>
       {students.length > 0 ? (
+        // Wrapping the table so it scrolls within its own box on narrow
+        // screens instead of forcing the whole page to scroll horizontally.
+        <Box style={{ width: "100%", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         <Table
           w={"100%"}
           mt={8}
@@ -211,6 +248,7 @@ const StudentSection = (props: {
             border: "1px solid #EEF1F6",
             borderRadius: "1rem",
             overflow: "hidden",
+            minWidth: isMd ? 560 : undefined,
           }}
         >
           <Table.Thead
@@ -461,6 +499,7 @@ const StudentSection = (props: {
             })}
           </tbody>
         </Table>
+        </Box>
       ) : (
         <Flex w={"100%"} bg={"white"} mih={"60vh"} align={"center"}>
           <Stack

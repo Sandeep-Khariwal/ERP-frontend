@@ -696,37 +696,46 @@ export default function DiaryPage(props: {
       }}
       p={isMobile ? "sm" : "xl"}
     >
-      {/* Header */}
-      <Paper
-        radius="xl"
-        p={isMobile ? "md" : "lg"}
+      {/* Header — restyled to match the Test section's master container:
+          light-blue tinted box instead of a plain white bordered panel. */}
+      <Box
+        p={20}
         mb="lg"
-        withBorder
-        style={{ borderColor: "#e9ecef", background: "#fff" }}
+        style={{
+          borderRadius: "16px",
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
+        }}
       >
         <Flex
           justify="space-between"
           align={isMobile ? "flex-start" : "center"}
           direction={isMobile ? "column" : "row"}
-          gap={isMobile ? "sm" : 0}
+          gap={isMobile ? "sm" : 16}
         >
-          <Stack gap={2}>
-            <Group gap="xs">
-              <ThemeIcon
-                size={36}
-                radius="xl"
-                style={{ background: "#2F6FED22" }}
-              >
-                <IconCalendar size={20} color="#2F6FED" />
-              </ThemeIcon>
-              <Title order={3} style={{ color: "#1a1a2e", fontWeight: 700 }}>
+          <Flex align="center" gap={14}>
+            <Flex
+              align="center"
+              justify="center"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "12px",
+                background: "#FFFFFF",
+                flexShrink: 0,
+              }}
+            >
+              <IconCalendar size={22} color="#2F6FED" />
+            </Flex>
+            <Stack gap={2} style={{ minWidth: 0 }}>
+              <Text fz={22} fw={700} c="#1B2559">
                 Diary
-              </Title>
-            </Group>
-            <Text size="sm" c="dimmed" ml={44}>
-              View and manage daily diary entries for all subjects.
-            </Text>
-          </Stack>
+              </Text>
+              <Text fz={13} c="#5B6B8C">
+                View and manage daily diary entries for all subjects.
+              </Text>
+            </Stack>
+          </Flex>
 
           <Group gap="sm" style={{ width: isMobile ? "100%" : "auto" }}>
             {/* Date Picker */}
@@ -742,7 +751,7 @@ export default function DiaryPage(props: {
                   color: "#2F6FED",
                   fontWeight: 600,
                   paddingRight: 36,
-                  background: "#EAF1FF",
+                  background: "#FFFFFF",
                   minWidth: isMobile ? "auto" : 160,
                   cursor: "pointer",
                 },
@@ -752,10 +761,14 @@ export default function DiaryPage(props: {
 
             <Button
               leftSection={<IconPlus size={16} />}
-              radius="xl"
-              style={{
-                background: "linear-gradient(135deg, #2F6FED, #4F7CFB)",
-                flex: isMobile ? 1 : "unset",
+              radius={10}
+              styles={{
+                root: {
+                  background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                  border: 0,
+                  fontWeight: 600,
+                  flex: isMobile ? 1 : "unset",
+                },
               }}
               onClick={openAdd}
             >
@@ -763,7 +776,7 @@ export default function DiaryPage(props: {
             </Button>
           </Group>
         </Flex>
-      </Paper>
+      </Box>
 
       {/* Filters Row */}
 

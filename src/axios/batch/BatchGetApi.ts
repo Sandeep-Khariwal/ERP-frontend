@@ -1,4 +1,5 @@
 import ApiHelper from "../../ApiHelper";
+import { dedupeInFlightRequest } from "../requestDedupe";
 
 export function GetBatchOverview(id:string) {
   return new Promise((resolve, reject) => {
@@ -8,10 +9,14 @@ export function GetBatchOverview(id:string) {
   });
 }
 export function GetAllSubjectsFromBatch(id:string) {
-  return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/batch/getAllSubjectsFromBatch/${id}`)
-      .then((response) => resolve(response))
-      .catch((error: any) => reject(error));
+  // Called independently from 7+ places for the same batch — dedupe
+  // truly-simultaneous calls without caching stale data.
+  return dedupeInFlightRequest(`batch-subjects:${id}`, () => {
+    return new Promise((resolve, reject) => {
+      ApiHelper.get(`${process.env.URL}/api/v1/batch/getAllSubjectsFromBatch/${id}`)
+        .then((response) => resolve(response))
+        .catch((error: any) => reject(error));
+    });
   });
 }
 export function GetTopClassPerformedStudents(id:string) {

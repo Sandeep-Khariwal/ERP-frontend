@@ -181,7 +181,7 @@ export default function InstituteExpanse() {
                 console.log("Error fetching expenses:", err);
             });
 
-    }, [institute]);
+    }, [institute?._id]);
 
     return (
         <Container size="xl" py="md">

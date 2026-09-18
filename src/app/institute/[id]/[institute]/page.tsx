@@ -63,6 +63,12 @@ const dashboard = () => {
   const tabQuery = searchParams?.get("tab") as Tabs | null;
   const selectedTab = tabQuery && Object.values(Tabs).includes(tabQuery) ? tabQuery : Tabs.DASHBOARD;
 
+  const handleSelectTab = (val: Tabs) => {
+    const newParams = new URLSearchParams(searchParams?.toString());
+    newParams.set("tab", val);
+    navigation.push(`${pathname}?${newParams.toString()}`);
+  };
+
   useEffect(() => {
     setIsLoading(true);
     GetAccountByToken()
@@ -108,12 +114,6 @@ const dashboard = () => {
       });
   }, []);
 
-  const handleSelectTab = (val: Tabs) => {
-    const newParams = new URLSearchParams(searchParams?.toString());
-    newParams.set("tab", val);
-    navigation.push(`${pathname}?${newParams.toString()}`);
-  };
-
   const [opened, { toggle }] = useDisclosure();
 
   return (
@@ -122,7 +122,7 @@ const dashboard = () => {
       <AppShell
         header={{ height: isMd ? 60 : 0 }}
         navbar={{
-          width: isMd ? 80 : 260,
+          width: isMd ? 280 : 260,
           breakpoint: 'sm',
           collapsed: { mobile: !opened },
         }}
@@ -147,8 +147,11 @@ const dashboard = () => {
             />
           )}
           {isMd && (
+            // On mobile the navbar only ever renders as a full-width drawer
+            // (see collapsed.mobile above), so it must always show icon +
+            // label — never the icon-only "collapsed" rail state.
             <DesktopNavbar
-              isCollapsed={opened}
+              isCollapsed={false}
               onClickCollapse={toggle}
               onSelectTab={(val: Tabs) => {
                 handleSelectTab(val);

@@ -1,0 +1,50 @@
+/* Global baseline — layout/responsiveness only, no visual/theme changes.
+   This file was empty before; these rules only prevent horizontal overflow
+   and make the app respect the real device width. They don't override any
+   component colors, spacing, or typography. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Let mobile browsers use the real device width instead of falling back
+     to a ~980px virtual viewport and scaling everything down. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Guard rail: a flex/grid child with text content will refuse to shrink
+   below its content's intrinsic width unless told to, which is the classic
+   cause of cards/rows clipping or forcing horizontal scroll on narrow
+   screens. This resets that default without changing any explicit width
+   already set inline on a component. */
+#__next,
+main {
+  min-width: 0;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tables are a common source of horizontal overflow on mobile; let them
+   scroll within their own container instead of pushing the whole page
+   wider than the viewport. */
+.responsive-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}

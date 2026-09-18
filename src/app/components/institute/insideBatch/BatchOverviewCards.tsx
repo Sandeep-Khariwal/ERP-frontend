@@ -47,9 +47,9 @@ export function BatchOverviewCards(props: {
           radius={18}
           p={22}
           shadow="0px 6px 20px rgba(15,23,42,0.05)"
-          style={{ border: "1px solid #F1F4F9" }}
+          style={{ border: "1px solid #F1F4F9", overflow: "hidden", minWidth: 0 }}
         >
-          <Flex align={"center"} gap={16}>
+          <Flex align={"center"} gap={16} style={{ minWidth: 0 }}>
             <Flex
               align={"center"}
               justify={"center"}
@@ -64,7 +64,7 @@ export function BatchOverviewCards(props: {
             >
               {stat.icon}
             </Flex>
-            <Stack gap={4}>
+            <Stack gap={4} style={{ minWidth: 0, flex: 1 }}>
               <Text
                 fz={12}
                 fw={700}
@@ -73,7 +73,13 @@ export function BatchOverviewCards(props: {
               >
                 {stat.label}
               </Text>
-              <Text lh={1} fw={700} fz={"1.7rem"} c={"#1B2559"}>
+              <Text
+                lh={1.2}
+                fw={700}
+                fz={"clamp(1.25rem, 5vw, 1.7rem)"}
+                c={"#1B2559"}
+                style={{ wordBreak: "break-word" }}
+              >
                 {stat.value}
               </Text>
             </Stack>

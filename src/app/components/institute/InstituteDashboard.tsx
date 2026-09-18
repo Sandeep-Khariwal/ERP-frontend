@@ -122,10 +122,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   };
 
   useEffect(() => {
-    if (institute?._id!!) {
+    if (institute?._id) {
       getAllInstituteBatches();
     }
-  }, [institute]);
+  }, [institute?._id]);
 
   useEffect(() => {
     if (openAddBatchModal) {
@@ -141,7 +141,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         setNoticeCount(Array.isArray(list) ? list.length : 0);
       })
       .catch(() => {});
-  }, [institute]);
+  }, [institute?._id]);
 
   const [data, setData] = useState<{ value: string; label: string }[]>([
     { value: "Hindi", label: "Hindi" },

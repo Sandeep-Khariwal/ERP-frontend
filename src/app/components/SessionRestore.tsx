@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useAppDispatch } from "@/app/redux/redux.hooks";
 import { setDetails } from "@/app/redux/slices/instituteSlice";
 import { setTeacherDetails } from "@/app/redux/slices/teacherSlice";
@@ -23,11 +24,39 @@ import { LocalStorageKey } from "@/axios/LocalStorageUtility";
  *
  * Isse har page pe, chahe refresh ho ya naya tab, data automatically restore
  * ho jaata hai — manual navigation ki zaroorat nahi padti.
+ *
+ * PERFORMANCE NOTE: the dashboard routes below (/, /institute/*, /user/*,
+ * /teacher/*, /student/*) already call GetAccountByToken() themselves in
+ * their own useEffect, with their own 401/403/404 redirect handling — that
+ * page-level logic can't be removed without losing that redirect behavior.
+ * This component is mounted globally in the root layout, so without this
+ * check it was firing the *same* GetAccountByToken() call a second time,
+ * in parallel, on every one of those pages. We skip it there and only use
+ * it to restore session state on the other (non-dashboard) pages, where
+ * nothing else is already fetching this data.
  */
+const SELF_RESTORING_ROUTE_PREFIXES = [
+  "/institute",
+  "/user",
+  "/teacher",
+  "/student",
+];
+
 export default function SessionRestore() {
   const dispatch = useAppDispatch();
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Only read pathname at the moment this effect runs (see deps note
+    // below) — we only care about whichever route the app first loaded
+    // on, not every route the user navigates to afterwards.
+    const isSelfRestoringRoute =
+      pathname === "/" ||
+      SELF_RESTORING_ROUTE_PREFIXES.some((prefix) =>
+        pathname?.startsWith(prefix)
+      );
+    if (isSelfRestoringRoute) return;
+
     const token = localStorage.getItem(LocalStorageKey.Token);
 
     // Koi token hi nahi hai -> user login nahi hai, kuch mat karo
@@ -73,6 +102,11 @@ export default function SessionRestore() {
         // already LogOut() call kar dega, isliye yaha sirf log karo.
         console.log("SESSION RESTORE ERROR :", error?.response || error);
       });
+    // Deliberately NOT depending on `pathname` — this should only run
+    // once per full page load (matching its original behavior), using
+    // whatever route the app happened to load on, not re-run on every
+    // client-side navigation afterwards (that would add calls back).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   // Ye component kuch render nahi karta — sirf background me kaam karta hai

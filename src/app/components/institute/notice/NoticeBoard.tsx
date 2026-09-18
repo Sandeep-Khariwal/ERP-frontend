@@ -70,7 +70,7 @@ export default function NoticeBoard(props: { userType: string }) {
       form.setFieldValue("institute", institute._id!);
       fetchNotices();
     }
-  }, [institute]);
+  }, [institute?._id]);
 
   // Fetch notices
   const fetchNotices = async () => {

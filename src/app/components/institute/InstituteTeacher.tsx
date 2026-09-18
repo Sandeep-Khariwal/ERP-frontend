@@ -143,7 +143,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
         setNoticeCount(Array.isArray(list) ? list.length : 0);
       })
       .catch(() => {});
-  }, [institute]);
+  }, [institute?._id]);
 
   const getAllTeachers = () => {
     setIsLoading(true);

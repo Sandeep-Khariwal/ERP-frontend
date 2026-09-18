@@ -1,11 +1,12 @@
 "use client";
 
-import { Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Box, Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { BatchOverviewCards } from "./BatchOverviewCards";
 import { useMediaQuery } from "@mantine/hooks";
 import { GetBatchOverview } from "@/axios/batch/BatchGetApi";
 import TopClassPerformanceStudents from "./TopClassPerformanceStudents";
+import { IconLayoutDashboard } from "@tabler/icons-react";
 
 const OverView = (props: { batchId: string }) => {     
   const isMd = useMediaQuery(`(max-width: 968px)`);
@@ -40,25 +41,45 @@ const OverView = (props: { batchId: string }) => {
   return (
     <Stack w={"100%"} mt={20} p={15}>
       <LoadingOverlay visible={isLoading} />
-      <Stack
-        w={"100%"}
-        bg={"white"}
+      {/* Header styled to match the Test section's master container:
+          light-blue tinted box, white icon badge, title + subtitle. */}
+      <Box
         p={20}
         style={{
           borderRadius: "16px",
-          border: "1px solid #F1F4F9",
-          boxShadow: "0px 6px 20px rgba(15,23,42,0.05)",
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
         }}
       >
-        <Text fw={700} fz={isMd ? 18 : 22} c="#1B2559">
-          View your batch details here!
-        </Text>
-        <Flex c={"#8B96AD"}>
-          {subjectNames.map((s,i:number) => (
-            <Text key={i} >{s + ", "} </Text>
-          ))}
+        <Flex align="center" gap={14}>
+          <Flex
+            align="center"
+            justify="center"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "12px",
+              background: "#FFFFFF",
+              flexShrink: 0,
+            }}
+          >
+            <IconLayoutDashboard size={22} color="#2F6FED" />
+          </Flex>
+          <Stack gap={2} style={{ minWidth: 0 }}>
+            <Text fz={isMd ? 18 : 22} fw={700} c="#1B2559">
+              View your batch details here!
+            </Text>
+            <Flex c={"#5B6B8C"} wrap="wrap" gap={4} style={{ rowGap: 2 }}>
+              {subjectNames.map((s, i: number) => (
+                <Text key={i} fz={13}>
+                  {s}
+                  {i < subjectNames.length - 1 ? "," : ""}
+                </Text>
+              ))}
+            </Flex>
+          </Stack>
         </Flex>
-      </Stack>
+      </Box>
       <BatchOverviewCards
         totalStudents={totalStudents}
         totalTeachers={totalTeachers}

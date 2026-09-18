@@ -22,14 +22,22 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // TODO: once you know the domain your uploaded images/logos/gallery
-  // photos are served from (S3/Cloudinary/etc.), add it here so those can
-  // move from raw <img> tags to next/image (automatic AVIF/WebP + resizing):
-  // images: {
-  //   remotePatterns: [
-  //     { protocol: "https", hostname: "your-asset-domain.example.com" },
-  //   ],
-  // },
+  images: {
+    // Applies to every next/image regardless of source — serves modern
+    // formats automatically where the browser supports them.
+    formats: ["image/avif", "image/webp"],
+    // TODO: once you know the domain your uploaded images/logos/gallery
+    // photos are served from (S3/Cloudinary/etc.), add it here so those
+    // can move from raw <img> tags to next/image (automatic resizing +
+    // the formats above):
+    // remotePatterns: [
+    //   { protocol: "https", hostname: "your-asset-domain.example.com" },
+    // ],
+  },
+
+  // Gzip/Brotli-compress responses. Also the default in production, but
+  // set explicitly so it can't be silently disabled by a config merge.
+  compress: true,
 
   poweredByHeader: false,
 };

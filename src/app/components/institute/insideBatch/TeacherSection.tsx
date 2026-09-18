@@ -20,7 +20,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
+import { IconDotsVertical, IconMessage, IconChalkboard } from "@tabler/icons-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
 import {
@@ -234,11 +234,45 @@ const TeachersSection = (props: {
     <Stack style={{ overflowY: "visible" }}>
       <Notifications />
       <LoadingOverlay visible={isLoading} />
+      {/* Header styled to match the Test section's master container. */}
+      <Box
+        p={20}
+        style={{
+          borderRadius: "16px",
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
+        }}
+      >
+        <Flex align="center" gap={14}>
+          <Flex
+            align="center"
+            justify="center"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "12px",
+              background: "#FFFFFF",
+              flexShrink: 0,
+            }}
+          >
+            <IconChalkboard size={22} color="#2F6FED" />
+          </Flex>
+          <Stack gap={2} style={{ minWidth: 0 }}>
+            <Text fz={22} fw={700} c="#1B2559">
+              Teachers
+            </Text>
+            <Text fz={13} c="#5B6B8C">
+              Manage teachers assigned to this batch.
+            </Text>
+          </Stack>
+        </Flex>
+      </Box>
       <Box
         style={{
           borderRadius: "16px",
           border: "1px solid #F1F4F9",
-          overflow: "hidden",
+          overflow: "auto",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         <Table
@@ -246,6 +280,7 @@ const TeachersSection = (props: {
           horizontalSpacing="xl"
           bg={"white"}
           fz={15}
+          style={{ minWidth: 640 }}
         >
         <Table.Thead
           bg={"#F7F9FC"}

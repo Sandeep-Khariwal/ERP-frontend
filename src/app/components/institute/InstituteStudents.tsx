@@ -176,7 +176,7 @@ export const InstituteStudents = () => {
           setIsLoading(false);
         });
     }
-  }, [institute]);
+  }, [institute?._id]);
 
   useEffect(() => {
     if (selectedBatchId) {

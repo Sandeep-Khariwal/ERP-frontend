@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import ReactQueryProvider from "./react-query-provider";
 import "./globals.css";
 import "@mantine/core/styles.css";
@@ -12,6 +12,17 @@ import React from "react";
 import { ModalsProvider } from "@mantine/modals";
 import Script from "next/script";
 import SessionRestore from "./components/SessionRestore";
+
+// Explicit viewport config so mobile browsers always render the app at the
+// device's actual width instead of falling back to a desktop-width virtual
+// viewport (which is what causes the "page opens zoomed in, have to pinch
+// out" symptom on phones).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+};
 
 export const metadata: Metadata = {
   title: {

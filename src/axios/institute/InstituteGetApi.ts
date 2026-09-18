@@ -1,4 +1,5 @@
 import ApiHelper from "../../ApiHelper";
+import { dedupeInFlightRequest } from "../requestDedupe";
 
 
 
@@ -23,17 +24,25 @@ export function GetBatchFee(id: string) {
   });
 }
 export function GetAllStudentsFromBatch(id: string) {
-  return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/institute/getStudentsFromBatch/${id}`)
-      .then((response: any) => resolve(response))
-      .catch((error: any) => reject(error));
+  // Called independently by StudentSection, TakeAttendanceView and a
+  // couple of modals for the same batch — dedupe truly-simultaneous
+  // calls (e.g. switching tabs) without caching stale data.
+  return dedupeInFlightRequest(`batch-students:${id}`, () => {
+    return new Promise((resolve, reject) => {
+      ApiHelper.get(`${process.env.URL}/api/v1/institute/getStudentsFromBatch/${id}`)
+        .then((response: any) => resolve(response))
+        .catch((error: any) => reject(error));
+    });
   });
 }
 export function GetAllTeachersFromBatch(id: string) {
-  return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/institute/getTeachersFromBatch/${id}`)
-      .then((response: any) => resolve(response))
-      .catch((error: any) => reject(error));
+  // Same reasoning as GetAllStudentsFromBatch above.
+  return dedupeInFlightRequest(`batch-teachers:${id}`, () => {
+    return new Promise((resolve, reject) => {
+      ApiHelper.get(`${process.env.URL}/api/v1/institute/getTeachersFromBatch/${id}`)
+        .then((response: any) => resolve(response))
+        .catch((error: any) => reject(error));
+    });
   });
 }
 export function GetStudent(id: string) {

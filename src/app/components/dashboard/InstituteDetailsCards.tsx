@@ -74,7 +74,10 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
         w={isMd ? "95%" : "92%"}
         mx={"auto"}
         mt={"1.5rem"}
-        cols={isMd ? 2 : 4}
+        // Two cramped columns is exactly what was clipping content on
+        // narrow phones (320-414px) — one column there, two once there's
+        // room (small tablets / large phones), four from desktop up.
+        cols={{ base: 1, xs: 2, md: 4 }}
         spacing={20}
         verticalSpacing={20}
       >
@@ -87,6 +90,8 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
             style={{
               border: "1px solid #F1F4F9",
               transition: "box-shadow 0.2s ease, transform 0.2s ease",
+              overflow: "hidden",
+              minWidth: 0,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = "0px 14px 32px rgba(15,23,42,0.10)";
@@ -97,7 +102,7 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
               e.currentTarget.style.transform = "translateY(0px)";
             }}
           >
-            <Flex align={"center"} gap={16} mb={12}>
+            <Flex align={"center"} gap={16} mb={12} style={{ minWidth: 0 }}>
               <Flex
                 align={"center"}
                 justify={"center"}
@@ -112,7 +117,7 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
               >
                 {stat.icon}
               </Flex>
-              <Stack gap={4}>
+              <Stack gap={4} style={{ minWidth: 0, flex: 1 }}>
                 <Text
                   fz={12}
                   fw={700}
@@ -121,7 +126,13 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
                 >
                   {stat.label}
                 </Text>
-                <Text lh={1} fw={700} fz={"1.7rem"} c={"#1B2559"}>
+                <Text
+                  lh={1.2}
+                  fw={700}
+                  fz={"clamp(1.25rem, 5vw, 1.7rem)"}
+                  c={"#1B2559"}
+                  style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                >
                   {stat.value}
                 </Text>
               </Stack>

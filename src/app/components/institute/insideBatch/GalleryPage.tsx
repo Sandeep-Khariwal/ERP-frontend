@@ -316,56 +316,70 @@ export default function GalleryPage(props: {
                 fontFamily: "'DM Sans', sans-serif",
             }}
         >
-            {/* HEADER */}
+            {/* HEADER — restyled to match the Students/Teachers section's
+                master container: light-blue tinted box with a white icon
+                badge, instead of the previous solid dark-blue hero block. */}
 
-            <Paper
-                radius="28px"
-                p="xl"
+            <Box
+                p={20}
                 mb="xl"
                 style={{
-                    background:
-                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
-                    color: "white",
-                    overflow: "hidden",
-                    position: "relative",
+                    borderRadius: "16px",
+                    background: "#EEF3FF",
+                    border: "1px solid #DCE7FF",
                 }}
             >
-                <Group justify="space-between">
-                    <Stack gap={4}>
-                        <Group>
-                            <ThemeIcon
-                                size={54}
-                                radius="xl"
-                                color="white"
-                                variant="light"
-                            >
-                                <IconSparkles size={28} />
-                            </ThemeIcon>
+                <Flex
+                    justify="space-between"
+                    direction={isMobile ? "column" : "row"}
+                    align={isMobile ? "flex-start" : "center"}
+                    gap={16}
+                    w="100%"
+                >
+                    <Group gap={14} wrap="nowrap" style={{ minWidth: 0 }}>
+                        <Flex
+                            align="center"
+                            justify="center"
+                            style={{
+                                width: 44,
+                                height: 44,
+                                borderRadius: "12px",
+                                background: "#FFFFFF",
+                                flexShrink: 0,
+                            }}
+                        >
+                            <IconSparkles size={22} color="#2F6FED" />
+                        </Flex>
 
-                            <div>
-                                <Title order={2} c="white">
-                                    Gallery
-                                </Title>
-
-                                <Text c="rgba(255,255,255,0.8)">
-                                    Manage gallery photos and links
-                                </Text>
-                            </div>
-                        </Group>
-                    </Stack>
+                        <Stack gap={2} style={{ minWidth: 0 }}>
+                            <Text fz={22} fw={700} c="#1B2559">
+                                Gallery
+                            </Text>
+                            <Text fz={13} c="#5B6B8C">
+                                Manage gallery photos and links
+                            </Text>
+                        </Stack>
+                    </Group>
 
                     <Button
                         leftSection={<IconPlus size={18} />}
-                        radius="xl"
+                        radius={10}
                         size="md"
                         onClick={openAdd}
-                        color="white"
-                        c="#2F6FED"
+                        w={isMobile ? "100%" : "auto"}
+                        styles={{
+                            root: {
+                                background:
+                                    "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                                border: 0,
+                                fontWeight: 600,
+                            },
+                        }}
                     >
                         Add Gallery
                     </Button>
-                </Group>
-            </Paper>
+                </Flex>
+            </Box>
 
             {/* LOADING */}
 
@@ -383,8 +397,8 @@ export default function GalleryPage(props: {
                             p={60}
                             ta="center"
                             style={{
-                                background: "#faf7ff",
-                                border: "1px dashed #cdbdff",
+                                background: "#F5F8FF",
+                                border: "1px dashed #C7D9FF",
                             }}
                         >
                             <ThemeIcon
@@ -427,9 +441,9 @@ export default function GalleryPage(props: {
                             p="lg"
                             style={{
                                 background: "#fff",
-                                border: "1px solid #f1ebff",
+                                border: "1px solid #F1F4F9",
                                 boxShadow:
-                                    "0 10px 30px rgba(92,61,232,0.05)",
+                                    "0 10px 30px rgba(15,23,42,0.05)",
                             }}
                         >
                             <Group
@@ -472,8 +486,8 @@ export default function GalleryPage(props: {
                                             style={{
                                                 overflow: "hidden",
                                                 background: "#ffffff",
-                                                border: "1px solid #ede7ff",
-                                                boxShadow: "0 12px 35px rgba(92,61,232,0.10)",
+                                                border: "1px solid #F1F4F9",
+                                                boxShadow: "0 12px 35px rgba(15,23,42,0.08)",
                                                 transition: "all .3s ease",
                                                 height: "100%",
                                                 display: "flex",
