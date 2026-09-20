@@ -58,7 +58,11 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
   const [resultDate, setResultDate] = useState<Date>(new Date());
   const [session, setSession] = useState<string>("");
   useEffect(() => {
-    if (!batchId) return;
+    // This modal is always mounted inside Marksheet.tsx (only its visual
+    // Modal is toggled by `opened`), so without this guard it fetched the
+    // subjects list every time the Marksheet tab loaded, whether or not
+    // "Add Single Student" was ever opened.
+    if (!opened || !batchId) return;
 
     setIsLoading(true);
 
@@ -82,7 +86,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
         console.log(e);
         setIsLoading(false);
       });
-  }, [batchId]);
+  }, [opened, batchId]);
 
 
   const processMarks = (marksArray: any[]) => {

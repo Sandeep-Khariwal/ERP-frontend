@@ -1,4 +1,5 @@
 import ApiHelper from "../../ApiHelper";
+import { dedupeInFlightRequest } from "../requestDedupe";
 
 export function GetStudentFeeInstallments(id: string) {
   return new Promise((resolve, reject) => {
@@ -39,10 +40,15 @@ export function GetStudentForIdCard(id: string) {
   });
 }
 export function GetStudentOverview(id: string) {
-  return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/student/getStudentOverview/${id}`)
-      .then((response) => resolve(response))
-      .catch((error: any) => reject(error));
+  // Fires on every student-row click (fresh mount of the student profile
+  // view) — dedupe truly-simultaneous calls the same way GetBatchOverview
+  // and GetAllSubjectsFromBatch already do.
+  return dedupeInFlightRequest(`student-overview:${id}`, () => {
+    return new Promise((resolve, reject) => {
+      ApiHelper.get(`${process.env.URL}/api/v1/student/getStudentOverview/${id}`)
+        .then((response) => resolve(response))
+        .catch((error: any) => reject(error));
+    });
   });
 }
 export function GetStudentAttendance(id: string) {

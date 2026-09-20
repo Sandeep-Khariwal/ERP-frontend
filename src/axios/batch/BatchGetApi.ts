@@ -2,10 +2,15 @@ import ApiHelper from "../../ApiHelper";
 import { dedupeInFlightRequest } from "../requestDedupe";
 
 export function GetBatchOverview(id:string) {
-  return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/batch/getBatchOverview/${id}`)
-      .then((response) => resolve(response))
-      .catch((error: any) => reject(error));
+  // React StrictMode double-invokes mount effects in dev, and this fires
+  // from OverView.tsx on every batch-card click (a fresh mount). Same
+  // dedupe pattern as GetAllSubjectsFromBatch below.
+  return dedupeInFlightRequest(`batch-overview:${id}`, () => {
+    return new Promise((resolve, reject) => {
+      ApiHelper.get(`${process.env.URL}/api/v1/batch/getBatchOverview/${id}`)
+        .then((response) => resolve(response))
+        .catch((error: any) => reject(error));
+    });
   });
 }
 export function GetAllSubjectsFromBatch(id:string) {

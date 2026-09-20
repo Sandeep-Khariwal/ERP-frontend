@@ -22,7 +22,9 @@ import { Modal } from "@mantine/core";
 import { Image, Group } from "@mantine/core";
 import SingleStudentModal from "./SingleStudentModal";
 import { useMediaQuery } from "@mantine/hooks";
-import * as XLSX from "xlsx";
+// XLSX (~230 KB) is loaded on demand inside handleFileUpload instead of
+// being bundled into every Marksheet tab load — it's only ever needed
+// when the user actually picks a file to bulk-import.
 import {
   CreateExamMarksheet,
   CreateExamMarksheetForExcel,
@@ -180,9 +182,10 @@ const Marksheet = (props: {
   const handleFileUpload = (file: File) => {
     const reader = new FileReader();
 
-    reader.onload = (e: any) => {
+    reader.onload = async (e: any) => {
       const data = e.target.result;
 
+      const XLSX = await import("xlsx");
       const workbook = XLSX.read(data, { type: "binary" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(sheet);

@@ -44,7 +44,6 @@ import { usePathname, useRouter } from "next/navigation";
 import NoticeBoard from "./notice/NoticeBoard";
 import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi";
 import { InstituteStudentsPage } from "../institute/student/InstituteStudentsPage";
-import { GetAllNotice } from "@/axios/notice/NoticeGetApi";
 import { Bell, Search } from "lucide-react";
 
 export interface Batch {
@@ -133,15 +132,11 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     }
   }, [openAddBatchModal]);
 
-  useEffect(() => {
-    if (!institute?._id) return;
-    GetAllNotice(institute._id)
-      .then((res: any) => {
-        const list = res?.data?.notices || res?.notices || [];
-        setNoticeCount(Array.isArray(list) ? list.length : 0);
-      })
-      .catch(() => {});
-  }, [institute?._id]);
+  // Notice count for the header bell badge is now read from the
+  // NoticeBoard's own fetch (via onNoticesChange below) instead of this
+  // component making its own separate GetAllNotice call for the same
+  // institute — NoticeBoard is already rendered on this same screen and
+  // was fetching the exact same list a second time.
 
   const [data, setData] = useState<{ value: string; label: string }[]>([
     { value: "Hindi", label: "Hindi" },
@@ -757,7 +752,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
           </SimpleGrid>
 
           <Flex w={"100%"} align="center" justify={"center"}>
-            <NoticeBoard userType={userType} />
+            <NoticeBoard userType={userType} onNoticesChange={setNoticeCount} />
           </Flex>
         </Stack>
       )}

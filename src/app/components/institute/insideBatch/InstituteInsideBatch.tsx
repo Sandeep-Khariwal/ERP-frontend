@@ -194,7 +194,16 @@ export function InstituteInsideBatch(props: {
           console.log("Teacher Fetch Error:", err);
         });
     }
+  }, [props.batchId, activeTab]);
 
+  // Subjects list for this batch rarely changes and is used across several
+  // tabs. This was previously fetched inside the effect above, which meant
+  // it re-ran (and re-fetched) on every single tab switch since `activeTab`
+  // was in that effect's dependency array. It only needs to be fetched once
+  // per batch — when the batch changes and the caller hasn't already
+  // supplied `subjects` as a prop — not on every tab click.
+  useEffect(() => {
+    if (!props.batchId) return;
     if (props.subjects?.length) return;
 
     GetAllSubjectsFromBatch(props.batchId)
@@ -202,7 +211,7 @@ export function InstituteInsideBatch(props: {
         setSubject(res.subjects.subjects);
       })
       .catch((e: any) => {});
-  }, [props.batchId, activeTab]);
+  }, [props.batchId]);
 
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [students, setStudents] = useState<StudentsDataWithBatch[]>([]);

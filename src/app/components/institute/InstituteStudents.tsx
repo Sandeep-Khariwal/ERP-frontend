@@ -32,7 +32,8 @@ import {
   GetStudentsPendingFee,
 } from "@/axios/institute/InstituteGetApi";
 import { UserType } from "../dashboard/InstituteBatchesSection";
-import * as XLSX from "xlsx";
+// XLSX is imported dynamically inside HandleDownloadExcel (see below) so
+// it isn't bundled into every load of this tab.
 import PassOutStudents from "./student/components/PassoutStudents";
 import { PayRecordWithNumber } from "@/axios/student/StudentGetApi";
 
@@ -115,7 +116,7 @@ export const InstituteStudents = () => {
       });
   };
 
-  const HandleDownloadExcel = () => {
+  const HandleDownloadExcel = async () => {
     const excelData = pendingStudents.map((s: any) => ({
       Name: s.Name || "",
       Address: s.address || "",
@@ -125,6 +126,11 @@ export const InstituteStudents = () => {
       PendingFees: s.pendingFees || 0,
       TotalFees: s.totalFees || 0,
     }));
+
+    // XLSX (~230 KB) is loaded on demand here rather than bundled into
+    // every load of the Students tab — it's only needed when the user
+    // actually clicks "Download Excel".
+    const XLSX = await import("xlsx");
 
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();

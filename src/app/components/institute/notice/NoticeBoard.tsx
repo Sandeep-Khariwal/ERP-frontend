@@ -38,7 +38,13 @@ interface Notice {
 }
 
 // Component
-export default function NoticeBoard(props: { userType: string }) {
+export default function NoticeBoard(props: {
+  userType: string;
+  // Optional: lets a parent that already needs the notice count (e.g. for a
+  // header badge) read it from this component's own fetch instead of
+  // firing its own separate GetAllNotice call for the same institute.
+  onNoticesChange?: (count: number) => void;
+}) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -77,6 +83,7 @@ export default function NoticeBoard(props: { userType: string }) {
     GetAllNotice(institute._id!)
       .then((x: any) => {
         if (x?.data) setNotices(x.data);
+        props.onNoticesChange?.(Array.isArray(x?.data) ? x.data.length : 0);
       })
       .catch((e) => {
         console.log(e);
