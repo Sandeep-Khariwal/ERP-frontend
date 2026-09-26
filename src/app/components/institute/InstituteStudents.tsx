@@ -22,10 +22,10 @@ import {
 } from "@tabler/icons-react";
 import StudentProfilePage from "./student/components/StudentProfilePage";
 import { useMediaQuery } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useAppSelector } from "@/app/redux/redux.hooks";
-import StudentPage from "../student/StudentPage";
+import StudentPage, { type StudentOverView } from "../student/StudentPage";
 import { GetInstituteBatches } from "@/axios/institute/instituteSlice";
 import {
   GetAllStudentsFromBatch,
@@ -63,6 +63,12 @@ export const InstituteStudents = () => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
+  const [selectedStudentOverview, setSelectedStudentOverview] =
+    useState<StudentOverView | null>(null);
+  const handleStudentOverviewLoaded = useCallback(
+    (student: StudentOverView) => setSelectedStudentOverview(student),
+    [],
+  );
   const [selectedBatchId, setSelectedBatchId] = useState<string>("");
   const [students, setStudents] = useState<StudentList[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<StudentList[]>([]);
@@ -277,6 +283,12 @@ export const InstituteStudents = () => {
             studentId={selectedStudentId}
             userType={UserType.OTHERS}
             activeTab={activeTab}
+            initialStudent={
+              selectedStudentOverview?._id === selectedStudentId
+                ? selectedStudentOverview
+                : undefined
+            }
+            onStudentLoaded={handleStudentOverviewLoaded}
             onClickBack={() => setActiveTab(StudentTabs.OTHER)}
           />
         </Stack>
@@ -708,7 +720,10 @@ export const InstituteStudents = () => {
                   <Table.Tr
                     key={s._id}
                     style={{ cursor: "pointer" }}
-                    onClick={() => setSelectedStudentId(s._id)}
+                    onClick={() => {
+                      setSelectedStudentOverview(null);
+                      setSelectedStudentId(s._id);
+                    }}
                   >
                     <Table.Td>
                       <Flex align="center" gap={10}>
@@ -771,7 +786,10 @@ export const InstituteStudents = () => {
           <Button
             variant="subtle"
             color="gray"
-            onClick={() => setSelectedStudentId("")}
+            onClick={() => {
+              setSelectedStudentId("");
+              setSelectedStudentOverview(null);
+            }}
             m={10}
             w={140}
             leftSection={<IconArrowLeft size={14} />}
@@ -780,6 +798,7 @@ export const InstituteStudents = () => {
           </Button>
           <StudentProfilePage
             selectedStudentId={selectedStudentId}
+            onStudentLoaded={handleStudentOverviewLoaded}
             onClickAction={(val: StudentTabs) => setActiveTab(val)}
           />
         </Stack>

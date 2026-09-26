@@ -2,6 +2,7 @@
 
 import {
   Button,
+  Avatar,
   Card,
   Divider,
   Grid,
@@ -17,7 +18,7 @@ import {
   Box,
   TextInput,
 } from "@mantine/core";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { DateTimePicker } from "@mantine/dates";
 import { IconArrowLeft, IconCalendar, IconTrash } from "@tabler/icons-react";
@@ -58,6 +59,8 @@ const FeeRecordSection = (props: {
   dateOfJoining: Date;
   batch?: string;
   studentId: string;
+  studentName?: string;
+  studentProfilePic?: string;
   onPaymentClick: () => void;
   onClickBack: () => void;
   fromBatch: boolean;
@@ -84,6 +87,9 @@ const FeeRecordSection = (props: {
     0,
   );
   const totalOverdue = totalFees - totalPaidFees;
+  const nextDueInstallment = installments.find(
+    (installment) => installment.amount - (installment.amountPaid ?? 0) > 0,
+  );
 
   const [openVanFareModal, setOpenVanFareModal] = useState(false);
 
@@ -100,6 +106,25 @@ const FeeRecordSection = (props: {
     Map<string, FeeRecordData>
   >(new Map());
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const refreshInstallments = useCallback(async () => {
+    const response: any = await GetStudentFeeInstallments(props.studentId);
+    const { feeRecords, vanFares } = response.data;
+
+    setVanFares(vanFares || []);
+    setInstallments(
+      feeRecords.map((fee: any) => ({
+        _id: fee._id,
+        name: fee.name,
+        dueDate: fee.dueDate,
+        amount: fee.totalAmount,
+        amountPaid: fee.amountPaid,
+        updatedAt: fee.updatedAt,
+        status: fee.status,
+        paidHistory: fee.paidHistory || [],
+      })),
+    );
+  }, [props.studentId]);
 
   const handleChange = (key: string, value: any, field = "amount") => {
     if (key === "paymentDate") {
@@ -137,47 +162,23 @@ const FeeRecordSection = (props: {
     }
   };
 
-  const handleDeletePendingRecords = () => {
+  const handleDeletePendingRecords = async () => {
     setIsLoading(true);
-
-    const feeRecordIds = installments.map((item: any) => item._id);
-
-    DeletePendingFeeRecords(props.studentId, feeRecordIds)
-      .then(() => {
-        setIsLoading(false);
-        setOpenDeleteModal(false);
-
-        GetStudentFeeInstallments(props.studentId).then((x: any) => {
-          console.log("delete: ", x);
-
-          const { feeRecords, vanFares } = x.data;
-
-          setVanFares(vanFares || []);
-
-          const installments = feeRecords.map((f: any) => ({
-            _id: f._id,
-            name: f.name,
-            dueDate: f.dueDate,
-            amount: f.totalAmount,
-            amountPaid: f.amountPaid,
-            updatedAt: f.updatedAt,
-            status: f.status,
-            paidHistory: f.paidHistory || [],
-          }));
-
-          setInstallments(installments);
-        });
-
-        SuccessNotification("Pending records deleted successfully.");
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsLoading(false);
-        ErrorNotification("Unable to delete records.");
-      });
+    try {
+      const feeRecordIds = installments.map((item: any) => item._id);
+      await DeletePendingFeeRecords(props.studentId, feeRecordIds);
+      setOpenDeleteModal(false);
+      SuccessNotification("Pending records deleted successfully.");
+      refreshInstallments().catch((err) => console.log(err));
+    } catch (err) {
+      console.log(err);
+      ErrorNotification("Unable to delete records.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     if (!formValues.paymentDate) {
       showNotification({
         message: "Select date please!!",
@@ -185,27 +186,23 @@ const FeeRecordSection = (props: {
       return;
     }
     setIsLoading(true);
-    console.log("feeRecordsMap", feeRecordsMap);
-    console.log("converted", Array.from(feeRecordsMap.entries()));
-    UpdateMultipleFeeRecord(
-      instituteDetails._id,
-      feeRecordsMap,
-      props.studentId,
-    )
-      .then((resp) => {
-        setIsLoading(false);
-
-        setOpenPaymentModel(false);
-        setFeeRecordsMap(new Map());
-        // props.onPaymentClick();
-      })
-      .catch((e) => {
-        console.log(e);
-        setIsLoading(false);
-      });
+    try {
+      await UpdateMultipleFeeRecord(
+        instituteDetails._id,
+        feeRecordsMap,
+        props.studentId,
+      );
+      setOpenPaymentModel(false);
+      setFeeRecordsMap(new Map());
+      await refreshInstallments();
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleVanFareSubmit = () => {
+  const handleVanFareSubmit = async () => {
     if (!formValues.paymentDate) {
       showNotification({
         message: "Select date please!!",
@@ -215,83 +212,39 @@ const FeeRecordSection = (props: {
 
     setIsLoading(true);
 
-    UpdateMultipleFeeRecord(
-      instituteDetails._id,
-      vanFareRecordsMap,
-      props.studentId,
-      "vanfare",
-    )
-      .then(() => {
-        setIsLoading(false);
-        setOpenVanFareModal(false);
-        setVanFareRecordsMap(new Map());
-
-        GetStudentFeeInstallments(props.studentId).then((x: any) => {
-          const { feeRecords, vanFares } = x.data;
-
-          setVanFares(vanFares || []);
-
-          const installments = feeRecords.map((f: any) => ({
-            _id: f._id,
-            name: f.name,
-            dueDate: f.dueDate,
-            amount: f.totalAmount,
-            amountPaid: f.amountPaid,
-            updatedAt: f.updatedAt,
-            status: f.status,
-            paidHistory: f.paidHistory || [],
-          }));
-
-          setInstallments(installments);
-        });
-      })
-      .catch((e) => {
-        console.log(e);
-        setIsLoading(false);
-      });
+    try {
+      await UpdateMultipleFeeRecord(
+        instituteDetails._id,
+        vanFareRecordsMap,
+        props.studentId,
+        "vanfare",
+      );
+      setOpenVanFareModal(false);
+      setVanFareRecordsMap(new Map());
+      await refreshInstallments();
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    if (props.studentId) {
-      setIsLoading(true);
-      GetStudentFeeInstallments(props.studentId)
-        .then((x: any) => {
-          const { feeRecords, vanFares } = x.data;
-          console.log("Complete Fee Response", x.data);
-          console.log("Fee Records", feeRecords);
+    if (!props.studentId) return;
 
-          setVanFares(vanFares || []);
-          const installments = feeRecords.map((f: any) => {
-            console.log("Single Fee Record", f);
-            return {
-              _id: f._id,
-              name: f.name,
-              dueDate: f.dueDate,
-              amount: f.totalAmount,
-              amountPaid: f.amountPaid,
-              updatedAt: f.updatedAt,
-              status: f.status,
-              paidHistory: f.paidHistory || [],
-            };
-          });
-          setInstallments(installments);
-          setIsLoading(false);
-        })
-        .catch((e) => {
-          console.log(e);
-          setIsLoading(false);
-        });
-    }
-  }, [props.studentId, openPaymentModel]);
+    setIsLoading(true);
+    refreshInstallments()
+      .catch((e) => console.log(e))
+      .finally(() => setIsLoading(false));
+  }, [props.studentId, refreshInstallments]);
 
   return (
     <>
       <LoadingOverlay visible={isLoading} />
       <Stack
-        w={"95%"}
-        style={{ backgroundColor: "#ffffff", borderRadius: "1rem" }}
-        mih={"100vh"}
-        m={"auto"}
+        w="100%"
+        style={{ backgroundColor: "#ffffff", borderRadius: 10, border: "1px solid #e5eaf2", minWidth: 0 }}
+        m="auto"
         py={isMd ? 0 : 20}
       >
         {props.fromBatch && (
@@ -306,11 +259,47 @@ const FeeRecordSection = (props: {
             </Text>
           </Flex>
         )}
-        <Grid p={10} style={{ position: "sticky", top: 50 }}>
-          <Grid.Col span={isMd ? 12 : 10}>
+        <Card
+          radius={10}
+          p={{ base: "sm", sm: "md" }}
+          mx={10}
+          mt="sm"
+          shadow="0 2px 8px rgba(20, 42, 76, 0.06)"
+          style={{
+            background: "linear-gradient(105deg, #e8efff 0%, #f7f9ff 100%)",
+            border: "1px solid #e1e8f4",
+          }}
+        >
+          <Flex align="center" justify="space-between" gap="sm" wrap="wrap">
+            <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+              <Avatar src={props.studentProfilePic || "/boyStudent.png"} size={44} radius="xl" />
+              <Stack gap={2} style={{ minWidth: 0 }}>
+                <Text fz={10} fw={700} c="#0755d9">Student fee account</Text>
+                <Text fz={14} fw={700} c="#172033" style={{ overflowWrap: "anywhere" }}>{props.studentName}</Text>
+                <Text fz={11} c="#667085" style={{ overflowWrap: "anywhere" }}>{props.batchName}</Text>
+              </Stack>
+            </Group>
+            {nextDueInstallment && (
+              <Box
+                p="xs"
+                style={{ background: "#ffffff", border: "1px solid #e7ebf2", borderRadius: 8, minWidth: 128 }}
+              >
+                <Text fz={9} fw={700} c="#667085">Next due date</Text>
+                <Text fz={12} fw={700} c="#172033">
+                  {new Date(nextDueInstallment.dueDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                </Text>
+                <Text fz={10} fw={700} c="#d92d20">
+                  ₹{nextDueInstallment.amount - (nextDueInstallment.amountPaid ?? 0)} pending
+                </Text>
+              </Box>
+            )}
+          </Flex>
+        </Card>
+        <Grid p={10}>
+          <Grid.Col span={12}>
             <SimpleGrid
-              cols={isMd ? 2 : 4}
-              spacing={isMd ? 15 : 40}
+              cols={{ base: 1, xs: 2, sm: 3 }}
+              spacing={isMd ? 12 : 16}
               verticalSpacing={20}
             >
               <StudentFeesCards
@@ -322,16 +311,12 @@ const FeeRecordSection = (props: {
           </Grid.Col>
         </Grid>
         <Box p={10}>
-          <Flex
-            justify={"space-between"}
-            align={"center"}
-            style={{ position: "sticky", top: 100 }}
-          >
-            <Text size="sm" c="blue">
+          <Flex justify="space-between" align="center" wrap="wrap" gap="sm">
+            <Text size="lg" fw={700} c="#1d2939">
               Fee Records
             </Text>
 
-            <Flex gap={10}>
+            <Flex gap={8} wrap="wrap" justify="flex-end" style={{ minWidth: 0 }}>
               {/* 🔥 NEW BUTTON */}
               <Button
                 color="green"
@@ -414,6 +399,7 @@ const FeeRecordSection = (props: {
                     // convertHtmlIntoPdf(html);
                   });
                 }}
+                size="sm"
               >
                 Download Report
               </Button>
@@ -430,6 +416,7 @@ const FeeRecordSection = (props: {
                     }
                     setOpenPaymentModel(true);
                   }}
+                  size="sm"
                 >
                   Record Payment
                 </Button>
@@ -439,6 +426,7 @@ const FeeRecordSection = (props: {
                 onClick={() => {
                   setOpenVanFareModal(true);
                 }}
+                size="sm"
               >
                 Van Fare Update
               </Button>

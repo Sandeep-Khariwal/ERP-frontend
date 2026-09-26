@@ -1,6 +1,7 @@
 "use client";
 import { GetAllDrivers } from "@/axios/institute/transportApi";
-import { LoadingOverlay, Stack, Table } from "@mantine/core";
+import { LoadingOverlay, ScrollArea, Stack, Table } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import React, { useEffect, useState } from "react";
 
 interface Drivers {
@@ -18,6 +19,7 @@ interface Drivers {
 }
 
 function DriverPage(props: { instituteId: string }) {
+  const isMobile = useMediaQuery("(max-width: 968px)");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [allDrivers, setAllDrivers] = useState<Drivers[]>([]);
   useEffect(() => {
@@ -46,17 +48,19 @@ function DriverPage(props: { instituteId: string }) {
     <Stack>
       <LoadingOverlay visible={isLoading} />
 
-      <Table striped highlightOnHover withTableBorder withColumnBorders c={"gray"} >
+      <ScrollArea type="auto">
+      <Table striped highlightOnHover withTableBorder withColumnBorders c={"gray"} miw={isMobile ? 480 : undefined}>
         <Table.Thead   bg={"#EEF3FF"} c={"#333"}>
           <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Th>Phone</Table.Th>
-            <Table.Th>Van Number</Table.Th>
-            <Table.Th>Plate Number</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Name</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Phone</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Van Number</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Plate Number</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
+      </ScrollArea>
     </Stack>
   );
 }

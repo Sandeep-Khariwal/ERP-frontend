@@ -2,13 +2,14 @@ import ApiHelper from "../../ApiHelper";
 import { dedupeInFlightRequest } from "../requestDedupe";
 
 export function GetStudentFeeInstallments(id: string) {
-  return new Promise((resolve, reject) => {
-    ApiHelper.get(
-      `${process.env.URL}/api/v1/student/getStudentFeeInstallments/${id}`,
-    )
-      .then((response) => resolve(response))
-      .catch((error: any) => reject(error));
-  });
+  return dedupeInFlightRequest(
+    `student-fee-installments:${id}`,
+    () =>
+      ApiHelper.get(
+        `${process.env.URL}/api/v1/student/getStudentFeeInstallments/${id}`,
+      ),
+    0,
+  );
 }
 export function GetStudentForPdf(id: string) {
   return new Promise((resolve, reject) => {
@@ -52,13 +53,14 @@ export function GetStudentOverview(id: string) {
   });
 }
 export function GetStudentAttendance(id: string) {
-  return new Promise((resolve, reject) => {
-    ApiHelper.get(
-      `${process.env.URL}/api/v1/student/getStudentAttendance/${id}`,
-    )
-      .then((response) => resolve(response))
-      .catch((error: any) => reject(error));
-  });
+  return dedupeInFlightRequest(
+    `student-attendance:${id}`,
+    () =>
+      ApiHelper.get(
+        `${process.env.URL}/api/v1/student/getStudentAttendance/${id}`,
+      ),
+    0,
+  );
 }
 export function GetVanLiveLocation() {
   return new Promise((resolve, reject) => {

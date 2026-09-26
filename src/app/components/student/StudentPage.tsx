@@ -59,11 +59,21 @@ export interface ChartData {
 
 export interface StudentPageProps {
   studentId: string;
+  initialStudent?: StudentOverView;
+  onStudentLoaded?: (student: StudentOverView) => void;
   onClickBack: () => void;
   userType: UserType;
   activeTab?: StudentTabs;
   onLogout?: () => void;
 }
+
+const studentTabLabels: Record<string, string> = {
+  Overview: "Overview",
+  "Fees Records": "Fee Record",
+  Attendance: "Attendance",
+  TEST: "Test",
+  Meetings: "Meeting",
+};
 
 const StudentPage = (props: StudentPageProps) => {
   const isMd = useMediaQuery(`(max-width: 968px)`);
@@ -156,15 +166,20 @@ const StudentPage = (props: StudentPageProps) => {
 
   useEffect(() => {
     if (props.studentId) {
+      if (props.initialStudent?._id === props.studentId) {
+        setStudent(props.initialStudent);
+        return;
+      }
       getStudents();
     }
-  }, [props.studentId]);
+  }, [props.studentId, props.initialStudent, props.onStudentLoaded]);
 
   const getStudents = () => {
     setIsLoading(true);
     GetStudentOverview(props.studentId)
       .then((x: any) => {
         setStudent(x.student);
+        props.onStudentLoaded?.(x.student);
         setIsLoading(false);
       })
       .catch((e) => {
@@ -174,7 +189,7 @@ const StudentPage = (props: StudentPageProps) => {
   };
 
   const content = (
-    <Stack w={"100%"}>
+    <Stack w={"100%"} style={{ minWidth: 0 }}>
       <LoadingOverlay visible={isLoading} />
       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
         {props.userType !== UserType.STUDENT ? (
@@ -188,25 +203,25 @@ const StudentPage = (props: StudentPageProps) => {
               height={15}
               style={{ cursor: "pointer" }}
             />
-            <Text fw={500} fz={18} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
+            <Text fw={600} fz={18} ff={"Poppins"} ta={"center"} c={"#182230"}>
               Students
             </Text>{" "}
           </>
         ) : (
           <>
-            <Text fw={500} fz={24} ff={"Poppins"} ta={"center"} c={"#2F4F4F"}>
+            <Text fw={600} fz={22} ff={"Poppins"} ta={"center"} c={"#182230"}>
               Students
             </Text>
           </>
         )}
       </Flex>
       {props.userType !== UserType.STUDENT && (
-        <Flex mt={isMd ? 10 : 20}>
+        <Flex mt={isMd ? 8 : 16} w="100%" gap={isMd ? 4 : 10} style={{ overflowX: "auto", minWidth: 0, borderBottom: "1px solid #e8edf5" }}>
           {Object.values(StudentTabs)
             .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
             .map((item: StudentTabs, i: number) => {
               return (
-                <Box key={i}>
+                <Box key={i} style={{ flex: "0 0 auto" }}>
                   {!(
                     item === StudentTabs.FEES &&
                     UserType.TEACHER === props.userType
@@ -214,21 +229,20 @@ const StudentPage = (props: StudentPageProps) => {
                     <Text
                       key={i}
                       onClick={() => setActiveTab(item)}
-                      mx={isMd ? 14 : 30}
-                      c={activeTab === item ? "#1B1212" : "#2F4F4F"}
-                      fw={600}
+                      c={activeTab === item ? "#0755d9" : "#526176"}
+                      fw={activeTab === item ? 700 : 600}
                       style={{
                         cursor: "pointer",
                         whiteSpace: "nowrap",
-                        border: "none",
+                        padding: isMd ? "9px 10px" : "10px 14px",
                         borderBottom: "2px solid",
-                        borderColor: activeTab === item ? "#4B65F6" : "white",
+                        borderColor: activeTab === item ? "#155eef" : "transparent",
                       }}
-                      fz={16}
-                      ff={"Roboto"}
+                      fz={14}
+                      ff={"Nunito"}
                       w={"auto"}
                     >
-                      {item}
+                      {studentTabLabels[item] ?? item}
                     </Text>
                   )}
                 </Box>
@@ -237,9 +251,9 @@ const StudentPage = (props: StudentPageProps) => {
         </Flex>
       )}
 
-      <Divider c={"gray"} />
+      <Divider color={"#e8edf5"} />
       {StudentTabs.OVERVIEW === activeTab && (
-        <Stack mt={10} w={"100%"} bg={"white"} p={10}>
+        <Stack mt={4} w={"100%"} bg={"white"} p={{ base: 4, sm: 10 }} style={{ minWidth: 0 }}>
           <StudentOverview
             student={student}
             testReportMap={testReportMap}
@@ -250,10 +264,12 @@ const StudentPage = (props: StudentPageProps) => {
         </Stack>
       )}
       {StudentTabs.FEES === activeTab && (
-        <Stack mt={10} w={"100%"} bg={"white"} p={10}>
+        <Stack mt={4} w={"100%"} bg={"white"} p={{ base: 4, sm: 10 }} style={{ minWidth: 0 }}>
           <FeeRecordSection
             userType={props.userType}
             batchName={student.batchId?.name || ""}
+            studentName={student.name}
+            studentProfilePic={student.profilePic}
             dateOfJoining={new Date(student.dateOfBirth)}
             batch={student.batchId?._id || ""}
             studentId={student._id}
@@ -264,12 +280,12 @@ const StudentPage = (props: StudentPageProps) => {
         </Stack>
       )}
       {StudentTabs.ATTENDANCE === activeTab && (
-        <Stack mt={10} w={"100%"} bg={"white"} py={10} px={4}>
+        <Stack mt={4} w={"100%"} bg={"white"} py={10} px={{ base: 4, sm: 10 }} style={{ minWidth: 0 }}>
           <StudentAttendanceView studentId={student._id} />
         </Stack>
       )}
       {StudentTabs.TEST === activeTab && (
-        <Stack mt={10} w={"100vw"} bg={"white"} py={10}>
+        <Stack mt={4} w={"100%"} bg={"white"} py={10} style={{ minWidth: 0 }}>
           <StudentTestCard
             studentId={student._id}
             test={{}}
@@ -278,7 +294,7 @@ const StudentPage = (props: StudentPageProps) => {
         </Stack>
       )}
        {StudentTabs.MEETNGS === activeTab && (
-        <Stack mt={10} w={"100%"} bg={"white"} py={10} px={4}>
+        <Stack mt={4} w={"100%"} bg={"white"} py={10} px={{ base: 4, sm: 10 }} style={{ minWidth: 0 }}>
           <StudentMeetingsPage studentId={student._id}  batchId={student.batchId._id} student={student.name} />
         </Stack>
       )}
@@ -328,7 +344,7 @@ const StudentPage = (props: StudentPageProps) => {
                   }}
                   fz={16}
                 >
-                  {item}
+                  {studentTabLabels[item] ?? item}
                 </Text>
               ))}
           </Stack>

@@ -97,3 +97,15 @@ export function GetInstituteBatches(id:string) {
     });
   });
 }
+
+export function GetInstituteDashboardBatches(id: string) {
+  return dedupeInFlightRequest(`institute-dashboard-batches:${id}`, () => {
+    return new Promise((resolve, reject) => {
+      ApiHelper.get(
+        `${process.env.URL}/api/v1/institute/getDashboardBatches/${id}`,
+      )
+        .then((response) => resolve(response))
+        .catch((error: any) => reject(error));
+    });
+  });
+}

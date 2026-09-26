@@ -965,7 +965,7 @@ export const DesktopNavbar = (props: {
                   }}
                 >
                   <Flex align="center" gap={4}>
-                    <Text fw={600} fz={17}>
+                    <Text fw={600} fz={20} style={{ fontFamily: "var(--mantine-font-family)" }}>
                       Business
                     </Text>
 
@@ -1003,8 +1003,8 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EXPENSE)}
                   >
-                    <Receipt size={20} color="#5B6B8C" />
-                    <Text fw={500}>Expanse</Text>
+                    <Receipt size={25} color="#5B6B8C" />
+                    <Text fw={600} fz={20} c="#33415C" style={{ fontFamily: "var(--mantine-font-family)" }}>Expense</Text>
                   </Flex>
 
                   {/* Earnings */}
@@ -1024,8 +1024,8 @@ export const DesktopNavbar = (props: {
                     gap={10}
                     onClick={() => props.onSelectTab(Tabs.EARNING)}
                   >
-                    <Wallet size={20} color="#5B6B8C" />
-                    <Text fw={500}>Earnings</Text>
+                    <Wallet size={25} color="#5B6B8C" />
+                    <Text fw={600} fz={20} c="#33415C" style={{ fontFamily: "var(--mantine-font-family)" }}>Earnings</Text>
                   </Flex>
                 </Stack>
               )}
@@ -1086,7 +1086,7 @@ export const DesktopNavbar = (props: {
                   }}
                 >
                   <Flex align="center" gap={4}>
-                    <Text fw={600} fz={17}>
+                    <Text fw={600} fz={20} style={{ fontFamily: "var(--mantine-font-family)" }}>
                       Marketing
                     </Text>
                     {/* Arrow */}

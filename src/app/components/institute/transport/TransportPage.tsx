@@ -162,31 +162,35 @@ function TransportPage() {
         direction={isMd ? "column" : "row"}
         justify={"space-between"}
       >
-        <Text fw={700} fz={isMd ? 22 : 26}>
+        <Text fw={700} fz={isMd ? 22 : 26} style={{ fontFamily: "sans-serif" }}>
           Transport Management
         </Text>
         <Flex
-          w={isMd ? "100%" : "50%"}
+          w={isMd ? "100%" : "auto"}
           align={"center"}
-          justify={"flex-end"}
-          gap={20}
+          justify={isMd ? "flex-start" : "flex-end"}
+          gap={12}
+          wrap="wrap"
           mt={isMd ? 20 : 0}
         >
           <Button
             style={{ backgroundColor: "#305CDE" }}
             onClick={() => setOpenDriverModal(true)}
+            flex={isMd ? "1 1 auto" : "0 0 auto"}
           >
             + Add Driver
           </Button>
           <Button
             style={{ backgroundColor: "#305CDE" }}
             onClick={() => setOpenVanModal(true)}
+            flex={isMd ? "1 1 auto" : "0 0 auto"}
           >
             + Add Van
           </Button>
            <Button
             style={{ backgroundColor: "#305CDE" }}
             onClick={() => setOpenGpsModal(true)}
+            flex={isMd ? "1 1 auto" : "0 0 auto"}
           >
            + Api keys
           </Button>

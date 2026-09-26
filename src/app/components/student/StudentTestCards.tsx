@@ -10,7 +10,6 @@ import {
   LoadingOverlay,
   Text,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import {
   SuccessNotification,
   ErrorNotification,
@@ -61,7 +60,6 @@ export default function StudentTestCard({
   const [resultModalOpened, setResultModalOpened] = useState(false);
   const [selectedResultId, setSelectedResultId] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
-  const isMd = useMediaQuery("(max-width: 968px)");
 
   useEffect(() => {
     getLiveQuiz();
@@ -125,39 +123,29 @@ export default function StudentTestCard({
 
   return (
     <>
-      <Stack w={"100vw"} mx="auto" p="md">
+      <Stack w="100%" mx="auto" p={{ base: "xs", sm: "md" }} style={{ minWidth: 0 }}>
         <LoadingOverlay visible={loading} />
-        <Stack w={"100%"}  >
+        <Stack w="100%" style={{ minWidth: 0 }}>
+          <Text fw={700} fz={18} c="#172033" style={{ fontFamily: "Poppins" }}>Online Tests</Text>
 
-          <Text style={{ fontSize: "1.5rem", fontWeight: "bold" }}> Online Tests</Text>
-
-          <Flex w={"100%"} align={"center"} justify={"flex-start"} gap={30} wrap={"wrap"} >
+          <Grid gutter="md" w="100%">
             {tests.map((test) => (
-              <Card
-                key={test._id}
-                shadow="sm"
-                padding="lg"
-                radius="md"
-                withBorder
-                miw={isMd ? "100%" : 500}
-                style={{
-                  minHeight: "180px",
-                }}
-              >
+              <Grid.Col key={test._id} span={{ base: 12, xs: 6, sm: 4 }}>
+              <Card shadow="0 2px 8px rgba(20, 42, 76, 0.06)" padding="md" radius={10} withBorder style={{ minHeight: 180, height: "100%", borderColor: "#e5eaf2" }}>
                 <Stack gap="sm">
-                  <Box style={{ fontWeight: 700, fontSize: "1.2rem" }}>
+                  <Box style={{ fontWeight: 700, fontSize: 15, color: "#172033", overflowWrap: "anywhere" }}>
                     {test.name}
                   </Box>
-                  <Box style={{ fontSize: "0.95rem", color: "#1976d2" }}>
+                  <Box style={{ fontSize: 12, color: "#0755d9" }}>
                     Subject: <strong>{test.subjectId?.name || "N/A"}</strong>
                   </Box>
-                  <Box style={{ fontSize: "0.9rem", color: "gray" }}>
+                  <Box style={{ fontSize: 12, color: "#667085" }}>
                     Duration: {formatDuration(test.totalTime)}
                   </Box>
-                  <Box style={{ fontSize: "0.9rem", color: "gray" }}>
+                  <Box style={{ fontSize: 12, color: "#667085" }}>
                     Questions: {test.questions?.length || 0}
                   </Box>
-                  <Box style={{ fontSize: "0.9rem", color: "gray" }}>
+                  <Box style={{ fontSize: 12, color: "#667085" }}>
                     Time:{" "}
                     {new Date(test.startTime).toLocaleTimeString([], {
                       hour: "2-digit",
@@ -175,6 +163,7 @@ export default function StudentTestCard({
                     {test.resultId ? (
                       <Button
                         size="sm"
+                        radius="md"
                         color="blue"
                         onClick={() => handleShowResult(test)}
                       >
@@ -183,6 +172,7 @@ export default function StudentTestCard({
                     ) : test.isLiveNow ? (
                       <Button
                         size="sm"
+                        radius="md"
                         color="green"
                         onClick={() => handleStartTest(test._id)}
                       >
@@ -190,11 +180,11 @@ export default function StudentTestCard({
                       </Button>
                     ) : test.expired
                       ? (
-                        <Button size="sm" color="orange" disabled>
+                        <Button size="sm" color="orange" radius="md" disabled>
                           Expired
                         </Button>
                       ) :
-                      (<Button size="sm" color="yellow" >
+                      (<Button size="sm" color="yellow" radius="md">
                         Start Soon
                       </Button>
                       )
@@ -203,8 +193,9 @@ export default function StudentTestCard({
                   </Flex>
                 </Stack>
               </Card>
+              </Grid.Col>
             ))}
-          </Flex>
+          </Grid>
         </Stack>
       </Stack>
 

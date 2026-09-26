@@ -68,10 +68,12 @@ export function GetStudentFeeRecords(id: string) {
 }
 
 export function GetInstituteOverview(id: string) {
-  return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/institute/getInstituteOverview/${id}`)
-      .then((response: any) => resolve(response))
-      .catch((error: any) => reject(error));
+  return dedupeInFlightRequest(`institute-overview:${id}`, () => {
+    return new Promise((resolve, reject) => {
+      ApiHelper.get(`${process.env.URL}/api/v1/institute/getInstituteOverview/${id}`)
+        .then((response: any) => resolve(response))
+        .catch((error: any) => reject(error));
+    });
   });
 }
 export function GetAdminByGmail(gmail: string) {

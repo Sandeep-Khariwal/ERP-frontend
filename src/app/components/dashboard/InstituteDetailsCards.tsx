@@ -19,8 +19,8 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
       GetInstituteOverview(props.instituteId)
         .then((x: any) => {
           const { institute } = x;
-          setTotalStudents(institute.students.length);
-          setTotalTeachers(institute.teachers.length);
+          setTotalStudents(institute.studentCount);
+          setTotalTeachers(institute.teacherCount);
           setTotalEarnings(institute.earnings);
           setTotalExpanses(institute.expanses);
           setIsLoading(false);

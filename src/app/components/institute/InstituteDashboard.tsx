@@ -25,7 +25,7 @@ import {
   CreateBatchAndSubjects,
   EditBatchAndSubjects,
   GetAccountByToken,
-  GetInstituteBatches,
+  GetInstituteDashboardBatches,
 } from "@/axios/institute/instituteSlice";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { EditCourseFeeModal } from "./EditCourseFeeModal";
@@ -53,8 +53,8 @@ export interface Batch {
   optionalSubjects: { _id: string; name: string }[];
   noOfTeachers: number;
   noOfStudents: number;
-  firstThreeTeachers: string[];
-  firstThreeStudents: string[];
+  teacherInitials: string[];
+  studentInitials: string[];
 }
 
 export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
@@ -177,7 +177,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
 
   const getAllInstituteBatches = () => {
     setIsLoading(true);
-    GetInstituteBatches(institute._id)
+    GetInstituteDashboardBatches(institute._id)
       .then((x: any) => {
         const { batches } = x;
         setIsLoading(false);
@@ -187,10 +187,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             name: b.name,
             subjects: b.subjects,
             optionalSubjects: b.optionalSubjects,
-            noOfTeachers: b.teachersCount,
-            noOfStudents: b.studentsCount,
-            firstThreeTeachers: b.teachers.slice(0, 2),
-            firstThreeStudents: b.students.slice(0, 2),
+            noOfTeachers: b.teacherCount,
+            noOfStudents: b.studentCount,
+            teacherInitials: b.teacherInitials,
+            studentInitials: b.studentInitials,
           };
         });
         setBatches(allBatches);
@@ -238,8 +238,12 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             noOfTeachers: data.teachers.length,
             noOfStudents: data.students.length,
             optionalSubjects: data.optionalSubjects,
-            firstThreeTeachers: data.teachers.splice(0, 3),
-            firstThreeStudents: data.students.splice(0, 3),
+            teacherInitials: data.teachers
+              .slice(0, 2)
+              .map((teacher: any) => teacher.name[0]),
+            studentInitials: data.students
+              .slice(0, 2)
+              .map((student: any) => student.name[0]),
           };
           const editedBatch = batches.filter((b) => b.id !== editBatchId);
           setBatches([...editedBatch, newBatch]);
@@ -270,8 +274,12 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             noOfTeachers: data.teachers.length,
             noOfStudents: data.students.length,
             optionalSubjects: data.optionalSubjects,
-            firstThreeTeachers: data.teachers.splice(0, 3),
-            firstThreeStudents: data.students.splice(0, 3),
+            teacherInitials: data.teachers
+              .slice(0, 2)
+              .map((teacher: any) => teacher.name[0]),
+            studentInitials: data.students
+              .slice(0, 2)
+              .map((student: any) => student.name[0]),
           };
           setBatches((prevBatches) => [...prevBatches, newBatch]);
           setBatchId(data._id);
@@ -719,8 +727,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                   subjects: batch?.subjects || [],
                   noOfTeachers: batch?.noOfTeachers || 0,
                   noOfStudents: batch?.noOfStudents || 0,
-                  firstThreeStudents: batch?.firstThreeStudents || [],
-                  firstThreeTeachers: batch?.firstThreeTeachers || [],
+                  studentInitials: batch?.studentInitials || [],
+                  teacherInitials: batch?.teacherInitials || [],
                 }))}
               allBatches={batches.map((batch: any) => ({
                 id: batch?.id || "",
