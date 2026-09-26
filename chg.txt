@@ -1,0 +1,2207 @@
+diff --git a/next.config.ts b/next.config.ts
+index 108f99f..30692ef 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -3,12 +3,10 @@ import type { NextConfig } from "next";
+ const nextConfig: NextConfig = {
+   /* config options here */
+   env: {
+-   URL: "http://localhost:8080"
+-    // URL: "https://server.shikshapay.cloud"
++  //  URL: "http://localhost:8080"
++    URL: "https://server.shikshapay.cloud"
+ 
+   },
+ };
+ 
+-export default nextConfig;
+-
+-
++export default nextConfig;
+\ No newline at end of file
+diff --git a/src/app/components/auth/Login.tsx b/src/app/components/auth/Login.tsx
+index 3d1c253..be11cd9 100644
+--- a/src/app/components/auth/Login.tsx
++++ b/src/app/components/auth/Login.tsx
+@@ -149,6 +149,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
+           );
+         })
+         .catch((e) => {
++           setIsLoading(false);
+           console.log("e: ", e);
+           const { message } = e?.response?.data;
+           ErrorNotification(message);
+@@ -156,7 +157,6 @@ export default function Login(props: { onCreateAccount: () => void }) {
+             navigation.push("/pricing");
+           }
+ 
+-          setIsLoading(false);
+         });
+     }
+ 
+@@ -191,13 +191,12 @@ export default function Login(props: { onCreateAccount: () => void }) {
+           navigation.push(`/user/${user._id}/${user.name}`);
+         })
+         .catch((e) => {
++           setIsLoading(false);
+           if (e?.response) {
+             const { message } = e?.response?.data;
+             ErrorNotification(message);
+             // SuccessNotification("error found!!");
+           }
+-
+-          setIsLoading(false);
+         });
+     }
+     // for student login
+@@ -211,10 +210,10 @@ export default function Login(props: { onCreateAccount: () => void }) {
+           setIsLoading(false);
+         })
+         .catch((e: any) => {
++          setIsLoading(false);
+           const { message } = e.response.data;
+           ErrorNotification(message);
+           console.log(e);
+-          setIsLoading(false);
+         });
+     }
+     // for teacher login
+@@ -250,11 +249,11 @@ export default function Login(props: { onCreateAccount: () => void }) {
+           navigation.push(`/teacher/${teacher._id}/${teacher.name}`);
+         })
+         .catch((e: any) => {
++          setIsLoading(false);
+           const { message } = e.response.data;
+           ErrorNotification(message);
+           // SuccessNotification("error found!!");
+           console.log(e);
+-          setIsLoading(false);
+         });
+     }
+   };
+diff --git a/src/app/components/institute/DesktopNavbar.tsx b/src/app/components/institute/DesktopNavbar.tsx
+index 94735c2..a63bb11 100644
+--- a/src/app/components/institute/DesktopNavbar.tsx
++++ b/src/app/components/institute/DesktopNavbar.tsx
+@@ -83,7 +83,7 @@ export const DesktopNavbar = (props: {
+ 
+   const [openBusiness, setOpenBusiness] = useState(false);
+   const [openMarketing, setOpenMarketing] = useState(false);
+-  const [hovered, setHovered] = useState(false);
++  const hovered = !props.isCollapsed;
+   const [settingsOpened, setSettingsOpened] = useState(false);
+   const [logoModalOpen, setLogoModalOpen] = useState(false);
+   const [activeSettingTab, setActiveSettingTab] = useState<
+@@ -556,17 +556,11 @@ export const DesktopNavbar = (props: {
+       />
+ 
+       <Stack
+-        w={isMd ? "0px" : hovered ? "250px" : "80px"}
++        w="100%"
+         h={"100vh"}
+         style={{
+-          position: "fixed",
+-          left: 0,
+-          top: 0,
+-          zIndex: 1000, // 🔥 ADD THIS
+           transition: "width 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+         }}
+-        onMouseEnter={() => setHovered(true)}
+-        onMouseLeave={() => setHovered(false)}
+         p={0}
+       >
+         <Stack
+diff --git a/src/app/components/institute/InstituteDashboard.tsx b/src/app/components/institute/InstituteDashboard.tsx
+index 8da5d04..ed7fe4f 100644
+--- a/src/app/components/institute/InstituteDashboard.tsx
++++ b/src/app/components/institute/InstituteDashboard.tsx
+@@ -386,10 +386,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
+               boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.04)",
+               transition: "all 0.3s ease",
+               cursor: "pointer",
+-            }}
+-            onClick={() => setOpenStudentsPage(true)}
+-            sx={{
+-              "&:hover": {
++                            "&:hover": {
+                 transform: "translateY(-4px)",
+                 borderColor: "#8B5CF6",
+                 boxShadow: "0px 12px 28px rgba(139, 92, 246, 0.12)",
+@@ -400,6 +397,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
+                 },
+               },
+             }}
++            onClick={() => setOpenStudentsPage(true)}
+           >
+             {/* Subtle light background accent dot */}
+             <div
+diff --git a/src/app/components/institute/InstituteStudents.tsx b/src/app/components/institute/InstituteStudents.tsx
+index ea9a38a..35cd40d 100644
+--- a/src/app/components/institute/InstituteStudents.tsx
++++ b/src/app/components/institute/InstituteStudents.tsx
+@@ -204,12 +204,6 @@ export const InstituteStudents = () => {
+ 
+   const addPayment = () => {
+     const studentIds = pendingStudents.map((stud: any) => stud.studentId);
+-    console.log(
+-      "adding payment : ",
+-      fees,
+-      pendingFilters.phoneNumber,
+-      studentIds,
+-    );
+     setIsLoading(true);
+     PayRecordWithNumber(institute._id, {
+       fees,
+@@ -586,7 +580,7 @@ export const InstituteStudents = () => {
+           Students Directory
+         </Text>
+         <Flex align={"center"} gap={10}>
+-          {institute.isAcadmy && (
++          {institute?.isAcadmy && (
+             <Button
+               onClick={() => setShowPassoutScreen(true)}
+               styles={{
+diff --git a/src/app/components/institute/insideBatch/DiaryPage.tsx b/src/app/components/institute/insideBatch/DiaryPage.tsx
+index 6aececc..21bcde9 100644
+--- a/src/app/components/institute/insideBatch/DiaryPage.tsx
++++ b/src/app/components/institute/insideBatch/DiaryPage.tsx
+@@ -53,8 +53,12 @@ import {
+ import { DateValue } from "@mantine/dates";
+ import { CreateDiary } from "@/axios/institute/InstitutePostApi";
+ import { SuccessNotification } from "@/app/helperFunction/Notification";
+-import { GetAllDiary, GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
++import {
++  GetAllDiary,
++  GetAllTeachersFromBatch,
++} from "@/axios/institute/InstituteGetApi";
+ import { DeleteDiary, updateDiary } from "@/axios/institute/InstitutePutApi";
++import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
+ 
+ // ─── Types ──────────────────────────────────────────────────────────────────
+ 
+@@ -121,7 +125,8 @@ function getSubjectIcon(subject: string) {
+   if (s.includes("science")) return <IconFlask size={16} />;
+   if (s.includes("english")) return <IconLanguage size={16} />;
+   if (s.includes("social")) return <IconGlobe size={16} />;
+-  if (s.includes("computer") || s.includes("c")) return <IconDeviceDesktop size={16} />;
++  if (s.includes("computer") || s.includes("c"))
++    return <IconDeviceDesktop size={16} />;
+   if (s.includes("hindi")) return <IconLetterA size={16} />;
+ 
+   return <IconBook size={16} />; // default icon
+@@ -237,32 +242,44 @@ interface EntryFormProps {
+   teacher?: string;
+   batchId: string;
+   subjects: { _id: string; name: string }[];
+-    id?: string; 
+-    isLoading?: boolean;
+-setIsLoading?: (v: boolean) => void;
+-fetchDiary: () => void;
++  id?: string;
++  isLoading?: boolean;
++  setIsLoading?: (v: boolean) => void;
++  fetchDiary: () => void;
+ }
+ 
+-function EntryForm({ initial, onSave, onCancel, teacher, batchId, subjects, id,  isLoading, setIsLoading, fetchDiary }: EntryFormProps) {
++function EntryForm({
++  initial,
++  onSave,
++  onCancel,
++  teacher,
++  batchId,
++  subjects,
++  id,
++  isLoading,
++  setIsLoading,
++  fetchDiary,
++}: EntryFormProps) {
+   const [subject, setSubject] = useState<string>(initial?.subject ?? "");
+   const [title, setTitle] = useState(initial?.title ?? "");
+   const [description, setDescription] = useState(initial?.description ?? "");
+   const [date, setDate] = useState<DateValue>(
+-    initial?.date ? new Date(initial.date) : new Date()
++    initial?.date ? new Date(initial.date) : new Date(),
++  );
++  //  const [teacherName,setteacherName] = useState<string>("")
++  const [teacherName, setteacherName] = useState<string>(
++    initial?.teacher ?? "",
+   );
+-//  const [teacherName,setteacherName] = useState<string>("")
+-const [teacherName, setteacherName] = useState<string>(initial?.teacher ?? "")
+ 
+   useEffect(() => {
+-  if (initial) {
+-    setSubject(initial.subject ?? "");
+-    setTitle(initial.title ?? "");
+-    setDescription(initial.description ?? "");
+-    setDate(initial.date ? new Date(initial.date) : new Date());
+-    setteacherName(initial.teacher ?? "");
+-  }
+-}, [initial]);
+-
++    if (initial) {
++      setSubject(initial.subject ?? "");
++      setTitle(initial.title ?? "");
++      setDescription(initial.description ?? "");
++      setDate(initial.date ? new Date(initial.date) : new Date());
++      setteacherName(initial.teacher ?? "");
++    }
++  }, [initial]);
+ 
+   const handleSave = () => {
+     if (!subject || !title || !description || !date) {
+@@ -274,48 +291,44 @@ const [teacherName, setteacherName] = useState<string>(initial?.teacher ?? "")
+       });
+       return;
+     }
+-setIsLoading?.(true);
+-
+-     const payload = {
+-    subject: subject as Subject,
+-    title,
+-    description,
+-    date: (date as Date).toISOString().split("T")[0],
+-    time: new Date().toLocaleTimeString("en-US", {
+-      hour: "2-digit",
+-      minute: "2-digit",
+-    }),
+-  };
+-
+-  // ✅ EDIT API CALL
+-  if (id) {
+-    updateDiary(id, payload)
+-      .then((res: any) => {
+-        console.log("edit :", res);
+-        
+-        SuccessNotification("Diary updated!!");
+-        fetchDiary();
+-        onCancel(); 
+-
+-        // onSave({
+-        //   ...payload,
+-        //   teacher: teacherName,
+-        // });
+-         setIsLoading?.(false);
+-      })
+-      .catch((e: any) => {
+-        console.log(e);
+-        
+-      })
+-       .finally(() => {
+-      setIsLoading?.(false);
+-    });
+-
+-    return;
+-  }
+-
++    setIsLoading?.(true);
+ 
++    const payload = {
++      subject: subject as Subject,
++      title,
++      description,
++      date: (date as Date).toISOString().split("T")[0],
++      time: new Date().toLocaleTimeString("en-US", {
++        hour: "2-digit",
++        minute: "2-digit",
++      }),
++    };
++
++    // ✅ EDIT API CALL
++    if (id) {
++      updateDiary(id, payload)
++        .then((res: any) => {
++          console.log("edit :", res);
++
++          SuccessNotification("Diary updated!!");
++          fetchDiary();
++          onCancel();
++
++          // onSave({
++          //   ...payload,
++          //   teacher: teacherName,
++          // });
++          setIsLoading?.(false);
++        })
++        .catch((e: any) => {
++          console.log(e);
++        })
++        .finally(() => {
++          setIsLoading?.(false);
++        });
+ 
++      return;
++    }
+ 
+     CreateDiary({
+       subject: subject as Subject,
+@@ -327,14 +340,13 @@ setIsLoading?.(true);
+       time: new Date().toLocaleTimeString("en-US", {
+         hour: "2-digit",
+         minute: "2-digit",
+-      })
++      }),
+     })
+       .then((res: any) => {
+         console.log("resdiary :", res);
+ 
+-  fetchDiary();   // ✅ UI तुरंत update
+-  onCancel();     // ✅ Drawer close
+-        
++        fetchDiary(); // ✅ UI तुरंत update
++        onCancel(); // ✅ Drawer close
+ 
+         // onSave({
+         //   subject: res.diary.subject,
+@@ -348,17 +360,15 @@ setIsLoading?.(true);
+         //   }),
+         // });
+ 
+-        SuccessNotification("Diary created!!")
+-         setIsLoading?.(false);
++        SuccessNotification("Diary created!!");
++        setIsLoading?.(false);
+       })
+       .catch((e: any) => {
+         console.log(e);
+-         setIsLoading?.(false);
+-      })
+-
++        setIsLoading?.(false);
++      });
+   };
+ 
+-
+   return (
+     <Stack gap="md">
+       <DatePickerInput
+@@ -374,13 +384,11 @@ setIsLoading?.(true);
+         label="Subject"
+         placeholder="Select Subject"
+         data={subjects.map((sub) => ({
+-          value: sub.name,   // ✅ id use karo
+-          label: sub.name   // ✅ name show karo
++          value: sub.name, // ✅ id use karo
++          label: sub.name, // ✅ name show karo
+         }))}
+         value={subject}
+-        onChange={(v) =>
+-          setSubject(v ?? "")
+-        }
++        onChange={(v) => setSubject(v ?? "")}
+         rightSection={<IconChevronDown size={14} />}
+         styles={{ input: { borderRadius: 8 } }}
+         required
+@@ -390,9 +398,9 @@ setIsLoading?.(true);
+         label="Teacher"
+         value={teacherName}
+         placeholder="Enter teacher name "
+-         onChange={(e) => setteacherName(e.currentTarget.value)}
+-      styles={{ input: { borderRadius: 8 } }}
+-      required
++        onChange={(e) => setteacherName(e.currentTarget.value)}
++        styles={{ input: { borderRadius: 8 } }}
++        required
+       />
+ 
+       <TextInput
+@@ -421,8 +429,8 @@ setIsLoading?.(true);
+         <Button
+           onClick={handleSave}
+           radius="md"
+-            loading={isLoading} // 👈 ये add करो
+-  disabled={isLoading} // optional but best
++          loading={isLoading} // 👈 ये add करो
++          disabled={isLoading} // optional but best
+           style={{ background: "#5c3de8" }}
+           leftSection={<IconCheck size={16} />}
+         >
+@@ -442,8 +450,6 @@ interface EntryCardProps {
+ }
+ 
+ function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
+-
+-  
+   return (
+     <Card
+       withBorder
+@@ -541,10 +547,12 @@ export default function DiaryPage(props: {
+   const [isLoading, setIsLoading] = useState<boolean>(false);
+ 
+   // Drawer / Modal state
+-  const [addDrawerOpen, { open: openAdd, close: closeAdd }] = useDisclosure(false);
++  const [addDrawerOpen, { open: openAdd, close: closeAdd }] =
++    useDisclosure(false);
+   const [editEntry, setEditEntry] = useState<DiaryEntry | null>(null);
+   const [deleteId, setDeleteId] = useState<string | null>(null);
+-  const [deleteModalOpen, { open: openDelete, close: closeDelete }] = useDisclosure(false);
++  const [deleteModalOpen, { open: openDelete, close: closeDelete }] =
++    useDisclosure(false);
+ 
+   // Unique teachers
+   const allTeachers = Array.from(new Set(entries.map((e) => e.teacher)));
+@@ -559,61 +567,58 @@ export default function DiaryPage(props: {
+     const matchTeacher = !teacherFilter || e.teacher === teacherFilter;
+     // return matchSearch && matchSubject && matchTeacher;
+     // filter kiya hai diary purani diary date pe dikhehi
+-      // ✅ DATE FILTER ADD
+-  const matchDate =
+-    !selectedDate ||
+-    new Date(e.date).toDateString() ===
+-      new Date(selectedDate as Date).toDateString();
+-
+-  return matchSearch && matchSubject && matchTeacher && matchDate;
++    // ✅ DATE FILTER ADD
++    const matchDate =
++      !selectedDate ||
++      new Date(e.date).toDateString() ===
++        new Date(selectedDate as Date).toDateString();
+ 
++    return matchSearch && matchSubject && matchTeacher && matchDate;
+   });
+ 
+   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+ 
+-
+-
+   const fetchDiary = useCallback(() => {
+-  if (!props.batchId) return;
++    if (!props.batchId) return;
+ 
+-  setIsLoading(true);
+-
+-  GetAllDiary(props.batchId)
+-    .then((res: any) => {
+-      console.log("GET DIARY RESPONSE 👉", res);
+-
+-      const data = res?.diary || []; // ✅ FIXED
+-
+-      const formatted: DiaryEntry[] = data.map((item: any) => ({
+-        id: item._id,
+-        subject: item.subject,
+-        teacher: item.teacher,
+-        title: item.title,
+-        description: item.description,
+-        date: item.date,
+-        time: new Date(item.createdAt).toLocaleTimeString("en-US", {
+-          hour: "2-digit",
+-          minute: "2-digit",
+-        }),
+-      }));
+-
+-      console.log("FORMATTED DATA 👉", formatted); // 👈 DEBUG
++    setIsLoading(true);
+ 
+-      setEntries(formatted);
+-    })
+-    .catch((err: any) => {
+-      console.log("GET DIARY ERROR ❌", err);
+-    })
+-    .finally(() => {
+-      setIsLoading(false);
+-    });
+-}, [props.batchId]);
++    GetAllDiary(props.batchId)
++      .then((res: any) => {
++        console.log("GET DIARY RESPONSE 👉", res);
++
++        const data = res?.diary || []; // ✅ FIXED
++
++        const formatted: DiaryEntry[] = data.map((item: any) => ({
++          id: item._id,
++          subject: item.subject,
++          teacher: item.teacher,
++          title: item.title,
++          description: item.description,
++          date: item.date,
++          time: new Date(item.createdAt).toLocaleTimeString("en-US", {
++            hour: "2-digit",
++            minute: "2-digit",
++          }),
++        }));
++
++        console.log("FORMATTED DATA 👉", formatted); // 👈 DEBUG
++
++        setEntries(formatted);
++      })
++      .catch((err: any) => {
++        console.log("GET DIARY ERROR ❌", err);
++      })
++      .finally(() => {
++        setIsLoading(false);
++      });
+ 
++  }, [props.batchId]);
+ 
+-useEffect(() => {
+-  fetchDiary();
+-}, [props.batchId]);
++  useEffect(() => {
++    fetchDiary();
++  }, [props.batchId]);
+ 
+   // Handlers
+   const handleAddSave = useCallback(
+@@ -628,14 +633,14 @@ useEffect(() => {
+         icon: <IconCheck size={16} />,
+       });
+     },
+-    [closeAdd]
++    [closeAdd],
+   );
+ 
+   const handleEditSave = useCallback(
+     (data: Omit<DiaryEntry, "id">) => {
+       if (!editEntry) return;
+       setEntries((prev) =>
+-        prev.map((e) => (e.id === editEntry.id ? { ...data, id: e.id } : e))
++        prev.map((e) => (e.id === editEntry.id ? { ...data, id: e.id } : e)),
+       );
+       setEditEntry(null);
+       notifications.show({
+@@ -645,30 +650,29 @@ useEffect(() => {
+         icon: <IconCheck size={16} />,
+       });
+     },
+-    [editEntry]
++    [editEntry],
+   );
+ 
+- const handleDeleteConfirm = useCallback(() => {
+-  if (!deleteId) return;
++  const handleDeleteConfirm = useCallback(() => {
++    if (!deleteId) return;
+     setIsLoading(true);
+ 
+-  // ✅ API CALL
+-  DeleteDiary(deleteId)
+-    .then((res: any) => {
+-      // ✅ UI update (existing logic)
+-      setEntries((prev) => prev.filter((e) => e.id !== deleteId));
+-      closeDelete();
+-
+-      setDeleteId(null);
+-      fetchDiary();   // 👈 ADD THIS
+-   SuccessNotification("Diary Deleted!!");
+-    })
+-    .catch((e: any) => {
+-      console.log(e);
+-      setIsLoading(false)
+-    });
++    // ✅ API CALL
++    DeleteDiary(deleteId)
++      .then((res: any) => {
++        // ✅ UI update (existing logic)
++        setEntries((prev) => prev.filter((e) => e.id !== deleteId));
++        closeDelete();
+ 
+-}, [deleteId, closeDelete]);
++        setDeleteId(null);
++        fetchDiary(); // 👈 ADD THIS
++        SuccessNotification("Diary Deleted!!");
++      })
++      .catch((e: any) => {
++        console.log(e);
++        setIsLoading(false);
++      });
++  }, [deleteId, closeDelete]);
+ 
+   const requestDelete = (id: string) => {
+     setDeleteId(id);
+@@ -677,10 +681,10 @@ useEffect(() => {
+ 
+   const formattedDate = selectedDate
+     ? (selectedDate as Date).toLocaleDateString("en-GB", {
+-      day: "2-digit",
+-      month: "long",
+-      year: "numeric",
+-    })
++        day: "2-digit",
++        month: "long",
++        year: "numeric",
++      })
+     : "Select Date";
+ 
+   return (
+@@ -708,7 +712,11 @@ useEffect(() => {
+         >
+           <Stack gap={2}>
+             <Group gap="xs">
+-              <ThemeIcon size={36} radius="xl" style={{ background: "#5c3de822" }}>
++              <ThemeIcon
++                size={36}
++                radius="xl"
++                style={{ background: "#5c3de822" }}
++              >
+                 <IconCalendar size={20} color="#5c3de8" />
+               </ThemeIcon>
+               <Title order={3} style={{ color: "#1a1a2e", fontWeight: 700 }}>
+@@ -759,13 +767,17 @@ useEffect(() => {
+ 
+       {/* Filters Row */}
+ 
+-
+       {/* Table / Card View */}
+       {isMobile ? (
+         /* Mobile: Card Grid */
+         <Stack gap="sm">
+           {paginated.length === 0 ? (
+-            <Paper radius="xl" p="xl" withBorder style={{ textAlign: "center" }}>
++            <Paper
++              radius="xl"
++              p="xl"
++              withBorder
++              style={{ textAlign: "center" }}
++            >
+               <Text c="dimmed">No diary entries found.</Text>
+             </Paper>
+           ) : (
+@@ -784,7 +796,11 @@ useEffect(() => {
+         <Paper
+           radius="xl"
+           withBorder
+-          style={{ borderColor: "#e9ecef", background: "#fff", overflow: "hidden" }}
++          style={{
++            borderColor: "#e9ecef",
++            background: "#fff",
++            overflow: "hidden",
++          }}
+         >
+           <ScrollArea>
+             <Table
+@@ -795,29 +811,37 @@ useEffect(() => {
+             >
+               <Table.Thead>
+                 <Table.Tr style={{ background: "#f5f0ff" }}>
+-                  {["Subject", "Teacher", "Title", "Description", "Date", "Action"].map(
+-                    (h) => (
+-                      <Table.Th
+-                        key={h}
+-                        style={{
+-                          color: "#5c3de8",
+-                          fontWeight: 600,
+-                          fontSize: 13,
+-                          letterSpacing: 0.3,
+-                          padding: "14px 20px",
+-                        }}
+-                      >
+-                        {h}
+-                      </Table.Th>
+-                    )
+-                  )}
++                  {[
++                    "Subject",
++                    "Teacher",
++                    "Title",
++                    "Description",
++                    "Date",
++                    "Action",
++                  ].map((h) => (
++                    <Table.Th
++                      key={h}
++                      style={{
++                        color: "#5c3de8",
++                        fontWeight: 600,
++                        fontSize: 13,
++                        letterSpacing: 0.3,
++                        padding: "14px 20px",
++                      }}
++                    >
++                      {h}
++                    </Table.Th>
++                  ))}
+                 </Table.Tr>
+               </Table.Thead>
+ 
+               <Table.Tbody>
+                 {paginated.length === 0 ? (
+                   <Table.Tr>
+-                    <Table.Td colSpan={6} style={{ textAlign: "center", padding: 40 }}>
++                    <Table.Td
++                      colSpan={6}
++                      style={{ textAlign: "center", padding: 40 }}
++                    >
+                       <Text c="dimmed">No diary entries found.</Text>
+                     </Table.Td>
+                   </Table.Tr>
+@@ -829,7 +853,7 @@ useEffect(() => {
+                     >
+                       <Table.Td style={{ padding: "12px 20px" }}>
+                         <Group gap="sm">
+-                         {getSubjectIcon(entry.subject)}
++                          {getSubjectIcon(entry.subject)}
+                           <Text fw={500} size="sm">
+                             {entry.subject}
+                           </Text>
+@@ -915,7 +939,8 @@ useEffect(() => {
+       >
+         <Text size="sm" c="dimmed">
+           Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)} to{" "}
+-          {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} entries
++          {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}{" "}
++          entries
+         </Text>
+         <Pagination
+           total={totalPages}
+@@ -940,7 +965,11 @@ useEffect(() => {
+         onClose={closeAdd}
+         title={
+           <Group gap="xs">
+-            <ThemeIcon size={28} radius="xl" style={{ background: "#5c3de822" }}>
++            <ThemeIcon
++              size={28}
++              radius="xl"
++              style={{ background: "#5c3de822" }}
++            >
+               <IconCalendar size={14} color="#5c3de8" />
+             </ThemeIcon>
+             <Text fw={700} size="md" style={{ color: "#1a1a2e" }}>
+@@ -960,7 +989,7 @@ useEffect(() => {
+           onCancel={closeAdd}
+           batchId={props.batchId}
+           subjects={props.subjects}
+-           fetchDiary={fetchDiary}
++          fetchDiary={fetchDiary}
+         />
+       </Drawer>
+ 
+@@ -970,7 +999,11 @@ useEffect(() => {
+         onClose={() => setEditEntry(null)}
+         title={
+           <Group gap="xs">
+-            <ThemeIcon size={28} radius="xl" style={{ background: "#0984e322" }}>
++            <ThemeIcon
++              size={28}
++              radius="xl"
++              style={{ background: "#0984e322" }}
++            >
+               <IconEdit size={14} color="#0984e3" />
+             </ThemeIcon>
+             <Text fw={700} size="md" style={{ color: "#1a1a2e" }}>
+@@ -987,15 +1020,14 @@ useEffect(() => {
+       >
+         {editEntry && (
+           <EntryForm
+-           id={editEntry.id}
++            id={editEntry.id}
+             initial={editEntry}
+             onSave={handleEditSave}
+             onCancel={() => setEditEntry(null)}
+             teacher={editEntry.teacher}
+             batchId={props.batchId}
+             subjects={props.subjects}
+-              fetchDiary={fetchDiary}
+-
++            fetchDiary={fetchDiary}
+           />
+         )}
+       </Drawer>
+@@ -1022,7 +1054,13 @@ useEffect(() => {
+             <Button variant="default" radius="md" onClick={closeDelete}>
+               Cancel
+             </Button>
+-            <Button color="red" loading={isLoading} radius="md" onClick={handleDeleteConfirm} leftSection={<IconTrash size={14} />}>
++            <Button
++              color="red"
++              loading={isLoading}
++              radius="md"
++              onClick={handleDeleteConfirm}
++              leftSection={<IconTrash size={14} />}
++            >
+               Delete
+             </Button>
+           </Group>
+diff --git a/src/app/components/institute/insideBatch/InstituteInsideBatch.tsx b/src/app/components/institute/insideBatch/InstituteInsideBatch.tsx
+index 3715a6b..03ca651 100644
+--- a/src/app/components/institute/insideBatch/InstituteInsideBatch.tsx
++++ b/src/app/components/institute/insideBatch/InstituteInsideBatch.tsx
+@@ -43,6 +43,7 @@ import ExaminationPage from "./ExaminationPage";
+ import MeetingsPage from "../../meeting/MeetingPage";
+ import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
+ import TimetablePage from "./timetable/TimeTablePage";
++import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
+ 
+ enum Tabs {
+   OVERVIEW = "Overview",
+@@ -129,6 +130,9 @@ export function InstituteInsideBatch(props: {
+   const [editStudentDetails, setEditStudentDetails] = useState<boolean>(false);
+   const [isLoading, setIsLoading] = useState<boolean>(false);
+   const [activeTab, setActiveTab] = useState<string>(Tabs.OVERVIEW);
++  const [subjects, setSubject] = useState<{ _id: string; name: string }[]>(
++    props.subjects ?? [],
++  );
+ 
+   const [studentData, setStudentData] = useState<StudentData>({
+     name: "",
+@@ -168,6 +172,14 @@ export function InstituteInsideBatch(props: {
+       .catch((err) => {
+         console.log("Teacher Fetch Error:", err);
+       });
++
++    if (props.subjects?.length) return;
++
++    GetAllSubjectsFromBatch(props.batchId)
++      .then((res: any) => {
++        setSubject(res.subjects.subjects);
++      })
++      .catch((e: any) => {});
+   }, [props.batchId]);
+ 
+   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
+@@ -451,7 +463,7 @@ export function InstituteInsideBatch(props: {
+           <Tests batchId={props.batchId} subjects={props.subjects ?? []} />
+         )}
+         {Tabs.DIARY === activeTab && (
+-          <DiaryPage batchId={props.batchId} subjects={props.subjects ?? []} />
++          <DiaryPage batchId={props.batchId} subjects={subjects ?? []} />
+         )}
+ 
+         {Tabs.STUDY_MATERIAL === activeTab && (
+diff --git a/src/app/components/institute/student/fees/FeeRecordTable.tsx b/src/app/components/institute/student/fees/FeeRecordTable.tsx
+index 6f51fb2..0c927cc 100644
+--- a/src/app/components/institute/student/fees/FeeRecordTable.tsx
++++ b/src/app/components/institute/student/fees/FeeRecordTable.tsx
+@@ -23,7 +23,7 @@ import { Installment } from "@/interfaces/batchInterface";
+ import { createReceiptPdf } from "./HtmlToPdf";
+ import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
+ import { GetStudentForPdf } from "@/axios/student/StudentGetApi";
+-import { getBase64Image } from "@/app/helperFunction/Notification";
++import { formatDateDDMMYY, getBase64Image } from "@/app/helperFunction/Notification";
+ import { useAppSelector } from "@/app/redux/redux.hooks";
+ 
+ export interface FeeRecord {
+@@ -347,7 +347,7 @@ const FeeRecordTable = (props: {
+           fontFamily: "sans-serif",
+         }}
+       >
+-        {`${new Date(row.dueDate).toLocaleDateString()}`}
++        {formatDateDDMMYY(`${new Date(row.dueDate).toLocaleDateString()}`)}
+       </Table.Td>
+       <Table.Td
+         style={{
+@@ -407,7 +407,7 @@ const FeeRecordTable = (props: {
+         }}
+       >
+         {(row.amountPaid ?? 0) > 0
+-          ? `${new Date(row.updatedAt || 0).toLocaleDateString()}`
++          ? formatDateDDMMYY(`${new Date(row.updatedAt || 0).toLocaleDateString()}`)
+           : "N/A"}
+       </Table.Td>
+       {/* {props.userType === UserType.TEACHER && ( */}
+@@ -631,9 +631,9 @@ const FeeRecordTable = (props: {
+                       </td>
+                       <td style={{ textAlign: "left" }}>
+                         <Text size="sm" fw={500}>
+-                          {new Date(
++                          {formatDateDDMMYY(new Date(
+                             singlePaymentRecord.paidDate,
+-                          ).toLocaleDateString()}
++                          ).toLocaleDateString())}
+                         </Text>
+                       </td>
+                       <td style={{ textAlign: "left" }}>
+diff --git a/src/app/components/marketing/meta/AppLayout.tsx b/src/app/components/marketing/meta/AppLayout.tsx
+index d49b820..70983b6 100644
+--- a/src/app/components/marketing/meta/AppLayout.tsx
++++ b/src/app/components/marketing/meta/AppLayout.tsx
+@@ -70,7 +70,7 @@ export function AppLayout({ children }: Props) {
+                 <ThemeIcon
+                   size={28}
+                   radius="sm"
+-                  variant={pathname.startsWith(item.href) ? "filled" : "light"}
++                  variant={pathname?.startsWith(item.href) ? "filled" : "light"}
+                   color="blue"
+                 >
+                   <item.icon size={15} />
+@@ -83,7 +83,7 @@ export function AppLayout({ children }: Props) {
+                   </Badge>
+                 ) : null
+               }
+-              active={pathname.startsWith(item.href)}
++              active={pathname?.startsWith(item.href)}
+               styles={{
+                 root: { borderRadius: "var(--mantine-radius-md)", marginBottom: 4 },
+               }}
+diff --git a/src/app/components/marketing/meta/IntegrationCallbackContent.tsx b/src/app/components/marketing/meta/IntegrationCallbackContent.tsx
+index b2f5b6a..c3b3c6a 100644
+--- a/src/app/components/marketing/meta/IntegrationCallbackContent.tsx
++++ b/src/app/components/marketing/meta/IntegrationCallbackContent.tsx
+@@ -67,9 +67,9 @@ export function IntegrationsCallbackContent() {
+   const notifiedRef  = useRef(false); // prevent double notification in strict mode
+ 
+   // ── Read params — exactly matching what your backend sends ───────
+-  const success = searchParams.get("success"); // "meta_connected" | null
+-  const error   = searchParams.get("error");   // see ERROR_MAP keys above | null
+-  const pages   = searchParams.get("pages");   // number string e.g. "3" | null
++  const success = searchParams?.get("success"); // "meta_connected" | null
++  const error   = searchParams?.get("error");   // see ERROR_MAP keys above | null
++  const pages   = searchParams?.get("pages");   // number string e.g. "3" | null
+ 
+   const isSuccess = success === "meta_connected";
+   const isError   = !!error;
+diff --git a/src/app/components/student/StudentPage.tsx b/src/app/components/student/StudentPage.tsx
+index be378ba..a631422 100644
+--- a/src/app/components/student/StudentPage.tsx
++++ b/src/app/components/student/StudentPage.tsx
+@@ -1,9 +1,10 @@
+ "use client";
+ 
+-import { Box, Divider, Flex, LoadingOverlay, Stack, Text } from "@mantine/core";
+-import { useMediaQuery } from "@mantine/hooks";
++import { Box, Divider, Flex, LoadingOverlay, Stack, Text, AppShell, Burger, Group, Button } from "@mantine/core";
++import { useMediaQuery, useDisclosure } from "@mantine/hooks";
+ import Image from "next/image";
+ import React, { useEffect, useState } from "react";
++import { useRouter, useSearchParams, usePathname } from "next/navigation";
+ import { StudentTabs } from "../institute/InstituteStudents";
+ import FeeRecordSection from "../institute/student/fees/FeeRecord";
+ import StudentOverview from "./StudentOverview";
+@@ -56,14 +57,32 @@ export interface ChartData {
+   datasets: Dataset[];
+ }
+ 
+-const StudentPage = (props: {
+-  onClickBack: () => void;
+-  activeTab: StudentTabs;
++export interface StudentPageProps {
+   studentId: string;
++  onClickBack: () => void;
+   userType: UserType;
+-}) => {
++  activeTab?: StudentTabs;
++  onLogout?: () => void;
++}
++
++const StudentPage = (props: StudentPageProps) => {
+   const isMd = useMediaQuery(`(max-width: 968px)`);
+-  const [activeTab, setActiveTab] = useState<StudentTabs>(props.activeTab);
++  const searchParams = useSearchParams();
++  const pathname = usePathname();
++  const router = useRouter();
++
++  const tabQuery = searchParams?.get("studentTab") as StudentTabs | null;
++  const urlTab = tabQuery && Object.values(StudentTabs).includes(tabQuery) ? tabQuery : null;
++  const [activeTabState, setActiveTabState] = useState<StudentTabs>(props.activeTab || StudentTabs.OVERVIEW);
++
++  const activeTab = urlTab || activeTabState;
++
++  const setActiveTab = (val: StudentTabs) => {
++    setActiveTabState(val);
++    const newParams = new URLSearchParams(searchParams?.toString());
++    newParams.set("studentTab", val);
++    router.push(`${pathname}?${newParams.toString()}`);
++  };
+ 
+   const [student, setStudent] = useState<StudentOverView>({
+     _id: "",
+@@ -154,7 +173,7 @@ const StudentPage = (props: {
+       });
+   };
+ 
+-  return (
++  const content = (
+     <Stack w={"100%"}>
+       <LoadingOverlay visible={isLoading} />
+       <Flex w={"100%"} gap={10} align={"center"} justify={"start"}>
+@@ -181,41 +200,42 @@ const StudentPage = (props: {
+           </>
+         )}
+       </Flex>
+-      <Flex mt={isMd ? 10 : 20}>
+-        {Object.values(StudentTabs)
+-          .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
+-          .map((item: StudentTabs, i: number) => {
+-            return (
+-              <Box key={i}>
+-                {!(
+-                  item === StudentTabs.FEES &&
+-                  UserType.TEACHER === props.userType
+-                ) && (
+-                  <Text
+-                    key={i}
+-                    onClick={() => setActiveTab(item)}
+-                    mx={isMd ? 14 : 30}
+-                    c={activeTab === item ? "#1B1212" : "#2F4F4F"}
+-                    fw={600}
+-                    style={{
+-                      cursor: "pointer",
+-                      whiteSpace: "nowrap",
+-                      border: "none",
+-                      borderBottom: "2px solid",
+-                      borderColor: activeTab === item ? "#4B65F6" : "white",
+-                    }}
+-                    fz={16}
+-                    ff={"Roboto"}
+-                    w={"auto"}
+-                  >
+-                    {item}
+-                    {/* {activeTab === item && <><hr color="#4B65F6" /></>} */}
+-                  </Text>
+-                )}
+-              </Box>
+-            );
+-          })}
+-      </Flex>
++      {props.userType !== UserType.STUDENT && (
++        <Flex mt={isMd ? 10 : 20}>
++          {Object.values(StudentTabs)
++            .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
++            .map((item: StudentTabs, i: number) => {
++              return (
++                <Box key={i}>
++                  {!(
++                    item === StudentTabs.FEES &&
++                    UserType.TEACHER === props.userType
++                  ) && (
++                    <Text
++                      key={i}
++                      onClick={() => setActiveTab(item)}
++                      mx={isMd ? 14 : 30}
++                      c={activeTab === item ? "#1B1212" : "#2F4F4F"}
++                      fw={600}
++                      style={{
++                        cursor: "pointer",
++                        whiteSpace: "nowrap",
++                        border: "none",
++                        borderBottom: "2px solid",
++                        borderColor: activeTab === item ? "#4B65F6" : "white",
++                      }}
++                      fz={16}
++                      ff={"Roboto"}
++                      w={"auto"}
++                    >
++                      {item}
++                    </Text>
++                  )}
++                </Box>
++              );
++            })}
++        </Flex>
++      )}
+ 
+       <Divider c={"gray"} />
+       {StudentTabs.OVERVIEW === activeTab && (
+@@ -264,6 +284,63 @@ const StudentPage = (props: {
+       )}
+     </Stack>
+   );
++
++  const [opened, { toggle }] = useDisclosure();
++  
++  if (props.userType === UserType.STUDENT) {
++    return (
++      <AppShell
++        header={{ height: 60 }}
++        navbar={{
++          width: 250,
++          breakpoint: 'sm',
++          collapsed: { mobile: !opened },
++        }}
++        padding="md"
++        bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
++      >
++        <AppShell.Header style={{ display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
++          <Group>
++            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
++            <Text fw={700} fz="1.2rem">Student Dashboard - {student.name}</Text>
++          </Group>
++          {props.onLogout && (
++            <Button color="red" variant="light" onClick={props.onLogout}>
++              Logout
++            </Button>
++          )}
++        </AppShell.Header>
++        <AppShell.Navbar p="md">
++          <Stack>
++            {Object.values(StudentTabs)
++              .filter((item: StudentTabs) => StudentTabs.OTHER !== item)
++              .map((item: StudentTabs, i: number) => (
++                <Text
++                  key={i}
++                  onClick={() => { setActiveTab(item); toggle(); }}
++                  c={activeTab === item ? "#4B65F6" : "#2F4F4F"}
++                  fw={600}
++                  style={{
++                    cursor: "pointer",
++                    padding: "10px",
++                    borderRadius: "8px",
++                    background: activeTab === item ? "#E8EDFF" : "transparent"
++                  }}
++                  fz={16}
++                >
++                  {item}
++                </Text>
++              ))}
++          </Stack>
++        </AppShell.Navbar>
++        <AppShell.Main>
++           {content}
++        </AppShell.Main>
++      </AppShell>
++    );
++  }
++
++  return content;
+ };
+ 
+ export default StudentPage;
+diff --git a/src/app/helperFunction/Notification.tsx b/src/app/helperFunction/Notification.tsx
+index 3f8f742..c3e0480 100644
+--- a/src/app/helperFunction/Notification.tsx
++++ b/src/app/helperFunction/Notification.tsx
+@@ -88,3 +88,11 @@ export function getExamStartTime(date: any) {
+     hour12: true,
+   });
+ }
++
++export function formatDateDDMMYY(date: string) {
++  if (!date) return "";
++
++  const [day, month, year] = date.split("/");
++
++  return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
++}
+\ No newline at end of file
+diff --git a/src/app/institute/[id]/[institute]/page.tsx b/src/app/institute/[id]/[institute]/page.tsx
+index a3fd6be..051faf9 100644
+--- a/src/app/institute/[id]/[institute]/page.tsx
++++ b/src/app/institute/[id]/[institute]/page.tsx
+@@ -18,15 +18,13 @@ import { setDetails } from "@/app/redux/slices/instituteSlice";
+ import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+ import { LocalStorageKey } from "@/axios/LocalStorageUtility";
+ import { Tabs } from "@/enums";
+-import { Box, Flex, LoadingOverlay } from "@mantine/core";
+-import { useMediaQuery } from "@mantine/hooks";
++import { Box, Flex, LoadingOverlay, AppShell, Burger, Group, Text } from "@mantine/core";
++import { useMediaQuery, useDisclosure } from "@mantine/hooks";
+ import { Notifications } from "@mantine/notifications";
+-import { useRouter } from "next/navigation";
++import { useRouter, useSearchParams, usePathname } from "next/navigation";
+ import { useEffect, useState } from "react";
+ 
+ const dashboard = () => {
+-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+-  const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
+ 
+   const isMd = useMediaQuery(`(max-width: 968px)`);
+   const [isLoading, setIsLoading] = useState<boolean>(false);
+@@ -36,6 +34,17 @@ const dashboard = () => {
+ 
+   const dispatch = useAppDispatch();
+   const navigation = useRouter();
++  const searchParams = useSearchParams();
++  const pathname = usePathname();
++
++  const tabQuery = searchParams?.get("tab") as Tabs | null;
++  const selectedTab = tabQuery && Object.values(Tabs).includes(tabQuery) ? tabQuery : Tabs.DASHBOARD;
++
++  const handleSelectTab = (val: Tabs) => {
++    const newParams = new URLSearchParams(searchParams?.toString());
++    newParams.set("tab", val);
++    navigation.push(`${pathname}?${newParams.toString()}`);
++  };
+ 
+   useEffect(() => {
+     setIsLoading(true);
+@@ -82,61 +91,76 @@ const dashboard = () => {
+       });
+   }, []);
+ 
+-  const [hovered, setHovered] = useState(false);
++  const [opened, { toggle }] = useDisclosure();
+ 
+   return (
+     <>
+       <Notifications />
+-      <div style={{ width: "100%", minHeight: "100vh" }}>
++      <AppShell
++        header={{ height: isMd ? 60 : 0 }}
++        navbar={{
++          width: isMd ? 80 : 260,
++          breakpoint: 'sm',
++          collapsed: { mobile: !opened },
++        }}
++        padding={0}
++        style={{ minHeight: "100vh" }}
++      >
+         <LoadingOverlay visible={isLoading} />
++        <AppShell.Header style={{ display: isMd ? 'flex' : 'none', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
++          <Group>
++            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
++            <Text fw={700} fz="1.1rem">Shikshapay</Text>
++          </Group>
++        </AppShell.Header>
+ 
+-        {!isMd && (
+-          <DesktopNavbar
+-            isCollapsed={hovered}
+-            onClickCollapse={() => {
+-              setHovered(!hovered);
+-            }}
+-            onSelectTab={(val: Tabs) => {
+-              setSelectedTab(val);
+-            }}
+-            activeTab={selectedTab}
+-          />
+-        )}
++        <AppShell.Navbar p={0} style={{ borderRight: "none", zIndex: 1000 }}>
++          {!isMd && (
++            <DesktopNavbar
++              isCollapsed={false}
++              onClickCollapse={() => {}}
++              onSelectTab={handleSelectTab}
++              activeTab={selectedTab}
++            />
++          )}
++          {isMd && (
++            <DesktopNavbar
++              isCollapsed={opened}
++              onClickCollapse={toggle}
++              onSelectTab={(val: Tabs) => {
++                handleSelectTab(val);
++                toggle();
++              }}
++              activeTab={selectedTab}
++            />
++          )}
++        </AppShell.Navbar>
+ 
+-        <Box style={{ display: !isMd ? "none" : "block" }}>
+-          <MobileNavbar
+-            onClickCollapse={() => {
+-              setIsCollapsed(!isCollapsed);
++        <AppShell.Main bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}>
++          <Box
++            style={{
++              transition: "all 0.3s ease",
++              minHeight: "100vh",
++              overflowY: "auto",
+             }}
+-            onSelectTab={(val: Tabs) => {
+-              setSelectedTab(val);
+-            }}
+-          />
+-        </Box>
+-        <Box
+-          style={{
+-            marginLeft: isMd ? "0px" : hovered ? "250px" : "80px",
+-            transition: "all 0.3s ease",
+-            minHeight: "100vh",
+-            overflowY: "auto",
+-          }}
+-          bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+-        >
+-          {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
+-          {Tabs.STUDENT === selectedTab && <InstituteStudents />}
+-          {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
+-          {Tabs.EARNING === selectedTab && <InstituteEarnings />}
+-          {Tabs.LEADS === selectedTab && <LeadsPage />}
+-          {Tabs.WHATSAPPLEADS === selectedTab && <WhatsAppPage />}
+-          {Tabs.INTEGRATION === selectedTab && <IntegrationsPage />}
++            p="md"
++          >
++            {Tabs.DASHBOARD === selectedTab && <InstituteDashboard />}
++            {Tabs.STUDENT === selectedTab && <InstituteStudents />}
++            {Tabs.EXPENSE === selectedTab && <InstituteExpanse />}
++            {Tabs.EARNING === selectedTab && <InstituteEarnings />}
++            {Tabs.LEADS === selectedTab && <LeadsPage />}
++            {Tabs.WHATSAPPLEADS === selectedTab && <WhatsAppPage />}
++            {Tabs.INTEGRATION === selectedTab && <IntegrationsPage />}
+ 
+-          {Tabs.TEACHER === selectedTab && (
+-            <InstituteTeachers userType={UserType.OTHERS} />
+-          )}
+-          {institute?.featureAccess?.transportManagement &&
+-            Tabs.TRANSPORT === selectedTab && <TransportPage />}
+-        </Box>
+-      </div>
++            {Tabs.TEACHER === selectedTab && (
++              <InstituteTeachers userType={UserType.OTHERS} />
++            )}
++            {institute?.featureAccess?.transportManagement &&
++              Tabs.TRANSPORT === selectedTab && <TransportPage />}
++          </Box>
++        </AppShell.Main>
++      </AppShell>
+     </>
+   );
+ };
+diff --git a/src/app/layout.tsx b/src/app/layout.tsx
+index 6273315..e2792ea 100644
+--- a/src/app/layout.tsx
++++ b/src/app/layout.tsx
+@@ -4,7 +4,7 @@ import "./globals.css";
+ import "@mantine/core/styles.css";
+ import "@mantine/dates/styles.css";
+ import "@mantine/notifications/styles.css";
+-import 'leaflet/dist/leaflet.css';
++import "leaflet/dist/leaflet.css";
+ import "@mantine/carousel/styles.css";
+ 
+ import { MantineProvider } from "@mantine/core";
+@@ -14,12 +14,10 @@ import { ModalsProvider } from "@mantine/modals";
+ import Script from "next/script";
+ import SessionRestore from "./components/SessionRestore";
+ 
+-
+-
+ export const metadata: Metadata = {
+   title: {
+     default: "shikshapay | Best ERP for school finance management",
+-    template: "%s"
++    template: "%s",
+   },
+ 
+   description: "Best - ERP software for records management",
+@@ -50,7 +48,6 @@ export default function RootLayout({
+   return (
+     <html lang="en">
+       <head>
+-
+         <Script
+           src="https://www.googletagmanager.com/gtag/js?id=G-DCCMSKS911"
+           strategy="afterInteractive"
+@@ -117,16 +114,16 @@ export default function RootLayout({
+           }}
+         >
+           <ReduxProvider>
+-  <ReactQueryProvider>
+-    <ModalsProvider>
+-      <React.StrictMode>
+-        <SessionRestore />
++            <ReactQueryProvider>
++              <ModalsProvider>
++                <React.StrictMode>
++                  <SessionRestore />
+ 
+-        {children}
+-      </React.StrictMode>
+-    </ModalsProvider>
+-  </ReactQueryProvider>
+-</ReduxProvider>
++                  {children}
++                </React.StrictMode>
++              </ModalsProvider>
++            </ReactQueryProvider>
++          </ReduxProvider>
+         </MantineProvider>
+       </body>
+     </html>
+diff --git a/src/app/marksheet/[id]/page.tsx b/src/app/marksheet/[id]/page.tsx
+index 2fe1e07..f2aa2cf 100644
+--- a/src/app/marksheet/[id]/page.tsx
++++ b/src/app/marksheet/[id]/page.tsx
+@@ -56,9 +56,9 @@ function Page() {
+   const [data, setData] = useState<MarksheetData | null>(null);
+ 
+   useEffect(() => {
+-    if (!params.id) return;
++    if (!params?.id) return;
+ 
+-    GetMarksheetVerify(params.id.toString())
++    GetMarksheetVerify(params?.id.toString())
+       .then((res: any) => {
+         const marksheet = res.marksheet;
+         GetStudentDetail(marksheet.student._id).then((studentRes: any) => {
+@@ -87,7 +87,7 @@ function Page() {
+         });
+       })
+       .catch(() => setLoading(false));
+-  }, [params.id]);
++  }, [params?.id]);
+ 
+   if (loading)
+     return (
+diff --git a/src/app/meeting/[id]/page.tsx b/src/app/meeting/[id]/page.tsx
+index 8ccfeda..20b62c8 100644
+--- a/src/app/meeting/[id]/page.tsx
++++ b/src/app/meeting/[id]/page.tsx
+@@ -1028,18 +1028,18 @@ const HOVER_TINT = "rgba(124,108,240,0.14)";
+ 
+ export default function MeetingRoomPage() {
+   
+-  const params = useParams();
++  const params:any = useParams();
+   const searchParams = useSearchParams();
+   const router = useRouter();
+-  const meetingId = params.id as string;
++  const meetingId = params?.id as string;
+ 
+-  const redirectUrl = searchParams.get("redirect");
++  const redirectUrl = searchParams?.get("redirect");
+ 
+   console.log("Redirect URL:", redirectUrl);
+ 
+-  const role = (searchParams.get("role") || "student") as UserRole;
+-  const userId = searchParams.get("userId") || "user_" + Date.now();
+-  const userName = decodeURIComponent(searchParams.get("name") || "Unknown");
++  const role = (searchParams?.get("role") || "student") as UserRole;
++  const userId = searchParams?.get("userId") || "user_" + Date.now();
++  const userName = decodeURIComponent(searchParams?.get("name") || "Unknown");
+   const isTeacher = role === "teacher" || role === "admin";
+ 
+   const [meeting, setMeeting] = useState<Meeting | null>(null);
+diff --git a/src/app/student/[id]/[student]/page.tsx b/src/app/student/[id]/[student]/page.tsx
+index daf9013..1ca3242 100644
+--- a/src/app/student/[id]/[student]/page.tsx
++++ b/src/app/student/[id]/[student]/page.tsx
+@@ -95,22 +95,16 @@ const Student = () => {
+   };
+ 
+   return (
+-    <Stack w={"95%"} mx={"auto"} pt={30}>
++    <>
+       <LoadingOverlay visible={isLoading} />
+-
+-      <Group justify="flex-end">
+-        <Button color="red" onClick={handleLogout}>
+-          Logout
+-        </Button>
+-      </Group>
+-
+       <StudentPage
+         studentId={selectedStudentId}
+         onClickBack={() => {}}
+         userType={UserType.STUDENT}
+         activeTab={StudentTabs.OVERVIEW}
++        onLogout={handleLogout}
+       />
+-    </Stack>
++    </>
+   );
+ };
+ 
+diff --git a/src/app/teacher/[teacherId]/[teacher]/page.tsx b/src/app/teacher/[teacherId]/[teacher]/page.tsx
+index e3703b3..a80476d 100644
+--- a/src/app/teacher/[teacherId]/[teacher]/page.tsx
++++ b/src/app/teacher/[teacherId]/[teacher]/page.tsx
+@@ -20,8 +20,8 @@ import {
+ import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+ import { LogOut } from "@/axios/LocalStorageUtility";
+ import { GetTeachersAllBatches } from "@/axios/teacher/TeacherGetApi";
+-import { LoadingOverlay, SimpleGrid, Stack, Text } from "@mantine/core";
+-import { useMediaQuery } from "@mantine/hooks";
++import { LoadingOverlay, SimpleGrid, Stack, Text, AppShell, Group, Burger } from "@mantine/core";
++import { useMediaQuery, useDisclosure } from "@mantine/hooks";
+ import { IconCircle0 } from "@tabler/icons-react";
+ import { useRouter } from "next/navigation";
+ import React, { useEffect, useState } from "react";
+@@ -33,6 +33,7 @@ const Teacher = () => {
+   );
+   const isMd = useMediaQuery(`(max-width: 968px)`);
+   const isLg = useMediaQuery(`(max-width: 1024px)`);
++  const [opened, { toggle }] = useDisclosure();
+   const [isLoading, setIsLoading] = useState<boolean>(false);
+   const [selectedBatch, setSelectedBatch] = useState<Batch | null>();
+   const [batchId, setBatchId] = useState<string | null>(null);
+@@ -103,17 +104,31 @@ const Teacher = () => {
+   };
+ 
+   return (
+-    <Stack
+-      w={"100%"}
+-      mih={"100vh"}
++    <AppShell
++      header={{ height: 60 }}
++      padding={0}
++      style={{ minHeight: "100vh" }}
+       bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+     >
+-      <LoadingOverlay visible={isLoading} />
+-      <TeacherProfile
+-        teacherId={selectedTeacherId}
+-        onClickBack={() => {}}
+-        userType={UserType.TEACHER}
+-      />
++      <AppShell.Header style={{ display: 'flex', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
++        <Group>
++          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
++          <Text fw={700} fz="1.1rem">Shikshapay Teacher</Text>
++        </Group>
++      </AppShell.Header>
++      
++      <AppShell.Main>
++        <Stack
++          w={"100%"}
++          mih={"100vh"}
++          bg={"transparent"}
++        >
++          <LoadingOverlay visible={isLoading} />
++          <TeacherProfile
++            teacherId={selectedTeacherId}
++            onClickBack={() => {}}
++            userType={UserType.TEACHER}
++          />
+       {/* {batchId === null && (
+         <Stack w={!isMd ? "80%" : "100%"} h={"100%"} mx={"auto"} p={20}>
+           <Text
+@@ -231,7 +246,9 @@ const Teacher = () => {
+           Log out
+         </Text>
+       </Stack> */}
+-    </Stack>
++        </Stack>
++      </AppShell.Main>
++    </AppShell>
+   );
+ };
+ 
+diff --git a/src/app/user/[id]/[user]/page.tsx b/src/app/user/[id]/[user]/page.tsx
+index a80fde4..35e7426 100644
+--- a/src/app/user/[id]/[user]/page.tsx
++++ b/src/app/user/[id]/[user]/page.tsx
+@@ -12,16 +12,28 @@ import { setDetails } from "@/app/redux/slices/instituteSlice";
+ import { setUserDetails } from "@/app/redux/slices/userSlice";
+ import { GetAccountByToken } from "@/axios/institute/instituteSlice";
+ import { Tabs } from "@/enums";
+-import { Box, Flex, LoadingOverlay, Stack } from "@mantine/core";
+-import { useMediaQuery } from "@mantine/hooks";
++import { Box, Flex, LoadingOverlay, AppShell, Burger, Group, Text } from "@mantine/core";
++import { useMediaQuery, useDisclosure } from "@mantine/hooks";
++import { useRouter, useSearchParams, usePathname } from "next/navigation";
+ import React, { useEffect, useState } from "react";
+ 
+ function page() {
+   const [isLoading, setIsLoading] = useState<boolean>(false);
+   const dispatch = useAppDispatch();
+-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+-  const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.DASHBOARD);
++  const navigation = useRouter();
++  const searchParams = useSearchParams();
++  const pathname = usePathname();
++
++  const tabQuery = searchParams?.get("tab") as Tabs | null;
++  const selectedTab = tabQuery && Object.values(Tabs).includes(tabQuery) ? tabQuery : Tabs.DASHBOARD;
++
++  const handleSelectTab = (val: Tabs) => {
++    const newParams = new URLSearchParams(searchParams?.toString());
++    newParams.set("tab", val);
++    navigation.push(`${pathname}?${newParams.toString()}`);
++  };
+   const isMd = useMediaQuery(`(max-width: 968px)`);
++  const [opened, { toggle }] = useDisclosure();
+   const institute = useAppSelector(
+     (state: any) => state.instituteSlice.instituteDetails,
+   );
+@@ -61,53 +73,69 @@ function page() {
+   }, []);
+ 
+   return (
+-    <Flex w={"100%"} mih={"100vh"}>
+-      <LoadingOverlay visible={isLoading} />
+-      <Box
+-        w={isCollapsed ? (isMd ? "100%" : "5%") : isMd ? "0%" : "15%"}
+-        style={{
+-          transition: "width 0.3s ease-in-out",
+-          display: isMd ? "none" : "block",
++    <>
++      <AppShell
++        header={{ height: isMd ? 60 : 0 }}
++        navbar={{
++          width: isMd ? 80 : 260,
++          breakpoint: 'sm',
++          collapsed: { mobile: !opened },
+         }}
++        padding={0}
++        style={{ minHeight: "100vh" }}
+       >
+-        <DesktopNavbar
+-          isCollapsed={isCollapsed}
+-          onClickCollapse={() => {
+-            setIsCollapsed(!isCollapsed);
+-          }}
+-          onSelectTab={(val: Tabs) => {
+-            setSelectedTab(val);
+-          }}
+-          activeTab={selectedTab}
+-        />
+-      </Box>
+-      <Box style={{ display: !isMd ? "none" : "block" }}>
+-        <MobileNavbar
+-          onClickCollapse={() => {
+-            setIsCollapsed(!isCollapsed);
+-          }}
+-          onSelectTab={(val: Tabs) => {
+-            setSelectedTab(val);
+-          }}
+-        />
+-      </Box>
+-      <Box
+-        w={isCollapsed ? (isMd ? "100%" : "95%") : "100%"}
+-        mah={"100vh"}
+-        bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+-        style={{ transition: "width 0.3s ease-in-out", overflowY: "scroll" }}
+-      >
+-        {Tabs.DASHBOARD === selectedTab && (
+-          <InstituteDashboard isShowTopCard={false} />
+-        )}
+-        {Tabs.STUDENT === selectedTab && <InstituteStudents />}
+-        {Tabs.TEACHER === selectedTab && (
+-          <InstituteTeachers userType={UserType.OTHERS} />
+-        )}
+-        {institute?.featureAccess?.transportManagement &&
+-          Tabs.TRANSPORT === selectedTab && <TransportPage />}
+-      </Box>
+-    </Flex>
++        <LoadingOverlay visible={isLoading} />
++        <AppShell.Header style={{ display: isMd ? 'flex' : 'none', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
++          <Group>
++            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
++            <Text fw={700} fz="1.1rem">Shikshapay</Text>
++          </Group>
++        </AppShell.Header>
++
++        <AppShell.Navbar p={0} style={{ borderRight: "none", zIndex: 1000 }}>
++          {!isMd && (
++            <DesktopNavbar
++              isCollapsed={false}
++              onClickCollapse={() => {}}
++              onSelectTab={handleSelectTab}
++              activeTab={selectedTab}
++            />
++          )}
++          {isMd && (
++            <DesktopNavbar
++              isCollapsed={opened}
++              onClickCollapse={toggle}
++              onSelectTab={(val: Tabs) => {
++                handleSelectTab(val);
++                toggle();
++              }}
++              activeTab={selectedTab}
++            />
++          )}
++        </AppShell.Navbar>
++
++        <AppShell.Main bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}>
++          <Box
++            style={{
++              transition: "all 0.3s ease",
++              minHeight: "100vh",
++              overflowY: "auto",
++            }}
++            p="md"
++          >
++            {Tabs.DASHBOARD === selectedTab && (
++              <InstituteDashboard isShowTopCard={false} />
++            )}
++            {Tabs.STUDENT === selectedTab && <InstituteStudents />}
++            {Tabs.TEACHER === selectedTab && (
++              <InstituteTeachers userType={UserType.OTHERS} />
++            )}
++            {institute?.featureAccess?.transportManagement &&
++              Tabs.TRANSPORT === selectedTab && <TransportPage />}
++          </Box>
++        </AppShell.Main>
++      </AppShell>
++    </>
+   );
+ }
+ 
+diff --git a/src/app/voucher/page.tsx b/src/app/voucher/page.tsx
+index ddf12b7..b7995b0 100644
+--- a/src/app/voucher/page.tsx
++++ b/src/app/voucher/page.tsx
+@@ -1814,7 +1814,7 @@ export default function Voucher() {
+                     Lifetime Ownership
+                   </Badge>
+                   <Group align="flex-end" gap={4}>
+-                    <Title order={1} c="dark.9">₹30,000</Title>
++                    <Title order={1} c="dark.9">₹30,000 + 10k Parent App</Title>
+                     <Text size="sm" c="dimmed" mb={6}>one-time</Text>
+                   </Group>
+                   <Text size="sm" c="violet" fw={600}>+ ₹1,000/month maintenance</Text>
+diff --git a/src/hooks/useAIQuestionPaper.ts b/src/hooks/useAIQuestionPaper.ts
+index 0b52dbd..72ff264 100644
+--- a/src/hooks/useAIQuestionPaper.ts
++++ b/src/hooks/useAIQuestionPaper.ts
+@@ -39,7 +39,7 @@ export function useOCRDocument(id: string, instituteId: string) {
+     queryKey: ["ocr-document", id],
+     queryFn: () => getOCRDocument(id, instituteId),
+     enabled: !!id && !!instituteId,
+-    refetchInterval: (query) => {
++    refetchInterval: (query:any) => {
+       const status = query.state.data?.data?.status;
+       if (status === "pending" || status === "processing") return 3000;
+       return false;
+diff --git a/src/pages/ai-question-paper/DashboardPage.tsx b/src/pages/ai-question-paper/DashboardPage.tsx
+index f9bf521..bfaf30d 100644
+--- a/src/pages/ai-question-paper/DashboardPage.tsx
++++ b/src/pages/ai-question-paper/DashboardPage.tsx
+@@ -1,332 +1,3 @@
+-// "use client";
+-
+-// import { useState } from "react";
+-// import {
+-//   Container,
+-//   Title,
+-//   Text,
+-//   Button,
+-//   Group,
+-//   Stack,
+-//   Card,
+-//   Badge,
+-//   TextInput,
+-//   Select,
+-//   SimpleGrid,
+-//   ThemeIcon,
+-//   ActionIcon,
+-//   Skeleton,
+-//   Pagination,
+-//   Center,
+-//   Menu,
+-//   Divider,
+-//   Paper,
+-// } from "@mantine/core";
+-// import {
+-//   IconPlus,
+-//   IconSearch,
+-//   IconSparkles,
+-//   IconEdit,
+-//   IconDownload,
+-//   IconSend,
+-//   IconDotsVertical,
+-//   IconFileText,
+-//   IconArchive,
+-//   IconFilter,
+-// } from "@tabler/icons-react";
+-// import { useQuestionPapers } from "../../hooks/useAIQuestionPaper";
+-// import { AIQuestionPaper } from "../../api/aiQuestionPaper.api";
+-// import { useRouter } from "next/navigation";
+-// import dayjs from "dayjs";
+-
+-// const INSTITUTE_ID = "INST-001";
+-// const TEACHER_ID = "TCH-001";
+-
+-// function PaperCard({ paper }: { paper: AIQuestionPaper }) {
+-//   const router = useRouter();
+-
+-//   const statusColor: Record<string, string> = {
+-//     draft: "orange",
+-//     published: "green",
+-//     archived: "gray",
+-//   };
+-
+-//   return (
+-//     <Card withBorder radius="md" p="md" style={{ cursor: "pointer" }}>
+-//       <Stack gap="sm">
+-//         <Group justify="space-between" wrap="nowrap">
+-//           <Stack gap={2} style={{ minWidth: 0 }}>
+-//             <Text fw={600} size="sm" truncate>
+-//               {paper.title}
+-//             </Text>
+-//             <Text size="xs" c="dimmed">
+-//               {paper.chapterName || "—"} •{" "}
+-//               {dayjs(paper.createdAt).format("DD MMM YYYY")}
+-//             </Text>
+-//           </Stack>
+-//           <Menu shadow="md" position="bottom-end">
+-//             <Menu.Target>
+-//               <ActionIcon variant="subtle" color="gray" size="sm">
+-//                 <IconDotsVertical size={14} />
+-//               </ActionIcon>
+-//             </Menu.Target>
+-//             <Menu.Dropdown>
+-//               <Menu.Item
+-//                 leftSection={<IconEdit size={14} />}
+-//                 onClick={() =>
+-//                   router.push(`/ai-question-paper/editor/${paper._id}`)
+-//                 }
+-//               >
+-//                 Edit
+-//               </Menu.Item>
+-//               {paper.pdfUrl && (
+-//                 <Menu.Item
+-//                   leftSection={<IconDownload size={14} />}
+-//                   component="a"
+-//                   href={paper.pdfUrl}
+-//                   target="_blank"
+-//                 >
+-//                   Download PDF
+-//                 </Menu.Item>
+-//               )}
+-//               {paper.answerKeyPdfUrl && (
+-//                 <Menu.Item
+-//                   leftSection={<IconFileText size={14} />}
+-//                   component="a"
+-//                   href={paper.answerKeyPdfUrl}
+-//                   target="_blank"
+-//                 >
+-//                   Download Answer Key
+-//                 </Menu.Item>
+-//               )}
+-//             </Menu.Dropdown>
+-//           </Menu>
+-//         </Group>
+-
+-//         <Divider />
+-
+-//         <Group gap="xs">
+-//           <Badge
+-//             color={statusColor[paper.status] || "gray"}
+-//             variant="light"
+-//             size="xs"
+-//           >
+-//             {paper.status}
+-//           </Badge>
+-//           <Badge color="violet" variant="outline" size="xs">
+-//             {paper.totalMarks} Marks
+-//           </Badge>
+-//           <Badge color="blue" variant="outline" size="xs">
+-//             {paper.duration} min
+-//           </Badge>
+-//           {paper.difficulty && (
+-//             <Badge color="gray" variant="outline" size="xs">
+-//               {paper.difficulty}
+-//             </Badge>
+-//           )}
+-//         </Group>
+-
+-//         <Group gap="xs" mt={4}>
+-//           <Button
+-//             size="xs"
+-//             color="violet"
+-//             variant="light"
+-//             leftSection={<IconEdit size={12} />}
+-//             onClick={() =>
+-//               router.push(`/ai-question-paper/editor/${paper._id}`)
+-//             }
+-//           >
+-//             Edit
+-//           </Button>
+-//           {paper.status !== "published" && (
+-//             <Button
+-//               size="xs"
+-//               color="green"
+-//               variant="light"
+-//               leftSection={<IconSend size={12} />}
+-//             >
+-//               Publish
+-//             </Button>
+-//           )}
+-//         </Group>
+-//       </Stack>
+-//     </Card>
+-//   );
+-// }
+-
+-// export default function AIQuestionPaperDashboard() {
+-//   const router = useRouter();
+-//   const [page, setPage] = useState(1);
+-//   const [search, setSearch] = useState("");
+-//   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+-
+-//   const { data, isLoading } = useQuestionPapers({
+-//     instituteId: INSTITUTE_ID,
+-//     teacherId: TEACHER_ID,
+-//     page,
+-//     limit: 12,
+-//     search: search || undefined,
+-//     status: statusFilter || undefined,
+-//   });
+-
+-//   const papers: AIQuestionPaper[] = data?.data || [];
+-//   const totalPages = data?.totalPages || 1;
+-//   const total = data?.total || 0;
+-
+-//   return (
+-//     <Container size="xl" py="xl">
+-//       <Stack gap="xl">
+-//         {/* Header */}
+-//         <Group justify="space-between" align="flex-start">
+-//           <Stack gap={4}>
+-//             <Group gap="xs">
+-//               <ThemeIcon color="violet" variant="light" size="lg" radius="md">
+-//                 <IconSparkles size={20} />
+-//               </ThemeIcon>
+-//               <Title order={2} fw={700}>
+-//                 AI Question Papers
+-//               </Title>
+-//             </Group>
+-//             <Text c="dimmed" size="sm">
+-//               Generate, manage and publish AI-powered question papers
+-//             </Text>
+-//           </Stack>
+-//           <Button
+-//             color="violet"
+-//             leftSection={<IconPlus size={16} />}
+-//             onClick={() => router.push("/ai-question-paper/upload")}
+-//           >
+-//             New Question Paper
+-//           </Button>
+-//         </Group>
+-
+-//         {/* Stats */}
+-//         <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="md">
+-//           {[
+-//             { label: "Total Papers", value: total, color: "violet" },
+-//             {
+-//               label: "Published",
+-//               value: papers.filter((p) => p.status === "published").length,
+-//               color: "green",
+-//             },
+-//             {
+-//               label: "Drafts",
+-//               value: papers.filter((p) => p.status === "draft").length,
+-//               color: "orange",
+-//             },
+-//             {
+-//               label: "This Month",
+-//               value: papers.filter(
+-//                 (p) =>
+-//                   dayjs(p.createdAt).month() === dayjs().month()
+-//               ).length,
+-//               color: "blue",
+-//             },
+-//           ].map((stat) => (
+-//             <Paper
+-//               key={stat.label}
+-//               withBorder
+-//               radius="md"
+-//               p="md"
+-//             >
+-//               <Stack gap={4}>
+-//                 <Text size="xs" c="dimmed" fw={500}>
+-//                   {stat.label}
+-//                 </Text>
+-//                 <Text fw={700} size="xl" c={stat.color}>
+-//                   {stat.value}
+-//                 </Text>
+-//               </Stack>
+-//             </Paper>
+-//           ))}
+-//         </SimpleGrid>
+-
+-//         {/* Filters */}
+-//         <Group gap="sm">
+-//           <TextInput
+-//             placeholder="Search papers..."
+-//             leftSection={<IconSearch size={14} />}
+-//             value={search}
+-//             onChange={(e) => {
+-//               setSearch(e.currentTarget.value);
+-//               setPage(1);
+-//             }}
+-//             style={{ flex: 1, maxWidth: 360 }}
+-//           />
+-//           <Select
+-//             placeholder="Filter by status"
+-//             leftSection={<IconFilter size={14} />}
+-//             clearable
+-//             data={[
+-//               { value: "draft", label: "Draft" },
+-//               { value: "published", label: "Published" },
+-//               { value: "archived", label: "Archived" },
+-//             ]}
+-//             value={statusFilter}
+-//             onChange={(v) => {
+-//               setStatusFilter(v);
+-//               setPage(1);
+-//             }}
+-//             w={180}
+-//           />
+-//         </Group>
+-
+-//         {/* Grid */}
+-//         {isLoading ? (
+-//           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
+-//             {[1, 2, 3, 4, 5, 6].map((i) => (
+-//               <Skeleton key={i} height={180} radius="md" />
+-//             ))}
+-//           </SimpleGrid>
+-//         ) : papers.length === 0 ? (
+-//           <Card withBorder radius="md" p="xl">
+-//             <Center py="xl">
+-//               <Stack align="center" gap="md">
+-//                 <ThemeIcon color="violet" variant="light" size={60} radius="xl">
+-//                   <IconSparkles size={30} />
+-//                 </ThemeIcon>
+-//                 <Stack align="center" gap={4}>
+-//                   <Text fw={600}>No question papers yet</Text>
+-//                   <Text c="dimmed" size="sm" ta="center">
+-//                     Upload study material and generate your first AI question paper
+-//                   </Text>
+-//                 </Stack>
+-//                 <Button
+-//                   color="violet"
+-//                   leftSection={<IconPlus size={16} />}
+-//                   onClick={() => router.push("/ai-question-paper/upload")}
+-//                 >
+-//                   Get Started
+-//                 </Button>
+-//               </Stack>
+-//             </Center>
+-//           </Card>
+-//         ) : (
+-//           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
+-//             {papers.map((paper) => (
+-//               <PaperCard key={paper._id} paper={paper} />
+-//             ))}
+-//           </SimpleGrid>
+-//         )}
+-
+-//         {/* Pagination */}
+-//         {totalPages > 1 && (
+-//           <Center>
+-//             <Pagination
+-//               total={totalPages}
+-//               value={page}
+-//               onChange={setPage}
+-//               color="violet"
+-//               radius="md"
+-//             />
+-//           </Center>
+-//         )}
+-//       </Stack>
+-//     </Container>
+-//   );
+-// }
+-  
+-
+ "use client";
+ 
+ import { useState } from "react";
+@@ -364,7 +35,7 @@ import {
+   IconFilter,
+ } from "@tabler/icons-react";
+ import { useQuestionPapers } from "../../hooks/useAIQuestionPaper";
+-import { Question } from "../../axios/aiQuestionPaper/aiQuestionPaper.api";
++import { AIQuestionPaper, Question } from "../../axios/aiQuestionPaper/aiQuestionPaper.api";
+ import { useRouter } from "next/navigation";
+ import dayjs from "dayjs";
+ import { useAppSelector } from "@/app/redux/redux.hooks";
+@@ -504,7 +175,7 @@ export default function AIQuestionPaperDashboard() {
+   const instituteId = institute?._id;
+   const teacherId = teacher?._id;
+ 
+-  const { data, isLoading } = useQuestionPapers({
++  const { data, isLoading }:any = useQuestionPapers({
+     instituteId: instituteId || "",
+     teacherId,
+     page,
+diff --git a/src/pages/ai-question-paper/GenerateQuestionPaperPage.tsx b/src/pages/ai-question-paper/GenerateQuestionPaperPage.tsx
+index 822b674..04ab14e 100644
+--- a/src/pages/ai-question-paper/GenerateQuestionPaperPage.tsx
++++ b/src/pages/ai-question-paper/GenerateQuestionPaperPage.tsx
+@@ -402,7 +402,7 @@ import { useAppSelector } from "@/app/redux/redux.hooks";
+ export default function GenerateQuestionPaperPage() {
+   const router = useRouter();
+   const searchParams = useSearchParams();
+-  const idsParam = searchParams.get("ids") || "";
++  const idsParam = searchParams?.get("ids") || "";
+   const docIds = idsParam.split(",").filter(Boolean);
+ 
+   // Real institute/teacher data from Redux — not hardcoded placeholders.
+diff --git a/src/pages/ai-question-paper/OCRPreviewPage.tsx b/src/pages/ai-question-paper/OCRPreviewPage.tsx
+index 553c972..d272689 100644
+--- a/src/pages/ai-question-paper/OCRPreviewPage.tsx
++++ b/src/pages/ai-question-paper/OCRPreviewPage.tsx
+@@ -343,7 +343,7 @@ interface OCRPreviewCardProps {
+ }
+ 
+ function OCRPreviewCard({ docId, index, instituteId, onTextChange }: OCRPreviewCardProps) {
+-  const { data, isLoading } = useOCRDocument(docId, instituteId);
++  const { data, isLoading }:any = useOCRDocument(docId, instituteId);
+   const updateMutation = useUpdateOCRText();
+   const [editMode, setEditMode] = useState(false);
+   const [localText, setLocalText] = useState("");
+@@ -516,7 +516,7 @@ function OCRPreviewCard({ docId, index, instituteId, onTextChange }: OCRPreviewC
+ export default function OCRPreviewPage() {
+   const router = useRouter();
+   const searchParams = useSearchParams();
+-  const idsParam = searchParams.get("ids") || "";
++  const idsParam = searchParams?.get("ids") || "";
+   const docIds = idsParam.split(",").filter(Boolean);
+ 
+   // Real institute data from Redux — NOT a hardcoded placeholder.
+diff --git a/src/pages/ai-question-paper/QuestionEditorPage.tsx b/src/pages/ai-question-paper/QuestionEditorPage.tsx
+index 74cc17c..e4c122c 100644
+--- a/src/pages/ai-question-paper/QuestionEditorPage.tsx
++++ b/src/pages/ai-question-paper/QuestionEditorPage.tsx
+@@ -743,6 +743,7 @@ import {
+   ScrollArea,
+   Paper,
+   Menu,
++  Center,
+ } from "@mantine/core";
+ import { useDisclosure } from "@mantine/hooks";
+ import { notifications } from "@mantine/notifications";
+@@ -1088,7 +1089,7 @@ function EditQuestionModal({
+ export default function QuestionEditorPage() {
+   const params = useParams();
+   const router = useRouter();
+-  const paperId = params.id as string;
++  const paperId = params?.id as string;
+ 
+   // Real institute/teacher data from Redux — not hardcoded placeholders.
+   const institute = useAppSelector(
+@@ -1102,7 +1103,7 @@ export default function QuestionEditorPage() {
+   // Use the real institute name for PDF generation instead of a hardcoded one.
+   const instituteName = institute?.name || "";
+ 
+-  const { data, isLoading } = useQuestionPaper(paperId, instituteId);
++  const { data, isLoading }:any = useQuestionPaper(paperId, instituteId);
+   const updatePaperMutation = useUpdatePaper();
+   const generatePDFMutation = useGeneratePDF();
+   const publishMutation = usePublishExam();
+@@ -1171,14 +1172,14 @@ export default function QuestionEditorPage() {
+   };
+ 
+   const handleSaveEditedQuestion = (updated: Question) => {
+-    const newList = currentQuestions.map((q) =>
++    const newList = currentQuestions.map((q:any) =>
+       q._id === updated._id ? updated : q
+     );
+     setQuestions(newList);
+   };
+ 
+   const handleDeleteQuestion = (id: string) => {
+-    setQuestions(currentQuestions.filter((q) => q._id !== id));
++    setQuestions(currentQuestions.filter((q:any) => q._id !== id));
+   };
+ 
+   const handleDuplicateQuestion = (q: Question) => {
+@@ -1191,7 +1192,7 @@ export default function QuestionEditorPage() {
+   };
+ 
+   const moveQuestion = (id: string, dir: "up" | "down") => {
+-    const idx = currentQuestions.findIndex((q) => q._id === id);
++    const idx = currentQuestions.findIndex((q:any) => q._id === id);
+     if (idx < 0) return;
+     const next = dir === "up" ? idx - 1 : idx + 1;
+     if (next < 0 || next >= currentQuestions.length) return;
+@@ -1274,10 +1275,10 @@ export default function QuestionEditorPage() {
+     }
+   };
+ 
+-  const mcqs = currentQuestions.filter((q) => q.type === "mcq");
+-  const shorts = currentQuestions.filter((q) => q.type === "short");
+-  const longs = currentQuestions.filter((q) => q.type === "long");
+-  const veryLongs = currentQuestions.filter((q) => q.type === "very_long");
++  const mcqs = currentQuestions.filter((q:any) => q.type === "mcq");
++  const shorts = currentQuestions.filter((q:any) => q.type === "short");
++  const longs = currentQuestions.filter((q:any) => q.type === "long");
++  const veryLongs = currentQuestions.filter((q:any) => q.type === "very_long");
+ 
+   return (
+     <Container size="xl" py="xl">
+@@ -1380,7 +1381,7 @@ export default function QuestionEditorPage() {
+               const tabQuestions =
+                 tab === "all"
+                   ? currentQuestions
+-                  : currentQuestions.filter((q) => q.type === tab);
++                  : currentQuestions.filter((q:any) => q.type === tab);
+ 
+               return (
+                 <Tabs.Panel key={tab} value={tab} pt="md">
+@@ -1395,7 +1396,7 @@ export default function QuestionEditorPage() {
+                           </Stack>
+                         </Card>
+                       )}
+-                      {tabQuestions.map((q, i) => (
++                      {tabQuestions.map((q:any, i:number) => (
+                         <QuestionCard
+                           key={q._id}
+                           question={q}

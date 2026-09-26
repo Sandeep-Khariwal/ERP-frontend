@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   env: {
-     URL: "http://localhost:8080"
-   // URL: "https://server.shikshapay.cloud",
+    // URL: "http://localhost:8080"
+   URL: "https://server.shikshapay.cloud",
   },
 
   // Automatically tree-shakes barrel-style imports from these packages so
@@ -43,3 +43,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
