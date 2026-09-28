@@ -176,7 +176,7 @@ export default function EarningsSummary({}) {
             onClick={GetDayWiseData}
             styles={{
               root: {
-                background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                 border: 0,
                 borderRadius: "10px",
                 height: "44px",
@@ -210,7 +210,7 @@ export default function EarningsSummary({}) {
             >
               <thead
                 style={{
-                  background: "linear-gradient(135deg, #C850C0, #4158D0)",
+                  background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
                   color: "white",
                 }}
               >

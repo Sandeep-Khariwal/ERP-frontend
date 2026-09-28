@@ -1,16 +1,7 @@
 "use client";
 import { UserType } from "@/app/components/dashboard/InstituteBatchesSection";
 import { DesktopNavbar } from "@/app/components/institute/DesktopNavbar";
-import { InstituteDashboard } from "@/app/components/institute/InstituteDashboard";
-import { InstituteStudents } from "@/app/components/institute/InstituteStudents";
-import { InstituteTeachers } from "@/app/components/institute/InstituteTeacher";
 import MobileNavbar from "@/app/components/institute/MobileNavbar";
-import InstituteEarnings from "@/app/components/institute/student/earnings/InstituteEarnings";
-import InstituteExpanse from "@/app/components/institute/student/expense/InstituteExpense";
-import TransportPage from "@/app/components/institute/transport/TransportPage";
-import IntegrationsPage from "@/app/components/marketing/meta/IntegrationPage";
-import LeadsPage from "@/app/components/marketing/meta/LeadsDashboard";
-import WhatsAppPage from "@/app/components/marketing/whatsapp/WhatsappLeads";
 import { ErrorNotification } from "@/app/helperFunction/Notification";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { setAdminDetails } from "@/app/redux/slices/adminSlice";
@@ -22,7 +13,39 @@ import { Box, Flex, LoadingOverlay, AppShell, Burger, Group, Text } from "@manti
 import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 import { Notifications } from "@mantine/notifications";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+
+// Lazily loaded — only the active tab is ever visible, so none of these
+// (and their heavy dependencies, e.g. charting/marketing SDKs) need to be
+// part of the JS that ships before the user has even picked a tab.
+const tabLoading = () => (
+  <Flex justify="center" align="center" mih={400}>
+    <LoadingOverlay visible overlayProps={{ blur: 1 }} />
+  </Flex>
+);
+
+const InstituteDashboard = dynamic(
+  () =>
+    import("@/app/components/institute/InstituteDashboard").then((m) => m.InstituteDashboard),
+  { loading: tabLoading },
+);
+const InstituteStudents = dynamic(
+  () =>
+    import("@/app/components/institute/InstituteStudents").then((m) => m.InstituteStudents),
+  { loading: tabLoading },
+);
+const InstituteTeachers = dynamic(
+  () =>
+    import("@/app/components/institute/InstituteTeacher").then((m) => m.InstituteTeachers),
+  { loading: tabLoading },
+);
+const InstituteEarnings = dynamic(() => import("@/app/components/institute/student/earnings/InstituteEarnings"), { loading: tabLoading });
+const InstituteExpanse = dynamic(() => import("@/app/components/institute/student/expense/InstituteExpense"), { loading: tabLoading });
+const TransportPage = dynamic(() => import("@/app/components/institute/transport/TransportPage"), { loading: tabLoading });
+const IntegrationsPage = dynamic(() => import("@/app/components/marketing/meta/IntegrationPage"), { loading: tabLoading });
+const LeadsPage = dynamic(() => import("@/app/components/marketing/meta/LeadsDashboard"), { loading: tabLoading });
+const WhatsAppPage = dynamic(() => import("@/app/components/marketing/whatsapp/WhatsappLeads"), { loading: tabLoading });
 
 const dashboard = () => {
 
@@ -99,7 +122,7 @@ const dashboard = () => {
       <AppShell
         header={{ height: isMd ? 60 : 0 }}
         navbar={{
-          width: isMd ? 80 : 260,
+          width: isMd ? 280 : 260,
           breakpoint: 'sm',
           collapsed: { mobile: !opened },
         }}
@@ -124,8 +147,11 @@ const dashboard = () => {
             />
           )}
           {isMd && (
+            // On mobile the navbar only ever renders as a full-width drawer
+            // (see collapsed.mobile above), so it must always show icon +
+            // label — never the icon-only "collapsed" rail state.
             <DesktopNavbar
-              isCollapsed={opened}
+              isCollapsed={false}
               onClickCollapse={toggle}
               onSelectTab={(val: Tabs) => {
                 handleSelectTab(val);
@@ -136,7 +162,7 @@ const dashboard = () => {
           )}
         </AppShell.Navbar>
 
-        <AppShell.Main bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}>
+        <AppShell.Main bg={"linear-gradient(160deg, #F1EEFF 0%, #F7F9FC 22%, #F7F9FC 100%)"}>
           <Box
             style={{
               transition: "all 0.3s ease",

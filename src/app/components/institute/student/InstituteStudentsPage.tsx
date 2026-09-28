@@ -174,7 +174,7 @@ export const InstituteStudentsPage = (props: { instituteId: string }) => {
       <LoadingOverlay visible={isLoading} />
 
       <Flex
-        w={isMd ? "95%" : "90%"}
+        w={isMd ? "95%" : "92%"}
         mx={"auto"}
         justify={"space-between"}
         align={isMd ? "flex-start" : "center"}
@@ -219,7 +219,7 @@ export const InstituteStudentsPage = (props: { instituteId: string }) => {
           other pages than are currently selected. */}
       {allOnPageSelected && !selectedAllMatchingFilter && total > students.length && (
         <Flex
-          w={isMd ? "95%" : "90%"}
+          w={isMd ? "95%" : "92%"}
           mx={"auto"}
           justify={"center"}
           align={"center"}
@@ -243,7 +243,7 @@ export const InstituteStudentsPage = (props: { instituteId: string }) => {
 
       {selectedAllMatchingFilter && (
         <Flex
-          w={isMd ? "95%" : "90%"}
+          w={isMd ? "95%" : "92%"}
           mx={"auto"}
           justify={"center"}
           align={"center"}
@@ -261,7 +261,7 @@ export const InstituteStudentsPage = (props: { instituteId: string }) => {
       )}
 
       {selectedIds.length > 0 && (
-        <Flex w={isMd ? "95%" : "90%"} mx={"auto"} justify={"flex-end"} gap={10}>
+        <Flex w={isMd ? "95%" : "92%"} mx={"auto"} justify={"flex-end"} gap={10}>
           <Button variant="light" color="gray" radius="xl" onClick={clearSelection}>
             Clear ({selectedIds.length})
           </Button>
@@ -271,7 +271,7 @@ export const InstituteStudentsPage = (props: { instituteId: string }) => {
         </Flex>
       )}
 
-      <Stack w={isMd ? "95%" : "90%"} mx={"auto"}>
+      <Stack w={isMd ? "95%" : "92%"} mx={"auto"}>
         <StudentTable
           students={students}
           selectedIds={selectedIds}

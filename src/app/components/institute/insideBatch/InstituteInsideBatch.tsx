@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { AddNewStudentModal } from "../AddNewStudentModal";
 import { AddMoreDetails } from "../student/addMoreDetails/AddMoreDetails";
@@ -31,19 +32,28 @@ import AddMarksModal from "./AddMarksModal";
 import { UserType } from "../../dashboard/InstituteBatchesSection";
 import { CreateStudent } from "@/axios/institute/InstitutePostApi";
 import TeacherProfile from "../teacher/TeacherProfile";
-import Tests from "./test/Tests";
-import Marksheet from "./Marksheet";
 import UploadExcelAdmission from "../student/addMoreDetails/UploadExcelAdmission";
-import DiaryPage from "./DiaryPage";
-import StudyMaterialPage from "./StudyMaterialPage";
-import SessionsPage from "./SessionsPage";
-import GalleryPage from "./GalleryPage";
-import ExaminationPage from "./ExaminationPage";
-
-import MeetingsPage from "../../meeting/MeetingPage";
 import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
-import TimetablePage from "./timetable/TimeTablePage";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
+
+// Lazily loaded — each of these is only ever shown for one active tab at a
+// time, so there's no reason to ship all of their code (and their heavy
+// dependencies like PDF/QR generation, charts, etc.) in the initial bundle.
+const tabLoading = () => (
+  <Flex justify="center" align="center" mih={300}>
+    <LoadingOverlay visible overlayProps={{ blur: 1 }} />
+  </Flex>
+);
+
+const Tests = dynamic(() => import("./test/Tests"), { loading: tabLoading });
+const Marksheet = dynamic(() => import("./Marksheet"), { loading: tabLoading });
+const DiaryPage = dynamic(() => import("./DiaryPage"), { loading: tabLoading });
+const StudyMaterialPage = dynamic(() => import("./StudyMaterialPage"), { loading: tabLoading });
+const SessionsPage = dynamic(() => import("./SessionsPage"), { loading: tabLoading });
+const GalleryPage = dynamic(() => import("./GalleryPage"), { loading: tabLoading });
+const ExaminationPage = dynamic(() => import("./ExaminationPage"), { loading: tabLoading });
+const MeetingsPage = dynamic(() => import("../../meeting/MeetingPage"), { loading: tabLoading });
+const TimetablePage = dynamic(() => import("./timetable/TimeTablePage"), { loading: tabLoading });
 
 enum Tabs {
   OVERVIEW = "Overview",
@@ -156,23 +166,44 @@ export function InstituteInsideBatch(props: {
   useEffect(() => {
     if (!props.batchId) return;
 
-    GetAllTeachersFromBatch(props.batchId)
-      .then((res: any) => {
-        const firstTeacher = res?.teachers?.[0];
+    // `teacherData` here is only ever consumed by the Time Table and
+    // Assignment tabs (see props passed to TimetablePage / MeetingsPage
+    // below) — both lazily loaded. Previously this fetched the entire
+    // teacher list on every batch page load regardless of which tab was
+    // open. Now it only fetches when one of those tabs is actually
+    // visited, and only once (guarded by teacherData._id already being
+    // set) rather than refetching every time the tab is revisited.
+    const needsTeacherData =
+      activeTab === Tabs.TIME_TABLE || activeTab === Tabs.ASSIGNMENT;
 
-        if (firstTeacher) {
-          settTeacherData({
-            _id: firstTeacher._id,
-            name: firstTeacher.name,
-            phoneNumber: firstTeacher.phoneNumber,
-            subjects: firstTeacher.subjects || [],
-          });
-        }
-      })
-      .catch((err) => {
-        console.log("Teacher Fetch Error:", err);
-      });
+    if (needsTeacherData && !teacherData._id) {
+      GetAllTeachersFromBatch(props.batchId)
+        .then((res: any) => {
+          const firstTeacher = res?.teachers?.[0];
 
+          if (firstTeacher) {
+            settTeacherData({
+              _id: firstTeacher._id,
+              name: firstTeacher.name,
+              phoneNumber: firstTeacher.phoneNumber,
+              subjects: firstTeacher.subjects || [],
+            });
+          }
+        })
+        .catch((err) => {
+          console.log("Teacher Fetch Error:", err);
+        });
+    }
+  }, [props.batchId, activeTab]);
+
+  // Subjects list for this batch rarely changes and is used across several
+  // tabs. This was previously fetched inside the effect above, which meant
+  // it re-ran (and re-fetched) on every single tab switch since `activeTab`
+  // was in that effect's dependency array. It only needs to be fetched once
+  // per batch — when the batch changes and the caller hasn't already
+  // supplied `subjects` as a prop — not on every tab click.
+  useEffect(() => {
+    if (!props.batchId) return;
     if (props.subjects?.length) return;
 
     GetAllSubjectsFromBatch(props.batchId)
@@ -200,41 +231,65 @@ export function InstituteInsideBatch(props: {
 
       {/* 🔹 Top Bar with Batch Name */}
       <Stack
-        w={isMd ? "95%" : props.fromInstituteTeacherSection ? "99%" : "90%"}
+        w={isMd ? "95%" : props.fromInstituteTeacherSection ? "99%" : "92%"}
         mt={20}
         mx={"auto"}
         mih={"100vh"}
       >
-        <Flex w={"100%"} align={"center"} justify={"start"} gap={10}>
-          <Image
+        <Flex
+          w={"100%"}
+          align={"center"}
+          justify={"start"}
+          gap={14}
+          pb={14}
+          style={{ borderBottom: "1px solid #F1F4F9" }}
+        >
+          <Flex
+            align="center"
+            justify="center"
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: "8px",
+              cursor: "pointer",
+              border: "1px solid #E2E8F0",
+            }}
             onClick={() => props.onClickBack()}
-            src={"/backArrow.png"}
-            alt="profile"
-            width={18}
-            height={15}
-            style={{ cursor: "pointer" }}
-          />
-          <Text fz={22} ff={"Roboto"}>
-            {props.batchName}
-          </Text>
+          >
+            <Image
+              src={"/backArrow.png"}
+              alt="back"
+              width={16}
+              height={13}
+            />
+          </Flex>
+          <Stack gap={0}>
+            <Text fz={12} fw={600} c="#8B96AD" style={{ fontFamily: "sans-serif" }}>
+              Academic workspace
+            </Text>
+            <Text fz={22} fw={700} c="#1B2559" style={{ fontFamily: "sans-serif" }}>
+              {props.batchName}
+            </Text>
+          </Stack>
         </Flex>
 
         {/* 🔹 Tab Bar */}
-        <ScrollArea p={10} mih={70}>
-          <Flex mt={isMd ? 10 : 20}>
+        <ScrollArea mih={56} scrollbarSize={4}>
+          <Flex gap={0} style={{ borderBottom: "1px solid #F1F4F9" }}>
             {Object.values(Tabs).map((item: Tabs, i: number) => {
               return (
                 <Box
                   key={i}
-                  mx={isMd ? 14 : 30}
+                  mx={isMd ? 12 : 18}
+                  py={10}
                   style={{ cursor: "pointer" }}
                   onClick={() => setActiveTab(item)}
                 >
                   <Text
-                    c={activeTab === item ? "#1B1212" : "#2F4F4F"}
-                    fw={600}
+                    c={activeTab === item ? "#2F6FED" : "#5B6B8C"}
+                    fw={activeTab === item ? 700 : 500}
                     style={{ whiteSpace: "nowrap" }}
-                    fz={16}
+                    fz={15}
                     ff={"Roboto"}
                   >
                     {item}
@@ -245,8 +300,9 @@ export function InstituteInsideBatch(props: {
                       style={{
                         border: "none",
                         height: 2,
-                        backgroundColor: "#4B65F6",
-                        marginTop: 4,
+                        borderRadius: 2,
+                        backgroundColor: "#2F6FED",
+                        marginTop: 8,
                       }}
                     />
                   )}
@@ -260,7 +316,7 @@ export function InstituteInsideBatch(props: {
           w={"100%"}
           p={3}
           style={{ borderRadius: "1rem" }}
-          bg={"linear-gradient(135deg, #9C27B0, #3F51B5)"}
+          bg={"transparent"}
         />
 
         {/* 🔹 Tab Content */}
@@ -285,9 +341,17 @@ export function InstituteInsideBatch(props: {
                     {students.length > 0 && (
                       <>
                         <Button
-                          variant="outline"
-                          color="dark"
-                          style={{ whiteSpace: "nowrap" }}
+                          variant="default"
+                          radius={10}
+                          styles={{
+                            root: {
+                              whiteSpace: "nowrap",
+                              border: "1px solid #E2E8F0",
+                              boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                              fontWeight: 600,
+                              color: "#33415C",
+                            },
+                          }}
                           onClick={() => {
                             setTakeAttandance(true);
                           }}
@@ -296,9 +360,17 @@ export function InstituteInsideBatch(props: {
                         </Button>
 
                         <Button
-                          variant="outline"
-                          color="dark"
-                          style={{ whiteSpace: "nowrap" }}
+                          variant="default"
+                          radius={10}
+                          styles={{
+                            root: {
+                              whiteSpace: "nowrap",
+                              border: "1px solid #E2E8F0",
+                              boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                              fontWeight: 600,
+                              color: "#33415C",
+                            },
+                          }}
                           onClick={() => {
                             setOpenAddMarksModal(true);
                           }}
@@ -318,9 +390,15 @@ export function InstituteInsideBatch(props: {
                     <>
                       {!props.fromInstituteTeacherSection && (
                         <Button
-                          variant="outline"
-                          color="dark"
-                          style={{ whiteSpace: "nowrap" }}
+                          radius={10}
+                          styles={{
+                            root: {
+                              whiteSpace: "nowrap",
+                              background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                              border: 0,
+                              fontWeight: 600,
+                            },
+                          }}
                           onClick={() => {
                             setShowSelectedScreen(Screen.ADDMORESCREEN);
                           }}
@@ -330,9 +408,17 @@ export function InstituteInsideBatch(props: {
                       )}
                       {!props.fromInstituteTeacherSection && (
                         <Button
-                          variant="outline"
-                          color="dark"
-                          style={{ whiteSpace: "nowrap" }}
+                          variant="default"
+                          radius={10}
+                          styles={{
+                            root: {
+                              whiteSpace: "nowrap",
+                              border: "1px solid #E2E8F0",
+                              boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                              fontWeight: 600,
+                              color: "#33415C",
+                            },
+                          }}
                           onClick={() => {
                             setOpenFileAdmissionModal(true);
                           }}

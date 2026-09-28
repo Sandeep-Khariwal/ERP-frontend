@@ -4,6 +4,7 @@
 import { GetAllStudentsFromBatch } from "@/axios/institute/InstituteGetApi";
 import {
   Badge,
+  Box,
   Button,
   Flex,
   LoadingOverlay,
@@ -14,7 +15,7 @@ import {
   Text,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { IconDotsVertical, IconMessage } from "@tabler/icons-react";
+import { IconDotsVertical, IconMessage, IconUsers } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { Screen } from "./InstituteInsideBatch";
 import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
@@ -199,30 +200,70 @@ const StudentSection = (props: {
   return (
     <Stack w={"100%"} pb={100}>
       <LoadingOverlay visible={isLoading} />
+      {/* Header styled to match the Test section's master container. */}
+      <Box
+        p={20}
+        style={{
+          borderRadius: "16px",
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
+        }}
+      >
+        <Flex align="center" gap={14}>
+          <Flex
+            align="center"
+            justify="center"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "12px",
+              background: "#FFFFFF",
+              flexShrink: 0,
+            }}
+          >
+            <IconUsers size={22} color="#2F6FED" />
+          </Flex>
+          <Stack gap={2} style={{ minWidth: 0 }}>
+            <Text fz={isMd ? 18 : 22} fw={700} c="#1B2559">
+              Students
+            </Text>
+            <Text fz={13} c="#5B6B8C">
+              Manage students enrolled in this batch.
+            </Text>
+          </Stack>
+        </Flex>
+      </Box>
       {students.length > 0 ? (
+        // Wrapping the table so it scrolls within its own box on narrow
+        // screens instead of forcing the whole page to scroll horizontally.
+        <Box style={{ width: "100%", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         <Table
           w={"100%"}
           mt={8}
           verticalSpacing="md"
           horizontalSpacing="xl"
           bg={"white"}
-          fz={18}
+          fz={15}
+          style={{
+            border: "1px solid #EEF1F6",
+            borderRadius: "1rem",
+            overflow: "hidden",
+            minWidth: isMd ? 560 : undefined,
+          }}
         >
           <Table.Thead
-            bg={"linear-gradient(135deg, #D28BD9, #7585D8)"}
+            bg={"#F7F9FC"}
             style={{
-              border: "2px solid transparent",
-              borderTopLeftRadius: "1rem",
-              borderTopRightRadius: "1rem",
+              borderBottom: "1px solid #EEF1F6",
             }}
           >
             <Table.Tr>
               <Table.Th
                 style={{
                   fontFamily: "Roboto",
-                  fontWeight: 700,
-                  color: "#2F4F4F",
-                  fontSize: 18,
+                  fontWeight: 600,
+                  color: "#64748B",
+                  fontSize: 13,
                 }}
               >
                 Name
@@ -231,12 +272,12 @@ const StudentSection = (props: {
                 <Table.Th
                   style={{
                     fontFamily: "Roboto",
-                    fontWeight: 700,
-                    color: "#2F4F4F",
-                    fontSize: 18,
+                    fontWeight: 600,
+                    color: "#64748B",
+                    fontSize: 13,
                   }}
                 >
-                  Parent's Name
+                  Parent / guardian
                 </Table.Th>
               ) : (
                 <></>
@@ -246,31 +287,31 @@ const StudentSection = (props: {
                   style={{
                     fontFamily: "Roboto",
                     fontWeight: 600,
-                    color: "#2F4F4F",
-                    fontSize: 18,
+                    color: "#64748B",
+                    fontSize: 13,
                   }}
                 >
-                  Phone Number
+                  Phone number
                 </Table.Th>
               )}
               <Table.Th
                 style={{
                   fontFamily: "Roboto",
                   fontWeight: 600,
-                  color: "#2F4F4F",
-                  fontSize: 18,
+                  color: "#64748B",
+                  fontSize: 13,
                   whiteSpace: "nowrap",
                 }}
               >
-                Fee Status
+                Fee status
               </Table.Th>
               {!isMd ? (
                 <Table.Th
                   style={{
                     fontFamily: "Roboto",
                     fontWeight: 600,
-                    color: "#2F4F4F",
-                    fontSize: 18,
+                    color: "#64748B",
+                    fontSize: 13,
                   }}
                 >
                   Message
@@ -282,8 +323,8 @@ const StudentSection = (props: {
                 style={{
                   fontFamily: "Roboto",
                   fontWeight: 600,
-                  color: "#2F4F4F",
-                  fontSize: 18,
+                  color: "#64748B",
+                  fontSize: 13,
                 }}
               >
                 Action
@@ -299,21 +340,21 @@ const StudentSection = (props: {
                     item.isInActive
                       ? {
                           backgroundColor: "#FAFCFF",
-                          textAlign: "center",
+                          textAlign: "left",
                           fontFamily: "Nunito",
-                          padding: "1rem",
+                          borderBottom: "1px solid #F1F5F9",
                         }
                       : {
-                          textAlign: "center",
+                          textAlign: "left",
                           fontFamily: "Nunito",
-                          padding: "1rem",
+                          borderBottom: "1px solid #F1F5F9",
                         }
                   }
                 >
                   <Table.Td
                     style={{
-                      color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                      fontWeight: 500,
+                      color: item.isInActive ? "#bebebe" : "#1B2559",
+                      fontWeight: 600,
                       padding: "1rem",
                     }}
                   >
@@ -322,7 +363,7 @@ const StudentSection = (props: {
                   {!isMd ? (
                     <Table.Td
                       style={{
-                        color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        color: item.isInActive ? "#bebebe" : "#64748B",
                         fontWeight: 500,
                       }}
                     >
@@ -334,7 +375,7 @@ const StudentSection = (props: {
                   {!isMd && (
                     <Table.Td
                       style={{
-                        color: item.isInActive ? "#bebebe" : "#7D7D7D",
+                        color: item.isInActive ? "#bebebe" : "#64748B",
                         fontWeight: 500,
                       }}
                     >
@@ -344,15 +385,22 @@ const StudentSection = (props: {
                   <Table.Td>
                     {" "}
                     <Badge
-                      bg={
-                        item.feeStatus === "Paid"
-                          ? "green"
-                          : item.feeStatus === "Partial Paid"
-                            ? "blue"
-                            : "red"
-                      }
+                      styles={{
+                        root: {
+                          backgroundColor:
+                            item.feeStatus === "Paid"
+                              ? "#EEF1F6"
+                              : item.feeStatus === "Partial Paid"
+                                ? "#2F6FED"
+                                : "#E5484D",
+                          color:
+                            item.feeStatus === "Paid" ? "#33415C" : "#FFFFFF",
+                          textTransform: "none",
+                          fontWeight: 600,
+                        },
+                      }}
                       size="lg"
-                      radius="xs"
+                      radius="xl"
                     >
                       {item.feeStatus}
                     </Badge>
@@ -360,9 +408,22 @@ const StudentSection = (props: {
                   {!isMd ? (
                     <Table.Td>
                       <a href={`sms:${item.phoneNumber[0]}?body=Hello!, `}>
-                        <div>
-                          <IconMessage cursor="pointer" color="#7D7D7D" />
-                        </div>
+                        <Flex
+                          align={"center"}
+                          justify={"center"}
+                          w={32}
+                          h={32}
+                          style={{
+                            borderRadius: "8px",
+                            backgroundColor: "#EEF3FF",
+                          }}
+                        >
+                          <IconMessage
+                            size={18}
+                            cursor="pointer"
+                            color="#2F6FED"
+                          />
+                        </Flex>
                       </a>
                     </Table.Td>
                   ) : (
@@ -376,9 +437,9 @@ const StudentSection = (props: {
                           justify={"center"}
                           w={"2rem"}
                           py={3}
-                          bg="#FFFFFF"
+                          bg="transparent"
                         >
-                          <IconDotsVertical />
+                          <IconDotsVertical color="#8B96AD" />
                         </Flex>
                       </Menu.Target>
                       <Menu.Dropdown>
@@ -438,6 +499,7 @@ const StudentSection = (props: {
             })}
           </tbody>
         </Table>
+        </Box>
       ) : (
         <Flex w={"100%"} bg={"white"} mih={"60vh"} align={"center"}>
           <Stack

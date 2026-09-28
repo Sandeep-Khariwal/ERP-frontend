@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Box,
   Button,
   Card,
   Flex,
@@ -24,7 +25,7 @@ import {
   CreateBatchAndSubjects,
   EditBatchAndSubjects,
   GetAccountByToken,
-  GetInstituteBatches,
+  GetInstituteDashboardBatches,
 } from "@/axios/institute/instituteSlice";
 import { useAppDispatch, useAppSelector } from "@/app/redux/redux.hooks";
 import { EditCourseFeeModal } from "./EditCourseFeeModal";
@@ -43,6 +44,7 @@ import { usePathname, useRouter } from "next/navigation";
 import NoticeBoard from "./notice/NoticeBoard";
 import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi";
 import { InstituteStudentsPage } from "../institute/student/InstituteStudentsPage";
+import { Bell, Search } from "lucide-react";
 
 export interface Batch {
   id: string;
@@ -51,8 +53,8 @@ export interface Batch {
   optionalSubjects: { _id: string; name: string }[];
   noOfTeachers: number;
   noOfStudents: number;
-  firstThreeTeachers: string[];
-  firstThreeStudents: string[];
+  teacherInitials: string[];
+  studentInitials: string[];
 }
 
 export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
@@ -79,6 +81,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [editBatchDetails, setEditBatchDetails] = useState<boolean>(false);
   const [editBatchId, setEditBatchId] = useState<string>("");
   const [openStudentsPage, setOpenStudentsPage] = useState<boolean>(false);
+  const [batchSearch, setBatchSearch] = useState<string>("");
+  const [noticeCount, setNoticeCount] = useState<number>(0);
   const navigation = useRouter();
 
   const pathname = usePathname();
@@ -117,16 +121,22 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   };
 
   useEffect(() => {
-    if (institute?._id!!) {
+    if (institute?._id) {
       getAllInstituteBatches();
     }
-  }, [institute]);
+  }, [institute?._id]);
 
   useEffect(() => {
     if (openAddBatchModal) {
       getSubjects();
     }
   }, [openAddBatchModal]);
+
+  // Notice count for the header bell badge is now read from the
+  // NoticeBoard's own fetch (via onNoticesChange below) instead of this
+  // component making its own separate GetAllNotice call for the same
+  // institute — NoticeBoard is already rendered on this same screen and
+  // was fetching the exact same list a second time.
 
   const [data, setData] = useState<{ value: string; label: string }[]>([
     { value: "Hindi", label: "Hindi" },
@@ -167,7 +177,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
 
   const getAllInstituteBatches = () => {
     setIsLoading(true);
-    GetInstituteBatches(institute._id)
+    GetInstituteDashboardBatches(institute._id)
       .then((x: any) => {
         const { batches } = x;
         setIsLoading(false);
@@ -177,10 +187,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             name: b.name,
             subjects: b.subjects,
             optionalSubjects: b.optionalSubjects,
-            noOfTeachers: b.teachers.length,
-            noOfStudents: b.students.length,
-            firstThreeTeachers: b.teachers.slice(0, 2),
-            firstThreeStudents: b.students.slice(0, 2),
+            noOfTeachers: b.teacherCount,
+            noOfStudents: b.studentCount,
+            teacherInitials: b.teacherInitials,
+            studentInitials: b.studentInitials,
           };
         });
         setBatches(allBatches);
@@ -228,8 +238,12 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             noOfTeachers: data.teachers.length,
             noOfStudents: data.students.length,
             optionalSubjects: data.optionalSubjects,
-            firstThreeTeachers: data.teachers.splice(0, 3),
-            firstThreeStudents: data.students.splice(0, 3),
+            teacherInitials: data.teachers
+              .slice(0, 2)
+              .map((teacher: any) => teacher.name[0]),
+            studentInitials: data.students
+              .slice(0, 2)
+              .map((student: any) => student.name[0]),
           };
           const editedBatch = batches.filter((b) => b.id !== editBatchId);
           setBatches([...editedBatch, newBatch]);
@@ -260,8 +274,12 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             noOfTeachers: data.teachers.length,
             noOfStudents: data.students.length,
             optionalSubjects: data.optionalSubjects,
-            firstThreeTeachers: data.teachers.splice(0, 3),
-            firstThreeStudents: data.students.splice(0, 3),
+            teacherInitials: data.teachers
+              .slice(0, 2)
+              .map((teacher: any) => teacher.name[0]),
+            studentInitials: data.students
+              .slice(0, 2)
+              .map((student: any) => student.name[0]),
           };
           setBatches((prevBatches) => [...prevBatches, newBatch]);
           setBatchId(data._id);
@@ -339,7 +357,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       {/* Students Page View */}
       {openStudentsPage && (
         <Stack w={"100%"} mih={"100%"} py={10}>
-          <Flex w={isMd ? "95%" : "80%"} mx={"auto"}>
+          <Flex w={isMd ? "95%" : "92%"} mx={"auto"}>
             <Button
               variant="subtle"
               color="dark"
@@ -356,6 +374,104 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
       {/* Main Dashboard View */}
       {!openStudentsPage && (batchId === null || openEditCourseFee) && (
         <Stack w={"100%"} mih={"100%"} py={20}>
+          {/* ── Top Header: Title + Search + Notifications + Profile ── */}
+          <Flex
+            w={isMd ? "95%" : "92%"}
+            mx={"auto"}
+            align={isMd ? "flex-start" : "center"}
+            justify="space-between"
+            direction={isMd ? "column" : "row"}
+            gap={16}
+            mb={4}
+          >
+            <Stack gap={2}>
+              <Text fz={26} fw={700} c="#1B2559" style={{ fontFamily: "sans-serif" }}>
+                All Batches
+              </Text>
+              <Text fz={13} c="#8B96AD">
+                Manage all your classes and batches
+              </Text>
+            </Stack>
+
+            <Flex align="center" gap={14} wrap="wrap">
+              <Box style={{ position: "relative", cursor: "pointer" }}>
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: "12px",
+                    background: "#FFFFFF",
+                    border: "1px solid #E2E8F0",
+                    boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                  }}
+                >
+                  <Bell size={18} color="#5B6B8C" />
+                </Flex>
+                {noticeCount > 0 && (
+                  <Flex
+                    align="center"
+                    justify="center"
+                    style={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                      minWidth: 18,
+                      height: 18,
+                      borderRadius: "50%",
+                      background: "#EF4444",
+                      color: "white",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: "0 4px",
+                      border: "2px solid white",
+                    }}
+                  >
+                    {noticeCount > 9 ? "9+" : noticeCount}
+                  </Flex>
+                )}
+              </Box>
+
+              <Flex
+                align="center"
+                gap={10}
+                py={6}
+                px={12}
+                style={{
+                  borderRadius: "12px",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                  background: "#FFFFFF",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    background: "#EAF1FF",
+                    color: "#2F6FED",
+                    fontWeight: 700,
+                    fontSize: 14,
+                  }}
+                >
+                  {(adminDetails?.name || "A").charAt(0).toUpperCase()}
+                </Flex>
+                <Stack gap={0}>
+                  <Text fz={13} fw={700} c="#1B2559" style={{ lineHeight: 1.1 }}>
+                    {adminDetails?.name || "Admin"}
+                  </Text>
+                  <Text fz={11} c="#8B96AD" style={{ lineHeight: 1.1 }}>
+                    {adminDetails?.role || "Admin"}
+                  </Text>
+                </Stack>
+              </Flex>
+            </Flex>
+          </Flex>
+
           {props.isShowTopCard !== false && (
             <InstituteDetailsCards instituteId={institute?._id || ""} />
           )}
@@ -374,7 +490,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
 
           {/* ── Students Database Card (Neat & Animated Redesign) ── */}
           <Card
-            w={isMd ? "95%" : "80%"}
+            w={isMd ? "95%" : "92%"}
             mx={"auto"}
             radius={16}
             p={{ base: 20, sm: 24 }}
@@ -388,12 +504,12 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               cursor: "pointer",
                             "&:hover": {
                 transform: "translateY(-4px)",
-                borderColor: "#8B5CF6",
-                boxShadow: "0px 12px 28px rgba(139, 92, 246, 0.12)",
+                borderColor: "#2F6FED",
+                boxShadow: "0px 12px 28px rgba(47,111,237,0.12)",
                 "& .db-icon-box": {
                   transform: "scale(1.06) rotate(3deg)",
-                  backgroundColor: "#F3E8FF",
-                  borderColor: "#C084FC",
+                  backgroundColor: "#EAF1FF",
+                  borderColor: "#A0B7FF",
                 },
               },
             }}
@@ -409,7 +525,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                 height: "160px",
                 borderRadius: "50%",
                 background:
-                  "radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, rgba(255,255,255,0) 70%)",
+                  "radial-gradient(circle, rgba(47,111,237,0.08) 0%, rgba(255,255,255,0) 70%)",
                 pointerEvents: "none",
               }}
             />
@@ -432,10 +548,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                   align="center"
                   gap={6}
                   style={{
-                    background: "#F5F3FF",
+                    background: "#EAF1FF",
                     padding: "4px 12px",
                     borderRadius: "20px",
-                    border: "1px solid #DDD6FE",
+                    border: "1px solid #C7D7FF",
                   }}
                 >
                   <span
@@ -443,13 +559,13 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                       width: 7,
                       height: 7,
                       borderRadius: "50%",
-                      backgroundColor: "#7C3AED",
+                      backgroundColor: "#2F6FED",
                     }}
                   />
                   <Text
                     fz={11}
                     fw={700}
-                    c="#6D28D9"
+                    c="#2F6FED"
                     style={{
                       letterSpacing: "0.5px",
                       textTransform: "uppercase",
@@ -478,7 +594,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                   size="md"
                   radius="xl"
                   variant="light"
-                  color="violet"
+                  color="blue"
                   fw={600}
                   px={22}
                   style={{
@@ -499,8 +615,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                     width: 80,
                     height: 80,
                     borderRadius: 20,
-                    background: "#F5F3FF",
-                    border: "1px solid #DDD6FE",
+                    background: "#EAF1FF",
+                    border: "1px solid #C7D7FF",
                     flexShrink: 0,
                     transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   }}
@@ -514,18 +630,18 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
                   >
                     <path
                       d="M12 3C7.58172 3 4 4.34315 4 6C4 7.65685 7.58172 9 12 9C16.4183 9 20 7.65685 20 6C20 4.34315 16.4183 3 12 3Z"
-                      fill="#7C3AED"
+                      fill="#2F6FED"
                       fillOpacity="0.8"
                     />
                     <path
                       d="M4 6V11C4 12.6569 7.58172 14 12 14C16.4183 14 20 12.6569 20 11V6"
-                      stroke="#6D28D9"
+                      stroke="#2F6FED"
                       strokeWidth="1.8"
                       strokeLinecap="round"
                     />
                     <path
                       d="M4 11V16C4 17.6569 7.58172 19 12 19C16.4183 19 20 17.6569 20 16V11"
-                      stroke="#6D28D9"
+                      stroke="#2F6FED"
                       strokeWidth="1.8"
                       strokeLinecap="round"
                     />
@@ -538,9 +654,15 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
           </Card>
 
           {/* ── Batches Section ── */}
-          <Flex align={"center"} w={isMd ? "95%" : "80%"} mx={"auto"}>
+          <Flex
+            align={"center"}
+            justify={"space-between"}
+            w={isMd ? "95%" : "92%"}
+            mx={"auto"}
+            wrap="wrap"
+            gap={12}
+          >
             <Text
-              w={"100%"}
               fz={18}
               fw={700}
               c={"#1B1212"}
@@ -548,6 +670,22 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             >
               Batches
             </Text>
+            <TextInput
+              value={batchSearch}
+              onChange={(e) => setBatchSearch(e.currentTarget.value)}
+              placeholder="Search batches..."
+              leftSection={<Search size={16} color="#8B96AD" />}
+              radius={12}
+              w={isMd ? "100%" : 260}
+              styles={{
+                input: {
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+                  height: 42,
+                },
+              }}
+            />
             {isMd && (
               <Button
                 onClick={() => setOpenAddBatchModal(true)}
@@ -570,22 +708,28 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
 
           <SimpleGrid
             cols={isMd ? 1 : isLg ? 2 : 4}
-            w={isMd ? "95%" : "80%"}
+            w={isMd ? "95%" : "92%"}
             mx={"auto"}
-            spacing={20}
-            verticalSpacing={20}
+            spacing={24}
+            verticalSpacing={24}
             mb={isMd ? 100 : 0}
           >
             <InstituteBatchesSection
-              batches={batches.map((batch: any) => ({
-                id: batch?.id || "",
-                name: batch?.name || "",
-                subjects: batch?.subjects || [],
-                noOfTeachers: batch?.noOfTeachers || 0,
-                noOfStudents: batch?.noOfStudents || 0,
-                firstThreeStudents: batch?.firstThreeStudents || [],
-                firstThreeTeachers: batch?.firstThreeTeachers || [],
-              }))}
+              batches={batches
+                .filter((batch: any) =>
+                  (batch?.name || "")
+                    .toLowerCase()
+                    .includes(batchSearch.trim().toLowerCase()),
+                )
+                .map((batch: any) => ({
+                  id: batch?.id || "",
+                  name: batch?.name || "",
+                  subjects: batch?.subjects || [],
+                  noOfTeachers: batch?.noOfTeachers || 0,
+                  noOfStudents: batch?.noOfStudents || 0,
+                  studentInitials: batch?.studentInitials || [],
+                  teacherInitials: batch?.teacherInitials || [],
+                }))}
               allBatches={batches.map((batch: any) => ({
                 id: batch?.id || "",
                 name: batch?.name || "",
@@ -616,7 +760,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
           </SimpleGrid>
 
           <Flex w={"100%"} align="center" justify={"center"}>
-            <NoticeBoard userType={userType} />
+            <NoticeBoard userType={userType} onNoticesChange={setNoticeCount} />
           </Flex>
         </Stack>
       )}
@@ -626,7 +770,7 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         <Stack
           w={"100%"}
           h={"100%"}
-          bg={"linear-gradient(135deg, #E6E1FF, #F7F5FF)"}
+          bg={"transparent"}
         >
           <InstituteInsideBatch
             userType={UserType.OTHERS}

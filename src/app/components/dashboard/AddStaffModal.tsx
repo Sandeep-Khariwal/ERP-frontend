@@ -163,8 +163,13 @@ const AddStaffModal = (props: {
   };
 
   //get all batches from institute
+  // Only needed once the modal is actually open — this component is
+  // always mounted inside the dashboard (the Modal itself just stays
+  // hidden when closed), so without this guard it fetched the batch
+  // list on every dashboard load whether or not "Add Staff" was ever
+  // opened.
   useEffect(() => {
-    if (props.instituteId) {
+    if (props.isOpen && props.instituteId) {
       GetInstituteBatches(props.instituteId)
         .then((x: any) => {
           const { batches } = x;
@@ -181,7 +186,7 @@ const AddStaffModal = (props: {
           console.log(e);
         });
     }
-  }, [props.instituteId]);
+  }, [props.isOpen, props.instituteId]);
 
   // function updateTeacher() {
   //   if (initialFormData) {

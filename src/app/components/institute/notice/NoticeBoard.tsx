@@ -38,7 +38,13 @@ interface Notice {
 }
 
 // Component
-export default function NoticeBoard(props: { userType: string }) {
+export default function NoticeBoard(props: {
+  userType: string;
+  // Optional: lets a parent that already needs the notice count (e.g. for a
+  // header badge) read it from this component's own fetch instead of
+  // firing its own separate GetAllNotice call for the same institute.
+  onNoticesChange?: (count: number) => void;
+}) {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -70,13 +76,14 @@ export default function NoticeBoard(props: { userType: string }) {
       form.setFieldValue("institute", institute._id!);
       fetchNotices();
     }
-  }, [institute]);
+  }, [institute?._id]);
 
   // Fetch notices
   const fetchNotices = async () => {
     GetAllNotice(institute._id!)
       .then((x: any) => {
         if (x?.data) setNotices(x.data);
+        props.onNoticesChange?.(Array.isArray(x?.data) ? x.data.length : 0);
       })
       .catch((e) => {
         console.log(e);
@@ -100,9 +107,9 @@ export default function NoticeBoard(props: { userType: string }) {
   };
 
   return (
-    <Stack w={"80%"}>
+    <Stack w={"92%"} mx={"auto"}>
       <LoadingOverlay visible={loading} />
-      <Flex w={"100%"} align={isMd?"flex-start":"center"} justify={"start"} gap={20}>
+      <Flex w={"100%"} align={isMd?"flex-start":"center"} justify={"space-between"} gap={20}>
         <Title order={2}>Notice Board</Title>
         {/* <CreateNoticeCard/> */}
         {props.userType === "admin" && (

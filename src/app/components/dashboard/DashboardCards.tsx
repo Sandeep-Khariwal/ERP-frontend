@@ -20,6 +20,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { UserType } from "./InstituteBatchesSection";
 import { PromoteBatch, SetPassoutBatch } from "@/axios/batch/BatchPutApi";
+import { getBatchIconStyle } from "./batchIconMap";
+import { Plus, PenLine, Receipt, ArrowUpCircle, GraduationCap, Trash2 } from "lucide-react";
 
 export function SingleBatchCard(props: {
   id: string;
@@ -29,14 +31,14 @@ export function SingleBatchCard(props: {
     id: string;
     name: string;
   }[];
-  firstThreeStudents: string[];
+  studentInitials: string[];
   userType: UserType;
   onbatchCardClick: () => void;
   onEditBatchName: (val: string) => void;
   onEditCourseFees: () => void;
   subjects: string[];
   noOfTeachers: number;
-  firstThreeTeachers: string[];
+  teacherInitials: string[];
   hasNextButton: boolean;
   showVerticalIcon: boolean;
   onEditBatchButtonClick: () => void;
@@ -115,7 +117,7 @@ export function SingleBatchCard(props: {
   return (
     <>
       <Card
-        shadow="0px 0px 30px 0px rgba(0, 0, 0, 0.10)"
+        shadow="0px 6px 20px rgba(15, 23, 42, 0.06)"
         bg={"#FFFFFF"}
         h={"100%"}
         p={20}
@@ -126,8 +128,19 @@ export function SingleBatchCard(props: {
           props.onbatchCardClick();
         }}
         style={{
-          borderRadius: "10px",
+          borderRadius: "16px",
           cursor: "pointer",
+          border: "1px solid #F1F4F9",
+          position: "relative",
+          transition: "box-shadow 0.2s ease, transform 0.2s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0px 14px 32px rgba(15,23,42,0.10)";
+          e.currentTarget.style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "0px 6px 20px rgba(15, 23, 42, 0.06)";
+          e.currentTarget.style.transform = "translateY(0px)";
         }}
       >
         <Modal
@@ -239,9 +252,9 @@ export function SingleBatchCard(props: {
           closeOnClickOutside={false}
           closeButtonProps={{
             style: {
-              background: "#F3E8FF",
+              background: "#EAF1FF",
               borderRadius: "50%",
-              color: "#7E57C2",
+              color: "#2F6FED",
             },
           }}
           padding={30}
@@ -319,13 +332,13 @@ export function SingleBatchCard(props: {
                       style={{
                         border:
                           selectedNextBatchId === batch.id
-                            ? "2px solid #7E57C2"
+                            ? "2px solid #2F6FED"
                             : "1px solid #ECECEC",
                         borderRadius: "16px",
                         cursor: "pointer",
                         background:
                           selectedNextBatchId === batch.id
-                            ? "#F5EEFF"
+                            ? "#EAF1FF"
                             : "#FFFFFF",
                         transition: "0.2s ease",
                         minHeight: "85px",
@@ -365,7 +378,7 @@ export function SingleBatchCard(props: {
                           borderRadius: "50%",
                           border:
                             selectedNextBatchId === batch.id
-                              ? "7px solid #7E57C2"
+                              ? "7px solid #2F6FED"
                               : "2px solid #D1D1D1",
                           transition: "0.2s ease",
                           flexShrink: 0,
@@ -410,15 +423,33 @@ export function SingleBatchCard(props: {
             </Button>
           </Flex>
         </Modal>
+        {(() => {
+          const iconStyle = getBatchIconStyle(props.name, props.subjects);
+          return (
+            <Flex
+              align="center"
+              justify="center"
+              mb={14}
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: "14px",
+                background: iconStyle.bg,
+              }}
+            >
+              {iconStyle.icon}
+            </Flex>
+          );
+        })()}
         {
           props.userType === UserType.OTHERS &&
 
-          <Flex justify="space-between" align="center" ml={5} mr={5}>
+          <Flex justify="space-between" align="flex-start" ml={5} mr={5}>
             {!isnameEdit && (
               <Text
-                fz={22}
-                fw={500}
-                c={"#36431F"}
+                fz={19}
+                fw={700}
+                c={"#1B2559"}
                 style={{
                   whiteSpace: "nowrap",
                   maxWidth: "70%",
@@ -446,7 +477,12 @@ export function SingleBatchCard(props: {
                     props.showVerticalIcon ?
 
                       <Flex
-                        style={{ cursor: "pointer" }}
+                        style={{
+                          cursor: "pointer",
+                          position: "absolute",
+                          top: 14,
+                          right: 14,
+                        }}
                         justify="center"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -475,12 +511,7 @@ export function SingleBatchCard(props: {
                     <Flex align="center">
                       <Flex align="center">
                         <Box mr={2}>
-                          <Image
-                            src={"/renameImg.png"}
-                            alt="profile"
-                            width={20}
-                            height={20}
-                          />
+                          <PenLine size={18} color="#5B6B8C" />
                         </Box>
                       </Flex>
                       <Text
@@ -503,12 +534,7 @@ export function SingleBatchCard(props: {
                       <Flex align="center">
                         <Flex align="center">
                           <Box mr={2}>
-                            <Image
-                              src={"/editImg.png"}
-                              alt="profile"
-                              width={20}
-                              height={20}
-                            />
+                            <Receipt size={18} color="#5B6B8C" />
                           </Box>
                         </Flex>
                         <Text
@@ -559,22 +585,14 @@ export function SingleBatchCard(props: {
                     <Flex align="center">
                       <Flex align="center">
                         <Box mr={2}>
-                          <Image
-                            src={"/promoteImg.png"}
-                            alt="promote"
-                            width={30}
-                            height={30}
-                            style={{
-                              objectFit: "contain",
-                            }}
-                          />
+                          <ArrowUpCircle size={18} color="#5B6B8C" />
                         </Box>
                       </Flex>
 
                       <Text
                         fz={16}
                         fw={500}
-                        ml={2}
+                        ml={10}
                         style={{ fontFamily: "Roboto" }}
                       >
                         Promote Batch
@@ -591,12 +609,7 @@ export function SingleBatchCard(props: {
                     <Flex align="center">
                       <Flex align="center">
                         <Box mr={2}>
-                          <Image
-                            src={"/passoutImg2.png"}
-                            alt="profile"
-                            width={20}
-                            height={20}
-                          />
+                          <GraduationCap size={18} color="#5B6B8C" />
                         </Box>
                       </Flex>
                       <Text
@@ -619,18 +632,14 @@ export function SingleBatchCard(props: {
                     <Flex align="center">
                       <Flex align="center">
                         <Box mr={2}>
-                          <Image
-                            src={"/deleteImg.png"}
-                            alt="profile"
-                            width={20}
-                            height={20}
-                          />
+                          <Trash2 size={18} color="#E03131" />
                         </Box>
                       </Flex>
                       <Text
                         fz={16}
                         fw={500}
                         ml={10}
+                        c="#E03131"
                         style={{ fontFamily: "Roboto" }}
                       >
                         Delete Batch
@@ -652,8 +661,8 @@ export function SingleBatchCard(props: {
           </Flex>
           <Flex mt={10}>
             <Flex>
-              {props.firstThreeStudents.length > 0 ? (
-                props.firstThreeStudents.map((student: any, index) => (
+              {props.studentInitials.length > 0 ? (
+                props.studentInitials.map((studentInitial, index) => (
                   <div
                     key={index}
                     style={{
@@ -671,7 +680,7 @@ export function SingleBatchCard(props: {
                     >
                       <Text fz={14} fw={500}>
                         {" "}
-                        {student.name[0]}{" "}
+                        {studentInitial}
                       </Text>
                     </Flex>
                   </div>
@@ -685,7 +694,7 @@ export function SingleBatchCard(props: {
               )}
             </Flex>
 
-            {props.firstThreeStudents.length > 0 ? (
+            {props.studentInitials.length > 0 ? (
               <Text
                 fz={14}
                 fw={600}
@@ -693,8 +702,8 @@ export function SingleBatchCard(props: {
                 mt={4}
                 style={{ fontFamily: "Nunito" }}
               >
-                {props.noOfStudents - 3 > 0
-                  ? `+${props.noOfStudents - 3}`
+                {props.noOfStudents - props.studentInitials.length > 0
+                  ? `+${props.noOfStudents - props.studentInitials.length}`
                   : props.noOfStudents}{" "}
                 students{" "}
               </Text>
@@ -704,7 +713,7 @@ export function SingleBatchCard(props: {
           </Flex>
           <Flex mt={5}>
             <Flex>
-              {props.firstThreeTeachers.map((teacher: any, index) => (
+              {props.teacherInitials.map((teacherInitial, index) => (
                 <Box
                   key={index}
                   style={{
@@ -721,13 +730,13 @@ export function SingleBatchCard(props: {
                     style={{ height: "100%" }}
                   >
                     <Text fz={14} fw={500} c={"white"} >
-                      {teacher.name[0]}
+                      {teacherInitial}
                     </Text>
                   </Flex>
                 </Box>
               ))}
             </Flex>
-            {props.firstThreeTeachers.length > 0 ? (
+            {props.teacherInitials.length > 0 ? (
               <Text
                 fz={14}
                 fw={600}
@@ -735,8 +744,8 @@ export function SingleBatchCard(props: {
                 mt={4}
                 style={{ fontFamily: "Nunito" }}
               >
-                {props.noOfTeachers - 3 > 0
-                  ? `+${props.noOfTeachers - 3}`
+                {props.noOfTeachers - props.teacherInitials.length > 0
+                  ? `+${props.noOfTeachers - props.teacherInitials.length}`
                   : props.noOfTeachers}{" "}
                 teachers{" "}
               </Text>
@@ -756,35 +765,45 @@ export function AddCardWithButton(props: {
   return (
     <>
       <Card
-        radius={10}
+        radius={16}
         bg={"#FFFFFF"}
         h={"100%"}
         p={20}
-        shadow="0px 0px 30px 0px rgba(0, 0, 0, 0.10)"
+        shadow="0px 6px 20px rgba(15, 23, 42, 0.06)"
+        style={{
+          border: "1.5px dashed #D6E0F5",
+          cursor: "pointer",
+        }}
+        onClick={props.onAddBatchButtonClick}
       >
-        <Center mt={30}>
+        <Center h={"100%"} mt={10}>
           <Flex direction="column" justify="center" align="center">
             <Image
               src={"/classroom.png"}
-              width={70}
-              height={70}
+              width={64}
+              height={64}
               alt="classroom"
             />
-            <Button
-              size="sm"
+            <Flex
+              align="center"
+              justify="center"
+              mt={14}
               style={{
-                backgroundColor: "#f7f7ff",
-                color: "black",
-                borderRadius: "20px",
-                border: "1px solid #808080",
-                marginTop: "10px",
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: "#EAF1FF",
+                border: "1px solid #D6E0F5",
               }}
-              onClick={props.onAddBatchButtonClick}
             >
-              <Text fz={16} fw={700} c={"#353935"} ff={"Poppins"}>
-                Add Batch
-              </Text>
-            </Button>
+              <Plus size={20} color="#2F6FED" />
+            </Flex>
+            <Text fz={16} fw={700} c={"#1B2559"} ff={"Poppins"} mt={10}>
+              Add New Batch
+            </Text>
+            <Text fz={13} c={"#8B96AD"} mt={2}>
+              Create a new batch
+            </Text>
           </Flex>
         </Center>
       </Card>
