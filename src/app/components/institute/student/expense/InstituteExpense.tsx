@@ -1,15 +1,18 @@
 // InstituteExpanse.tsx (Complete UI with Dummy Data)
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Grid, Button, Title, Card, Text, Group, Select, Stack, Flex } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { LineChart, Line, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar, Legend, ResponsiveContainer } from "recharts";
 import { Modal } from "@mantine/core";
 import ExpenseForm from "./AddExpenseModel";
-import { useEffect } from "react";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { GetExpenseData } from "@/axios/institute/ExpenseApi";
+import { GetInstituteOverview } from "@/axios/institute/InstituteGetApi";
+import { createExpenseSlipPdf } from "./CreateExpenseSlipPdf";
+
 import { useMemo } from "react";
 import { useMediaQuery } from "@mantine/hooks";
+import { IconDownload } from "@tabler/icons-react";
 // ================= Interfaces =================
 
 interface Expense {
@@ -19,6 +22,10 @@ interface Expense {
     category: string;
     paymentMethod: string;
     expenseDate: string;
+    note?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    instituteId?: string;
 }
 
 interface Filters {
@@ -36,6 +43,24 @@ const COLORS = [
     "#A855F7", // Purple
     "#14B8A6", // Teal
 ];
+
+// Image to Base64 conversion helper
+const getBase64Image = async (imgUrl: string): Promise<string> => {
+    if (!imgUrl) return "";
+    if (imgUrl.startsWith("data:image")) return imgUrl;
+    try {
+        const res = await fetch(imgUrl);
+        const blob = await res.blob();
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = () => resolve(imgUrl);
+            reader.readAsDataURL(blob);
+        });
+    } catch (e) {
+        return imgUrl;
+    }
+};
 
 export default function InstituteExpanse() {
     const isMobile = useMediaQuery("(max-width: 968px)");
@@ -55,7 +80,24 @@ export default function InstituteExpanse() {
 
     const [totalExpense, setTotalExpense] = useState(0);
 
+    // Download PDF state & Institute details
+    const [downloadingId, setDownloadingId] = useState<string | null>(null);
+    const [instituteData, setInstituteData] = useState<any>(null);
 
+    // Fetch Full Institute Overview Details (Logo, Signature, Address, GST)
+    useEffect(() => {
+        if (institute?._id) {
+            GetInstituteOverview(institute._id)
+                .then((res: any) => {
+                    if (res?.institute) {
+                        setInstituteData(res.institute);
+                    }
+                })
+                .catch((err: any) => {
+                    console.log("Error fetching institute overview:", err);
+                });
+        }
+    }, [institute?._id]);
 
     const finalExpenses = useMemo(() => {
         if (!filters.startDate && !filters.endDate && !filters.category) {
@@ -81,12 +123,8 @@ export default function InstituteExpanse() {
         });
     }, [expenses, filters]);
 
-
-
     useEffect(() => {
         const total = finalExpenses.reduce((sum, e) => sum + e.amount, 0);
-
-        setTotalExpense(total);
 
         setTotalExpense(total);
 
@@ -185,6 +223,67 @@ export default function InstituteExpanse() {
 
     }, [institute?._id]);
 
+    // Handle PDF Download
+    const handleDownloadExpenseSlip = async (expenseItem: Expense) => {
+        try {
+            setDownloadingId(expenseItem._id);
+
+            const logoUrl = instituteData?.logo || institute?.logo || "";
+            const signatureUrl = instituteData?.signature || institute?.signature || "";
+
+            const base64Logo = logoUrl ? await getBase64Image(logoUrl) : "";
+            const base64Signature = signatureUrl ? await getBase64Image(signatureUrl) : "";
+const gstNo =
+  typeof instituteData?.gst === "object"
+    ? instituteData?.gst?.number || "N/A"
+    : instituteData?.gst || "N/A";
+
+
+            const html = createExpenseSlipPdf({
+                instituteName: instituteData?.name || institute?.name || "Institute Name",
+                instituteAddress: instituteData?.address || institute?.address || "",
+                institutePhone:
+                    instituteData?.institutePhoneNumber ||
+                    instituteData?.phoneNumber ||
+                    institute?.phoneNumber ||
+                    "",
+                instituteEmail: instituteData?.email || institute?.email || "",
+                instituteLogo: base64Logo,
+                instituteSignature: base64Signature,
+                gstNo: gstNo,
+
+                expenseId: expenseItem._id,
+                title: expenseItem.title,
+                category: expenseItem.category,
+                amount: expenseItem.amount,
+                paymentMethod: expenseItem.paymentMethod,
+                expenseDate: expenseItem.expenseDate,
+                createdAt: expenseItem.createdAt,
+                note: expenseItem.note,
+            });
+
+            const printWindow = window.open("", "_blank");
+
+            if (printWindow) {
+                printWindow.document.open();
+                printWindow.document.write(html);
+                printWindow.document.close();
+
+                setTimeout(() => {
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.onafterprint = () => {
+                        printWindow.close();
+                    };
+                }, 500);
+            }
+        } catch (error) {
+            console.error("Error generating Expense Slip PDF:", error);
+        } finally {
+            setDownloadingId(null);
+        }
+    };
+
     return (
         <Container size="xl" py="md" px={isMobile ? "xs" : "md"}>
             <Group justify="space-between" mb="md" wrap="wrap" gap="sm">
@@ -202,7 +301,7 @@ export default function InstituteExpanse() {
                     centered
                 >
                     <ExpenseForm
-                        institute={institute._id}
+                        institute={institute?._id}
                         onSuccess={(newExpense: any) => {
                             // ✅ 1. Add new expense instantly
                             setExpenses(prev => [newExpense, ...prev]);
@@ -345,6 +444,7 @@ export default function InstituteExpanse() {
                     </Card>
                 </Grid.Col>
             </Grid>
+
             <Grid mt="md">
                 <Grid.Col span={12}>
                     <Card radius="md" shadow="md" p="lg" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
@@ -420,6 +520,20 @@ export default function InstituteExpanse() {
                                     <Text style={{ flex: 1 }} fw={600} ta="right">
                                         ₹{e.amount}
                                     </Text>
+
+                                    {/* Download PDF Action */}
+                                    <Group justify="flex-end" style={{ flex: 1.5 }}>
+                                        <Button
+                                            size="xs"
+                                            variant="light"
+                                            color="blue"
+                                            leftSection={<IconDownload size={14} />}
+                                            loading={downloadingId === e._id}
+                                            onClick={() => handleDownloadExpenseSlip(e)}
+                                        >
+                                            Download Slip
+                                        </Button>
+                                    </Group>
 
                                 </Group>
                                 )
