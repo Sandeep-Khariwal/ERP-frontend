@@ -137,16 +137,16 @@ const joinByCode = () => {
   const past = meetings.filter((m) => m.status === "ended" || m.status === "cancelled");
 
   return (
-    <Box bg="gray.0" mih="100vh" py="xl">
-      <Container size="lg">
-        <Group justify="space-between" mb="xl">
+    <Box w="100%" py={{ base: "sm", sm: "md" }} style={{ minWidth: 0 }}>
+      <Container size="lg" px={{ base: 0, sm: "md" }}>
+        <Group justify="space-between" align="flex-start" mb="md" gap="md" wrap="wrap">
           <Box>
-            <Title order={2} fw={700} c="dark.8">My Classes</Title>
+            <Title order={2} fw={700} c="#172033" style={{ fontFamily: "Poppins" }}>My Classes</Title>
             <Text c="dimmed" size="sm">Join your online classroom sessions</Text>
           </Box>
 
           {/* Join by code */}
-          <Group gap="xs">
+          <Group gap="xs" style={{ width: "100%", maxWidth: 390, minWidth: 0 }} wrap="nowrap">
             <TextInput
               placeholder="Enter meeting code..."
               leftSection={<IconKey size={14} />}
@@ -154,12 +154,13 @@ const joinByCode = () => {
               onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === "Enter" && joinByCode()}
               maxLength={6}
+              style={{ flex: 1, minWidth: 0 }}
               styles={{ input: { fontFamily: "monospace", fontWeight: 600, letterSpacing: 2 } }}
             />
             <Button
               loading={searching}
               onClick={joinByCode}
-              color="violet"
+              color="blue"
               leftSection={<IconSearch size={14} />}
             >
               Join
@@ -169,7 +170,7 @@ const joinByCode = () => {
 
         {/* Live now */}
         {live.length > 0 && (
-          <Box mb="xl">
+          <Box mb="md">
             <Group gap="sm" mb="md">
               <Box w={8} h={8} style={{ borderRadius: "50%", background: "#22c55e", animation: "pulse 2s infinite" }} />
               <Title order={4} c="green.7">Live Now</Title>
@@ -183,9 +184,9 @@ const joinByCode = () => {
         )}
 
         {/* Upcoming */}
-        <Title order={4} mb="md" c="dark.7">Upcoming Classes</Title>
+        <Title order={4} mb="md" c="#172033" style={{ fontFamily: "Poppins" }}>Upcoming Classes</Title>
         {upcoming.length === 0 ? (
-          <Card withBorder radius="md" p="xl" mb="xl" ta="center">
+          <Card withBorder radius={10} p="xl" mb="xl" ta="center" style={{ borderColor: "#e5eaf2" }}>
             <IconCalendar size={40} color="var(--mantine-color-gray-4)" />
             <Text c="dimmed" mt="sm">No upcoming classes scheduled</Text>
           </Card>
@@ -218,34 +219,37 @@ function StudentMeetingCard({ meeting, onJoin }: { meeting: Meeting; onJoin: () 
   const isJoinable = meeting.status === "live" || meeting.status === "scheduled";
 
   return (
-    <Card withBorder radius="md" p="lg" style={{
-      borderLeft: meeting.status === "live" ? "4px solid var(--mantine-color-green-5)" : undefined,
-      background: meeting.status === "live" ? "var(--mantine-color-green-0)" : undefined,
+    <Card withBorder radius={10} p={{ base: "sm", sm: "md" }} style={{
+      borderColor: "#e5eaf2",
+      boxShadow: "0 2px 8px rgba(20, 42, 76, 0.06)",
+      borderLeft: meeting.status === "live" ? "4px solid #0d55dd" : undefined,
+      background: meeting.status === "live" ? "#f3f7ff" : "#ffffff",
     }}>
-      <Group justify="space-between">
-        <Group gap="md">
+      <Group justify="space-between" gap="sm" wrap="wrap">
+        <Group gap="sm" wrap="nowrap" style={{ minWidth: 0, flex: "1 1 280px" }}>
           <Box
-            p="md"
+            p="sm"
             style={{
-              borderRadius: 12,
+              borderRadius: 10,
               background: meeting.status === "live"
-                ? "var(--mantine-color-green-1)"
-                : "var(--mantine-color-violet-0)",
+                ? "#e4edff"
+                : "#e4edff",
+              flexShrink: 0,
             }}
           >
             <IconVideo
               size={24}
               color={meeting.status === "live"
-                ? "var(--mantine-color-green-6)"
-                : "var(--mantine-color-violet-6)"}
+                ? "#0755d9"
+                : "#0755d9"}
             />
           </Box>
-          <Box>
+          <Box style={{ minWidth: 0 }}>
             <Group gap="sm" mb={4}>
               <Text fw={600}>{meeting.title}</Text>
               <Badge color={status.color} size="sm" radius="sm">{status.label}</Badge>
             </Group>
-            <Group gap="lg">
+            <Group gap="sm" wrap="wrap">
               <Group gap={4}><IconBook size={13} /><Text size="xs" c="dimmed">{meeting.subject}</Text></Group>
               <Group gap={4}><IconUsers size={13} /><Text size="xs" c="dimmed">{meeting.teacherName}</Text></Group>
               <Group gap={4}><IconCalendar size={13} /><Text size="xs" c="dimmed">{dayjs(meeting.scheduledAt).format("DD MMM, hh:mm A")}</Text></Group>
@@ -255,7 +259,7 @@ function StudentMeetingCard({ meeting, onJoin }: { meeting: Meeting; onJoin: () 
         </Group>
         {isJoinable && (
           <Button
-            color={meeting.status === "live" ? "green" : "violet"}
+            color={"blue"}
             variant={meeting.status === "live" ? "filled" : "light"}
             leftSection={<IconVideo size={14} />}
             radius="md"

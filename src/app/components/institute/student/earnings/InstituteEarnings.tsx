@@ -15,6 +15,7 @@ import {
   Button,
   Divider,
   Flex,
+  ScrollArea,
 } from "@mantine/core";
 
 import {
@@ -190,7 +191,7 @@ const monthlyData = Object.values(monthlyMap);
     <Box bg="#f3f6fb" style={{ minHeight: "100vh", padding: 20 }}>
       <Container size="xl" px={isMobile ? "xs" : "md"}>
         {/* HEADER */}
-        <Title ta="center" fw={700} mb="md">
+        <Title ta="center" fw={700} mb="md" style={{ fontFamily: "sans-serif" }}>
           Earnings Dashboard
         </Title>
 
@@ -229,17 +230,21 @@ const monthlyData = Object.values(monthlyMap);
             },
           ].map((item, i) => (
             <Grid.Col span={isMobile ? 6 : 2.4} key={i}>
-              <Card radius="xl" shadow="sm" p="md">
+              <Card radius="md" shadow="sm" p="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
                 <Group>
-                  <ThemeIcon color={item.color} size={42} radius="xl">
+                  <ThemeIcon color={item.color} size={42} radius="md">
                     <item.icon size={20} />
                   </ThemeIcon>
 
                   <Box>
-                    <Text size="xs" c="#6b7280">
+                    <Text size="xs" c="#6b7280" style={{ fontFamily: "sans-serif" }}>
                       {item.title}
                     </Text>
-                    <Text fw={700} size="lg">
+                    <Text
+                      fw={700}
+                      fz={isMobile ? "clamp(1rem, 4.5vw, 1.2rem)" : "lg"}
+                      style={{ fontFamily: "sans-serif", wordBreak: "break-word" }}
+                    >
                       {item.value}
                     </Text>
                   </Box>
@@ -255,7 +260,7 @@ const monthlyData = Object.values(monthlyMap);
 
 
         {/* ================= CHART ================= */}
-        <Card radius="xl" p="xs" mb="md">
+        <Card radius="md" p="xs" mb="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
           <Text fw={600} mb="xs">
             Monthly Earnings
           </Text>
@@ -271,7 +276,7 @@ const monthlyData = Object.values(monthlyMap);
             </BarChart>
           </ResponsiveContainer>
         </Card>
-        <Card radius="xl" p="md" mb="md">
+        <Card radius="md" p="md" mb="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
   <Flex justify="space-between" align="center">
     <Text fw={700}>Upcoming Fees</Text>
 
@@ -282,14 +287,15 @@ const monthlyData = Object.values(monthlyMap);
 
   <Divider my="sm" />
 
-  <Table highlightOnHover striped>
+  <ScrollArea type="auto">
+  <Table highlightOnHover striped miw={isMobile ? 560 : undefined}>
     <Table.Thead>
       <Table.Tr>
-        <Table.Th>Class</Table.Th>
-        <Table.Th>Student</Table.Th>
-        <Table.Th>Roll No</Table.Th>
-        <Table.Th>Total Amount</Table.Th>
-        <Table.Th>Due Date</Table.Th>
+        <Table.Th style={{ fontFamily: "Roboto" }}>Class</Table.Th>
+        <Table.Th style={{ fontFamily: "Roboto" }}>Student</Table.Th>
+        <Table.Th style={{ fontFamily: "Roboto" }}>Roll No</Table.Th>
+        <Table.Th style={{ fontFamily: "Roboto" }}>Total Amount</Table.Th>
+        <Table.Th style={{ fontFamily: "Roboto" }}>Due Date</Table.Th>
       </Table.Tr>
     </Table.Thead>
 
@@ -323,6 +329,7 @@ const monthlyData = Object.values(monthlyMap);
       ))}
     </Table.Tbody>
   </Table>
+  </ScrollArea>
 
   {/* PAGINATION */}
   {totalPages > 1 && (
@@ -356,7 +363,7 @@ const monthlyData = Object.values(monthlyMap);
       <Grid>
   {/* LEFT */}
   <Grid.Col span={4} {...(isMobile && { span: 12 })}>
-    <Card radius="xl" p="md" shadow="sm">
+    <Card radius="md" p="md" shadow="sm" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
       
       {/* HEADER */}
       <Flex justify="space-between" align="center">
@@ -372,12 +379,13 @@ const monthlyData = Object.values(monthlyMap);
       <Divider my="sm" />
 
       {/* TABLE */}
-      <Table highlightOnHover striped>
+      <ScrollArea type="auto">
+      <Table highlightOnHover striped miw={isMobile ? 420 : undefined}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Th>Date</Table.Th>
-            <Table.Th>Amount</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Name</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Date</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Amount</Table.Th>
           </Table.Tr>
         </Table.Thead>
 
@@ -404,6 +412,7 @@ const monthlyData = Object.values(monthlyMap);
           ))}
         </Table.Tbody>
       </Table>
+      </ScrollArea>
 
       {/* VIEW MORE / LESS BUTTON */}
       {dueFees.length > 5 && (
@@ -424,7 +433,7 @@ const monthlyData = Object.values(monthlyMap);
   <Grid.Col span={8} {...(isMobile && { span: 12 })}>
     
     {/* ✅ BATCH TABLE */}
-    <Card radius="xl" p="md">
+    <Card radius="md" p="md" withBorder styles={{ root: { borderColor: "#F1F4F9" } }}>
       <Flex justify="space-between" align="center">
         <Text fw={700}>Batch-wise Earnings</Text>
 
@@ -435,12 +444,13 @@ const monthlyData = Object.values(monthlyMap);
 
       <Divider my="sm" />
 
-      <Table highlightOnHover striped>
+      <ScrollArea type="auto">
+      <Table highlightOnHover striped miw={isMobile ? 420 : undefined}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Batch</Table.Th>
-            <Table.Th>Collected</Table.Th>
-            <Table.Th>Pending</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Batch</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Collected</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Pending</Table.Th>
           </Table.Tr>
         </Table.Thead>
 
@@ -464,6 +474,7 @@ const monthlyData = Object.values(monthlyMap);
           ))}
         </Table.Tbody>
       </Table>
+      </ScrollArea>
 
       {/* VIEW MORE / LESS */}
       {batchData.length > 5 && (

@@ -68,15 +68,15 @@ const StudentAttendanceView = (props: { studentId: string }) => {
   return (
     <Stack w={"100%"}>
       <LoadingOverlay visible={isLoading} />
-      <Stack w={"100%"} p={10}>
-        <Text ta={"start"} fw={600} ff={"Roboto"} fz={24}>
+      <Stack w={"100%"} p={10} gap="md">
+        <Text ta={"start"} fw={700} c="#1d2939" fz={20}>
           Attendance Records
         </Text>
 
         {Array.from(attendance.keys()).map((monthYear) => {
           const records = attendance.get(monthYear);
           return (
-            <AttendanceCard monthYear={monthYear} records={records || []} />
+            <AttendanceCard key={monthYear} monthYear={monthYear} records={records || []} />
           );
         })}
       </Stack>

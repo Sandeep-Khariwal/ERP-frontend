@@ -267,8 +267,8 @@ console.log("FULL TEACHER DATA => ", props.teacherData);
             leftSection={<IconPlus size={16} />}
             onClick={open}
             size="md"
-            radius="md"
-            style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}
+            radius={10}
+            style={{ background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)" }}
           >
             Schedule New Class
           </Button>
@@ -277,13 +277,13 @@ console.log("FULL TEACHER DATA => ", props.teacherData);
         {/* ── Stats Row ── */}
         <Grid mb="xl">
           {[
-            { label: "Total Classes", value: meetings.length, color: "violet", icon: IconVideo },
+            { label: "Total Classes", value: meetings.length, color: "blue", icon: IconVideo },
             { label: "Upcoming", value: upcoming.length, color: "blue", icon: IconCalendar },
             { label: "Completed", value: meetings.filter((m) => m.status === "ended").length, color: "teal", icon: IconCheck },
             { label: "Live Now", value: meetings.filter((m) => m.status === "live").length, color: "green", icon: IconUsers },
           ].map((stat) => (
             <Grid.Col span={{ base: 6, sm: 3 }} key={stat.label}>
-              <Card withBorder radius="md" p="lg">
+              <Card withBorder radius={16} p="lg" style={{ borderColor: "#F1F4F9" }}>
                 <Group>
                   <Box
                     p="xs"
@@ -292,8 +292,8 @@ console.log("FULL TEACHER DATA => ", props.teacherData);
                     <stat.icon size={22} color={`var(--mantine-color-${stat.color}-6)`} />
                   </Box>
                   <Box>
-                    <Text size="xl" fw={700}>{stat.value}</Text>
-                    <Text size="xs" c="dimmed">{stat.label}</Text>
+                    <Text size="xl" fw={700} c="#1B2559">{stat.value}</Text>
+                    <Text size="xs" c="#5B6B8C">{stat.label}</Text>
                   </Box>
                 </Group>
               </Card>
@@ -302,12 +302,12 @@ console.log("FULL TEACHER DATA => ", props.teacherData);
         </Grid>
 
         {/* ── Upcoming Meetings ── */}
-        <Title order={4} mb="md" c="dark.7">Upcoming Classes</Title>
+        <Title order={4} mb="md" c="#1B2559">Upcoming Classes</Title>
         {upcoming.length === 0 ? (
-          <Card withBorder radius="md" p="xl" mb="xl" ta="center">
+          <Card withBorder radius={16} p="xl" mb="xl" ta="center" style={{ borderColor: "#F1F4F9" }}>
             <IconCalendar size={40} color="var(--mantine-color-gray-4)" />
             <Text c="dimmed" mt="sm">No upcoming classes scheduled</Text>
-            <Button variant="light" mt="md" onClick={open}>Schedule Now</Button>
+            <Button variant="light" mt="md" radius={10} onClick={open}>Schedule Now</Button>
           </Card>
         ) : (
           <Stack mb="xl">
@@ -449,7 +449,8 @@ function MeetingCard({ meeting, role, onJoin, onCancel, onCopyCode }: MeetingCar
   const isLive = meeting.status === "live";
 
   return (
-    <Card withBorder radius="md" p="lg" style={{
+    <Card withBorder radius={16} p="lg" style={{
+      borderColor: "#F1F4F9",
       borderLeft: isLive ? "4px solid var(--mantine-color-green-5)" : undefined,
       background: isLive ? "var(--mantine-color-green-0)" : undefined,
     }}>
@@ -459,13 +460,13 @@ function MeetingCard({ meeting, role, onJoin, onCancel, onCopyCode }: MeetingCar
             p="md"
             style={{
               borderRadius: 12,
-              background: isLive ? "var(--mantine-color-green-1)" : "var(--mantine-color-violet-0)",
+              background: isLive ? "var(--mantine-color-green-1)" : "var(--mantine-color-blue-0)",
               flexShrink: 0,
             }}
           >
             <IconVideo
               size={24}
-              color={isLive ? "var(--mantine-color-green-6)" : "var(--mantine-color-violet-6)"}
+              color={isLive ? "var(--mantine-color-green-6)" : "var(--mantine-color-blue-6)"}
             />
           </Box>
           <Box style={{ minWidth: 0 }}>
@@ -510,7 +511,7 @@ function MeetingCard({ meeting, role, onJoin, onCancel, onCopyCode }: MeetingCar
           >
             <Group gap={4}>
               <IconLink size={12} color="var(--mantine-color-gray-5)" />
-              <Text size="xs" ff="monospace" fw={600} c="violet">{meeting.meetingCode}</Text>
+              <Text size="xs" ff="monospace" fw={600} c="blue">{meeting.meetingCode}</Text>
             </Group>
           </Box>
 
@@ -519,7 +520,7 @@ function MeetingCard({ meeting, role, onJoin, onCancel, onCopyCode }: MeetingCar
               size="sm"
               radius="md"
               onClick={onJoin}
-              color={isLive ? "green" : "violet"}
+              color={isLive ? "green" : "blue"}
               variant={isLive ? "filled" : "light"}
               leftSection={<IconVideo size={14} />}
             >

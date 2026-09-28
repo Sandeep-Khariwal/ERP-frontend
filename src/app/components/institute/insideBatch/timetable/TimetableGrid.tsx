@@ -7,12 +7,10 @@ import {
   ActionIcon,
   Tooltip,
   Group,
-  Paper,
   Stack,
 } from "@mantine/core";
 import { IconEdit, IconTrash, IconCalendarEvent } from "@tabler/icons-react";
 import { DayOfWeek, DAYS_OF_WEEK, Timetable } from "./timetable.types";
-
 
 interface TimetableGridProps {
   timetables: Timetable[];
@@ -23,19 +21,13 @@ interface TimetableGridProps {
   isAdmin?: boolean;
 }
 
-const TIME_SLOTS = [
-  "07:00", "08:00", "09:00", "10:00", "11:00",
-  "12:00", "13:00", "14:00", "15:00", "16:00", "17:00",
+const FALLBACK_PERIODS = [
+  { startTime: "08:00", endTime: "08:45" },
+  { startTime: "09:00", endTime: "09:45" },
+  { startTime: "10:15", endTime: "11:00" },
+  { startTime: "11:15", endTime: "12:00" },
+  { startTime: "13:00", endTime: "13:45" },
 ];
-
-function getSlotColor(subjectName?: string): string {
-  const colors = [
-    "blue", "teal", "violet", "orange", "pink", "cyan", "green", "indigo",
-  ];
-  if (!subjectName) return "blue";
-  const idx = subjectName.charCodeAt(0) % colors.length;
-  return colors[idx];
-}
 
 export function TimetableGrid({
   timetables,
@@ -52,150 +44,207 @@ export function TimetableGrid({
     if (byDay[t.dayOfWeek]) byDay[t.dayOfWeek].push(t);
   });
 
+  // Derive the distinct periods (start–end pairs) actually used in this
+  // batch's schedule, sorted chronologically. Falls back to a sensible
+  // default set of periods when nothing has been scheduled yet.
+  const periodKey = (p: { startTime: string; endTime: string }) =>
+    `${p.startTime}-${p.endTime}`;
+
+  const periodMap = new Map<string, { startTime: string; endTime: string }>();
+  timetables.forEach((t) => {
+    periodMap.set(periodKey(t), {
+      startTime: t.startTime,
+      endTime: t.endTime,
+    });
+  });
+
+  const periods =
+    periodMap.size > 0
+      ? Array.from(periodMap.values()).sort((a, b) =>
+          a.startTime.localeCompare(b.startTime),
+        )
+      : FALLBACK_PERIODS;
+
   return (
     <Box style={{ overflowX: "auto" }}>
       <Box
         style={{
           display: "grid",
-          gridTemplateColumns: `80px repeat(${DAYS_OF_WEEK.length}, 1fr)`,
-          minWidth: 800,
+          gridTemplateColumns: `100px repeat(${DAYS_OF_WEEK.length}, 1fr)`,
+          minWidth: 900,
+          border: "1px solid #EEF1F6",
+          borderRadius: "12px",
+          overflow: "hidden",
         }}
       >
         {/* Header row */}
         <Box
-          p="xs"
-          style={{ borderBottom: "2px solid var(--mantine-color-gray-3)" }}
-        />
+          p="sm"
+          style={{
+            background: "#F7F9FC",
+            borderBottom: "1px solid #EEF1F6",
+          }}
+        >
+          <Text fw={600} fz={13} c="#64748B">
+            Time
+          </Text>
+        </Box>
         {DAYS_OF_WEEK.map((day) => (
           <Box
             key={day}
-            p="xs"
-            ta="center"
+            p="sm"
             style={{
-              borderBottom: "2px solid var(--mantine-color-gray-3)",
-              borderLeft: "1px solid var(--mantine-color-gray-2)",
+              background: "#F7F9FC",
+              borderBottom: "1px solid #EEF1F6",
+              borderLeft: "1px solid #EEF1F6",
             }}
           >
-            <Text fw={600} size="sm">
-              {day.slice(0, 3)}
+            <Text fw={600} fz={13} c="#1B2559">
+              {day}
             </Text>
           </Box>
         ))}
 
-        {/* Time rows */}
-        {TIME_SLOTS.map((time, tIdx) => (
+        {/* Period rows */}
+        {periods.map((period, pIdx) => (
           <>
             <Box
-              key={`time-${time}`}
-              p="xs"
+              key={`time-${periodKey(period)}`}
+              p="sm"
               style={{
-                borderBottom: "1px solid var(--mantine-color-gray-2)",
-                display: "flex",
-                alignItems: "flex-start",
+                borderBottom:
+                  pIdx === periods.length - 1 ? "none" : "1px solid #EEF1F6",
               }}
             >
-              <Text size="xs" c="dimmed">
-                {time}
+              <Text fz={13} fw={600} c="#1B2559">
+                {period.startTime}
+              </Text>
+              <Text fz={12} c="#8B96AD">
+                {period.endTime}
               </Text>
             </Box>
             {DAYS_OF_WEEK.map((day) => {
               const slots = byDay[day].filter(
                 (t) =>
-                  t.startTime >= time &&
-                  t.startTime < (TIME_SLOTS[tIdx + 1] ?? "18:00")
+                  t.startTime === period.startTime &&
+                  t.endTime === period.endTime,
               );
+              const hasSlot = slots.length > 0;
               return (
                 <Box
-                  key={`cell-${day}-${time}`}
+                  key={`cell-${day}-${periodKey(period)}`}
                   style={{
-                    borderBottom: "1px solid var(--mantine-color-gray-2)",
-                    borderLeft: "1px solid var(--mantine-color-gray-2)",
-                    minHeight: 64,
-                    padding: 4,
+                    borderLeft: "1px solid #EEF1F6",
+                    borderBottom:
+                      pIdx === periods.length - 1
+                        ? "none"
+                        : "1px solid #EEF1F6",
+                    minHeight: 72,
+                    padding: 8,
                   }}
                 >
-                  {slots.map((slot) => {
-                    const isManaged = managedTimetableIds.has(slot._id);
-                    const color = getSlotColor(slot.subjectName);
-                    return (
-                      <Paper
-                        key={slot._id}
-                        p={6}
-                        mb={4}
-                        radius="sm"
-                        style={{
-                          backgroundColor: `var(--mantine-color-${color}-1)`,
-                          borderLeft: `3px solid var(--mantine-color-${color}-6)`,
-                          position: "relative",
-                        }}
-                      >
-                        <Stack gap={2}>
-                          <Text size="xs" fw={700} c={`${color}.8`}>
-                            {slot.subjectName ?? slot.subjectId}
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {slot.startTime} – {slot.endTime}
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {slot.teacherName ?? slot.teacherId}
-                          </Text>
-                          {slot.room && (
-                            <Text size="xs" c="dimmed">
-                              📍 {slot.room}
+                  {hasSlot ? (
+                    slots.map((slot) => {
+                      const isManaged = managedTimetableIds.has(slot._id);
+                      return (
+                        <Box
+                          key={slot._id}
+                          p={10}
+                          mb={6}
+                          style={{
+                            borderRadius: "10px",
+                            background: "#EAF1FF",
+                            position: "relative",
+                          }}
+                        >
+                          <Stack gap={2} pr={isAdmin ? 40 : 0}>
+                            <Text fz={13} fw={700} c="#1B2559">
+                              {slot.subjectName ?? slot.subjectId}
                             </Text>
-                          )}
-                          {isManaged && (
-                            <Badge color="yellow" size="xs" variant="filled" mt={2}>
-                              Managed
-                            </Badge>
-                          )}
-                        </Stack>
+                            <Text fz={12} c="#5B6B8C">
+                              {slot.teacherName ?? slot.teacherId}
+                              {slot.room ? ` • ${slot.room}` : ""}
+                            </Text>
+                            {isManaged && (
+                              <Badge
+                                color="orange"
+                                size="xs"
+                                variant="light"
+                                radius="xl"
+                                mt={2}
+                                w="fit-content"
+                              >
+                                Overridden today
+                              </Badge>
+                            )}
+                          </Stack>
 
-                        {isAdmin && (
-                          <Group
-                            gap={2}
-                            style={{ position: "absolute", top: 4, right: 4 }}
-                          >
-                            {onManage && (
-                              <Tooltip label="Manage class">
-                                <ActionIcon
-                                  size="xs"
-                                  variant="subtle"
-                                  color="yellow"
-                                  onClick={() => onManage(slot)}
-                                >
-                                  <IconCalendarEvent size={12} />
-                                </ActionIcon>
-                              </Tooltip>
-                            )}
-                            {onEdit && (
-                              <Tooltip label="Edit">
-                                <ActionIcon
-                                  size="xs"
-                                  variant="subtle"
-                                  onClick={() => onEdit(slot)}
-                                >
-                                  <IconEdit size={12} />
-                                </ActionIcon>
-                              </Tooltip>
-                            )}
-                            {onDelete && (
-                              <Tooltip label="Delete">
-                                <ActionIcon
-                                  size="xs"
-                                  variant="subtle"
-                                  color="red"
-                                  onClick={() => onDelete(slot)}
-                                >
-                                  <IconTrash size={12} />
-                                </ActionIcon>
-                              </Tooltip>
-                            )}
-                          </Group>
-                        )}
-                      </Paper>
-                    );
-                  })}
+                          {isAdmin && (
+                            <Group
+                              gap={2}
+                              style={{
+                                position: "absolute",
+                                top: 6,
+                                right: 6,
+                              }}
+                            >
+                              {onManage && (
+                                <Tooltip label="Manage class">
+                                  <ActionIcon
+                                    size="xs"
+                                    variant="subtle"
+                                    color="blue"
+                                    onClick={() => onManage(slot)}
+                                  >
+                                    <IconCalendarEvent size={12} />
+                                  </ActionIcon>
+                                </Tooltip>
+                              )}
+                              {onEdit && (
+                                <Tooltip label="Edit">
+                                  <ActionIcon
+                                    size="xs"
+                                    variant="subtle"
+                                    onClick={() => onEdit(slot)}
+                                  >
+                                    <IconEdit size={12} />
+                                  </ActionIcon>
+                                </Tooltip>
+                              )}
+                              {onDelete && (
+                                <Tooltip label="Delete">
+                                  <ActionIcon
+                                    size="xs"
+                                    variant="subtle"
+                                    color="red"
+                                    onClick={() => onDelete(slot)}
+                                  >
+                                    <IconTrash size={12} />
+                                  </ActionIcon>
+                                </Tooltip>
+                              )}
+                            </Group>
+                          )}
+                        </Box>
+                      );
+                    })
+                  ) : (
+                    <Box
+                      style={{
+                        border: "1px dashed #E2E8F0",
+                        borderRadius: "10px",
+                        height: "100%",
+                        minHeight: 56,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text fz={12} c="#B4BECF">
+                        Open slot
+                      </Text>
+                    </Box>
+                  )}
                 </Box>
               );
             })}

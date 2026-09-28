@@ -31,11 +31,13 @@ const MobileNavbar = (props: {
         bottom: "1%",
         left: "50%",
         transform: "translateX(-50%)",
-        borderRadius: "2rem",
+        borderRadius: "1.5rem",
+        border: "1px solid #E2E8F0",
+        boxShadow: "0px 8px 24px rgba(15,23,42,0.10)",
         zIndex: 10,
       }}
       px={15}
-      bg={"linear-gradient(135deg, #9C27B0, #3F51B5)"}
+      bg={"#FFFFFF"}
     >
       <Stack
         style={{ cursor: "pointer" }}
@@ -44,8 +46,8 @@ const MobileNavbar = (props: {
         gap={10}
         onClick={() => props.onSelectTab(Tabs.DASHBOARD)}
       >
-        <IconHome size={36} style={{ color: "#FFFFFF" }} />
-        <Text fw={600} fz={15} c={"#FFFFFF"}>
+        <IconHome size={36} style={{ color: "#33415C" }} />
+        <Text fw={600} fz={15} c={"#33415C"}>
           Home
         </Text>
       </Stack>
@@ -56,8 +58,8 @@ const MobileNavbar = (props: {
         gap={10}
         onClick={() => props.onSelectTab(Tabs.STUDENT)}
       >
-        <PiStudent size={36} style={{ color: "#FFFFFF" }} />
-        <Text fw={600} fz={15} c={"#FFFFFF"}>
+        <PiStudent size={36} style={{ color: "#33415C" }} />
+        <Text fw={600} fz={15} c={"#33415C"}>
           Student
         </Text>
       </Stack>
@@ -68,8 +70,8 @@ const MobileNavbar = (props: {
         gap={10}
         onClick={() => props.onSelectTab(Tabs.TEACHER)}
       >
-        <LiaChalkboardTeacherSolid size={36} style={{ color: "#FFFFFF" }} />
-        <Text fw={600} fz={15} c={"#FFFFFF"}>
+        <LiaChalkboardTeacherSolid size={36} style={{ color: "#33415C" }} />
+        <Text fw={600} fz={15} c={"#33415C"}>
           Teacher
         </Text>
       </Stack>
@@ -83,8 +85,8 @@ const MobileNavbar = (props: {
         gap={10}
         onClick={() => props.onSelectTab(Tabs.TRANSPORT)}
       >
-        <LiaBusAltSolid size={36} style={{ color: "#FFFFFF" }} />
-        <Text fw={600} fz={15} c={"#FFFFFF"}>
+        <LiaBusAltSolid size={36} style={{ color: "#33415C" }} />
+        <Text fw={600} fz={15} c={"#33415C"}>
           Transport
         </Text>
       </Stack>
@@ -96,8 +98,8 @@ const MobileNavbar = (props: {
         gap={10}
         onClick={() => props.onSelectTab(Tabs.TEACHER)}
       >
-        <LiaChalkboardTeacherSolid size={36} style={{ color: "#FFFFFF" }} />
-        <Text fw={600} fz={15} c={"#FFFFFF"}>
+        <LiaChalkboardTeacherSolid size={36} style={{ color: "#33415C" }} />
+        <Text fw={600} fz={15} c={"#33415C"}>
           Teacher
         </Text>
       </Stack> */}
@@ -120,8 +122,8 @@ const MobileNavbar = (props: {
           navigation.push("/");
         }}
       >
-        <AiOutlineLogout size={36} style={{ color: "#FFFFFF" }} />
-        <Text fw={600} fz={15} c={"#FFFFFF"}>
+        <AiOutlineLogout size={36} style={{ color: "#33415C" }} />
+        <Text fw={600} fz={15} c={"#33415C"}>
           Logout
         </Text>
       </Stack>

@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  ActionIcon,
+  Badge,
   Divider,
   Stack,
   Table,
@@ -71,7 +73,7 @@ const FeeRecordTable = (props: {
   );
   const batchTotalPandingFees = batchTotalFees - batchTotalPaidFees;
 
-  const [collapse, setCollapse] = useState<boolean>(false);
+  const [collapse, setCollapse] = useState<boolean>(true);
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setisLoading] = useState<boolean>(false);
 
@@ -318,16 +320,9 @@ const FeeRecordTable = (props: {
   const renderRows = props.data.map((row, index) => (
     <Table.Tr
       style={{
-        width: "100%",
-        height: "100%",
-        border: "2px solid #F8F8F8",
-        backgroundColor: "#F8F8F8",
-        borderRadius: "1rem",
-        overflowX: "auto",
-        marginBottom: "10px",
-        // padding:"0px 5px"
+        backgroundColor: index % 2 === 0 ? "#ffffff" : "#f8faff",
       }}
-      key={index}
+      key={row._id}
     >
       <Table.Td
         style={{
@@ -349,34 +344,14 @@ const FeeRecordTable = (props: {
       >
         {formatDateDDMMYY(`${new Date(row.dueDate).toLocaleDateString()}`)}
       </Table.Td>
-      <Table.Td
-        style={{
-          padding: isMd ? "10px" : "5px",
-          textAlign: isMd ? "center" : "start",
-          fontSize: "12px",
-          fontFamily: "sans-serif",
-        }}
-      >
-        <Table.Td
+      <Table.Td style={{ textAlign: isMd ? "center" : "start" }}>
+        <Badge
+          color={row.status === "Not paid" ? "red" : row.status === "Partial paid" ? "blue" : "teal"}
           variant="light"
-          style={{
-            textAlign: "center",
-            borderRadius: "1rem",
-            fontSize: "12px",
-            fontFamily: "sans-serif",
-            whiteSpace: "nowrap",
-          }}
-          c={"white"}
-          bg={
-            row.status == "Not paid"
-              ? "red"
-              : row.status == "Partial paid"
-                ? "#93A3FA"
-                : "green"
-          }
+          style={{ whiteSpace: "nowrap" }}
         >
           {row.status}
-        </Table.Td>
+        </Badge>
       </Table.Td>
       <Table.Td
         style={{
@@ -428,15 +403,22 @@ const FeeRecordTable = (props: {
           )} */}
           {(row.amountPaid ?? 0) > 0 && (
             <Flex justify="center" gap={8}>
-              <IconEye
-                style={{ cursor: "pointer", color: "#5e66de" }}
+              <ActionIcon
+                variant="subtle"
+                color="blue"
+                aria-label="View payment history"
                 onClick={() => setSelectedFeeRecord(row as any)}
-              />
-
-              <IconDownload
-                style={{ cursor: "pointer" }}
+              >
+                <IconEye size={18} />
+              </ActionIcon>
+              <ActionIcon
+                variant="subtle"
+                color="blue"
+                aria-label="Download receipt"
                 onClick={() => convertHtmlIntoPdf(row._id || "")}
-              />
+              >
+                <IconDownload size={18} />
+              </ActionIcon>
             </Flex>
           )}
         </Table.Td>
@@ -457,19 +439,24 @@ const FeeRecordTable = (props: {
   return (
     <>
       <LoadingOverlay visible={isLoading} />
-      <Stack w={isMd ? "95%" : "100%"} mb={"1rem"}>
-        <Flex w={"100%"} p={5} justify="space-between" align="center">
-          <Stack w={"50%"}>
-            <Text fw={500}>{props.batchName}</Text>
-            <Text size="sm" c="dimmed">
+      <Stack
+        w="100%"
+        mb="1rem"
+        p={{ base: "xs", sm: "sm" }}
+        style={{ border: "1px solid #e5eaf2", borderRadius: 10, background: "#ffffff", minWidth: 0 }}
+      >
+        <Flex w="100%" p="sm" justify="space-between" align="center" gap="sm" wrap="wrap" bg="#f3f6fc" style={{ borderRadius: 8 }}>
+          <Stack style={{ flex: "1 1 180px", minWidth: 0 }}>
+            <Text fw={700} c="#1d2939">{props.batchName}</Text>
+            <Text size="sm" c="#667085">
               {`${new Date(props.dateOfJoining).toLocaleDateString()}`}
             </Text>
           </Stack>
-          <Flex w={"50%"} justify="space-between" align="center">
-            <Text size="sm" c="green">
+          <Flex style={{ flex: "1 1 180px", minWidth: 0 }} justify="space-between" align="center" gap="xs">
+            <Text size="sm" fw={700} c="teal.7">
               {batchTotalFees}
             </Text>
-            <Text size="sm" c="red">
+            <Text size="sm" fw={700} c="red.7">
               {batchTotalPandingFees}
             </Text>
             {collapse ? (
@@ -491,11 +478,11 @@ const FeeRecordTable = (props: {
           style={{
             display: collapse ? "block" : "none",
             width: "100%",
-            overflowX: "hidden",
           }}
         >
-          <Box w={isMd ? "100%" : "100%"} h={"100%"} py={20}>
-            <Table horizontalSpacing="xl">
+          <Box w="100%" h="100%" py={12}>
+            <ScrollArea type="auto" offsetScrollbars>
+            <Table horizontalSpacing="md" verticalSpacing="sm" miw={700}>
               <Table.Thead>
                 <Table.Tr style={{ border: "none" }}>
                   <Table.Th
@@ -582,6 +569,7 @@ const FeeRecordTable = (props: {
               </Table.Thead>
               <Table.Tbody>{renderRows}</Table.Tbody>
             </Table>
+            </ScrollArea>
           </Box>
         </Box>
       </Stack>

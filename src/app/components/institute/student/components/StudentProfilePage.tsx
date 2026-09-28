@@ -1,16 +1,18 @@
 "use client";
 
 import {
+  ActionIcon,
+  Box,
   Card,
+  Grid,
+  Group,
   Text,
   Avatar,
-  Divider,
   Stack,
-  Title,
   Flex,
   Menu,
-  Button,
   LoadingOverlay,
+  ThemeIcon,
 } from "@mantine/core";
 import { Line } from "react-chartjs-2";
 import { Select } from "@mantine/core";
@@ -27,9 +29,13 @@ import {
   IconCalendarTime,
   IconCurrencyRupee,
   IconDotsVertical,
+  IconGenderBigender,
+  IconHome,
+  IconPhone,
   IconServer,
+  IconUser,
+  IconSchool,
 } from "@tabler/icons-react";
-import { useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { StudentTabs } from "../../InstituteStudents";
 import { GetStudentOverview } from "@/axios/student/StudentGetApi";
@@ -79,9 +85,9 @@ interface ChartData {
 
 export default function StudentProfilePage(props: {
   selectedStudentId: string;
+  onStudentLoaded?: (student: any) => void;
   onClickAction: (val: StudentTabs) => void;
 }) {
-  // const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [student, setStudent] = useState<StudentOverview>({
     _id: "",
@@ -175,6 +181,7 @@ useEffect(() => {
           console.log("studentoverview" , x);
           
           setStudent(x.student);
+          props.onStudentLoaded?.(x.student);
           setIsLoading(false);
         })
         .catch((e) => {
@@ -182,197 +189,110 @@ useEffect(() => {
           console.log(e);
         });
     }
-  }, [props.selectedStudentId]);
+  }, [props.selectedStudentId, props.onStudentLoaded]);
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Box w="100%" pos="relative" style={{ minWidth: 0 }}>
       <LoadingOverlay visible={isLoading} />
-      <Flex direction="column" align="center" gap="md">
-        <Avatar
-          src={
-            student?.profilePic ||
-            "/boyStudent.png"
-          }
-          size={80}
-          radius="xl"
-        />
-        <Stack align="center">
-          <Title order={3}>{student?.name}</Title>
-          <Text c="dimmed">
-            {student.batchId.name} | Student Roll: {student.uniqueRoll}
-          </Text>
-        </Stack>
-      </Flex>
-      <Divider my="lg" />
-      <Stack
-        w={"100%"}
-        style={{ border: "1px solid #BFBFBF", borderRadius: "0.5rem" }}
-        p={10}
-      >
-        <Flex  w={"100%"} align={"center"} justify={"space-between"}>
-          <Text>Basic details</Text>
-          <Menu shadow="md" trigger="hover" width={150}>
-            <Menu.Target>
-              <IconDotsVertical style={{ cursor: "pointer" }} />
-            </Menu.Target>
+      <Stack gap="md" p={{ base: "sm", sm: "md" }} style={{ minWidth: 0 }}>
+        <Card
+          radius={10}
+          p={{ base: "sm", sm: "md" }}
+          shadow="0 2px 8px rgba(20, 42, 76, 0.06)"
+          style={{ background: "linear-gradient(105deg, #e8efff 0%, #f7f9ff 100%)", border: "1px solid #e1e8f4" }}
+        >
+          <Flex align="center" justify="space-between" gap="sm" wrap="wrap">
+            <Group gap="sm" wrap="nowrap" style={{ minWidth: 0, flex: "1 1 260px" }}>
+              <Avatar src={student.profilePic || "/boyStudent.png"} size={56} radius="xl" style={{ border: "3px solid #ffffff", flexShrink: 0 }} />
+              <Stack gap={2} style={{ minWidth: 0 }}>
+                <Text fz={10} fw={700} c="#0755d9">Student profile</Text>
+                <Text fz={17} fw={700} c="#172033" style={{ fontFamily: "Poppins", overflowWrap: "anywhere", lineHeight: 1.25 }}>{student.name}</Text>
+                <Text fz={11} c="#667085" style={{ overflowWrap: "anywhere" }}>
+                  {student.batchId.name} | Student Roll: {student.uniqueRoll}
+                </Text>
+              </Stack>
+            </Group>
+            <Menu shadow="md" trigger="click" width={170}>
+              <Menu.Target>
+                <ActionIcon variant="white" color="blue" radius="md" size={34} aria-label="Student actions">
+                  <IconDotsVertical size={18} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item leftSection={<IconServer size={16} />} onClick={() => props.onClickAction(StudentTabs.OVERVIEW)}>Overview</Menu.Item>
+                <Menu.Item leftSection={<IconCurrencyRupee size={16} />} onClick={() => props.onClickAction(StudentTabs.FEES)}>Fee Status</Menu.Item>
+                <Menu.Item leftSection={<IconCalendarTime size={16} />} onClick={() => props.onClickAction(StudentTabs.ATTENDANCE)}>Attendance</Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Flex>
+        </Card>
 
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IconServer />}
-                onClick={() => props.onClickAction(StudentTabs.OVERVIEW)}
-              >
-                Overview
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconCurrencyRupee />}
-                onClick={() => props.onClickAction(StudentTabs.FEES)}
-              >
-                Fee Status
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconCalendarTime />}
-                onClick={() => props.onClickAction(StudentTabs.ATTENDANCE)}
-              >
-                Attendance
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Flex>
-        <Flex w={"100%"} align={"center"} justify={"space-between"} mt={10}>
-          <Stack w={"30%"}>
-            <Text
-              lh={0}
-              fz={16}
-              fw={600}
-               c={"#4F4F4F"}
-            >
-              Gender
-            </Text>
-            <Text
-              lh={0.5}
-              fz={14}
-           
-                c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
-            >
-              {student.gender}
-            </Text>
-          </Stack>
+        <Grid gutter="md">
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Card radius={10} p={{ base: "sm", sm: "md" }} shadow="0 2px 8px rgba(20, 42, 76, 0.06)" withBorder style={{ borderColor: "#e5eaf2", height: "100%" }}>
+              <Group justify="space-between" mb="sm">
+                <Text fz={13} fw={700} c="#0755d9">Basic details</Text>
+                <ThemeIcon variant="light" color="blue" radius="md" size={26}><IconUser size={14} /></ThemeIcon>
+              </Group>
+              <Stack gap={10}>
+                <DetailRow icon={<IconUser size={12} />} label="Name" value={student.name} tone="blue" />
+                <DetailRow icon={<IconUser size={12} />} label="Father" value={student.parentName} tone="teal" />
+                <DetailRow icon={<IconCalendarTime size={12} />} label="Date of birth" value={student.dateOfBirth.split("T")[0]} tone="blue" />
+                <DetailRow icon={<IconGenderBigender size={12} />} label="Gender" value={student.gender} tone="teal" />
+                <DetailRow icon={<IconSchool size={12} />} label="Class" value={student.batchId.name} tone="blue" />
+              </Stack>
+            </Card>
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Card radius={10} p={{ base: "sm", sm: "md" }} shadow="0 2px 8px rgba(20, 42, 76, 0.06)" withBorder style={{ borderColor: "#e5eaf2", height: "100%" }}>
+              <Group justify="space-between" mb="sm">
+                <Text fz={13} fw={700} c="#0755d9">Contact details</Text>
+                <ThemeIcon variant="light" color="teal" radius="md" size={26}><IconPhone size={14} /></ThemeIcon>
+              </Group>
+              <Stack gap={10}>
+                <DetailRow icon={<IconPhone size={12} />} label="Student" value={student.phoneNumber[0]} tone="teal" />
+                <DetailRow icon={<IconPhone size={12} />} label="Guardian" value={student.parentNumber} tone="blue" />
+                <DetailRow icon={<IconHome size={12} />} label="Address" value={student.address} tone="teal" />
+              </Stack>
+            </Card>
+          </Grid.Col>
+        </Grid>
 
-          <Stack w={"30%"}>
-            <Text
-              lh={0}
-              fz={16}
-              fw={600}
-               c={"#4F4F4F"}
-              // style={{ fontFamily: "sans-serif" }}
-            >
-              Date of Birth
-            </Text>
-            <Text
-              lh={0.5}
-              fz={14}
-           
-                c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
-            >
-              {student.dateOfBirth.split("T")[0]}
-            </Text>
-          </Stack>
-
-          <Stack w={"30%"}>
-            <Text
-              lh={0}
-              fz={16}
-              fw={600}
-                c={"#4F4F4F"}
-              // style={{ fontFamily: "sans-serif" }}
-            >
-              Number
-            </Text>
-            <Text
-              lh={0.5}
-              fz={14}
-         
-                 c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
-            >
-              {student.phoneNumber[0]}
-            </Text>
-          </Stack>
-        </Flex>
-        <Flex w={"100%"} align={"center"} justify={"start"} mt={20} gap={20}>
-          <Stack w={"30%"}>
-            <Text
-              lh={0}
-              fz={16}
-              fw={600}
-           
-              c={"#4F4F4F"}
-              // style={{ fontFamily: "sans-serif" }}
-            >
-              Address
-            </Text>
-            <Text fz={14}    c={"#BFBFBF"} style={{ fontFamily: "sans-serif" }}>
-              {student.address}
-            </Text>
-          </Stack>
-
-          <Stack w={"30%"}>
-            <Text
-              lh={0}
-              fz={16}
-              fw={600}
-               c={"#4F4F4F"}
-             
-              style={{ fontFamily: "sans-serif" }}
-            >
-              Father
-            </Text>
-            <Text
-              lh={0.5}
-              fz={14}
-              c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
-            >
-              {student.parentName}
-            </Text>
-            <Text
-              lh={0.5}
-              fz={14}
-              c={"#BFBFBF"}
-              style={{ fontFamily: "sans-serif" }}
-            >
-              ({student.parentNumber})
-            </Text>
-          </Stack>
-        </Flex>
+        <Card radius={10} p={{ base: "sm", sm: "md" }} shadow="0 2px 8px rgba(20, 42, 76, 0.06)" withBorder style={{ borderColor: "#e5eaf2", minWidth: 0 }}>
+          <Flex justify="space-between" align="center" gap="sm" wrap="wrap" mb="sm">
+            <Text fz={14} fw={700} c="#172033">{selectedSubject ? `${selectedSubject} Progress` : "Progress"}</Text>
+            <Select
+              aria-label="Select subject"
+              placeholder="Select subject"
+              data={allSubjects}
+              value={selectedSubject}
+              onChange={(value) => setSelectedSubject(value)}
+              size="xs"
+              w={{ base: "100%", xs: 180 }}
+              searchable
+              nothingFoundMessage="No subject found"
+            />
+          </Flex>
+          {data && <Box h={{ base: 220, sm: 280 }} style={{ minWidth: 0 }}><Line data={data} options={options!!} /></Box>}
+        </Card>
       </Stack>
-      <Stack
-        w={"100%"}
-        h={"100%"}
-        style={{ border: "1px solid #BFBFBF", borderRadius: "0.5rem" }}
-        p={10}
-        mt={20}
-      >
-        <Flex justify="space-between" align="center" mb="sm">
-  <Title order={4}>
-    {selectedSubject ? `${selectedSubject} Progress` : "Progress"}
-  </Title>
+    </Box>
+  );
+}
 
-  <Select
-    placeholder="Select subject"
-    data={allSubjects}
-    value={selectedSubject}
-    onChange={(value) => setSelectedSubject(value)}
-    size="xs"
-    w={180}
-    searchable
-    nothingFoundMessage="No subject found"
-  />
-</Flex>
-        {data && <Line data={data} options={options!!} />}
-      </Stack>
-    </Card>
+function DetailRow(props: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  tone: "blue" | "teal";
+}) {
+  return (
+    <Group gap={8} wrap="nowrap" style={{ minWidth: 0 }}>
+      <ThemeIcon variant="light" color={props.tone} radius="xl" size={22} style={{ flexShrink: 0 }}>
+        {props.icon}
+      </ThemeIcon>
+      <Text fz={11} c="#667085" w={92} style={{ flexShrink: 0 }}>{props.label}</Text>
+      <Text fz={12} fw={700} c="#172033" style={{ minWidth: 0, overflowWrap: "anywhere" }}>{props.value}</Text>
+    </Group>
   );
 }
