@@ -18,7 +18,8 @@ import {
   Box,
   TextInput,
 } from "@mantine/core";
-import React, { useCallback, useEffect, useState } from "react";
+
+import React, { useCallback, useEffect, useState, useRef, } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { DateTimePicker } from "@mantine/dates";
 import { IconArrowLeft, IconCalendar, IconTrash } from "@tabler/icons-react";
@@ -106,6 +107,10 @@ const FeeRecordSection = (props: {
     Map<string, FeeRecordData>
   >(new Map());
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
+
+
 
   const refreshInstallments = useCallback(async () => {
     const response: any = await GetStudentFeeInstallments(props.studentId);
@@ -564,9 +569,19 @@ const FeeRecordSection = (props: {
             >
               Cancel
             </Button>
-            <Button radius={10} onClick={handleSubmit} type="submit">
+            {/* <Button radius={10} onClick={handleSubmit} type="submit">
               Payment
-            </Button>
+            </Button> */}
+          <Button
+  radius={10}
+  onClick={handleSubmit}
+  type="button"
+  loading={isSubmitting}
+  disabled={isSubmitting}
+>
+  {isSubmitting ? "Processing..." : "Payment"}
+</Button>
+
             <Button
               color="red"
               radius={10}

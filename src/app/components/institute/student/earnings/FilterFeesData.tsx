@@ -52,8 +52,10 @@ export default function EarningsSummary({}) {
   //   useState<any[]>(dummyStudents);
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const [fromDate, setFromDate] = useState<Date>(new Date());
   const [toDate, setToDate] = useState<Date>(new Date());
+
 
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
@@ -105,7 +107,15 @@ export default function EarningsSummary({}) {
       dayjs(toDate).format("YYYY-MM-DD"),
     )
       .then((res: any) => {
+
         console.log("api res : ",res);
+          const total = (res.data || []).reduce(
+        (sum: number, item: any) => sum + (item.paidFees || 0),
+        0
+      );
+
+      console.log("DAY WISE TOTAL 👉", total);
+
         
         setFilterFeesStudents(res.data || []);
         setCurrentPage(1);
