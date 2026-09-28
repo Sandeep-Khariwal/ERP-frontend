@@ -13,18 +13,18 @@ export function StudentFeesCards(props: studentFeesCardsProps) {
         <SingleInstituteCard
           heading="Total Fees"
           displayNumber={props.totalFees}
-          dashColor="#B54BF6"
+          dashColor="#2563eb"
         />
         <SingleInstituteCard
           heading="Total Paid"
           displayNumber={props.totalPaid}
-          dashColor="#F64BAE"
+          dashColor="#0f9f78"
           icon={<IconCurrencyRupee />}
         />
         <SingleInstituteCard
           heading="Total Overdue"
           displayNumber={props.totalOverdue}
-          dashColor="#F6714B"
+          dashColor="#e05252"
         />
       </>
     );
@@ -48,20 +48,25 @@ export function StudentFeesCards(props: studentFeesCardsProps) {
         <Card
           bg={"#FFFFFF"}
           radius={10}
-          shadow="0px 0px 30px 0px rgba(0, 0, 0, 0.10)"
-          h={90}
-          w={175}
+          shadow="0 2px 8px rgba(20, 42, 76, 0.06)"
+          h="100%"
+          mih={104}
+          w="100%"
+          withBorder
+          p={{ base: "sm", sm: "md" }}
+          style={{ borderColor: "#e5eaf2", minWidth: 0 }}
         >
           <Stack
-            style={{ borderLeft: `4px solid ${props.dashColor}` }}
-            px={8}
+            style={{ borderLeft: `3px solid ${props.dashColor}`, minWidth: 0 }}
+            px={10}
             h={"100%"}
+            justify="center"
           >
-            <Text c={"#ABABAB"} fz={14} fw={500} w="100%">
+            <Text c="#667085" fz={12} fw={600} w="100%">
               {props.heading}
             </Text>
             <Flex align="center">
-              <Text fz={20} fw={500}>
+              <Text fz={22} fw={700} c="#172033">
                 {props.icon ? props.icon : ""}
                 {formatNumber(Number(props.displayNumber))}
               </Text>

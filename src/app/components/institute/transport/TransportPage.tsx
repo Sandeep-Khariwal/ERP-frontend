@@ -78,7 +78,7 @@ function TransportPage() {
         console.log(e);
         setIsLoading(false);
       });
-  }, [institute]);
+  }, [institute?._id]);
 
   const handleDriverChange = (field: keyof Driver, value: string) => {
     setDriverData((prev) => ({
@@ -156,36 +156,41 @@ function TransportPage() {
     <Stack w={"100%"} mih={"100vh"} p={"20px"}>
       <LoadingOverlay visible={isLoading} />
       <Flex
-        w={"80%"}
+        w={"92%"}
+        mx={"auto"}
         align={"center"}
         direction={isMd ? "column" : "row"}
         justify={"space-between"}
       >
-        <Text fw={700} fz={isMd ? 22 : 26}>
+        <Text fw={700} fz={isMd ? 22 : 26} style={{ fontFamily: "sans-serif" }}>
           Transport Management
         </Text>
         <Flex
-          w={isMd ? "100%" : "50%"}
+          w={isMd ? "100%" : "auto"}
           align={"center"}
-          justify={"flex-end"}
-          gap={20}
+          justify={isMd ? "flex-start" : "flex-end"}
+          gap={12}
+          wrap="wrap"
           mt={isMd ? 20 : 0}
         >
           <Button
             style={{ backgroundColor: "#305CDE" }}
             onClick={() => setOpenDriverModal(true)}
+            flex={isMd ? "1 1 auto" : "0 0 auto"}
           >
             + Add Driver
           </Button>
           <Button
             style={{ backgroundColor: "#305CDE" }}
             onClick={() => setOpenVanModal(true)}
+            flex={isMd ? "1 1 auto" : "0 0 auto"}
           >
             + Add Van
           </Button>
            <Button
             style={{ backgroundColor: "#305CDE" }}
             onClick={() => setOpenGpsModal(true)}
+            flex={isMd ? "1 1 auto" : "0 0 auto"}
           >
            + Api keys
           </Button>
@@ -193,7 +198,7 @@ function TransportPage() {
         </Flex>
       </Flex>
 
-      <Stack w={"100%"}>
+      <Stack w={"92%"} mx={"auto"}>
         <Tabs color="teal" defaultValue="drivers">
           <Tabs.List>
             <Tabs.Tab value="drivers">Drivers</Tabs.Tab>

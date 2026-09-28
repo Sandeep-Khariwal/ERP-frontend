@@ -190,7 +190,7 @@ function EntryForm({
                     leftSection={<IconCheck size={18} />}
                     style={{
                         background:
-                            "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                            "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                     }}
                 >
                     Upload Material
@@ -314,62 +314,76 @@ export default function StudyMaterialPage(props: {
                 fontFamily: "'DM Sans', sans-serif",
             }}
         >
-            {/* HEADER */}
+            {/* HEADER — restyled to match the Test section's master
+                container: light-blue tinted box with a white icon badge,
+                instead of the previous solid dark-blue hero block. */}
 
-            <Paper
-                radius="28px"
-                p="xl"
+            <Box
+                p={20}
                 mb="xl"
                 style={{
-                    background:
-                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
-                    color: "white",
-                    overflow: "hidden",
-                    position: "relative",
+                    borderRadius: "16px",
+                    background: "#EEF3FF",
+                    border: "1px solid #DCE7FF",
                 }}
             >
-                <Group justify="space-between">
-                    <Stack gap={4}>
-                        <Group>
-                            <ThemeIcon
-                                size={54}
-                                radius="xl"
-                                color="white"
-                                variant="light"
-                            >
-                                <IconSparkles size={28} />
-                            </ThemeIcon>
+                <Flex
+                    justify="space-between"
+                    direction={isMobile ? "column" : "row"}
+                    align={isMobile ? "flex-start" : "center"}
+                    gap={16}
+                    w="100%"
+                >
+                    <Group gap={14} wrap="nowrap" style={{ minWidth: 0 }}>
+                        <Flex
+                            align="center"
+                            justify="center"
+                            style={{
+                                width: 44,
+                                height: 44,
+                                borderRadius: "12px",
+                                background: "#FFFFFF",
+                                flexShrink: 0,
+                            }}
+                        >
+                            <IconSparkles size={22} color="#2F6FED" />
+                        </Flex>
 
-                            <div>
-                                <Title order={2} c="white">
-                                    Study Materials
-                                </Title>
-
-                                <Text c="rgba(255,255,255,0.8)">
-                                    Manage all notes and resources
-                                </Text>
-                            </div>
-                        </Group>
-                    </Stack>
+                        <Stack gap={2} style={{ minWidth: 0 }}>
+                            <Text fz={22} fw={700} c="#1B2559">
+                                Study Materials
+                            </Text>
+                            <Text fz={13} c="#5B6B8C">
+                                Manage all notes and resources
+                            </Text>
+                        </Stack>
+                    </Group>
 
                     <Button
                         leftSection={<IconPlus size={18} />}
-                        radius="xl"
+                        radius={10}
                         size="md"
                         onClick={openAdd}
-                        color="white"
-                        c="#5c3de8"
+                        w={isMobile ? "100%" : "auto"}
+                        styles={{
+                            root: {
+                                background:
+                                    "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                                border: 0,
+                                fontWeight: 600,
+                            },
+                        }}
                     >
                         Upload Material
                     </Button>
-                </Group>
-            </Paper>
+                </Flex>
+            </Box>
 
             {/* LOADING */}
 
             {isLoading ? (
                 <Flex justify="center" mt={80}>
-                    <Loader color="violet" size="lg" />
+                    <Loader color="blue" size="lg" />
                 </Flex>
             ) : (
                 <>
@@ -392,7 +406,7 @@ export default function StudyMaterialPage(props: {
                                 mb="md"
                                 style={{
                                     background:
-                                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                                 }}
                             >
                                 <IconBook size={40} />
@@ -413,7 +427,7 @@ export default function StudyMaterialPage(props: {
                                 onClick={openAdd}
                                 style={{
                                     background:
-                                        "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                        "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                                 }}
                             >
                                 Upload Material
@@ -457,7 +471,7 @@ export default function StudyMaterialPage(props: {
                                     leftSection={<IconDownload size={16} />}
                                     radius="xl"
                                     variant="light"
-                                    color="violet"
+                                    color="blue"
                                 >
                                     Download All
                                 </Button>
@@ -486,7 +500,7 @@ export default function StudyMaterialPage(props: {
                                                         size={48}
                                                         radius="xl"
                                                         variant="light"
-                                                        color="violet"
+                                                        color="blue"
                                                     >
                                                         <IconFileDescription size={22} />
                                                     </ThemeIcon>
@@ -516,7 +530,7 @@ export default function StudyMaterialPage(props: {
                                                         <ActionIcon
                                                             variant="subtle"
                                                             radius="xl"
-                                                            color="violet"
+                                                            color="blue"
                                                         >
                                                             <IconDotsVertical size={18} />
                                                         </ActionIcon>
@@ -599,8 +613,8 @@ export default function StudyMaterialPage(props: {
                                         styles={{
                                             control: {
                                                 "&[data-active]": {
-                                                    background: "#5c3de8",
-                                                    borderColor: "#5c3de8",
+                                                    background: "#2F6FED",
+                                                    borderColor: "#2F6FED",
                                                 },
                                             },
                                         }}
@@ -655,7 +669,7 @@ export default function StudyMaterialPage(props: {
                             radius="xl"
                             style={{
                                 background:
-                                    "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                                    "linear-gradient(135deg, #2F6FED, #4F7CFB)",
                             }}
                         >
                             <IconBook size={18} />

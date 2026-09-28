@@ -780,7 +780,7 @@
 //       {batchId != null && (
 //         <div style={{
 //           margin: isMd ? "0 12px 48px" : "0 48px 48px",
-//           background: "linear-gradient(135deg, #E6E1FF, #F7F5FF)",
+//           background: "transparent",
 //           borderRadius: 20, overflow: "hidden",
 //         }}>
 //           <InstituteInsideBatch
@@ -1227,7 +1227,7 @@ const TeacherProfile = (props: {
       {batchId != null && (
         <div style={{
           margin: isMd ? "0 12px 48px" : "0 48px 48px",
-          background: "linear-gradient(135deg, #E6E1FF, #F7F5FF)",
+          background: "transparent",
           borderRadius: 20, overflow: "hidden",
         }}>
           <InstituteInsideBatch

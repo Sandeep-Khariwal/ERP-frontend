@@ -86,7 +86,7 @@ content: {
 backgroundColor: "#FAF7FF",
 },
 }}
-title={ <Box> <Text fw={700} size="lg" c="#7C3AED">
+title={ <Box> <Text fw={700} size="lg" c="#2F6FED">
 Payment Keys Configuration </Text> <Text size="xs" c="dimmed">
 Configure your payment gateway credentials </Text> </Box>
 }
@@ -96,7 +96,7 @@ label="API Key"
 placeholder="Enter API Key"
 value={api_key}
 onChange={(e) => setApiKey(e.currentTarget.value)}
-leftSection={<IconKey size={16} color="#7C3AED" />}
+leftSection={<IconKey size={16} color="#2F6FED" />}
 radius="md"
 styles={{
 input: {
@@ -116,7 +116,7 @@ fontWeight: 600,
       placeholder="Enter API Secret"
       value={api_secret}
       onChange={(e) => setApiSecret(e.currentTarget.value)}
-      leftSection={<IconLock size={16} color="#7C3AED" />}
+      leftSection={<IconLock size={16} color="#2F6FED" />}
       radius="md"
       styles={{
         input: {
@@ -140,7 +140,7 @@ fontWeight: 600,
       styles={{
         root: {
           background:
-            "linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)",
+            "linear-gradient(135deg, #8B5CF6 0%, #2F6FED 100%)",
           border: "none",
           fontWeight: 600,
           boxShadow: "0 4px 14px rgba(124,58,237,0.25)",

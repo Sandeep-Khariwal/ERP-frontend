@@ -1,8 +1,10 @@
 import { Van } from "@/interfaces/student.interface";
-import { Stack, Table } from "@mantine/core";
+import { ScrollArea, Stack, Table } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import React from "react";
 
 function VansPage(props: { allVans: Van[] }) {
+  const isMobile = useMediaQuery("(max-width: 968px)");
   const rows = props.allVans.map((van: Van) => (
     <Table.Tr key={van._id}>
       <Table.Td>{van.vanNumber}</Table.Td>
@@ -13,17 +15,19 @@ function VansPage(props: { allVans: Van[] }) {
   ));
   return (
     <Stack>
-      <Table striped highlightOnHover withTableBorder withColumnBorders>
-        <Table.Thead   bg={"linear-gradient(135deg, #D28BD9, #7585D8)"} c={"#333"}>
+      <ScrollArea type="auto">
+      <Table striped highlightOnHover withTableBorder withColumnBorders miw={isMobile ? 480 : undefined}>
+        <Table.Thead   bg={"#EEF3FF"} c={"#333"}>
           <Table.Tr>
-            <Table.Th>Van Number</Table.Th>
-            <Table.Th>plateNumber</Table.Th>
-            <Table.Th>Driver Name</Table.Th>
-            <Table.Th>Total Students</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Van Number</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>plateNumber</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Driver Name</Table.Th>
+            <Table.Th style={{ fontFamily: "Roboto" }}>Total Students</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
+      </ScrollArea>
     </Stack>
   );
 }

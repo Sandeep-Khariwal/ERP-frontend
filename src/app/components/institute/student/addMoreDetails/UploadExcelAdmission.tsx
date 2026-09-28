@@ -613,7 +613,7 @@ import {
   SuccessNotification,
 } from "@/app/helperFunction/Notification";
 import { CreateStudent } from "@/axios/institute/InstitutePostApi";
-import { parseExcelDate } from "../../helperFunctions";
+import { parseExcelDate } from "./parseExcelDate";
 
 interface Props {
   opened: boolean;

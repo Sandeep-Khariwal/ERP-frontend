@@ -70,7 +70,7 @@ export const SignatureModal = ({ opened, onClose, institute }: Props) => {
               borderRadius: "8px",
             }}
           >
-            <BsPencilSquare size={18} color="#7c3aed" />
+            <BsPencilSquare size={18} color="#2F6FED" />
           </Box>
           <Text fw={600}>Add Principal Or Director Signatures</Text>
         </Group>
@@ -103,12 +103,12 @@ export const SignatureModal = ({ opened, onClose, institute }: Props) => {
               borderRadius: "14px",
               padding: "20px",
               cursor: "pointer",
-              background: "#faf5ff", // light purple bg
+              background: "#EAF1FF", // light purple bg
             }}
           >
             <Center>
               <Stack align="center" gap="xs">
-                <IconUpload size={40} color="#7c3aed" />
+                <IconUpload size={40} color="#2F6FED" />
 
                 <Text fw={500}>Drag & drop your logo here</Text>
                 <Text size="sm" c="dimmed">
@@ -219,7 +219,7 @@ export const SignatureModal = ({ opened, onClose, institute }: Props) => {
 
         <Box
   style={{
-    background: "#f5f3ff", // light purple bg
+    background: "#EAF1FF", // light purple bg
     border: "1px solid #e9d5ff",
     borderRadius: "10px",
     padding: "12px",
@@ -228,7 +228,7 @@ export const SignatureModal = ({ opened, onClose, institute }: Props) => {
  <Group align="center" gap="sm" wrap="nowrap">
 
     {/* ICON */}
-    <IconInfoCircle size={18} color="#7c3aed" />
+    <IconInfoCircle size={18} color="#2F6FED" />
 
     {/* TEXT */}
     <Text size="sm" c="#4c1d95">

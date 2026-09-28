@@ -29,6 +29,7 @@ import dayjs from "dayjs";
 import SimpleEditTestModal from "./TestOverviewCard";
 import { useMediaQuery } from "@mantine/hooks";
 import ShowStudentResultsModal from "./ShowStudentResultsModal";
+import { IconFlask } from "@tabler/icons-react";
 
 const Tests = (props: {
   batchId: string;
@@ -189,36 +190,70 @@ const Tests = (props: {
     <>
       <Stack w="100%" mt={20} mx="auto" gap={20}>
         {/* Header with Add Button and Subject Filter */}
-        <Flex
-          justify="space-between"
-          direction={isMd ? "column" : "row"}
-          align="center"
-          w="100%"
+        <Box
+          p={20}
+          style={{
+            borderRadius: "16px",
+            background: "#EEF3FF",
+            border: "1px solid #DCE7FF",
+          }}
         >
-          <Text fz={20} fw={600}>
-            🧪 Tests
-          </Text>
-          <Flex gap={10} mt={isMd ? 20 : 0} align="end">
-            <Button
-              w={"50%"}
-              variant="outline"
-              onClick={() => setOpenAddTestsModal(true)}
-            >
-              + Add Test
-            </Button>
-
-            {/* Subject Filter using Map */}
-            <Select
-              placeholder="All Subjects"
-              label="Filter by Subject"
-              value={selectedSubjectId}
-              onChange={handleSubjectChange}
-              data={getSubjectsForDropdown()}
-              clearable
-              w={"50%"}
-            />
+          <Flex
+            justify="space-between"
+            direction={isMd ? "column" : "row"}
+            align={isMd ? "flex-start" : "center"}
+            w="100%"
+            gap={16}
+          >
+            <Flex align="center" gap={14}>
+              <Flex
+                align="center"
+                justify="center"
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: "12px",
+                  background: "#FFFFFF",
+                }}
+              >
+                <IconFlask size={22} color="#2F6FED" />
+              </Flex>
+              <Stack gap={2}>
+                <Text fz={22} fw={700} c="#1B2559">
+                  Tests
+                </Text>
+                <Text fz={13} c="#5B6B8C">
+                  Build, schedule, and review class assessments.
+                </Text>
+              </Stack>
+            </Flex>
+            <Flex gap={10} w={isMd ? "100%" : "auto"} align="end">
+              <Select
+                placeholder="All Subjects"
+                label="Filter by Subject"
+                value={selectedSubjectId}
+                onChange={handleSubjectChange}
+                data={getSubjectsForDropdown()}
+                clearable
+                radius={10}
+                w={isMd ? "60%" : 220}
+              />
+              <Button
+                radius={10}
+                styles={{
+                  root: {
+                    background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                    border: 0,
+                    fontWeight: 600,
+                  },
+                }}
+                onClick={() => setOpenAddTestsModal(true)}
+              >
+                + Add Test
+              </Button>
+            </Flex>
           </Flex>
-        </Flex>
+        </Box>
 
         {/* Tests List */}
         {isLoading ? (
@@ -226,35 +261,57 @@ const Tests = (props: {
             <LoadingOverlay visible={isLoading} />
           </Box>
         ) : tests.length > 0 ? (
-          <Stack gap={20}>
-            {tests.map((test) => (
+          <Stack gap={16}>
+            {tests.map((test) => {
+              const status =
+                test.resultId.length > 0
+                  ? { label: "Completed", bg: "#E6F8F1", fg: "#0EA872" }
+                  : test.startTime && new Date(test.startTime) > new Date()
+                    ? { label: "Scheduled", bg: "#EAF1FF", fg: "#2F6FED" }
+                    : { label: "Draft", bg: "#F1F4F9", fg: "#5B6B8C" };
+              return (
               <Flex
                 key={test._id}
                 direction={isMd ? "column" : "row"}
                 justify="space-between"
                 align="center"
                 w={"100%"}
-                p={16}
+                p={18}
                 style={{
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
-                  backgroundColor: "#f9f9f9",
+                  border: "1px solid #F1F4F9",
+                  borderRadius: "14px",
+                  backgroundColor: "#FFFFFF",
+                  boxShadow: "0px 4px 16px rgba(15,23,42,0.04)",
                 }}
               >
                 <Box w={isMd ? "100%" : "60%"}>
-                  <Text fw={600} fz={18}>
+                  <Flex align="center" gap={10} mb={4}>
+                    <Box
+                      style={{
+                        borderRadius: "999px",
+                        background: status.bg,
+                        color: status.fg,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        padding: "3px 10px",
+                      }}
+                    >
+                      {status.label}
+                    </Box>
+                  </Flex>
+                  <Text fw={700} fz={17} c="#1B2559">
                     {test.name || test.testName || "Untitled Test"}
                   </Text>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm" c="#8B96AD">
                     Max Marks: {calculateMaxMarks(test)}
                   </Text>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm" c="#8B96AD">
                     Duration: {formatDuration(test.totalTime)}
                   </Text>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm" c="#8B96AD">
                     Questions: {test.questions?.length || 0}
                   </Text>
-                  <Text size="sm" c="dimmed">
+                  <Text size="sm" c="#8B96AD">
                     Date: {formatDate(test.startTime)}
                   </Text>
                 </Box>
@@ -268,6 +325,9 @@ const Tests = (props: {
                 >
                   <Button
                     size="xs"
+                    radius={8}
+                    variant="default"
+                    styles={{ root: { fontWeight: 600, color: "#33415C" } }}
                     // p={10}
                     // fullWidth
                     onClick={() => {
@@ -279,6 +339,7 @@ const Tests = (props: {
                   </Button>
                   <Button
                     size="xs"
+                    radius={8}
                     color="blue"
                   //  fullWidth
                     onClick={() => {
@@ -290,7 +351,8 @@ const Tests = (props: {
                   </Button>
                   <Button
                     size="xs"
-                     
+                    radius={8}
+                    variant="light"
                     color="red"
                     onClick={() =>
                       setDeleteConfirmModal({
@@ -305,6 +367,7 @@ const Tests = (props: {
                   {test.resultId.length > 0 && (
                     <Button
                       size="xs"
+                      radius={8}
                       color="green"
                       onClick={() => {
                         setSelectedTest(test)
@@ -316,15 +379,15 @@ const Tests = (props: {
                   )}
                 </Flex>
               </Flex>
-            ))}
+            );})}
           </Stack>
         ) : (
           <Box
             p="xl"
             style={{
               textAlign: "center",
-              border: "1px dashed #ddd",
-              borderRadius: "8px",
+              border: "1px dashed #E2E8F0",
+              borderRadius: "16px",
             }}
           >
             <Text size="lg" c="dimmed" mb="sm">

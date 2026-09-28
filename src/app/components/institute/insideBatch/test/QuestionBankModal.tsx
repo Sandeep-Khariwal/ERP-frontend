@@ -138,6 +138,11 @@ export default function QuestionBankModal({
   };
 
   useEffect(() => {
+    // Was firing as soon as this modal mounted (i.e. as soon as "Add Test"
+    // opened), regardless of whether the user ever opened the question
+    // bank. Gate it on `opened` so it only fetches when actually shown.
+    if (!opened) return;
+
     GetAllQuestionsFromBank(selectedBatch, selectedSubject)
       .then((res: any) => {
         setQuestions(res.data.questions);
@@ -145,7 +150,7 @@ export default function QuestionBankModal({
       .catch((e: any) => {
         console.log(e);
       });
-  }, [selectedBatch, selectedSubject]);
+  }, [opened, selectedBatch, selectedSubject]);
 
   // Add Selected
   const handleAddSelected = async () => {
@@ -211,7 +216,8 @@ export default function QuestionBankModal({
       });
   };
   useEffect(() => {
-    if (!selectedBatch) return;
+    // Same as above — only needed once this modal is actually opened.
+    if (!opened || !selectedBatch) return;
 
     GetAllSubjectsFromBatch(selectedBatch)
       .then((res: any) => {
@@ -227,13 +233,13 @@ export default function QuestionBankModal({
 
         setSubjects([]);
       });
-  }, [selectedBatch]);
+  }, [opened, selectedBatch]);
 
   useEffect(() => {
-    if (institute?._id) {
+    if (opened && institute?._id) {
       getAllInstituteBatches();
     }
-  }, [institute?._id]);
+  }, [opened, institute?._id]);
   return (
     <Modal
       opened={opened}

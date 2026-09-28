@@ -78,49 +78,68 @@ export default function SessionsPage(props: {
     >
       {/* HEADER */}
       <Paper
-        radius="28px"
+        radius="16px"
         p="xl"
         mb="xl"
         style={{
-          background:
-            "linear-gradient(135deg, #5c3de8, #7b5ef8)",
-          color: "white",
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
         }}
       >
-        <Group>
-          <ThemeIcon
-            size={50}
-            radius="xl"
-            variant="light"
-            color="white"
-          >
-            <IconSchool size={26} />
-          </ThemeIcon>
+        <Flex justify="space-between" align="center" wrap="wrap" gap="md">
+          <Group>
+            <Flex
+              align="center"
+              justify="center"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "12px",
+                background: "#FFFFFF",
+              }}
+            >
+              <IconSchool size={22} color="#2F6FED" />
+            </Flex>
 
-          <div>
-            <Title order={2} c="white">
-              Sessions
-            </Title>
+            <div>
+              <Text fz={12} fw={600} c="#2F6FED" tt="uppercase" style={{ letterSpacing: 0.4 }}>
+                Class records
+              </Text>
+              <Title order={3} c="#1B2559">
+                Sessions
+              </Title>
+              <Text c="#5B6B8C" fz={13}>
+                Review pass-out students and their final fee records by academic session.
+              </Text>
+            </div>
+          </Group>
 
-            <Text c="rgba(255,255,255,0.8)">
-              Previous session passout students
+          <Paper radius="12px" p="sm" style={{ background: "#FFFFFF", border: "1px solid #DCE7FF" }}>
+            <Text fz={12} c="#5B6B8C" fw={600}>
+              Archived learners
             </Text>
-          </div>
-        </Group>
+            <Text fz={20} fw={700} c="#2F6FED">
+              {studentsData.length} students
+            </Text>
+          </Paper>
+        </Flex>
       </Paper>
 
       {/* SESSION SELECT */}
       <Paper
-        radius="24px"
+        radius="16px"
         p="lg"
         mb="xl"
         style={{
           background: "#fff",
-          border: "1px solid #f1ebff",
+          border: "1px solid #F1F4F9",
         }}
       >
-        <Text fw={700} mb="md" c="#3F51B5">
-          Select Session
+        <Text fw={700} mb={2} c="#1B2559">
+          Select session
+        </Text>
+        <Text fz={13} c="#5B6B8C" mb="md">
+          Choose an academic year to view completed Class records.
         </Text>
 
         <Flex gap="sm">
@@ -128,7 +147,7 @@ export default function SessionsPage(props: {
             radius="xl"
             color={
               selectedSession === "2025-26"
-                ? "violet"
+                ? "blue"
                 : "gray"
             }
             variant={
@@ -147,7 +166,7 @@ export default function SessionsPage(props: {
             radius="xl"
             color={
               selectedSession === "2026-27"
-                ? "violet"
+                ? "blue"
                 : "gray"
             }
             variant={
@@ -166,13 +185,19 @@ export default function SessionsPage(props: {
 
       {/* TABLE */}
       <Paper
-        radius="24px"
+        radius="16px"
         p="lg"
         style={{
           background: "#fff",
-          border: "1px solid #f1ebff",
+          border: "1px solid #F1F4F9",
         }}
       >
+        <Text fw={700} mb={2} c="#1B2559">
+          Pass-out student register
+        </Text>
+        <Text fz={13} c="#5B6B8C" mb="md">
+          Final enrollment and fee status for the selected session.
+        </Text>
         <ScrollArea>
           <Table
             highlightOnHover
@@ -183,7 +208,7 @@ export default function SessionsPage(props: {
             <Table.Thead>
               <Table.Tr
                 style={{
-                  background: "#f5f0ff",
+                  background: "#F7F9FC",
                 }}
               >
                 {[
@@ -197,8 +222,9 @@ export default function SessionsPage(props: {
                   <Table.Th
                     key={item}
                     style={{
-                      color: "#5c3de8",
-                      fontWeight: 700,
+                      color: "#64748B",
+                      fontWeight: 600,
+                      fontSize: 13,
                     }}
                   >
                     {item}
@@ -208,6 +234,23 @@ export default function SessionsPage(props: {
             </Table.Thead>
 
             <Table.Tbody>
+              {paginatedStudents.length === 0 && (
+                <Table.Tr>
+                  <Table.Td colSpan={6} style={{ border: "none" }}>
+                    <Stack align="center" gap={6} py={40}>
+                      <ThemeIcon size={44} radius="xl" variant="light" color="blue">
+                        <IconSchool size={22} />
+                      </ThemeIcon>
+                      <Text fw={600} c="#1B2559">
+                        No pass-out students yet
+                      </Text>
+                      <Text fz={13} c="#5B6B8C">
+                        Completed student records for {selectedSession} will appear here.
+                      </Text>
+                    </Stack>
+                  </Table.Td>
+                </Table.Tr>
+              )}
               {paginatedStudents.map((student:any) => (
                 <Table.Tr key={student.id}>
                   <Table.Td>
@@ -248,7 +291,7 @@ export default function SessionsPage(props: {
                       <Menu.Target>
                         <ActionIcon
                           variant="light"
-                          color="violet"
+                          color="blue"
                         >
                           <IconDotsVertical size={18} />
                         </ActionIcon>
@@ -315,8 +358,8 @@ export default function SessionsPage(props: {
             styles={{
               control: {
                 "&[data-active]": {
-                  background: "#5c3de8",
-                  borderColor: "#5c3de8",
+                  background: "#2F6FED",
+                  borderColor: "#2F6FED",
                 },
               },
             }}
@@ -379,7 +422,7 @@ export default function SessionsPage(props: {
               }
               style={{
                 background:
-                  "linear-gradient(135deg, #5c3de8, #7b5ef8)",
+                  "linear-gradient(135deg, #2F6FED, #4F7CFB)",
               }}
             >
               Download Marksheet
