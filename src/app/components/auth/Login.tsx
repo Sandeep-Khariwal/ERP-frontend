@@ -22,12 +22,14 @@ import {
   Tabs,
   Modal,
   LoadingOverlay,
+  Group,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import PinInput from "./OtpInput";
 import {
   StudentLogin,
+  StudentLoginWithPass,
   StudentOtpVarification,
   TeacherLogin,
 } from "@/axios/teacher/TeacherPostApi";
@@ -44,6 +46,12 @@ export default function Login(props: { onCreateAccount: () => void }) {
   const [userType, setUserType] = useState<UserTypes>(UserTypes.STUDENT);
   const [studentId, setStudentId] = useState<string>("");
   const [studentEmail, setStudentEmail] = useState<string>("");
+  const [studentLoginMode, setStudentLoginMode] = useState<"otp" | "password">("otp");
+
+const [studentPasswordData, setStudentPasswordData] = useState({
+  phone: "",
+  password: "",
+});
   const [loginData, setLoginData] = useState<{
     email: string;
     password: string;
@@ -200,22 +208,50 @@ export default function Login(props: { onCreateAccount: () => void }) {
         });
     }
     // for student login
-    if (userType === UserTypes.STUDENT) {
-      StudentLogin(loginData)
-        .then((x: any) => {
-          const { studentId, email } = x;
-          setStudentEmail(email);
-          setStudentId(studentId);
-          setOpenOtpModal(true);
-          setIsLoading(false);
-        })
-        .catch((e: any) => {
-          setIsLoading(false);
-          const { message } = e.response.data;
-          ErrorNotification(message);
-          console.log(e);
-        });
-    }
+    // if (userType === UserTypes.STUDENT) {
+    //   StudentLogin(loginData)
+    //     .then((x: any) => {
+    //       const { studentId, email } = x;
+    //       setStudentEmail(email);
+    //       setStudentId(studentId);
+    //       setOpenOtpModal(true);
+    //       setIsLoading(false);
+    //     })
+    //     .catch((e: any) => {
+    //       setIsLoading(false);
+    //       const { message } = e.response.data;
+    //       ErrorNotification(message);
+    //       console.log(e);
+    //     });
+    // }
+    // For student login
+if (userType === UserTypes.STUDENT) {
+  // Login with phone number and password
+  if (studentLoginMode === "password") {
+    handleStudentPasswordLogin();
+    return;
+  }
+
+  // Existing email OTP login
+  StudentLogin({ email: loginData.email })
+    .then((x: any) => {
+      const { studentId, email } = x;
+
+      setStudentEmail(email);
+      setStudentId(studentId);
+      setOpenOtpModal(true);
+      setIsLoading(false);
+    })
+    .catch((e: any) => {
+      setIsLoading(false);
+
+      const message =
+        e?.response?.data?.message || "Unable to send OTP.";
+
+      ErrorNotification(message);
+      console.log(e);
+    });
+}
     // for teacher login
     if (userType === UserTypes.TEACHER) {
       TeacherLogin(loginData)
@@ -296,6 +332,69 @@ export default function Login(props: { onCreateAccount: () => void }) {
         setIsLoading(false);
       });
   };
+
+  const handleStudentPasswordLogin = () => {
+  if (!studentPasswordData.phone.trim() || !studentPasswordData.password) {
+    ErrorNotification("Please enter phone number and password");
+    return;
+  }
+
+  setIsLoading(true);
+
+  StudentLoginWithPass({
+    phone: studentPasswordData.phone.trim(),
+    password: studentPasswordData.password,
+  })
+    .then((x: any) => {
+      const { student, token } = x;
+      
+      console.log("Student data:", student);
+console.log("Received token:", token);
+
+
+      setIsLoading(false);
+
+      SuccessNotification("Login Successfully!!");
+
+      dispatch(
+        setStudentDetails({
+          name: student.name,
+          _id: student._id,
+          phone: student.phoneNumber?.[0] || studentPasswordData.phone,
+          institute: student.instituteId._id,
+        })
+      );
+
+      dispatch(saveToken(token));
+
+localStorage.setItem(LocalStorageKey.Token, token);
+localStorage.setItem("studentId", student._id);
+localStorage.setItem("userType", "student");
+
+      localStorage.setItem(LocalStorageKey.Token, token);
+
+      const instituteDetails = {
+        name: student.instituteId.name,
+        _id: student.instituteId._id,
+        phoneNumber: "",
+        address: student.instituteId.address,
+        featureAccess: student.instituteId.accessFeatures,
+      };
+
+      dispatch(setDetails(instituteDetails));
+
+      navigation.push(`/student/${student._id}/${student.name}`);
+    })
+    .catch((e: any) => {
+      setIsLoading(false);
+
+      const message =
+        e?.response?.data?.message || "Login failed. Please try again.";
+
+      ErrorNotification(message);
+      console.log(e);
+    });
+};
 
   return (
     <>
@@ -394,6 +493,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                     >
                       Student
                     </Tabs.Tab>
+     
                   </Tabs.List>
 
                   <Tabs.Panel value={UserTypes.ADMIN} py={20}>
@@ -434,7 +534,7 @@ export default function Login(props: { onCreateAccount: () => void }) {
                     />
                   </Tabs.Panel>
 
-                  <Tabs.Panel value={UserTypes.STUDENT} py={20}>
+                  {/* <Tabs.Panel value={UserTypes.STUDENT} py={20}>
                     <TextInput
                       label="Email"
                       placeholder="Enter your email"
@@ -443,7 +543,85 @@ export default function Login(props: { onCreateAccount: () => void }) {
                       value={loginData?.email}
                       onChange={handleChange}
                     />
-                  </Tabs.Panel>
+                  </Tabs.Panel> */}
+                  <Tabs.Panel value={UserTypes.STUDENT} py={20}>
+  <Stack gap="md">
+    {studentLoginMode === "otp" ? (
+      <>
+        <Group justify="flex-end">
+          <Text
+            size="sm"
+            c="#9C27B0"
+            fw={600}
+            style={{ cursor: "pointer" }}
+            onClick={() => setStudentLoginMode("password")}
+          >
+            Login with Password
+          </Text>
+        </Group>
+
+        <TextInput
+          label="Email"
+          placeholder="Enter your email"
+          type="email"
+          required
+          name="email"
+          value={loginData.email}
+          onChange={handleChange}
+        />
+      </>
+    ) : (
+      <>
+        <Group justify="space-between">
+          <Text size="sm" fw={600}>
+            Login with Password
+          </Text>
+
+          <Text
+            size="sm"
+            c="#9C27B0"
+            fw={600}
+            style={{ cursor: "pointer" }}
+            onClick={() => setStudentLoginMode("otp")}
+          >
+            Login with OTP
+          </Text>
+        </Group>
+
+        <TextInput
+          label="Phone Number"
+          placeholder="Enter your registered phone number"
+          type="tel"
+          required
+          value={studentPasswordData.phone}
+        onChange={(event) => {
+  const phone = event.currentTarget.value;
+
+  setStudentPasswordData((prev) => ({
+    ...prev,
+    phone,
+  }));
+}}
+        />
+
+       <PasswordInput
+  label="Password"
+  placeholder="Enter your password"
+  required
+  value={studentPasswordData.password}
+  onChange={(event) => {
+    const password = event.currentTarget.value;
+
+    setStudentPasswordData((prev) => ({
+      ...prev,
+      password,
+    }));
+  }}
+/>
+      </>
+    )}
+  </Stack>
+</Tabs.Panel>
                   <Tabs.Panel value={UserTypes.TEACHER} py={20}>
                     <TextInput
                       label="Email"

@@ -4,6 +4,9 @@ import { useMediaQuery } from "@mantine/hooks";
 import { GraduationCap, Building2, IndianRupee, FileWarning } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatNumberInK } from "../institute/helperFunctions";
+import { useDispatch, useSelector } from "react-redux";
+import { setInstituteLogo } from "@/app/redux/slices/instituteSlice";
+import { RootState } from "@/app/redux/store";
 
 export function InstituteDetailsCards(props: { instituteId: string }) {
   const isMd = useMediaQuery(`(max-width: 968px)`);
@@ -13,22 +16,31 @@ export function InstituteDetailsCards(props: { instituteId: string }) {
   const [totalExpanses, setTotalExpanses] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const dispatch = useDispatch();
+
+
+
   useEffect(() => {
     if (props.instituteId) {
       setIsLoading(true);
       GetInstituteOverview(props.instituteId)
         .then((x: any) => {
-          console.log("institute detial :", x);
+          console.log("institute detiaals :", x);
           
           const { institute } = x;
           setTotalStudents(institute.studentCount);
           setTotalTeachers(institute.teacherCount);
           setTotalEarnings(institute.earnings);
           setTotalExpanses(institute.expanses);
+             // Overview API se logo Redux mein update karein
+    if (institute.logo) {
+      dispatch(setInstituteLogo(institute.logo));
+    }
           setIsLoading(false);
         })
         .catch((e) => {
           console.log(e);
+          
           setIsLoading(false);
         });
     }

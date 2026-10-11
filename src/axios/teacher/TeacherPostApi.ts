@@ -37,6 +37,19 @@ export function StudentLogin(data:{
       .catch((error:any) => reject(error));
   });
 }
+export function StudentLoginWithPass(data: {
+  phone: string;
+  password: string;
+}) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/student/loginWithPass`,
+      data
+    )
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
 export function StudentOtpVarification(data:{
   studentId:string,
   otp:string;

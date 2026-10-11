@@ -4,6 +4,8 @@ import { Modal, Button, Text, Stack, Group, Box, Center, LoadingOverlay } from "
 import { useEffect, useRef, useState } from "react";
 import { IconUpload, IconPhoto, IconTrash } from "@tabler/icons-react";
 import { Uploadlogo } from "@/axios/institute/InstitutePostApi";
+import { useDispatch } from "react-redux";
+import { setDetails, setInstituteLogo } from "@/app/redux/slices/instituteSlice";
 
 type Props = {
   opened: boolean;
@@ -16,6 +18,8 @@ export const LogoModal = ({ opened, onClose, institute }: Props) => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const dispatch = useDispatch();
 
   // HANDLE FILE
   const handleFile = (selected: File) => {
@@ -30,27 +34,67 @@ export const LogoModal = ({ opened, onClose, institute }: Props) => {
     if (droppedFile) handleFile(droppedFile);
   };
 
-  useEffect(() => {
-    // ❌ agar file ya institute id nahi hai toh stop
-    if (!file || !institute?._id) return;
+  // useEffect(() => {
+  //   // ❌ agar file ya institute id nahi hai toh stop
+  //   if (!file || !institute?._id) return;
 
-    const formData = new FormData();
-    formData.append("logo", file);
-    setIsLoading(true);
-    // 🔥 API CALL (same GPS pattern)
-    Uploadlogo(formData, institute._id)
-      .then((res: any) => {
-        console.log("✅ Upload success:", res);
-        setIsLoading(false);
-        if (res?.data?.url) {
-          console.log("🌐 Image URL:", res.data.url);
-        }
-      })
-      .catch((err: any) => {
-        console.log("❌ Upload error:", err);
-        setIsLoading(false);
-      });
-  }, [file]); // 🔥 file change = API call
+  //   const formData = new FormData();
+  //   formData.append("logo", file);
+  //   setIsLoading(true);
+  //   // 🔥 API CALL (same GPS pattern)
+  //   Uploadlogo(formData, institute._id)
+  //     .then((res: any) => {
+  //       console.log("✅ Upload success:", res);
+  //       setIsLoading(false);
+  //       if (res?.data?.url) {
+  //         console.log("🌐 Image URL:", res.data.url);
+  //       }
+  //     })
+  //     .catch((err: any) => {
+  //       console.log("❌ Upload error:", err);
+  //       setIsLoading(false);
+  //     });
+  // }, [file]); // 🔥 file change = API call
+
+useEffect(() => {
+  if (!file || !institute?._id) return;
+
+  const formData = new FormData();
+  formData.append("logo", file);
+
+  setIsLoading(true);
+
+  Uploadlogo(formData, institute._id)
+    .then((res: any) => {
+      console.log("Full API response:", res);
+
+      // API direct object return kar rahi hai
+      const logoUrl = res?.url;
+
+      console.log("Logo URL:", logoUrl);
+
+      if (!logoUrl) {
+        console.error("API response mein logo URL nahi mila:", res);
+        return;
+      }
+
+      // Redux mein updated institute details save karo
+      dispatch(
+        setDetails({
+          ...institute,
+          logo: logoUrl,
+        })
+      );
+
+      console.log("Logo Redux mein save ho gaya:", logoUrl);
+    })
+    .catch((err: any) => {
+      console.error("Logo upload error:", err);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+}, [file, institute?._id, dispatch]);
 
   return (
     <Modal

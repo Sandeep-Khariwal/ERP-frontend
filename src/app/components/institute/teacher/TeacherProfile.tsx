@@ -894,6 +894,8 @@ const TeacherProfile = (props: {
     setIsLoading(true);
     GetTeacherById(props.teacherId)
       .then((x: any) => {
+        console.log("teacher profile :", x);
+        
         setTeacher(x.teacher);
         setIsLoading(false);
       })
