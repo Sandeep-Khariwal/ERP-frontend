@@ -117,7 +117,7 @@ import { Box, Button, Flex, Stack, Text } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { createSalarySlipPdf } from "./CreateSalarySlipPdf";
-import { GetInstituteOverview } from "@/axios/institute/InstituteGetApi";
+import { GetInstituteBasicDetails, GetInstituteOverview } from "@/axios/institute/InstituteGetApi";
 
 export interface Salary {
   _id?: string;
@@ -173,6 +173,9 @@ export default function SalaryCard(props: {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [instituteData, setInstituteData] = useState<any>(null);
 
+  console.log("instituute :", instituteData);
+  
+
 
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
@@ -208,20 +211,73 @@ export default function SalaryCard(props: {
   }
 }, [props.teacherId]);
 
+// useEffect(() => {
+//   if (props.instituteId) {
+//     GetInstituteOverview(props.instituteId)
+//       .then((x: any) => {
+//         console.log("INSTITUTE OVERVIEW =", x);
+
+//         const { institute } = x;
+
+//         setInstituteData(institute);
+//       })
+//       .catch((e) => {
+//         console.log("Institute overview error:", e);
+//       });
+//   }
+// }, [props.instituteId]);
+
 useEffect(() => {
-  if (props.instituteId) {
-    GetInstituteOverview(props.instituteId)
-      .then((x: any) => {
-        console.log("INSTITUTE OVERVIEW =", x);
-
-        const { institute } = x;
-
-        setInstituteData(institute);
-      })
-      .catch((e) => {
-        console.log("Institute overview error:", e);
-      });
+  if (!props.instituteId) {
+    console.error("Institute ID missing");
+    return;
   }
+
+  GetInstituteBasicDetails(props.instituteId)
+    .then((response: any) => {
+      console.log(
+        "INSTITUTE BASIC DETAILS RESPONSE:",
+        JSON.stringify(response, null, 2)
+      );
+
+      const institute = response?.institute ?? null;
+
+      console.log("INSTITUTE DATA SET:", institute);
+
+      setInstituteData(institute);
+    })
+    .catch((error: any) => {
+      console.error(
+        "Institute Basic Details API Error:",
+        error?.response?.data || error
+      );
+
+      setInstituteData(null);
+    });
+}, [props.instituteId]);
+
+
+useEffect(() => {
+  if (!props.instituteId) {
+    console.error("Institute ID missing");
+    return;
+  }
+
+  GetInstituteOverview(props.instituteId)
+    .then((response: any) => {
+      console.log(
+        "FULL INSTITUTE RESPONSE:",
+        JSON.stringify(response, null, 2)
+      );
+
+      console.log("INSTITUTE OBJECT:", response?.institute);
+
+      setInstituteData(response?.institute ?? null);
+    })
+    .catch((error: any) => {
+      console.error("Institute API error:", error);
+      setInstituteData(null);
+    });
 }, [props.instituteId]);
 
 
@@ -234,121 +290,61 @@ const handleDownloadSalarySlip = async (salaryItem: Salary) => {
     // Institute Logo & Signature
     // -----------------------------------
 
-    const logoUrl = instituteData?.logo || "";
-    const signatureUrl = instituteData?.signature || "";
+ 
+const logoUrl = instituteData?.logo || "";
+const signatureUrl = instituteData?.signature || "";
 
-    console.log("Institute Logo URL:", logoUrl);
-    console.log("Institute Signature URL:", signatureUrl);
+console.log("SALARY SLIP INSTITUTE DATA:", instituteData);
 
-    const base64Logo = logoUrl
-      ? await getBase64Image(logoUrl)
-      : "";
+const base64Logo = logoUrl
+  ? await getBase64Image(logoUrl)
+  : "";
 
-    const base64Signature = signatureUrl
-      ? await getBase64Image(signatureUrl)
-      : "";
+const base64Signature = signatureUrl
+  ? await getBase64Image(signatureUrl)
+  : "";
 
-    // -----------------------------------
-    // GST
-    // -----------------------------------
+const gstNo = instituteData?.gst?.number || "N/A";
 
- const gstNo =
-  typeof instituteData?.gst === "object"
-    ? instituteData?.gst?.number || "N/A"
-    : instituteData?.gst || "N/A";
+console.log("LOGO BASE64:", base64Logo);
+console.log("SIGNATURE BASE64:", base64Signature);
+console.log("GST NUMBER:", gstNo);
 
-    // -----------------------------------
-    // Debug
-    // -----------------------------------
+    console.log("INSTITUTE DATA:", instituteData);
 
-    console.log("========== SALARY SLIP DEBUG ==========");
-    console.log("Institute:", instituteData);
-    console.log("Original Logo:", logoUrl);
-    console.log("Base64 Logo:", base64Logo);
-    console.log("Original Signature:", signatureUrl);
-    console.log("Base64 Signature:", base64Signature);
-    console.log("Salary Item:", salaryItem);
-    console.log("========================================");
+    
+const html = createSalarySlipPdf({
+  // Institute Details
+  instituteName: instituteData?.name || "Institute Name",
+  instituteAddress: instituteData?.address || "",
+  institutePhone: instituteData?.institutePhoneNumber || "",
+  instituteLogo: base64Logo,
+  instituteSignature: base64Signature,
+  gstNo: gstNo,
 
-    // -----------------------------------
-    // Create PDF HTML
-    // -----------------------------------
+  // Neeche aapka existing teacher aur salary data
+  // bilkul same rehne do
+  teacherName: props.teacherName || "N/A",
+  teacherId: salaryItem.teacherId || props.teacherId,
+  designation: props.designation || "Teacher",
+  bankAccountNo: props.bankAccountNo || "N/A",
+  payableDays: props.payableDays || 30,
 
-    const html = createSalarySlipPdf({
-      // Institute Details
-      instituteName: instituteData?.name || "Institute Name",
+  salaryMonth: salaryItem.month,
+  salaryDate: salaryItem.salleryDate || salaryItem.createdAt,
+  baseSalary: salaryItem.baseSalary,
+  netSalary: salaryItem.netSalary,
+  amountPaid: salaryItem.amountPaid,
 
-      instituteAddress: instituteData?.address || "",
+  pfDeduction: salaryItem.deductions?.pf || 0,
+  esiDeduction: salaryItem.deductions?.esi || 0,
+  otherDeduction: salaryItem.deductions?.otherDeductions || 0,
 
-      institutePhone:
-        instituteData?.institutePhoneNumber ||
-        instituteData?.phoneNumber ||
-        "",
+  salleryStatus: salaryItem.salleryStatus,
+  salleryMode: salaryItem.salleryMode,
+  transactionReference: salaryItem.transactionReference,
+});
 
-      instituteEmail: instituteData?.email || "",
-
-      // Logo & Signature
-      instituteLogo: base64Logo,
-
-      instituteSignature: base64Signature,
-
-      gstNo: gstNo,
-
-      // Teacher Details
-      teacherName: props.teacherName || "N/A",
-
-      teacherId:
-        salaryItem.teacherId ||
-        props.teacherId,
-
-      designation:
-        props.designation ||
-        "Teacher",
-
-      bankAccountNo:
-        props.bankAccountNo ||
-        "N/A",
-
-      payableDays:
-        props.payableDays ||
-        30,
-
-      // Salary Details
-      salaryMonth: salaryItem.month,
-
-      salaryDate:
-        salaryItem.salleryDate ||
-        salaryItem.createdAt,
-
-      baseSalary:
-        salaryItem.baseSalary,
-
-      netSalary:
-        salaryItem.netSalary,
-
-      amountPaid:
-        salaryItem.amountPaid,
-
-      // Deductions
-      pfDeduction:
-        salaryItem.deductions?.pf || 0,
-
-      esiDeduction:
-        salaryItem.deductions?.esi || 0,
-
-      otherDeduction:
-        salaryItem.deductions?.otherDeductions || 0,
-
-      // Payment
-      salleryStatus:
-        salaryItem.salleryStatus,
-
-      salleryMode:
-        salaryItem.salleryMode,
-
-      transactionReference:
-        salaryItem.transactionReference,
-    });
 
     // -----------------------------------
     // Print

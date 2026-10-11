@@ -15,6 +15,7 @@ import { UserType } from "../dashboard/InstituteBatchesSection";
 import StudentTestView from "./StudentTestView";
 import StudentTestCard from "./StudentTestCards";
 import StudentMeetingsPage from "./AllMeetings";
+import StudentTimeTable from "./StudentTimeTable";
 
 export interface StudentOverView {
   _id: string;
@@ -73,6 +74,8 @@ const studentTabLabels: Record<string, string> = {
   Attendance: "Attendance",
   TEST: "Test",
   Meetings: "Meeting",
+ "Time Table": "Time Table",
+
 };
 
 const StudentPage = (props: StudentPageProps) => {
@@ -293,6 +296,20 @@ const StudentPage = (props: StudentPageProps) => {
           />
         </Stack>
       )}
+      {StudentTabs.TIMETABLE === activeTab && (
+  <Stack
+    mt={4}
+    w="100%"
+    bg="white"
+    p={{ base: 4, sm: 10 }}
+    style={{ minWidth: 0 }}
+  >
+    <StudentTimeTable
+      studentId={student._id}
+      batchId={student.batchId?._id || ""}
+    />
+  </Stack>
+)}
        {StudentTabs.MEETNGS === activeTab && (
         <Stack mt={4} w={"100%"} bg={"white"} py={10} px={{ base: 4, sm: 10 }} style={{ minWidth: 0 }}>
           <StudentMeetingsPage studentId={student._id}  batchId={student.batchId._id} student={student.name} />

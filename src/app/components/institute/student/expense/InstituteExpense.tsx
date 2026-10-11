@@ -7,7 +7,7 @@ import { Modal } from "@mantine/core";
 import ExpenseForm from "./AddExpenseModel";
 import { useAppSelector } from "@/app/redux/redux.hooks";
 import { GetExpenseData } from "@/axios/institute/ExpenseApi";
-import { GetInstituteOverview } from "@/axios/institute/InstituteGetApi";
+import { GetInstituteBasicDetails, GetInstituteOverview } from "@/axios/institute/InstituteGetApi";
 import { createExpenseSlipPdf } from "./CreateExpenseSlipPdf";
 
 import { useMemo } from "react";
@@ -98,6 +98,27 @@ export default function InstituteExpanse() {
                 });
         }
     }, [institute?._id]);
+    // Fetch Institute Basic Details for Expense Slip
+useEffect(() => {
+    if (!institute?._id) return;
+
+    GetInstituteBasicDetails(institute._id)
+        .then((res: any) => {
+            console.log(
+                "Institute Basic Details:",
+                res?.institute
+            );
+
+            setInstituteData(res?.institute || null);
+        })
+        .catch((err: any) => {
+            console.error(
+                "Error fetching institute basic details:",
+                err?.response?.data || err
+            );
+            setInstituteData(null);
+        });
+}, [institute?._id]);
 
     const finalExpenses = useMemo(() => {
         if (!filters.startDate && !filters.endDate && !filters.category) {
@@ -224,65 +245,127 @@ export default function InstituteExpanse() {
     }, [institute?._id]);
 
     // Handle PDF Download
-    const handleDownloadExpenseSlip = async (expenseItem: Expense) => {
-        try {
-            setDownloadingId(expenseItem._id);
+  // Handle PDF Download
+const handleDownloadExpenseSlip = async (expenseItem: Expense) => {
+    try {
+        setDownloadingId(expenseItem._id);
 
-            const logoUrl = instituteData?.logo || institute?.logo || "";
-            const signatureUrl = instituteData?.signature || institute?.signature || "";
+        // Latest institute details from API
+        const logoUrl = instituteData?.logo || institute?.logo || "";
+        const signatureUrl =
+            instituteData?.signature || institute?.signature || "";
 
-            const base64Logo = logoUrl ? await getBase64Image(logoUrl) : "";
-            const base64Signature = signatureUrl ? await getBase64Image(signatureUrl) : "";
-const gstNo =
-  typeof instituteData?.gst === "object"
-    ? instituteData?.gst?.number || "N/A"
-    : instituteData?.gst || "N/A";
+        // Convert images to Base64 for PDF
+        const base64Logo = logoUrl
+            ? await getBase64Image(logoUrl)
+            : "";
 
+        const base64Signature = signatureUrl
+            ? await getBase64Image(signatureUrl)
+            : "";
 
-            const html = createExpenseSlipPdf({
-                instituteName: instituteData?.name || institute?.name || "Institute Name",
-                instituteAddress: instituteData?.address || institute?.address || "",
-                institutePhone:
-                    instituteData?.institutePhoneNumber ||
-                    instituteData?.phoneNumber ||
-                    institute?.phoneNumber ||
-                    "",
-                instituteEmail: instituteData?.email || institute?.email || "",
-                instituteLogo: base64Logo,
-                instituteSignature: base64Signature,
-                gstNo: gstNo,
+        // GST can be an object or a string
+        const gstNo =
+            typeof instituteData?.gst === "object"
+                ? instituteData?.gst?.number || "N/A"
+                : instituteData?.gst || "N/A";
 
-                expenseId: expenseItem._id,
-                title: expenseItem.title,
-                category: expenseItem.category,
-                amount: expenseItem.amount,
-                paymentMethod: expenseItem.paymentMethod,
-                expenseDate: expenseItem.expenseDate,
-                createdAt: expenseItem.createdAt,
-                note: expenseItem.note,
-            });
+        console.log("Expense Slip Institute Data:", {
+            name: instituteData?.name || institute?.name,
+            address: instituteData?.address || institute?.address,
+            phone:
+                instituteData?.institutePhoneNumber ||
+                institute?.institutePhoneNumber ||
+                institute?.phoneNumber,
+            logoUrl,
+            logoConverted: base64Logo.startsWith("data:image"),
+            signatureUrl,
+            signatureConverted: base64Signature.startsWith("data:image"),
+            gstNo,
+        });
 
-            const printWindow = window.open("", "_blank");
+        const html = createExpenseSlipPdf({
+            instituteName:
+                instituteData?.name ||
+                institute?.name ||
+                "Institute Name",
 
-            if (printWindow) {
-                printWindow.document.open();
-                printWindow.document.write(html);
-                printWindow.document.close();
+            instituteAddress:
+                instituteData?.address ||
+                institute?.address ||
+                "",
 
-                setTimeout(() => {
-                    printWindow.focus();
-                    printWindow.print();
-                    printWindow.onafterprint = () => {
-                        printWindow.close();
-                    };
-                }, 500);
-            }
-        } catch (error) {
-            console.error("Error generating Expense Slip PDF:", error);
-        } finally {
-            setDownloadingId(null);
+            institutePhone:
+                instituteData?.institutePhoneNumber ||
+                instituteData?.phoneNumber ||
+                institute?.institutePhoneNumber ||
+                institute?.phoneNumber ||
+                "",
+
+            instituteEmail:
+                instituteData?.email ||
+                institute?.email ||
+                "",
+
+            instituteLogo: base64Logo,
+            instituteSignature: base64Signature,
+            gstNo,
+
+            expenseId: expenseItem._id,
+            title: expenseItem.title,
+            category: expenseItem.category,
+            amount: expenseItem.amount,
+            paymentMethod: expenseItem.paymentMethod,
+            expenseDate: expenseItem.expenseDate,
+            createdAt: expenseItem.createdAt,
+            note: expenseItem.note,
+        });
+
+        const printWindow = window.open("", "_blank");
+
+        if (!printWindow) {
+            console.error(
+                "Print window blocked. Please allow pop-ups for this site."
+            );
+            return;
         }
-    };
+
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+
+        // Wait for images to load before printing
+        printWindow.onload = () => {
+            const images = Array.from(
+                printWindow.document.images
+            );
+
+            Promise.all(
+                images.map((img) => {
+                    if (img.complete) {
+                        return Promise.resolve();
+                    }
+
+                    return new Promise<void>((resolve) => {
+                        img.onload = () => resolve();
+                        img.onerror = () => resolve();
+                    });
+                })
+            ).then(() => {
+                printWindow.focus();
+                printWindow.print();
+
+                printWindow.onafterprint = () => {
+                    printWindow.close();
+                };
+            });
+        };
+    } catch (error) {
+        console.error("Error generating Expense Slip PDF:", error);
+    } finally {
+        setDownloadingId(null);
+    }
+};
 
     return (
         <Container size="xl" py="md" px={isMobile ? "xs" : "md"}>

@@ -55,7 +55,8 @@ export enum StudentTabs {
   ATTENDANCE = "Attendance",
   TEST = "TEST",
   OTHER = "Other",
-  MEETNGS = "Meetings"
+  MEETNGS = "Meetings",
+  TIMETABLE = "Time Table",
 
 }
 
