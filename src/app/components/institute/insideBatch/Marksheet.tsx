@@ -819,7 +819,7 @@ const Marksheet = (props: {
 
                         <Menu.Dropdown>
                           {/* DOWNLOAD */}
-                          <Menu.Item
+                          {/* <Menu.Item
                             leftSection={<IconDownload size={18} />}
                             onClick={async () => {
                               const url = `https://shikshapay.cloud/marksheet/${item._id}`;
@@ -849,92 +849,168 @@ const Marksheet = (props: {
                                   let term1: any = {};
                                   let term2: any = {};
 
-                                  if (
-                                    filterExam.includes("Annual") &&
-                                    !isAcadmy
-                                  ) {
-                                    const res: any = await GetMidExamMarksheet(
-                                      item.batch._id,
-                                      student._id,
-                                    );
+                                  // if (
+                                  //   filterExam.includes("Annual") &&
+                                  //   !isAcadmy
+                                  // ) {
+                                  //   const res: any = await GetMidExamMarksheet(
+                                  //     item.batch._id,
+                                  //     student._id,
+                                  //   );
 
-                                    const marksheet = res.marksheet;
+                                  //   const marksheet = res.marksheet;
 
-                                    term1 = {
-                                      instituteName: institute?.name,
-                                      examName: item.name,
-                                      batchName: item.batch.name,
-                                      studentName: item.student?.name,
-                                      rollNumber: item.student?.rollNumber,
-                                      enrolment: item.student?.enrollmentNo,
-                                      marks: marksheet.marks,
-                                      activity: marksheet.activity,
-                                      skills: marksheet.skills,
-                                      totalMarks: marksheet.totalMarks,
-                                      percentage: marksheet.percentage,
-                                      overallGrade: marksheet.overallGrade,
-                                      status: marksheet.status,
-                                      allsubjecttotal:
-                                        marksheet.marks.length * 100,
-                                      date: new Date(
-                                        marksheet.date,
-                                      ).toLocaleDateString("en-GB"),
-                                      session: marksheet.session,
-                                      fName: student.parentName,
-                                      address: student.address,
-                                      parentNumber: student.parentNumber,
-                                      dob: formatDate(student.dateOfBirth),
+                                  //   term1 = {
+                                  //     instituteName: institute?.name,
+                                  //     examName: item.name,
+                                  //     batchName: item.batch.name,
+                                  //     studentName: item.student?.name,
+                                  //     rollNumber: item.student?.rollNumber,
+                                  //     enrolment: item.student?.enrollmentNo,
+                                  //     marks: marksheet.marks,
+                                  //     activity: marksheet.activity,
+                                  //     skills: marksheet.skills,
+                                  //     totalMarks: marksheet.totalMarks,
+                                  //     percentage: marksheet.percentage,
+                                  //     overallGrade: marksheet.overallGrade,
+                                  //     status: marksheet.status,
+                                  //     allsubjecttotal:
+                                  //       marksheet.marks.length * 100,
+                                  //     date: new Date(
+                                  //       marksheet.date,
+                                  //     ).toLocaleDateString("en-GB"),
+                                  //     session: marksheet.session,
+                                  //     fName: student.parentName,
+                                  //     address: student.address,
+                                  //     parentNumber: student.parentNumber,
+                                  //     dob: formatDate(student.dateOfBirth),
 
-                                      // ✅ Base64 images
-                                      photo: base64Photo,
-                                      instituteLogo: base64Logo,
-                                      principalSignature: base64Signature,
+                                  //     // ✅ Base64 images
+                                  //     photo: base64Photo,
+                                  //     instituteLogo: base64Logo,
+                                  //     principalSignature: base64Signature,
 
-                                      instituteAdress:
-                                        student.instituteId.address,
-                                      institutePhone:
-                                        student.instituteId
-                                          .institutePhoneNumber,
+                                  //     instituteAdress:
+                                  //       student.instituteId.address,
+                                  //     institutePhone:
+                                  //       student.instituteId
+                                  //         .institutePhoneNumber,
 
-                                      qr,
-                                    };
+                                  //     qr,
+                                  //   };
 
-                                    term2 = {
-                                      instituteName: institute?.name,
-                                      examName: item.name,
-                                      batchName: item.batch.name,
-                                      studentName: item.student?.name,
-                                      rollNumber: item.student?.rollNumber,
-                                      enrolment: item.student?.enrollmentNo,
-                                      marks: item.marks,
-                                      activity: item.activity,
-                                      skills: item.skills,
-                                      totalMarks: item.totalMarks,
-                                      percentage: item.percentage,
-                                      overallGrade: item.overallGrade,
-                                      status: item.status,
-                                      allsubjecttotal: item.marks.length * 100,
-                                      date: new Date(
-                                        item.date,
-                                      ).toLocaleDateString("en-GB"),
-                                      session: item.session,
-                                      fName: student.parentName,
-                                      address: student.address,
-                                      parentNumber: student.parentNumber,
-                                      dob: formatDate(student.dateOfBirth),
+                                  //   term2 = {
+                                  //     instituteName: institute?.name,
+                                  //     examName: item.name,
+                                  //     batchName: item.batch.name,
+                                  //     studentName: item.student?.name,
+                                  //     rollNumber: item.student?.rollNumber,
+                                  //     enrolment: item.student?.enrollmentNo,
+                                  //     marks: item.marks,
+                                  //     activity: item.activity,
+                                  //     skills: item.skills,
+                                  //     totalMarks: item.totalMarks,
+                                  //     percentage: item.percentage,
+                                  //     overallGrade: item.overallGrade,
+                                  //     status: item.status,
+                                  //     allsubjecttotal: item.marks.length * 100,
+                                  //     date: new Date(
+                                  //       item.date,
+                                  //     ).toLocaleDateString("en-GB"),
+                                  //     session: item.session,
+                                  //     fName: student.parentName,
+                                  //     address: student.address,
+                                  //     parentNumber: student.parentNumber,
+                                  //     dob: formatDate(student.dateOfBirth),
 
-                                      // ✅ Base64 images
-                                      photo: base64Photo,
-                                      instituteLogo: base64Logo,
-                                      principalSignature: base64Signature,
+                                  //     // ✅ Base64 images
+                                  //     photo: base64Photo,
+                                  //     instituteLogo: base64Logo,
+                                  //     principalSignature: base64Signature,
 
-                                      instituteAdress:
-                                        student.instituteId.address,
-                                      institutePhone:
-                                        student.instituteId
-                                          .institutePhoneNumber,
-                                      qr,
-                                    };
+                                  //     instituteAdress:
+                                  //       student.instituteId.address,
+                                  //     institutePhone:
+                                  //       student.instituteId
+                                  //         .institutePhoneNumber,
+                                  //     qr,
+                                  //   };
+                                  if (filterExam.includes("Annual") && !isAcadmy) {
+  const res: any = await GetMidExamMarksheet(
+    item.batch._id,
+    student._id,
+  );
+
+  console.log("Mid Term API response:", res);
+  console.log("Annual marksheet:", item);
+
+  const marksheet = res?.marksheet;
+
+  // Stop here if the Mid Term marksheet does not exist
+  if (!marksheet) {
+    ErrorNotification(
+      "Mid Term marksheet not found for this student. Please check the saved Mid Term result."
+    );
+    return;
+  }
+
+  term1 = {
+    instituteName: institute?.name,
+    examName: marksheet.name,
+    batchName: item.batch.name,
+    studentName: item.student?.name,
+    rollNumber: item.student?.rollNumber,
+    enrolment: item.student?.enrollmentNo,
+    marks: marksheet.marks,
+    activity: marksheet.activity,
+    skills: marksheet.skills,
+    totalMarks: marksheet.totalMarks,
+    percentage: marksheet.percentage,
+    overallGrade: marksheet.overallGrade,
+    status: marksheet.status,
+    allsubjecttotal: marksheet.marks.length * 100,
+    date: new Date(marksheet.date).toLocaleDateString("en-GB"),
+    session: marksheet.session,
+    fName: student.parentName,
+    address: student.address,
+    parentNumber: student.parentNumber,
+    dob: formatDate(student.dateOfBirth),
+    photo: base64Photo,
+    instituteLogo: base64Logo,
+    principalSignature: base64Signature,
+    instituteAdress: student.instituteId.address,
+    institutePhone: student.instituteId.institutePhoneNumber,
+    qr,
+  };
+
+  term2 = {
+    instituteName: institute?.name,
+    examName: item.name,
+    batchName: item.batch.name,
+    studentName: item.student?.name,
+    rollNumber: item.student?.rollNumber,
+    enrolment: item.student?.enrollmentNo,
+    marks: item.marks,
+    activity: item.activity,
+    skills: item.skills,
+    totalMarks: item.totalMarks,
+    percentage: item.percentage,
+    overallGrade: item.overallGrade,
+    status: item.status,
+    allsubjecttotal: item.marks.length * 100,
+    date: new Date(item.date).toLocaleDateString("en-GB"),
+    session: item.session,
+    fName: student.parentName,
+    address: student.address,
+    parentNumber: student.parentNumber,
+    dob: formatDate(student.dateOfBirth),
+    photo: base64Photo,
+    instituteLogo: base64Logo,
+    principalSignature: base64Signature,
+    instituteAdress: student.instituteId.address,
+    institutePhone: student.instituteId.institutePhoneNumber,
+    qr,
+  };
                                   } else {
                                     term1 = {
                                       instituteName: institute?.name,
@@ -1031,7 +1107,161 @@ const Marksheet = (props: {
                             }}
                           >
                             Download
-                          </Menu.Item>
+                          </Menu.Item> */}
+
+                          <Menu.Item
+  leftSection={<IconDownload size={18} />}
+  onClick={async () => {
+    try {
+      const url = `https://shikshapay.cloud/marksheet/${item._id}`;
+      const qr = await QRCode.toDataURL(url);
+      const isAcadmy = institute?.isAcadmy;
+
+      const res: any = await GetStudentDetail(item.student._id);
+      const student = res.student;
+
+      if (!student) {
+        ErrorNotification("Student details not found!");
+        return;
+      }
+
+      const base64Photo = await getBase64Image(student.profilePic);
+      const base64Logo = await getBase64Image(student.instituteId.logo);
+      const base64Signature = await getBase64Image(
+        student.instituteId.signature,
+      );
+
+      // Common student and institute details
+      const commonData = {
+        instituteName: institute?.name,
+        batchName: item.batch?.name,
+        studentName: item.student?.name,
+        rollNumber: item.student?.rollNumber,
+        enrolment: item.student?.enrollmentNo,
+        fName: student.parentName,
+        address: student.address,
+        parentNumber: student.parentNumber,
+        dob: formatDate(student.dateOfBirth),
+        photo: base64Photo,
+        instituteLogo: base64Logo,
+        principalSignature: base64Signature,
+        instituteAdress: student.instituteId.address,
+        institutePhone: student.instituteId.institutePhoneNumber,
+        qr,
+      };
+
+      // Current selected marksheet (Mid TERM or Annual TERM)
+      const currentMarksheet = {
+        ...commonData,
+        examName: item.name,
+        marks: item.marks ?? [],
+        activity: item.activity ?? [],
+        skills: item.skills ?? [],
+        totalMarks: item.totalMarks,
+        percentage: item.percentage,
+        overallGrade: item.overallGrade,
+        status: item.status,
+        allsubjecttotal: (item.marks ?? []).length * 100,
+        date: new Date(item.date).toLocaleDateString("en-GB"),
+        session: item.session,
+      };
+
+      let term1: any = currentMarksheet;
+      let term2: any = currentMarksheet;
+      let html = "";
+
+      // Academy: retain the existing academy PDF
+      if (isAcadmy) {
+        html = createAcadmyMarksheetPdf(currentMarksheet);
+      } else if (filterExam?.includes("Annual")) {
+        // Annual TERM: try to fetch the Mid TERM marksheet
+        let midMarksheet: any = null;
+
+        try {
+          const midResponse: any = await GetMidExamMarksheet(
+            item.batch?._id ?? props.batchId,
+            item.student?._id,
+          );
+
+          console.log("Mid Term API response:", midResponse);
+          console.log("Annual marksheet:", item);
+
+          midMarksheet = midResponse?.marksheet ?? null;
+        } catch (error) {
+          // If the API returns 404 or another error,
+          // Annual TERM can still be downloaded independently.
+          console.warn("Mid Term marksheet unavailable:", error);
+        }
+
+        term2 = currentMarksheet;
+
+        if (midMarksheet?.marks?.length) {
+          term1 = {
+            ...commonData,
+            examName: midMarksheet.name,
+            marks: midMarksheet.marks,
+            activity: midMarksheet.activity ?? [],
+            skills: midMarksheet.skills ?? [],
+            totalMarks: midMarksheet.totalMarks,
+            percentage: midMarksheet.percentage,
+            overallGrade: midMarksheet.overallGrade,
+            status: midMarksheet.status,
+            allsubjecttotal: midMarksheet.marks.length * 100,
+            date: new Date(midMarksheet.date).toLocaleDateString("en-GB"),
+            session: midMarksheet.session,
+          };
+
+          // Both terms exist: generate combined PDF
+          html = createCombinedMarksheetPdf(term1, term2);
+        } else {
+          // Mid TERM missing: generate Annual TERM PDF only
+          html = createMarksheetPdf(currentMarksheet);
+        }
+      } else {
+        // Mid TERM selected: generate its single PDF
+        html = createMarksheetPdf(currentMarksheet);
+      }
+
+      if (!html) {
+        ErrorNotification("Unable to generate marksheet PDF!");
+        return;
+      }
+
+      // Open print window
+      const printWindow = window.open("", "_blank");
+
+      if (!printWindow) {
+        ErrorNotification(
+          "Please allow pop-ups in your browser to download the marksheet.",
+        );
+        return;
+      }
+
+      printWindow.document.open();
+      printWindow.document.write(html);
+      printWindow.document.close();
+
+      // Print after the HTML has rendered
+      printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+      };
+
+      // Fallback in case onload fires before the handler is attached
+      setTimeout(() => {
+        if (!printWindow.closed) {
+          printWindow.focus();
+          printWindow.print();
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("Download marksheet error:", error);
+      ErrorNotification("Failed to generate marksheet!");
+    }
+  }}
+>
+  Download
+</Menu.Item>
 
                           {/* DELETE */}
                           <Menu.Item
