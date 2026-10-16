@@ -162,7 +162,7 @@ const AddMarksModal = (props: {
           <Table.Tbody>
             {props.students.map((s: StudentsDataWithBatch) => (
               <Table.Tr key={s._id}>
-                <Table.Td>{s.uniqueRoll}</Table.Td>
+                <Table.Td>{s.rollNumber}</Table.Td>
                 <Table.Td>{s.name}</Table.Td>
                 <Table.Td>
                   <NumberInput

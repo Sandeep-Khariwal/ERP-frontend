@@ -66,7 +66,7 @@ enum Tabs {
   TIME_TABLE = "Time Table",
   GALLERY = "Gallery",
   EXAMINATION = "Examination",
-  ASSIGNMENT = "Assignment",
+  ASSIGNMENT = "Meeting",
   SESSIONS = "Sessions",
 }
 
@@ -126,6 +126,13 @@ export function InstituteInsideBatch(props: {
   userType: UserType;
 }) {
   const isMd = useMediaQuery(`(max-width: 968px)`);
+    useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, []);
   const [selectedTeacherId, setSelectTeacherId] = useState<string>("");
   const [openAddStudentModal, setOpenAddStudentModal] =
     useState<boolean>(false);

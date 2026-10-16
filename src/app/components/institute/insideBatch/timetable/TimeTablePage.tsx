@@ -15,6 +15,7 @@ import {
   ThemeIcon,
   Box,
   Flex,
+  Modal,
 } from "@mantine/core";
 import {
   IconPlus,
@@ -75,6 +76,8 @@ export default function TimetablePage(props: {
   const [createOpen, setCreateOpen] = useState(false);
   const [manageTarget, setManageTarget] = useState<Timetable | null>(null);
   const [activeTab, setActiveTab] = useState<string | null>("grid");
+  const [deleteTarget, setDeleteTarget] = useState<Timetable | null>(null);
+const [isDeleting, setIsDeleting] = useState(false);
 
   // Load baseline reference records
   // useEffect(() => {
@@ -215,19 +218,27 @@ export default function TimetablePage(props: {
         console.log("GET MANAGEMENT ERROR ❌", err);
       });
   };
-  const handleDelete = (item: Timetable) => {
-    if (!confirm(`Delete timetable slot for ${item.subjectName}?`)) return;
+ const handleDelete = (item: Timetable) => {
+  setDeleteTarget(item);
+};
 
-    DeleteTimetable(item._id)
-      .then(() => {
-        console.log("DELETE TIMETABLE SUCCESS ✅");
+const confirmDelete = async () => {
+  if (!deleteTarget || isDeleting) return;
 
-        loadTimetable();
-      })
-      .catch((err: any) => {
-        console.log("DELETE TIMETABLE ERROR ❌", err);
-      });
-  };
+  setIsDeleting(true);
+
+  try {
+    await DeleteTimetable(deleteTarget._id);
+
+    setDeleteTarget(null);
+    loadTimetable();
+    loadTodayManaged();
+  } catch (err) {
+    console.error("DELETE TIMETABLE ERROR ❌", err);
+  } finally {
+    setIsDeleting(false);
+  }
+};
 
   return (
     <Container size="xl" py="xl">
@@ -437,6 +448,49 @@ export default function TimetablePage(props: {
         teachers={teachers}
         adminId={ADMIN_ID}
       />
+      <Modal
+  opened={!!deleteTarget}
+  onClose={() => {
+    if (!isDeleting) setDeleteTarget(null);
+  }}
+  title="Delete Timetable Slot"
+  centered
+  radius="lg"
+  size="md"
+  closeOnClickOutside={!isDeleting}
+  closeOnEscape={!isDeleting}
+>
+  <Stack gap="lg">
+    <Text c="dimmed" size="sm">
+      Are you sure you want to delete the timetable slot
+      {deleteTarget?.subjectName
+        ? ` for ${deleteTarget.subjectName}`
+        : ""}?
+      This action cannot be undone.
+    </Text>
+
+    <Group justify="flex-end" gap="sm">
+      <Button
+        variant="default"
+        radius="md"
+        disabled={isDeleting}
+        onClick={() => setDeleteTarget(null)}
+      >
+        No, Cancel
+      </Button>
+
+      <Button
+        color="red"
+        radius="md"
+        loading={isDeleting}
+        onClick={confirmDelete}
+      >
+        Yes, Delete
+      </Button>
+    </Group>
+  </Stack>
+</Modal>
+
     </Container>
   );
 }

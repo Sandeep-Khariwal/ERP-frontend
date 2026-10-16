@@ -70,6 +70,7 @@ import { AddPaymentKeysModal } from "./AddPaymentKeys";
 import { Switch } from "@mantine/core";
 import { FaMoon } from "react-icons/fa6";
 import { Receipt, Wallet } from "lucide-react";
+import { StampModal } from "./StampModal";
 
 export const DesktopNavbar = (props: {
   isCollapsed: boolean;
@@ -96,6 +97,7 @@ export const DesktopNavbar = (props: {
   const [gstModalOpen, setGstModalOpen] = useState(false);
   const [addEmailModalOpen, setAddEmailModalOpen] = useState(false);
   const [addPaymentKeysModalOpen, setAddPaymentKeysModalOpen] = useState(false);
+ const [addStampModalOpen, setStampModalOpen] = useState(false);
 
   const [schoolName, setSchoolName] = useState("");
   const [email, setEmail] = useState("");
@@ -436,6 +438,25 @@ export const DesktopNavbar = (props: {
               </Text>
             </Flex>
 
+  <Flex
+              align="center"
+              gap={10}
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSettingsOpened(false);
+               setStampModalOpen(true);
+              }}
+            >
+              <CiMoneyCheck1 size={20} />
+              <Text size="sm" fw={500}>
+                Add Stamp
+              </Text>
+            </Flex>
+
           </Stack>
 
           {/* RIGHT SIDE */}
@@ -634,15 +655,30 @@ export const DesktopNavbar = (props: {
         onClose={() => setAddPaymentKeysModalOpen(false)}
         institute={institute}
       />
-
-      <Stack
+<StampModal
+        opened={addStampModalOpen}
+        onClose={() =>  setStampModalOpen(false)}
+        institute={institute}
+      />
+      {/* <Stack
         w="100%"
         h={"100vh"}
         style={{
           transition: "width 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
         p={0}
-      >
+      > */}
+      
+    <Stack
+  w={props.isCollapsed ? "80px" : "260px"}
+  h="100vh"
+  style={{
+    flexShrink: 0,
+    overflow: "hidden",
+    transition: "width 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+  }}
+  p={0}
+>
         <Stack
           w={"100%"}
           c={"#1B2559"}
@@ -703,31 +739,29 @@ export const DesktopNavbar = (props: {
           <Divider size={1} color="#EDF1F7" />
           <Stack h={"90%"} align="center" justify="space-between">
             <Box w={"90%"}>
-              {/* <Flex
-                onClick={() => props.onClickCollapse()}
-                style={{
-                  cursor: "pointer",
-
-                  background: props.isCollapsed ? "white" : "transparent",
-                  color: props.isCollapsed ? "#3F51B5" : "white",
-                  borderLeft: props.isCollapsed
-                    ? "5px solid yellow"
-                    : "5px solid transparent",
-                  borderRadius: "8px",
-                  padding: "3px",
-                  transition: "all 0.2s",
-                }}
-                my={10}
-                align={"center"}
-                justify={props.isCollapsed ? "center" : "start"}
-                gap={10}
-              >
-                {!props.isCollapsed ? (
-                  <IoMdClose size={28} />
-                ) : (
-                  <FaBars size={28} />
-                )}
-                <Box
+          
+              {/* <Box
+  onClick={props.onClickCollapse}
+  style={{
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: "32px",
+    height: "32px",
+    borderRadius: "8px",
+    background: "#EEF3FF",
+    color: "#2F6FED",
+    transition: "all 0.3s ease",
+  }}
+  title={props.isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+>
+  {props.isCollapsed ? (
+    <FaBars size={28} />
+  ) : (
+    <IoMdClose size={28} />
+  )}
+    <Box
                   style={{
                     overflow: "hidden",
                     whiteSpace: "nowrap",
@@ -742,7 +776,55 @@ export const DesktopNavbar = (props: {
                     Collapse
                   </Text>
                 </Box>
-              </Flex> */}
+</Box> */}
+
+<Flex
+  onClick={props.onClickCollapse}
+  align="center"
+  justify={hovered ? "flex-start" : "center"}
+  gap={12}
+  my={10}
+  p="8px"
+  style={{
+    cursor: "pointer",
+    borderRadius: "12px",
+    background: "#EEF3FF",
+    color: "#2F6FED",
+    border: "1px solid #DCE7FF",
+    transition: "all 0.3s ease",
+    minHeight: "48px",
+  }}
+  title={props.isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+>
+  <Box
+    style={{
+      minWidth: "40px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    {props.isCollapsed ? (
+      <FaBars size={24} />
+    ) : (
+      <IoMdClose size={24} />
+    )}
+  </Box>
+
+  <Box
+    style={{
+      overflow: "hidden",
+      whiteSpace: "nowrap",
+      width: hovered ? "auto" : "0px",
+      opacity: hovered ? 1 : 0,
+      transition: "all 0.3s ease",
+    }}
+  >
+    <Text fw={600} fz={20}>
+      {props.isCollapsed ? "Expand" : "Collapse"}
+    </Text>
+  </Box>
+</Flex>
               <Flex
                 style={{
                   cursor: "pointer",
