@@ -142,6 +142,16 @@ export function UploadSignature(data: FormData,  instituteId: string) {
   });
 }
 
+export function UploadStamp(data: FormData,  instituteId: string) {
+  return new Promise((resolve, reject) => {
+    ApiHelper.post(
+      `${process.env.URL}/api/v1/admin/uploadStamp/${instituteId}`,data) 
+      .then((response) => resolve(response))
+      .catch((error: any) => reject(error));
+  });
+}
+
+
 export function CreateDiary(data: {
   subject: string;
   batch: string;

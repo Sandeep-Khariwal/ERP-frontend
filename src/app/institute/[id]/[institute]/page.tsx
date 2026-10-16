@@ -51,6 +51,7 @@ const dashboard = () => {
 
   const isMd = useMediaQuery(`(max-width: 968px)`);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const institute = useAppSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
@@ -119,7 +120,7 @@ const dashboard = () => {
   return (
     <>
       <Notifications />
-      <AppShell
+      {/* <AppShell
         header={{ height: isMd ? 60 : 0 }}
         navbar={{
           width: isMd ? 280 : 260,
@@ -128,7 +129,17 @@ const dashboard = () => {
         }}
         padding={0}
         style={{ minHeight: "100vh" }}
-      >
+      > */}
+      <AppShell
+  header={{ height: isMd ? 60 : 0 }}
+  navbar={{
+    width: isMd ? 280 : isSidebarCollapsed ? 80 : 260,
+    breakpoint: "sm",
+    collapsed: { mobile: !opened },
+  }}
+  padding={0}
+  style={{ minHeight: "100vh" }}
+>
         <LoadingOverlay visible={isLoading} />
         <AppShell.Header style={{ display: isMd ? 'flex' : 'none', alignItems: 'center', padding: '0 16px', justifyContent: 'space-between' }}>
           <Group>
@@ -139,12 +150,20 @@ const dashboard = () => {
 
         <AppShell.Navbar p={0} style={{ borderRight: "none", zIndex: 1000 }}>
           {!isMd && (
-            <DesktopNavbar
-              isCollapsed={false}
-              onClickCollapse={() => {}}
-              onSelectTab={handleSelectTab}
-              activeTab={selectedTab}
-            />
+            // <DesktopNavbar
+            //   isCollapsed={false}
+            //   onClickCollapse={() => {}}
+            //   onSelectTab={handleSelectTab}
+            //   activeTab={selectedTab}
+            // />
+             <DesktopNavbar
+    isCollapsed={isSidebarCollapsed}
+    onClickCollapse={() =>
+      setIsSidebarCollapsed((prev) => !prev)
+    }
+    onSelectTab={handleSelectTab}
+    activeTab={selectedTab}
+  />
           )}
           {isMd && (
             // On mobile the navbar only ever renders as a full-width drawer
