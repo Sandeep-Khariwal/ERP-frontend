@@ -33,7 +33,7 @@ export interface StudentsDataWithBatch {
     dateOfBirth?: Date;
     address?: string;
     totalPaidFees?: number;
-    uniqueRoll?: number;
+   rollNumber?: number;
     isInActive?: boolean;
     checked?: boolean;
     marks?: number;

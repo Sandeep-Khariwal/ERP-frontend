@@ -42,7 +42,7 @@ export interface StudentList {
   name: string;
   profilePic: string;
   dateOfJoining: string;
-  uniqueRoll: string;
+  rollNumber: string;
   batchId: {
     _id: string;
     name: string;
@@ -203,7 +203,7 @@ export const InstituteStudents = () => {
               _id: s._id,
               name: s.name,
               profilePic: s.profilePic,
-              uniqueRoll: s.uniqueRoll,
+              rollNumber: s.rollNumber,
               dateOfJoining: yearOfJoining.toString(),
               batchId: {
                 _id: s.batchId._id,
@@ -737,7 +737,7 @@ export const InstituteStudents = () => {
                       </Flex>
                     </Table.Td>
                     <Table.Td c="#5B6B8C" fz={14}>
-                      {s.uniqueRoll}
+                      {s.rollNumber}
                     </Table.Td>
                     <Table.Td>
                       <Badge variant="light" color="blue" radius="sm">

@@ -66,6 +66,48 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
     return map;
   }, [batches]);
 
+  
+const filteredTeachers = useMemo(() => {
+  const term = search.trim().toLowerCase();
+
+  return originalArrayOfTeachers.filter((teacher) => {
+    // 1. Class filter
+    const teacherBatches = Array.isArray(teacher.instituteBatches)
+      ? teacher.instituteBatches
+      : [];
+
+    const matchesClass =
+      !selectedClass || teacherBatches.includes(selectedClass);
+
+    // 2. Subject filter
+    const teacherSubjects = Array.isArray(teacher.subjects)
+      ? teacher.subjects
+      : [];
+
+    const matchesSubject =
+      !selectedSubject ||
+      teacherSubjects.some(
+        (subject) => subject?._id === selectedSubject
+      );
+
+    // 3. Phone number string ya array dono support karega
+    const phoneValue = Array.isArray(teacher.phoneNumber)
+      ? teacher.phoneNumber.join(" ")
+      : String(teacher.phoneNumber ?? "");
+
+    // 4. Search by name, phone, or subject
+    const matchesSearch =
+      !term ||
+      String(teacher.name ?? "").toLowerCase().includes(term) ||
+      phoneValue.toLowerCase().includes(term) ||
+      teacherSubjects.some((subject) =>
+        String(subject?.name ?? "").toLowerCase().includes(term)
+      );
+
+    return matchesClass && matchesSubject && matchesSearch;
+  });
+}, [originalArrayOfTeachers, selectedClass, selectedSubject, search]);
+
   useEffect(() => {
     if (selectedClass) {
       setIsLoading(true);
@@ -110,25 +152,25 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
   }, [selectedSubject]);
 
   // Real client-side search across name / phone / subject name.
-  useEffect(() => {
-    const term = search.trim().toLowerCase();
-    if (!term) {
-      if (!selectedClass && !selectedSubject) setTeachers(originalArrayOfTeachers);
-      return;
-    }
-    const base = selectedClass
-      ? originalArrayOfTeachers.filter((t) => t.instituteBatches.includes(selectedClass))
-      : originalArrayOfTeachers;
+  // useEffect(() => {
+  //   const term = search.trim().toLowerCase();
+  //   if (!term) {
+  //     if (!selectedClass && !selectedSubject) setTeachers(originalArrayOfTeachers);
+  //     return;
+  //   }
+  //   const base = selectedClass
+  //     ? originalArrayOfTeachers.filter((t) => t.instituteBatches.includes(selectedClass))
+  //     : originalArrayOfTeachers;
 
-    setTeachers(
-      base.filter(
-        (t) =>
-          t.name.toLowerCase().includes(term) ||
-          (t.phoneNumber || "").toLowerCase().includes(term) ||
-          t.subjects.some((s) => s.name.toLowerCase().includes(term))
-      )
-    );
-  }, [search]);
+  //   setTeachers(
+  //     base.filter(
+  //       (t) =>
+  //         t.name.toLowerCase().includes(term) ||
+  //         (t.phoneNumber || "").toLowerCase().includes(term) ||
+  //         t.subjects.some((s) => s.name.toLowerCase().includes(term))
+  //     )
+  //   );
+  // }, [search]);
 
   useEffect(() => {
     getAllTeachers();
@@ -145,31 +187,59 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
       .catch(() => {});
   }, [institute?._id]);
 
-  const getAllTeachers = () => {
-    setIsLoading(true);
-    GetAllTeacherStaff(institute?._id || "")
-      .then((x: any) => {
-        const { teachers } = x;
+  // const getAllTeachers = () => {
+  //   setIsLoading(true);
+  //   GetAllTeacherStaff(institute?._id || "")
+  //     .then((x: any) => {
+  //       const { teachers } = x;
 
-        const teachersData = teachers.map((s: any) => {
-          return {
-            _id: s._id,
-            name: s.name,
-            phoneNumber: s.phoneNumber,
-            instituteBatches: s.instituteBatches,
-            subjects: s.subjects,
-          };
-        });
+  //       const teachersData = teachers.map((s: any) => {
+  //         return {
+  //           _id: s._id,
+  //           name: s.name,
+  //           phoneNumber: s.phoneNumber,
+  //           instituteBatches: s.instituteBatches,
+  //           subjects: s.subjects,
+  //         };
+  //       });
 
-        setTeachers(teachersData);
-        setOriginalArrayOfTeachers(teachersData);
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        console.log(e);
-        setIsLoading(false);
-      });
-  };
+  //       setTeachers(teachersData);
+  //       setOriginalArrayOfTeachers(teachersData);
+  //       setIsLoading(false);
+  //     })
+  //     .catch((e) => {
+  //       console.log(e);
+  //       setIsLoading(false);
+  //     });
+  // };
+
+  
+const getAllTeachers = () => {
+  setIsLoading(true);
+
+  GetAllTeacherStaff(institute?._id || "")
+    .then((x: any) => {
+      const teachersData = (Array.isArray(x?.teachers)
+        ? x.teachers
+        : []
+      ).map((s: any) => ({
+        _id: s._id,
+        name: String(s.name ?? ""),
+        phoneNumber: s.phoneNumber ?? [],
+        instituteBatches: Array.isArray(s.instituteBatches)
+          ? s.instituteBatches
+          : [],
+        subjects: Array.isArray(s.subjects) ? s.subjects : [],
+      }));
+
+      setOriginalArrayOfTeachers(teachersData);
+      setIsLoading(false);
+    })
+    .catch((e) => {
+      console.error("Error fetching teachers:", e);
+      setIsLoading(false);
+    });
+};
 
   const getAllInstituteBatches = () => {
     setIsLoading(true);
@@ -215,7 +285,7 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
             </Stack>
 
             <Flex align="center" gap={14} wrap="wrap">
-              <TextInput
+              {/* <TextInput
                 value={search}
                 onChange={(e) => setSearch(e.currentTarget.value)}
                 placeholder="Search teachers by name, phone or subject..."
@@ -230,7 +300,23 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
                     height: 42,
                   },
                 }}
-              />
+              /> */}
+              <TextInput
+  value={search}
+  onChange={(event) => setSearch(event.currentTarget.value)}
+  placeholder="Search teachers by name, phone or subject..."
+  leftSection={<IconSearch size={16} color="#8B96AD" />}
+  radius={12}
+  w={isMd ? "100%" : 300}
+  styles={{
+    input: {
+      backgroundColor: "#FFFFFF",
+      border: "1px solid #E2E8F0",
+      boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+      height: 42,
+    },
+  }}
+/>
 
               <Box style={{ position: "relative" }}>
                 <Flex
@@ -373,7 +459,8 @@ export const InstituteTeachers = (props: { userType: UserType }) => {
             <Stack w={"100%"}>
               <TeachersSection
                 userType={props.userType}
-                teachers={teachers}
+                // teachers={teachers}
+                teachers={filteredTeachers}
                 batchId={selectedClass}
                 isTeacherDashboard={true}
                 batchMap={batchMap}

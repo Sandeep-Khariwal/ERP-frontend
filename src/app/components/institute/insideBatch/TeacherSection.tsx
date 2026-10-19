@@ -20,7 +20,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { IconDotsVertical, IconMessage, IconChalkboard } from "@tabler/icons-react";
+import { IconDotsVertical, IconMessage, IconChalkboard, IconUserCircle, IconUserMinus, IconEdit } from "@tabler/icons-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
 import {
@@ -439,7 +439,14 @@ const TeachersSection = (props: {
                 </Table.Td>
                 {props.userType === UserType.OTHERS && (
                   <Table.Td style={{ cursor: "pointer" }}>
-                    <Menu>
+                    {/* <Menu> */}
+<Menu
+  shadow="md"
+  width={210}
+  position="bottom-end"
+  withArrow={false}
+  radius="md"
+>
                       <Menu.Target>
                         <Flex
                           align={"center"}
@@ -451,9 +458,35 @@ const TeachersSection = (props: {
                           <IconDotsVertical />
                         </Flex>
                       </Menu.Target>
-                      <Menu.Dropdown>
+                      {/* <Menu.Dropdown> */}
+                      <Menu.Dropdown
+  styles={{
+    dropdown: {
+      padding: "6px",
+      border: "1px solid #E2E8F0",
+      borderRadius: "12px",
+      boxShadow: "0 8px 24px rgba(15, 23, 42, 0.10)",
+      fontFamily: "Roboto, sans-serif",
+    },
+  }}
+>
                         {!props.fromInstituteTeacherSection && (
                           <Menu.Item
+                            leftSection={<IconUserCircle size={18} stroke={1.7} />}
+  styles={{
+    item: {
+      fontFamily: "Roboto, sans-serif",
+      fontSize: "14px",
+      fontWeight: 500,
+      color: "#334155",
+      borderRadius: "8px",
+      padding: "10px 12px",
+    },
+    itemLabel: {
+      fontFamily: "Roboto, sans-serif",
+    },
+  }}
+
                             onClick={() => {
                               props.setSelectTeacherId &&
                                 props.setSelectTeacherId(item._id);
@@ -461,25 +494,14 @@ const TeachersSection = (props: {
                             }}
                           >
                             <Flex align={"center"} gap={10}>
-                              <FaUserCircle size={20} />
+                              {/* <FaUserCircle size={20} /> */}
                               <Text>View Profile</Text>
                             </Flex>
                           </Menu.Item>
                         )}
-                        {/* <Menu.Item
-                        onClick={() => {
-                        //   props.setSelectedStudentId(item._id);
-                        //   props.setEditStudentDetails(true);
-                        //   props.setShowSelectedScreen(Screen.ADDMORESCREEN);
-                          // setSelectedStudent(item);
-                          // setEditStudentFee(true);
-                        }}
-                      >
-                        {" "}
-                        Edit Profile
-                      </Menu.Item> */}
+                       
 
-                        <Menu.Item
+                        {/* <Menu.Item
                           onClick={() => {
                             setShowWarning(true);
                             setDeletingTeacherId(item._id);
@@ -504,47 +526,100 @@ const TeachersSection = (props: {
                               Remove Teacher
                             </Text>
                           </Flex>
-                        </Menu.Item>
+                        </Menu.Item> */}
+                        <Menu.Item
+  color="red"
+  leftSection={<IconUserMinus size={18} stroke={1.7} />}
+  styles={{
+    item: {
+      fontFamily: "Roboto, sans-serif",
+      fontSize: "14px",
+      fontWeight: 500,
+      borderRadius: "8px",
+      padding: "10px 12px",
+    },
+    itemLabel: {
+      fontFamily: "Roboto, sans-serif",
+    },
+  }}
+  onClick={() => {
+    setShowWarning(true);
+    setDeletingTeacherId(item._id);
+  }}
+>
+  Remove Teacher
+</Menu.Item>
                         {props.batchId && (
+                          // <Menu.Item
+                          //   onClick={() => {
+                          //     setEditTeacher(true);
+                          //     setEditTeacherId(item);
+                          //     console.log(
+                          //       "batchId : ",
+                          //       item.subjects,
+                          //       props.batchId
+                          //     );
+                          //     const alreadyBatchAssigned = item.subjects.filter(
+                          //       (s: any) => s.batchId === props.batchId
+                          //     );
+                          //     setSelectedSubjectIds(
+                          //       alreadyBatchAssigned.map((s: any) => s._id)
+                          //     );
+                          //   }}
+                          // >
+                          //   <Flex align="center">
+                          //     <Flex align="center">
+                          //       <Box mr={2}>
+                          //         <Image
+                          //           src={"/editImg.png"}
+                          //           alt="profile"
+                          //           width={20}
+                          //           height={20}
+                          //         />
+                          //       </Box>
+                          //     </Flex>
+                          //     <Text
+                          //       // fz={16}
+                          //       ml={10}
+                          //       style={{ fontFamily: "Roboto" }}
+                          //     >
+                          //       Edit Teacher
+                          //     </Text>
+                          //   </Flex>
+                          // </Menu.Item>
                           <Menu.Item
-                            onClick={() => {
-                              setEditTeacher(true);
-                              setEditTeacherId(item);
-                              console.log(
-                                "batchId : ",
-                                item.subjects,
-                                props.batchId
-                              );
-                              const alreadyBatchAssigned = item.subjects.filter(
-                                (s: any) => s.batchId === props.batchId
-                              );
-                              setSelectedSubjectIds(
-                                alreadyBatchAssigned.map((s: any) => s._id)
-                              );
-                            }}
-                          >
-                            <Flex align="center">
-                              <Flex align="center">
-                                <Box mr={2}>
-                                  <Image
-                                    src={"/editImg.png"}
-                                    alt="profile"
-                                    width={20}
-                                    height={20}
-                                  />
-                                </Box>
-                              </Flex>
-                              <Text
-                                // fz={16}
-                                ml={10}
-                                style={{ fontFamily: "Roboto" }}
-                              >
-                                Edit Teacher
-                              </Text>
-                            </Flex>
-                          </Menu.Item>
+  leftSection={<IconEdit size={18} stroke={1.7} />}
+  styles={{
+    item: {
+      fontFamily: "Roboto, sans-serif",
+      fontSize: "14px",
+      fontWeight: 500,
+      color: "#334155",
+      borderRadius: "8px",
+      padding: "10px 12px",
+    },
+    itemLabel: {
+      fontFamily: "Roboto, sans-serif",
+    },
+  }}
+  onClick={() => {
+    setEditTeacher(true);
+    setEditTeacherId(item);
+
+    const alreadyBatchAssigned = (item.subjects || []).filter(
+      (s: any) => s.batchId === props.batchId
+    );
+
+    setSelectedSubjectIds(
+      alreadyBatchAssigned.map((s: any) => s._id)
+    );
+  }}
+>
+  Edit Teacher
+</Menu.Item>
                         )}
                       </Menu.Dropdown>
+                      
                     </Menu>
                   </Table.Td>
                 )}
