@@ -124,6 +124,30 @@ export async function CreateExamMarksheetForExcel(data: {
 }
 
 
+export function SaveMarksheetDesign(
+  instituteId: string,
+  midTermDesignId: string,
+  annualTermDesignId: string,
+) {
+  return ApiHelper.post(
+    `${process.env.URL}/api/v1/institute/marksheet-design/${instituteId}`,
+    {
+      midTermDesignId,
+      annualTermDesignId,
+    },
+  );
+}
+
+
+
+export function GetMarksheetDesign(instituteId: string) {
+  return ApiHelper.get(
+    `${process.env.URL}/api/v1/institute/marksheet-design/${instituteId}`,
+  );
+}
+
+
+
 export function Uploadlogo(data: FormData,  instituteId: string) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(
