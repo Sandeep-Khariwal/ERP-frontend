@@ -27,6 +27,18 @@ export const generateMidTermMarksheet1 = (data: any) => {
     return "#8b0000";
   };
 
+  const isCoScholastic = (type?: string) =>
+  type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ??
+  false;
+
+const scholasticMarks = (data.marks ?? []).filter(
+  (m: any) => !isCoScholastic(m.subjectType)
+);
+
+const coScholasticMarks = (data.marks ?? []).filter(
+  (m: any) => isCoScholastic(m.subjectType)
+);
+
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -374,7 +386,7 @@ body {
       </tr>
 
       <!-- MARKS ROWS -->
-      ${data.marks
+      ${scholasticMarks
         .map(
           (m: any, i: number) => `
       <tr style="background: ${i % 2 === 0 ? "#fff" : "#f0f4fc"};">
@@ -441,25 +453,35 @@ body {
             <th style="border: 1px solid #4a7abf; padding: 6px 8px; text-align: left;">Activity</th>
             <th style="border: 1px solid #4a7abf; padding: 6px 8px; text-align: center; width: 80px;">Grade</th>
           </tr>
-          ${data.activity
-            ?.map(
-              (item: any, i: number) => `
-          <tr style="background: ${i % 2 === 0 ? "#fff" : "#f0f4fc"};">
-            <td style="border: 1px solid #b0c4de; padding: 5px 8px; color: #333;">${item.subjectName}</td>
-            <td style="border: 1px solid #b0c4de; text-align: center;">
-              <span style="
-                background: ${getGradeBadgeColor(item.grade)};
-                color: #fff;
-                padding: 2px 8px;
-                border-radius: 10px;
-                font-weight: bold;
-                font-size: 11px;
-              ">${item.grade}</span>
-            </td>
-          </tr>
-          `
-            )
-            .join("")}
+        
+${[
+  ...(data.activity ?? []),
+  ...coScholasticMarks.map((m: any) => ({
+    subjectName: m.subjectName,
+    grade: m.grade,
+  })),
+]
+  .map(
+    (item: any, i: number) => `
+      <tr style="background: ${i % 2 === 0 ? "#fff" : "#f0f4fc"};">
+        <td style="border: 1px solid #b0c4de; padding: 5px 8px; color: #333;">
+          ${item.subjectName ?? "-"}
+        </td>
+        <td style="border: 1px solid #b0c4de; text-align: center;">
+          <span style="
+            background: ${getGradeBadgeColor(item.grade ?? "")};
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 11px;
+          ">${item.grade || "-"}</span>
+        </td>
+      </tr>
+    `
+  )
+  .join("")}
+
         </table>
 
         <!-- SKILLS -->
@@ -704,6 +726,28 @@ body {
 // =====================================================================
 
 export const generateAnnualMarksheet1 = (term1: any, term2: any) => {
+
+  
+  const isCoScholastic = (type?: string) =>
+    type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ??
+    false;
+
+  const term1ScholasticMarks = (term1.marks ?? []).filter(
+    (m: any) => !isCoScholastic(m.subjectType)
+  );
+
+  const term2ScholasticMarks = (term2.marks ?? []).filter(
+    (m: any) => !isCoScholastic(m.subjectType)
+  );
+
+  const term1CoScholasticMarks = (term1.marks ?? []).filter(
+    (m: any) => isCoScholastic(m.subjectType)
+  );
+
+  const term2CoScholasticMarks = (term2.marks ?? []).filter(
+    (m: any) => isCoScholastic(m.subjectType)
+  );
+
   const getRemark = () => {
     const percentage =
       (Number(term1.percentage) + Number(term2.percentage)) / 2;
@@ -956,7 +1000,7 @@ body {
               <td style="padding: 3px 6px; color: #333;">${term1.fName}</td>
               <td style="padding: 3px 6px; font-weight: bold; color: #1a5c38;">Mother's Name</td>
               <td style="padding: 3px 2px; color: #555;">:</td>
-              <td style="padding: 3px 6px; color: #333;">${term1.motherName || "-"}</td>
+              <td style="padding: 3px 6px; color: #333;">${term1.mName || "-"}</td>
             </tr>
             <tr>
               <td style="padding: 3px 6px; font-weight: bold; color: #1a5c38;">Date of Birth</td>
@@ -1040,11 +1084,11 @@ body {
         <th style="border:1px solid #4caf85;padding:3px;text-align:center;color:#d4a017;">Grade</th>
       </tr>
 
-      ${term1.marks
-        .map((m1: any, i: number) => {
-          const m2 = term2.marks.find(
-            (x: any) => x.subjectName === m1.subjectName
-          );
+    ${term1ScholasticMarks
+  .map((m1: any, i: number) => {
+    const m2 = term2ScholasticMarks.find(
+      (x: any) => x.subjectName === m1.subjectName
+    );
           return `
       <tr style="background: ${i % 2 === 0 ? "#fff" : "#f0faf4"};">
         <td style="border:1px solid #9ecfb3;padding:4px 6px;font-weight:bold;color:#1a5c38;">${m1.subjectName}</td>
@@ -1101,11 +1145,22 @@ body {
             <th style="border:1px solid #4caf85;padding:4px;text-align:center;width:80px;">Term I</th>
             <th style="border:1px solid #4caf85;padding:4px;text-align:center;width:80px;">Term II</th>
           </tr>
-          ${term1.activity
-            ?.map((a1: any, i: number) => {
-              const a2 = term2.activity.find(
-                (x: any) => x.subjectName === a1.subjectName
-              );
+         ${[
+  ...(term1.activity ?? []),
+  ...term1CoScholasticMarks.map((m: any) => ({
+    subjectName: m.subjectName,
+    grade: m.grade,
+  })),
+]
+
+  .map((a1: any, i: number) => {
+    const a2 =
+      (term2.activity ?? []).find(
+        (x: any) => x.subjectName === a1.subjectName
+      ) ??
+      term2CoScholasticMarks.find(
+        (x: any) => x.subjectName === a1.subjectName
+      );
               return `
           <tr style="background:${i % 2 === 0 ? "#fff" : "#f0faf4"};">
             <td style="border:1px solid #9ecfb3;padding:3px 6px;color:#333;">${a1.subjectName}</td>

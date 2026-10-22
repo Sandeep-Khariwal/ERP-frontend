@@ -6,6 +6,7 @@ import {
 import { generateAnnualMarksheet1, generateMidTermMarksheet1 } from "./CreateMarksheetPdf1";
 import { generateAnnualMarksheet2, generateMidTermMarksheet2 } from "./CreateMarksheetPdf2";
 import { generateAnnualMarksheet3, generateMidTermMarksheet3 } from "./CreateMarksheetPdf3";
+import { generateAnnualMarksheet4, generateMidTermMarksheet4 } from "./CreateMarksheetPdf4";
 
 // Mid Term design selector
 export const getMidTermMarksheetHtml = (
@@ -24,6 +25,9 @@ export const getMidTermMarksheetHtml = (
 
       case "temp_4mid":
       return generateMidTermMarksheet3(data);
+
+       case "temp_5mid":
+      return generateMidTermMarksheet4(data);
 
     default:
       return "";
@@ -48,6 +52,9 @@ export const getAnnualTermMarksheetHtml = (
 
        case "temp_4annual":
       return generateAnnualMarksheet3(term1, term2);
+
+        case "temp_5annual":
+      return generateAnnualMarksheet4(term1, term2);
 
     default:
       return "";

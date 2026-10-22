@@ -2,6 +2,7 @@
 // 1. MID-TERM MARKSHEET (Exact Match to Uploaded Image)
 // =========================================================================================
 export const generateMidTermMarksheet3 = (data: any) => {
+
   const getRemark = () => {
     if (data.status === "Fail") {
       return "Needs improvement. Work harder and try again.";
@@ -14,6 +15,18 @@ export const generateMidTermMarksheet3 = (data: any) => {
     if (percentage >= 40) return "Satisfactory performance. Keep improving.";
     return "Needs improvement. Focus more on studies.";
   };
+
+  const isCoScholastic = (type?: string) =>
+  type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ??
+  false;
+
+const scholasticMarks = (data.marks ?? []).filter(
+  (m: any) => !isCoScholastic(m.subjectType)
+);
+
+const coScholasticMarks = (data.marks ?? []).filter(
+  (m: any) => isCoScholastic(m.subjectType)
+);
 
   return `
 <!DOCTYPE html>
@@ -288,7 +301,7 @@ table {
     </tr>
 
     <!-- ROWS -->
-    ${data.marks
+    ${scholasticMarks
       .map(
         (m: any) => `
     <tr>
@@ -352,7 +365,13 @@ table {
       </th>
     </tr>
 
-    ${data.activity
+   ${[
+  ...(data.activity ?? []),
+  ...coScholasticMarks.map((m: any) => ({
+    subjectName: m.subjectName,
+    grade: m.grade,
+  })),
+]
       ?.map(
         (item: any) => `
     <tr>
@@ -526,6 +545,27 @@ export const generateAnnualMarksheet3 = (
   term1: any,
   term2: any
 ) => {
+  
+  const isCoScholastic = (type?: string) =>
+    type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ??
+    false;
+
+  const term1ScholasticMarks = (term1.marks ?? []).filter(
+    (m: any) => !isCoScholastic(m.subjectType)
+  );
+
+  const term2ScholasticMarks = (term2.marks ?? []).filter(
+    (m: any) => !isCoScholastic(m.subjectType)
+  );
+
+  const term1CoScholasticMarks = (term1.marks ?? []).filter(
+    (m: any) => isCoScholastic(m.subjectType)
+  );
+
+  const term2CoScholasticMarks = (term2.marks ?? []).filter(
+    (m: any) => isCoScholastic(m.subjectType)
+  );
+
   const getRemark = () => {
     const percentage =
       (Number(term1.percentage) + Number(term2.percentage)) / 2;
@@ -712,7 +752,7 @@ table {
         <tr>
           <td style="padding: 2px 0; font-weight: bold;">Mother's Name</td>
           <td style="padding: 2px 2px;">:</td>
-          <td style="padding: 2px 0;">${term1.motherName || "-"}</td>
+          <td style="padding: 2px 0;">${term1.mName || "-"}</td>
 
           <td style="padding: 2px 0; font-weight: bold;">Roll No</td>
           <td style="padding: 2px 2px;">:</td>
@@ -821,11 +861,11 @@ table {
     </tr>
 
     <!-- ROWS -->
-    ${term1?.marks
-      .map((m1: any) => {
-        const m2 = term2.marks.find(
-          (x: any) => x.subjectName === m1.subjectName
-        );
+    ${term1ScholasticMarks
+  .map((m1: any, i: number) => {
+    const m2 = term2ScholasticMarks.find(
+      (x: any) => x.subjectName === m1.subjectName
+    );
 
         return `
         <tr>
@@ -847,7 +887,7 @@ table {
           <td style="border: 1px solid #777777; text-align: center;">${m2?.subject_enrichment || "-"}</td>
           <td style="border: 1px solid #777777; text-align: center;">${m2?.theory_marks || "-"}</td>
           <td style="border: 1px solid #777777; text-align: center; font-weight: bold;">${m2?.obtained_marks || "-"}</td>
-          <td style="border: 1px solid #777777; text-align: center; font-weight: bold;">${m2?.grade || "-"}</td>
+          <td style="border: 1px solid #777777; text-align: center; font-weight: bold;">${m2?.grade}</td>
         </tr>
       `;
       })
@@ -884,8 +924,13 @@ table {
         Term — II
       </th>
     </tr>
-
-    ${term1.activity
+ ${[
+  ...(term1.activity ?? []),
+  ...term1CoScholasticMarks.map((m: any) => ({
+    subjectName: m.subjectName,
+    grade: m.grade,
+  })),
+]
       ?.map((a1: any) => {
         const a2 = term2.activity.find(
           (x: any) => x.subjectName === a1.subjectName

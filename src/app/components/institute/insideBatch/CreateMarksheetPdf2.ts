@@ -1,15 +1,4 @@
-// =========================================================================================
-// THEME: "Royal Burgundy & Champagne Gold" (Prestige Academic Theme)
-// Primary Color    : #5a102a (Deep Burgundy)
-// Secondary Color  : #7d1d3f (Rich Wine)
-// Accent / Gold    : #c4973b / #d8ac4e (Champagne Gold)
-// Background Tint  : #fcf9f5 (Warm Ivory)
-// Text Dark        : #1e1e1e
-// =========================================================================================
 
-// =========================================================================================
-// 1. MID-TERM / SINGLE TERM MARKSHEET
-// =========================================================================================
 export const generateMidTermMarksheet2 = (data: any) => {
   const getRemark = () => {
     if (data.status === "Fail") {
@@ -31,6 +20,19 @@ export const generateMidTermMarksheet2 = (data: any) => {
     if (grade === "D") return "background:#935116; color:#ffffff;";
     return "background:#900c3f; color:#ffffff;";
   };
+
+  const isCoScholastic = (type?: string) =>
+  type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ??
+  false;
+
+const scholasticMarks = (data.marks ?? []).filter(
+  (m: any) => !isCoScholastic(m.subjectType)
+);
+
+const coScholasticMarks = (data.marks ?? []).filter(
+  (m: any) => isCoScholastic(m.subjectType)
+);
+
 
   return `
 <!DOCTYPE html>
@@ -359,7 +361,7 @@ table {
       </tr>
 
       <!-- ROWS -->
-      ${data.marks
+      ${scholasticMarks
         .map(
           (m: any, i: number) => `
       <tr style="background: ${i % 2 === 0 ? "#ffffff" : "#fdfbfa"};">
@@ -424,7 +426,13 @@ table {
             <th style="border: 1px solid #7d1d3f; padding: 4px 6px; text-align: left;">Activity</th>
             <th style="border: 1px solid #7d1d3f; padding: 4px; text-align: center; width: 75px;">Grade</th>
           </tr>
-          ${data.activity
+         ${[
+  ...(data.activity ?? []),
+  ...coScholasticMarks.map((m: any) => ({
+    subjectName: m.subjectName,
+    grade: m.grade,
+  })),
+]
             ?.map(
               (item: any, i: number) => `
           <tr style="background: ${i % 2 === 0 ? "#ffffff" : "#fdfbfa"};">
@@ -644,6 +652,27 @@ export const generateAnnualMarksheet2 = (
   term1: any,
   term2: any
 ) => {
+
+    const isCoScholastic = (type?: string) =>
+    type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ??
+    false;
+
+  const term1ScholasticMarks = (term1.marks ?? []).filter(
+    (m: any) => !isCoScholastic(m.subjectType)
+  );
+
+  const term2ScholasticMarks = (term2.marks ?? []).filter(
+    (m: any) => !isCoScholastic(m.subjectType)
+  );
+
+  const term1CoScholasticMarks = (term1.marks ?? []).filter(
+    (m: any) => isCoScholastic(m.subjectType)
+  );
+
+  const term2CoScholasticMarks = (term2.marks ?? []).filter(
+    (m: any) => isCoScholastic(m.subjectType)
+  );
+
   const getRemark = () => {
     const percentage =
       (Number(term1.percentage) + Number(term2.percentage)) / 2;
@@ -898,7 +927,7 @@ table {
               <td style="padding: 2px 4px; font-weight: bold; color: #5a102a;">Father Name</td>
               <td style="padding: 2px;">: ${term1.fName}</td>
               <td style="padding: 2px 4px; font-weight: bold; color: #5a102a;">Mother Name</td>
-              <td style="padding: 2px;">: ${term1.motherName || "-"}</td>
+              <td style="padding: 2px;">: ${term1.mName || "-"}</td>
             </tr>
 
             <tr style="background: #fbf5ee;">
@@ -988,11 +1017,11 @@ table {
       </tr>
 
       <!-- ROWS -->
-      ${term1?.marks
-        .map((m1: any, i: number) => {
-          const m2 = term2.marks.find(
-            (x: any) => x.subjectName === m1.subjectName
-          );
+      ${term1ScholasticMarks
+  .map((m1: any, i: number) => {
+    const m2 = term2ScholasticMarks.find(
+      (x: any) => x.subjectName === m1.subjectName
+    );
 
           return `
           <tr style="background: ${i % 2 === 0 ? "#ffffff" : "#fdfbfa"};">
@@ -1071,11 +1100,21 @@ table {
             <th style="border: 1px solid #7d1d3f; padding: 2px; text-align: center; width: 65px;">Term II</th>
           </tr>
 
-          ${term1.activity
-            ?.map((a1: any, i: number) => {
-              const a2 = term2.activity.find(
-                (x: any) => x.subjectName === a1.subjectName
-              );
+             ${[
+  ...(term1.activity ?? []),
+  ...term1CoScholasticMarks.map((m: any) => ({
+    subjectName: m.subjectName,
+    grade: m.grade,
+  })),
+]
+  .map((a1: any, i: number) => {
+    const a2 =
+      (term2.activity ?? []).find(
+        (x: any) => x.subjectName === a1.subjectName
+      ) ??
+      term2CoScholasticMarks.find(
+        (x: any) => x.subjectName === a1.subjectName
+      );
 
               return `
               <tr style="background: ${i % 2 === 0 ? "#ffffff" : "#fdfbfa"};">

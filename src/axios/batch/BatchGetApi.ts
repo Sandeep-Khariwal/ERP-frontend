@@ -24,6 +24,7 @@ export function GetAllSubjectsFromBatch(id:string) {
     });
   });
 }
+
 export function GetTopClassPerformedStudents(id:string) {
   return new Promise((resolve, reject) => {
     ApiHelper.get(`${process.env.URL}/api/v1/batch/getTopThreeStudentsFromBatch/${id}`)

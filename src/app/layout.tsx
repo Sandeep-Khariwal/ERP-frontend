@@ -86,6 +86,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+         
         <MantineProvider
           theme={{
             colors: {
@@ -125,6 +126,7 @@ export default function RootLayout({
             </ReactQueryProvider>
           </ReduxProvider>
         </MantineProvider>
+       
       </body>
     </html>
   );
