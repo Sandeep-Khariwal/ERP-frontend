@@ -122,8 +122,8 @@ table {
     <!-- RIGHT LOGO -->
     <div style="width: 75px; height: 75px; text-align: center; flex-shrink: 0;">
       ${
-        data.instituteLogoRight || data.instituteLogo
-          ? `<img src="${data.instituteLogoRight || data.instituteLogo}" crossorigin="anonymous" style="width: 75px; height: 75px; object-fit: contain;" />`
+        data.photoRight || data.photo
+          ? `<img src="${data.photoRight || data.photo}" crossorigin="anonymous" style="width: 75px; height: 75px; object-fit: contain;" />`
           : `<div style="width: 70px; height: 70px; border: 1px dashed #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">LOGO</div>`
       }
     </div>
@@ -492,8 +492,8 @@ table {
     <!-- RIGHT LOGO -->
     <div style="width: 70px; height: 70px; text-align: center; flex-shrink: 0;">
       ${
-        term1.instituteLogoRight || term1.instituteLogo
-          ? `<img src="${term1.instituteLogoRight || term1.instituteLogo}" crossorigin="anonymous" style="width: 70px; height: 70px; object-fit: contain;" />`
+        term1.photoRight || term1.photo
+          ? `<img src="${term1.photoRight || term1.photo}" crossorigin="anonymous" style="width: 70px; height: 70px; object-fit: contain;" />`
           : `<div style="width: 65px; height: 65px; border: 1px dashed #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px;">LOGO</div>`
       }
     </div>
@@ -544,8 +544,12 @@ table {
         <th rowspan="2" style="width: 20%; vertical-align: middle;">SUBJECTS</th>
         <th colspan="5" style="padding: 2px;">TERM — I (100)</th>
         <th colspan="5" style="padding: 2px;">TERM — II (100)</th>
-        <th rowspan="2" style="width: 8%; vertical-align: middle;">TOTAL<br>(100)</th>
-        <th rowspan="2" style="width: 7%; vertical-align: middle;">FINAL<br>GRADE</th>
+         
+      
+  <th colspan="5" style="padding: 2px;">
+      OVERALL (T-1+T-2)
+    </th>
+      
       </tr>
       <tr style="font-size: 9px;">
         <!-- Term 1 -->
@@ -560,6 +564,10 @@ table {
         <th style="width: 6%;">PORT (5)</th>
         <th style="width: 7%;">EXAM (80)</th>
         <th style="width: 7%;">TOTAL</th>
+         <th style="width: 6%;">T1<br />(50)</th>
+    <th style="width: 6%;">T2<br />(50)</th>
+     <th style="width: 6%;">TOTAL<br>(100)</th>
+      <th style="width: 6%;">FINAL<br>GRADE</th>
       </tr>
     </thead>
     <tbody>
@@ -571,8 +579,12 @@ table {
 
           const t1Total = Number(m1.obtained_marks || 0);
           const t2Total = Number(m2?.obtained_marks || 0);
-          const combinedSubjectTotal =  (t1Total + t2Total) / 2;
+          // const combinedSubjectTotal =  (t1Total + t2Total) / 2;
 
+          const t1Half = t1Total / 2;
+const t2Half = t2Total / 2;
+
+const combinedSubjectTotal = t1Half + t2Half;
           return `
           <tr>
             <td class="text-left font-bold" style="padding-left: 5px;">${m1.subjectName}</td>
@@ -592,6 +604,8 @@ table {
             <td class="font-bold">${m2?.obtained_marks ?? "-"}</td>
 
             <!-- Combined -->
+            <td class="font-bold">${t1Half}</td>
+<td class="font-bold">${t2Half}</td>
             <td class="font-bold">${combinedSubjectTotal || "-"}</td>
             <td class="font-bold">${m2?.grade || m1.grade || "-"}</td>
           </tr>
@@ -604,7 +618,7 @@ table {
         <td class="text-left" style="padding: 4px 6px;">Grand Total</td>
         <td colspan="5" class="text-center">Term I: ${term1.totalMarks || 0} (${Number(term1.percentage || 0).toFixed(2)}%)</td>
         <td colspan="5" class="text-center">Term II: ${term2.totalMarks || 0} (${Number(term2.percentage || 0).toFixed(2)}%)</td>
-        <td colspan="2" class="text-center">
+        <td colspan="5" class="text-center">
           ${grandTotalMarks}/${grandMaxMarks} (${overallPercentage}%)
         </td>
       </tr>
