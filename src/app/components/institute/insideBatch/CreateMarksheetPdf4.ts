@@ -387,9 +387,24 @@ export const generateAnnualMarksheet4 = (term1: any, term2: any) => {
     return "NEEDS IMPROVEMENT. WORK HARDER IN NEXT SESSION.";
   };
 
-  const grandTotalMarks = Number(term1.totalMarks || 0) + Number(term2.totalMarks || 0);
-  const grandMaxMarks = Number(term1.allsubjecttotal || 0) + Number(term2.allsubjecttotal || 0);
-  const overallPercentage = ((Number(term1.percentage || 0) + Number(term2.percentage || 0)) / 2).toFixed(2);
+  // const grandTotalMarks = Number(term1.totalMarks || 0) + Number(term2.totalMarks || 0);
+  // const grandMaxMarks = Number(term1.allsubjecttotal || 0) + Number(term2.allsubjecttotal || 0);
+  // const overallPercentage = ((Number(term1.percentage || 0) + Number(term2.percentage || 0)) / 2).toFixed(2);
+  
+const grandTotalMarks =
+  (Number(term1.totalMarks || 0) +
+    Number(term2.totalMarks || 0)) / 2;
+
+const grandMaxMarks =
+  (Number(term1.allsubjecttotal || 0) +
+    Number(term2.allsubjecttotal || 0)) / 2;
+
+const overallPercentage = (
+  (Number(term1.percentage || 0) +
+    Number(term2.percentage || 0)) /
+  2
+).toFixed(2);
+
 
   return `<!DOCTYPE html>
 <html>
@@ -529,7 +544,7 @@ table {
         <th rowspan="2" style="width: 20%; vertical-align: middle;">SUBJECTS</th>
         <th colspan="5" style="padding: 2px;">TERM — I (100)</th>
         <th colspan="5" style="padding: 2px;">TERM — II (100)</th>
-        <th rowspan="2" style="width: 8%; vertical-align: middle;">TOTAL<br>(200)</th>
+        <th rowspan="2" style="width: 8%; vertical-align: middle;">TOTAL<br>(100)</th>
         <th rowspan="2" style="width: 7%; vertical-align: middle;">FINAL<br>GRADE</th>
       </tr>
       <tr style="font-size: 9px;">
@@ -556,7 +571,7 @@ table {
 
           const t1Total = Number(m1.obtained_marks || 0);
           const t2Total = Number(m2?.obtained_marks || 0);
-          const combinedSubjectTotal = t1Total + t2Total;
+          const combinedSubjectTotal =  (t1Total + t2Total) / 2;
 
           return `
           <tr>

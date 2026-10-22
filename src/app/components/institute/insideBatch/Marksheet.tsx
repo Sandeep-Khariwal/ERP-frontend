@@ -874,7 +874,7 @@ const calculateOverall = (marksArray: any[]) => {
         rollNumber: item.student?.rollNumber,
         enrolment: item.student?.enrollmentNo,
         fName: student.parentName,
-        mName:student.motherName,
+        mName: student.motherName,
         address: student.address,
         parentNumber: student.parentNumber,
         dob: formatDate(student.dateOfBirth),
