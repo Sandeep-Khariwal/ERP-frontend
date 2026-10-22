@@ -64,6 +64,7 @@ export function AddSubjects(data: {
   value: string;
   label: string;
   instituteId: string;
+  type: "scholastic" | "co-scholastic";
 }) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(`${process.env.URL}/api/v1/subject/createorupdate`, data)
@@ -79,8 +80,12 @@ export function CreateExamMarksheet(data: {
   student: string;
   marks: {
     subjectName: string;
+    subjectType?: string;
     theory_marks: number;
     practical_marks: number;
+      periodic_test: number;
+  note_book: number;
+  subject_enrichment: number;
     obtained_marks: number;
     grade: string;
   }[];
@@ -103,8 +108,12 @@ export async function CreateExamMarksheetForExcel(data: {
   student: string;
   marks: {
     subjectName: string;
+    subjectType?: string;
     theory_marks: number;
     practical_marks: number;
+      periodic_test: number;
+  note_book: number;
+  subject_enrichment: number;
     obtained_marks: number;
     grade: string;
   }[];
@@ -122,6 +131,30 @@ export async function CreateExamMarksheetForExcel(data: {
   return Promise.all(allPromises);
 
 }
+
+
+export function SaveMarksheetDesign(
+  instituteId: string,
+  midTermDesignId: string,
+  annualTermDesignId: string,
+) {
+  return ApiHelper.post(
+    `${process.env.URL}/api/v1/institute/marksheet-design/${instituteId}`,
+    {
+      midTermDesignId,
+      annualTermDesignId,
+    },
+  );
+}
+
+
+
+export function GetMarksheetDesign(instituteId: string) {
+  return ApiHelper.get(
+    `${process.env.URL}/api/v1/institute/marksheet-design/${instituteId}`,
+  );
+}
+
 
 
 export function Uploadlogo(data: FormData,  instituteId: string) {
