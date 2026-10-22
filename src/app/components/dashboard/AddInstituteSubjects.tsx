@@ -2,11 +2,16 @@ import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi";
 import { AddSubjects } from "@/axios/institute/InstitutePostApi";
 import { DeleteSubject } from "@/axios/institute/InstitutePutApi";
 import {
+  Badge,
+  Box,
   Button,
+  Divider,
   Flex,
   Group,
   LoadingOverlay,
   Modal,
+  Paper,
+  Select,
   Stack,
   Text,
   TextInput,
@@ -23,12 +28,17 @@ export function AddInstituteSubjects(Props: {
   const institute = useSelector(
     (state: any) => state.instituteSlice.instituteDetails,
   );
+  type SubjectType = "scholastic" | "co-scholastic";
+
+const [subjectType, setSubjectType] =
+  useState<SubjectType>("scholastic");
   const [subjectInput, setSubjectInput] = useState("");
   const [subjects, setSubjects] = useState<
     {
       _id: string;
       value: string;
       label: string;
+       type: SubjectType;
     }[]
   >([]);
 
@@ -37,59 +47,92 @@ export function AddInstituteSubjects(Props: {
     _id: string;
     value: string;
     label: string;
+      type: SubjectType;
   }>({
     _id: "",
     value: "",
     label: "",
+      type: "scholastic",
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null);
 
-  const createSubjects = () => {
-    if (!subjectInput) return;
-    setIsLoading(true);
-    AddSubjects({
-      _id: isEditing ? selectedSubject._id : "",
-      value: subjectInput,
-      label: subjectInput,
-      instituteId: institute._id,
-    })
-      .then((x: any) => {
-        if (isEditing) {
-          // subject with updated subject
-          // update existing subject in state
-          setSubjects((prev) =>
-            prev.map((item) =>
-              item._id === selectedSubject._id
-                ? { ...item, value: subjectInput, label: subjectInput }
-                : item,
-            ),
-          );
-          setIsEditing(false);
-          setSelectedSubject({ _id: "", value: "", label: "" });
-        } else {
-          //
-          // push new subject into
-          const newSubject = {
-            _id: x._id || Math.random().toString(), // API se id aaye toh better
-            value: subjectInput,
-            label: subjectInput,
-          };
+  
+  const createSubjects = async () => {
+  const trimmedSubject = subjectInput.trim();
 
-          setSubjects((prev) => [...prev, newSubject]);
-        }
-        //   getSubjects()
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        console.log(e);
-        setIsLoading(false);
+  if (!trimmedSubject) {
+    return;
+  }
+
+  if (!institute?._id) {
+    console.error("Institute ID is missing");
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    const response: any = await AddSubjects({
+      _id: isEditing ? selectedSubject._id : "",
+      value: trimmedSubject,
+      label: trimmedSubject,
+      instituteId: institute._id,
+
+      // Backend mein subject type save karne ke liye
+      type: subjectType,
+    } as any);
+
+    const result = response?.data ?? response;
+
+    if (isEditing) {
+      setSubjects((prev) =>
+        prev.map((item) =>
+          item._id === selectedSubject._id
+            ? {
+                ...item,
+                value: trimmedSubject,
+                label: trimmedSubject,
+                type: subjectType,
+              }
+            : item,
+        ),
+      );
+
+      setIsEditing(false);
+
+      setSelectedSubject({
+        _id: "",
+        value: "",
+        label: "",
+        type: "scholastic",
       });
+    } else {
+      const newSubject = {
+        _id: result?._id ?? result?.subject?._id,
+        value: trimmedSubject,
+        label: trimmedSubject,
+        type: subjectType,
+      };
+
+      // API response mein ID honi chahiye
+      if (newSubject._id) {
+        setSubjects((prev) => [...prev, newSubject]);
+      } else {
+        await getSubjects();
+      }
+    }
 
     setSubjectInput("");
-  };
+    setSubjectType("scholastic");
+  } catch (error) {
+    console.error("Failed to save subject:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
   //delete api function
   const deleteSubject = (id: string) => {
     setIsLoading(true);
@@ -110,27 +153,53 @@ export function AddInstituteSubjects(Props: {
     getSubjects();
   }, [Props.isOpen]);
 
-  const getSubjects = () => {
-    if (!Props.isOpen) return;
-    setIsLoading(true);
+  // const getSubjects = () => {
+  //   if (!Props.isOpen) return;
+  //   setIsLoading(true);
 
-    GetInstituteSubjects()
-      .then((x: any) => {
-        // assuming res.data me array aa rha hai
-        setSubjects(x.subjects || []);
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        console.log(e);
-        setIsLoading(false);
-      });
-  };
+  //   GetInstituteSubjects()
+  //     .then((x: any) => {
+  //       // assuming res.data me array aa rha hai
+  //       setSubjects(x.subjects || []);
+  //       setIsLoading(false);
+  //     })
+  //     .catch((e) => {
+  //       console.log(e);
+  //       setIsLoading(false);
+  //     });
+  // };
+
+  const getSubjects = async () => {
+  if (!Props.isOpen) return;
+
+  setIsLoading(true);
+
+  try {
+    const response: any = await GetInstituteSubjects();
+    const result = response?.data ?? response;
+
+    setSubjects(
+      (result?.subjects ?? []).map((sub: any) => ({
+        ...sub,
+        type:
+          sub.type === "co-scholastic"
+            ? "co-scholastic"
+            : "scholastic",
+      })),
+    );
+  } catch (error) {
+    console.error("Failed to fetch subjects:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <>
       <Modal
         opened={Props.isOpen}
         onClose={() => Props.onClose()}
+        
         title={
           <Text fz={20} fw={700}>
             Add Subject
@@ -149,6 +218,29 @@ export function AddInstituteSubjects(Props: {
               onChange={(e) => setSubjectInput(e.target.value)}
               style={{ flex: 1 }}
             />
+             <Select
+    label="Subject Type"
+    placeholder="Select type"
+    value={subjectType}
+    onChange={(value) => {
+      if (value) {
+        setSubjectType(value as SubjectType);
+      }
+    }}
+    data={[
+      {
+        value: "scholastic",
+        label: "Scholastic",
+      },
+      {
+        value: "co-scholastic",
+        label: "Co-Scholastic",
+      },
+    ]}
+    allowDeselect={false}
+    w={170}
+    required
+  />
             {!isEditing && (
               <Button
                 size="sm"
@@ -169,51 +261,93 @@ export function AddInstituteSubjects(Props: {
               </Button>
             )}
           </Flex>
-          <Stack mt={15} gap={8}>
-            <Text fw={600}>Subjects List</Text>
+        
+          <Stack mt={20} gap={12}>
+  <Group justify="space-between">
+    <Box>
+      <Text fw={700} fz="md">
+        Subjects List
+      </Text>
+      <Text size="xs" c="dimmed">
+        Manage your institute subjects
+      </Text>
+    </Box>
 
-            {subjects.map((sub, index) => {
-              return (
-                <Flex
-                  key={index}
-                  justify="space-between"
-                  align="center"
-                  p={8}
-                  style={{
-                    border: "1px solid #E0E0E0",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Text>{sub.value}</Text>
+    <Badge variant="light" color="gray" size="lg">
+      {subjects.length} Subjects
+    </Badge>
+  </Group>
 
-                  <Group gap={8}>
-                    <FaEdit
-                      size={18}
-                      color="#87CEFA"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        setSubjectInput(sub.value);
-                        setIsEditing(true);
-                        setSelectedSubject(sub);
-                      }}
-                    />
+  <Divider />
 
-                    <IoTrashOutline
-                      size={18}
-                      color="red"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        //    deleteSubject(sub._id);
+  {subjects.map((sub) => (
+    <Paper
+      key={sub._id}
+      p="sm"
+      radius="md"
+      withBorder
+      shadow="xs"
+    >
+      <Flex justify="space-between" align="center" gap="sm">
+        <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
+          <Text fw={600} size="sm" truncate>
+            {sub.value}
+          </Text>
 
-                        setDeleteModalOpen(true);
-                        setSubjectToDelete(sub._id);
-                      }}
-                    />
-                  </Group>
-                </Flex>
-              );
-            })}
-          </Stack>
+          <Badge
+            variant="light"
+            color={
+              sub.type === "co-scholastic" ? "teal" : "blue"
+            }
+            size="sm"
+            radius="sm"
+            style={{ alignSelf: "flex-start" }}
+          >
+            {sub.type === "co-scholastic"
+              ? "Co-Scholastic"
+              : "Scholastic"}
+          </Badge>
+        </Stack>
+
+        <Group gap={12} wrap="nowrap">
+          <Button
+            variant="subtle"
+            color="blue"
+            size="compact-sm"
+            aria-label={`Edit ${sub.value}`}
+            onClick={() => {
+              setSubjectInput(sub.value);
+              setSubjectType(sub.type ?? "scholastic");
+              setIsEditing(true);
+              setSelectedSubject(sub);
+            }}
+          >
+            <FaEdit size={17} />
+          </Button>
+
+          <Button
+            variant="subtle"
+            color="red"
+            size="compact-sm"
+            aria-label={`Delete ${sub.value}`}
+            onClick={() => {
+              setDeleteModalOpen(true);
+              setSubjectToDelete(sub._id);
+            }}
+          >
+            <IoTrashOutline size={17} />
+          </Button>
+        </Group>
+      </Flex>
+    </Paper>
+  ))}
+
+  {subjects.length === 0 && !isLoading && (
+    <Text c="dimmed" ta="center" py="xl" size="sm">
+      No subjects added yet.
+    </Text>
+  )}
+</Stack>
         </Stack>
       </Modal>
       <Modal

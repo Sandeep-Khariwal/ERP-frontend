@@ -132,34 +132,10 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
     }
   }, [openAddBatchModal]);
 
-  // Notice count for the header bell badge is now read from the
-  // NoticeBoard's own fetch (via onNoticesChange below) instead of this
-  // component making its own separate GetAllNotice call for the same
-  // institute — NoticeBoard is already rendered on this same screen and
-  // was fetching the exact same list a second time.
-
-  const [data, setData] = useState<{ value: string; label: string }[]>([
-    { value: "Hindi", label: "Hindi" },
-    { value: "English", label: "English" },
-    { value: "Science", label: "Science" },
-    { value: "Social science", label: "Social science" },
-    { value: "EVS", label: "EVS" },
-    { value: "G.K.", label: "G.K." },
-    { value: "Physics", label: "Physics" },
-    { value: "Chemistry", label: "Chemistry" },
-    { value: "Mathematics", label: "Mathematics" },
-    { value: "Biology", label: "Biology" },
-    { value: "IT", label: "IT" },
-    { value: "Punjabi", label: "Punjabi" },
-    { value: "Sanskrit", label: "Sanskrit" },
-    { value: "Geography", label: "Geography" },
-    { value: "Economics", label: "Economics" },
-    { value: "History", label: "History" },
-    { value: "Physical science", label: "Physical science" },
-  ]);
+  
 
   const [subjectOptions, setSubjectOptions] = useState<
-    { value: string; label: string }[]
+    { value: string; label: string; type: string; }[]
   >([]);
 
   const getSubjects = () => {
@@ -169,6 +145,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
         const formatted = (res.subjects || []).map((sub: any) => ({
           value: sub.value,
           label: sub.label,
+                  type: sub.type,
+
         }));
         setSubjectOptions(formatted);
       })
@@ -811,6 +789,27 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             searchable
             rightSection={<IconCaretDownFilled style={{ cursor: "pointer" }} />}
             required
+              renderOption={({ option }) => {
+    const subject = subjectOptions.find(
+      (sub) => sub.value === option.value
+    );
+
+    return (
+      <Flex justify="space-between" align="center" w="100%">
+        <Text size="sm">{option.label}</Text>
+
+        <Text
+          size="xs"
+          c={subject?.type === "scholastic" ? "blue" : "grape"}
+          tt="capitalize"
+        >
+          {subject?.type === "co-scholastic"
+            ? "Co-Scholastic"
+            : subject?.type || ""}
+        </Text>
+      </Flex>
+    );
+  }}
           />
           <MultiSelect
             label="Select optional subjects"
@@ -822,6 +821,27 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
             }
             rightSection={<IconCaretDownFilled style={{ cursor: "pointer" }} />}
             searchable
+              renderOption={({ option }) => {
+    const subject = subjectOptions.find(
+      (sub) => sub.value === option.value
+    );
+
+    return (
+      <Flex justify="space-between" align="center" w="100%">
+        <Text size="sm">{option.label}</Text>
+
+        <Text
+          size="xs"
+          c={subject?.type === "scholastic" ? "blue" : "grape"}
+          tt="capitalize"
+        >
+          {subject?.type === "co-scholastic"
+            ? "Co-Scholastic"
+            : subject?.type || ""}
+        </Text>
+      </Flex>
+    );
+  }}
           />
         </Stack>
         <Flex w={"100%"} ml={"auto"} p={20}>

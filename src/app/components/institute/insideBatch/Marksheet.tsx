@@ -28,6 +28,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import {
 
   CreateExamMarksheetForExcel,
+  GetMarksheetDesign,
 } from "@/axios/institute/InstitutePostApi";
 import {
   GetAllStudentsFromBatch,
@@ -50,6 +51,8 @@ import {
 import { formatDate } from "../../marketing/utility/utils";
 import QRCode from "qrcode";
 import { DeleteMarksheet } from "@/axios/institute/InstitutePutApi";
+import { getAnnualTermMarksheetHtml, getMidTermMarksheetHtml } from "./MarksheetDesignHelper";
+import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 
 const Marksheet = (props: {
   batchId: string;
@@ -59,7 +62,12 @@ const Marksheet = (props: {
     (state: any) => state.instituteSlice.instituteDetails,
   );
   console.log("institye :", institute);
-  
+
+  const [savedDesignId, setSavedDesignId] = useState<string | null>(null);
+const [designLoading, setDesignLoading] = useState(false);
+  const [batchSubjects, setBatchSubjects] = useState<
+  { _id: string; name: string; type: string }[]
+>([]);
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
   const [batchStudents, setBatchStudents] = useState<
     { _id: string; name: string; rollNumber: number }[]
@@ -85,6 +93,12 @@ const Marksheet = (props: {
         name: string;
         rollNumber: string;
         _id: string;
+         instituteId?: {
+    _id: string;
+    name: string;
+    midTermMarksheetDesignId: string;
+    annualTermMarksheetDesignId: string;
+  };
       };
       marks: {
         subjectName: string;
@@ -127,62 +141,161 @@ const Marksheet = (props: {
         });
         setBatchStudents(batchStudents);
       })
+
+      GetAllSubjectsFromBatch(props.batchId)
+  .then((res: any) => {
+    const subjects = res?.subjects?.subjects ?? [];
+    setBatchSubjects(
+      subjects.map((subject: any) => ({
+        _id: subject._id,
+        name: subject.name,
+        type: subject.type ?? "",
+      }))
+    );
+  })
+  
       .catch((e: any) => {
         console.log(e);
       });
+
+
     GetResult();
   }, []);
+useEffect(() => {
+  const fetchSavedDesign = async () => {
+    if (!institute?._id) return;
+
+    try {
+      setDesignLoading(true);
+
+      const response: any = await GetMarksheetDesign(institute._id);
+
+      const data = response?.data ?? response;
+
+      setSavedDesignId(data?.selection?.designId ?? null);
+
+      console.log("Saved marksheet design:", data);
+      console.log("Design ID:", data?.selection?.designId);
+    } catch (error) {
+      console.error("Fetch marksheet design error:", error);
+      setSavedDesignId(null);
+    } finally {
+      setDesignLoading(false);
+    }
+  };
+
+  fetchSavedDesign();
+}, [institute?._id]);
+
 
   const GetResult = () => {
-    // get all marksheet
-    GetBatAllMarksheet(props.batchId)
-      .then((x: any) => {
-        setAllMarksheet(x.marksheets);
-        setFilterExam("Mid TERM");
-      })
-      .catch((e: any) => {
-        console.log(e);
-      });
-  };
+  GetBatAllMarksheet(props.batchId)
+    .then((x: any) => {
+      console.log("All marksheets:", x.marksheets);
 
-  const processMarks = (marksArray: any[]) => {
-    return marksArray.map((item) => {
-      const obtained = item.theory_marks + item.practical_marks;
+      const marksheets = x.marksheets ?? [];
 
+      setAllMarksheet(marksheets);
+      setFilterExam("Mid TERM");
+    })
+    .catch((e: any) => {
+      console.error("Get marksheets error:", e);
+    });
+};
+
+  const isCoScholastic = (type?: string) =>
+  type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ??
+  false;
+
+const getSubjectType = (subjectName: string, savedType?: string) => {
+  if (savedType) return savedType;
+
+  return (
+    batchSubjects.find(
+      (subject) =>
+        subject.name.trim().toLowerCase() ===
+        subjectName.trim().toLowerCase()
+    )?.type ?? ""
+  );
+};
+
+const getNormalizedMarks = (marksArray: any[]) => {
+  return marksArray.map((item) => {
+    const subjectType = getSubjectType(
+      item.subjectName ?? "",
+      item.subjectType
+    );
+
+    if (isCoScholastic(subjectType)) {
       return {
         ...item,
-        obtained_marks: obtained,
-        grade: GetGrade(obtained),
+        subjectType,
+        theory_marks: 0,
+        practical_marks: 0,
+        obtained_marks: 0,
+        // Manual grade ko change nahi karna.
+        grade: item.grade ?? "",
       };
-    });
-  };
+    }
 
-  const calculateOverall = (marks: any[]) => {
-    let total = 0;
+    const theory = Number(item.theory_marks) || 0;
+    // const practical = Number(item.practical_marks) || 0;
+    const periodicTest = Number(item.periodic_test) || 0;
+const noteBook = Number(item.note_book) || 0;
+const subjectEnrichment = Number(item.subject_enrichment) || 0;
 
-    marks.forEach((m: any) => {
-      let obtained_marks = m.practical_marks + m.theory_marks;
-      total += obtained_marks;
-    });
+// Practical marks = components ka total
+const practical =
+  periodicTest + noteBook + subjectEnrichment;
 
-    const percentage = total / marks.length;
-
-    // 👉 Grade (same function use kar sakta hai)
-    const overallGrade = GetGrade(percentage);
-
-    // 👉 Status logic (customize kar sakta hai)
-    const isFail = marks.some((m: any) => m.obtained_marks < 33);
-
-    const status = isFail ? "Fail" : "Pass";
+    const obtained = theory + practical;
 
     return {
-      totalMarks: total,
-      percentage,
-      overallGrade,
-      status,
+      ...item,
+      subjectType,
+      theory_marks: theory,
+      practical_marks: practical,
+      obtained_marks: obtained,
+      grade: item.grade || GetGrade(obtained),
     };
-  };
+  });
+};
 
+const calculateOverall = (marksArray: any[]) => {
+  const normalizedMarks = getNormalizedMarks(marksArray);
+
+  const scholasticMarks = normalizedMarks.filter(
+    (item) => !isCoScholastic(item.subjectType)
+  );
+
+  const totalMarks = scholasticMarks.reduce(
+    (sum, item) => sum + (Number(item.obtained_marks) || 0),
+    0
+  );
+
+  const percentage =
+    scholasticMarks.length > 0
+      ? totalMarks / scholasticMarks.length
+      : 0;
+
+  const overallGrade = GetGrade(percentage);
+
+  const isFail = scholasticMarks.some(
+    (item) => (Number(item.obtained_marks) || 0) < 33
+  );
+
+  return {
+    totalMarks,
+    percentage,
+    overallGrade,
+    status:
+      scholasticMarks.length === 0
+        ? "Pass"
+        : isFail
+          ? "Fail"
+          : "Pass",
+  };
+};
   const handleFileUpload = (file: File) => {
     const reader = new FileReader();
 
@@ -326,6 +439,10 @@ const Marksheet = (props: {
         });
 
         const rawMarks = Object.values(subjectMap);
+        const typedRawMarks = rawMarks.map((item: any) => ({
+  ...item,
+  subjectType: getSubjectType(item.subjectName ?? ""),
+}));
         const rawActivity = Object.values(activitySubjectMap);
         const rawSkills = Object.values(skillsSubjectMap);
         const overall = calculateOverall(rawMarks);
@@ -334,7 +451,8 @@ const Marksheet = (props: {
           return null;
         }
 
-        const marks = processMarks(rawMarks);
+        // const marks = processMarks(rawMarks);
+        const marks = getNormalizedMarks(typedRawMarks);
 
         return {
           name: selectedExam,
@@ -693,115 +811,7 @@ const Marksheet = (props: {
                         {item.overallGrade}
                       </Badge>
                     </Table.Td>
-                    {/* <Table.Td
-                      ta="center"
-                      style={{
-                        // color: item.isInActive ? "#bebebe" : "#7D7D7D",
-                        color: "#00000098",
-                        fontWeight: 500,
-                        padding: "1rem",
-                      }}
-                    >
-                      <IconArrowLeftFromArc
-                        size={24}
-                        style={{ cursor: "pointer", color: "#00000098" }}
-                        onClick={async () => {
-                          const url = `https://shikshapay.cloud/marksheet/${item._id}`;
-                          // const url = `http://localhost:3000/marksheet/${item._id}`;
-
-                          const qr = await QRCode.toDataURL(url);
-                          console.log("qr : ", qr);
-                          GetStudentDetail(item.student._id)
-                            .then((res: any) => {
-                              const student = res.student;
-
-                              const html = createMarksheetPdf({
-                                instituteName: institute?.name,
-                                examName: item.name,
-                                batchName: item.batch.name,
-                                studentName: item.student.name,
-                                rollNumber: item.student.rollNumber,
-                                enrolment: item.student.enrollmentNo,
-                                marks: item.marks,
-                                totalMarks: item.totalMarks,
-                                percentage: item.percentage,
-                                overallGrade: item.overallGrade,
-                                status: item.status,
-                                allsubjecttotal: item.marks.length * 100,
-                                date: new Date(item.date).toLocaleDateString(
-                                  "en-GB",
-                                ),
-                                session: item.session,
-                                fName: student.parentName,
-                                address: student.address,
-                                parentNumber: student.parentNumber,
-                                dob: formatDate(student.dateOfBirth),
-                                photo: student.profilePic,
-                                instituteLogo: student.instituteId.logo,
-                                instituteAdress: student.instituteId.address,
-                                institutePhone:
-                                  student.instituteId.institutePhoneNumber,
-                                principalSignature:
-                                  student.instituteId.signature,
-                                qr,
-                              });
-
-                              const printWindow = window.open("", "_blank");
-
-                              if (printWindow) {
-                                printWindow.document.write(html);
-                                printWindow.document.close();
-
-                                // ✅ WAIT FOR EVERYTHING (images + DOM)
-                                printWindow.onload = () => {
-                                  const images = printWindow.document.images;
-                                  let loaded = 0;
-                                  const total = images.length;
-
-                                  if (total === 0) {
-                                    printWindow.print();
-                                    return;
-                                  }
-
-                                  const checkDone = () => {
-                                    if (loaded === total) {
-                                      // small delay for layout stability
-                                      setTimeout(() => {
-                                        printWindow.print();
-                                      }, 200);
-                                    }
-                                  };
-
-                                  for (let i = 0; i < total; i++) {
-                                    const img = images[i];
-
-                                    if (img.complete) {
-                                      loaded++;
-                                      checkDone();
-                                    } else {
-                                      img.onload = () => {
-                                        loaded++;
-                                        checkDone();
-                                      };
-
-                                      img.onerror = () => {
-                                        console.warn("Image failed:", img.src);
-                                        loaded++;
-                                        checkDone();
-                                      };
-                                    }
-                                  }
-                                };
-                              } else {
-                                console.error("Failed to open print window.");
-                              }
-                            })
-                            .catch((e) => {
-                              console.log(e);
-                            });
-                        }}
-                      />
-                    </Table.Td> */}
+                  
                     <Table.Td
                       ta="center"
                       style={{
@@ -818,421 +828,226 @@ const Marksheet = (props: {
                         </Menu.Target>
 
                         <Menu.Dropdown>
-                          {/* DOWNLOAD */}
-                          {/* <Menu.Item
-                            leftSection={<IconDownload size={18} />}
-                            onClick={async () => {
-                              const url = `https://shikshapay.cloud/marksheet/${item._id}`;
-
-                              const qr = await QRCode.toDataURL(url);
-
-                              const isAcadmy = institute.isAcadmy;
-
-                              GetStudentDetail(item.student._id)
-                                .then(async (res: any) => {
-                                  console.log("detail :", res);
-                                  
-                                  const student = res.student;
-
-                                  const base64Photo = await getBase64Image(
-                                    student.profilePic,
-                                  );
-
-                                  const base64Logo = await getBase64Image(
-                                    student.instituteId.logo,
-                                  );
-
-                                  const base64Signature = await getBase64Image(
-                                    student.instituteId.signature,
-                                  );
-
-                                  let term1: any = {};
-                                  let term2: any = {};
-
-                                  // if (
-                                  //   filterExam.includes("Annual") &&
-                                  //   !isAcadmy
-                                  // ) {
-                                  //   const res: any = await GetMidExamMarksheet(
-                                  //     item.batch._id,
-                                  //     student._id,
-                                  //   );
-
-                                  //   const marksheet = res.marksheet;
-
-                                  //   term1 = {
-                                  //     instituteName: institute?.name,
-                                  //     examName: item.name,
-                                  //     batchName: item.batch.name,
-                                  //     studentName: item.student?.name,
-                                  //     rollNumber: item.student?.rollNumber,
-                                  //     enrolment: item.student?.enrollmentNo,
-                                  //     marks: marksheet.marks,
-                                  //     activity: marksheet.activity,
-                                  //     skills: marksheet.skills,
-                                  //     totalMarks: marksheet.totalMarks,
-                                  //     percentage: marksheet.percentage,
-                                  //     overallGrade: marksheet.overallGrade,
-                                  //     status: marksheet.status,
-                                  //     allsubjecttotal:
-                                  //       marksheet.marks.length * 100,
-                                  //     date: new Date(
-                                  //       marksheet.date,
-                                  //     ).toLocaleDateString("en-GB"),
-                                  //     session: marksheet.session,
-                                  //     fName: student.parentName,
-                                  //     address: student.address,
-                                  //     parentNumber: student.parentNumber,
-                                  //     dob: formatDate(student.dateOfBirth),
-
-                                  //     // ✅ Base64 images
-                                  //     photo: base64Photo,
-                                  //     instituteLogo: base64Logo,
-                                  //     principalSignature: base64Signature,
-
-                                  //     instituteAdress:
-                                  //       student.instituteId.address,
-                                  //     institutePhone:
-                                  //       student.instituteId
-                                  //         .institutePhoneNumber,
-
-                                  //     qr,
-                                  //   };
-
-                                  //   term2 = {
-                                  //     instituteName: institute?.name,
-                                  //     examName: item.name,
-                                  //     batchName: item.batch.name,
-                                  //     studentName: item.student?.name,
-                                  //     rollNumber: item.student?.rollNumber,
-                                  //     enrolment: item.student?.enrollmentNo,
-                                  //     marks: item.marks,
-                                  //     activity: item.activity,
-                                  //     skills: item.skills,
-                                  //     totalMarks: item.totalMarks,
-                                  //     percentage: item.percentage,
-                                  //     overallGrade: item.overallGrade,
-                                  //     status: item.status,
-                                  //     allsubjecttotal: item.marks.length * 100,
-                                  //     date: new Date(
-                                  //       item.date,
-                                  //     ).toLocaleDateString("en-GB"),
-                                  //     session: item.session,
-                                  //     fName: student.parentName,
-                                  //     address: student.address,
-                                  //     parentNumber: student.parentNumber,
-                                  //     dob: formatDate(student.dateOfBirth),
-
-                                  //     // ✅ Base64 images
-                                  //     photo: base64Photo,
-                                  //     instituteLogo: base64Logo,
-                                  //     principalSignature: base64Signature,
-
-                                  //     instituteAdress:
-                                  //       student.instituteId.address,
-                                  //     institutePhone:
-                                  //       student.instituteId
-                                  //         .institutePhoneNumber,
-                                  //     qr,
-                                  //   };
-                                  if (filterExam.includes("Annual") && !isAcadmy) {
-  const res: any = await GetMidExamMarksheet(
-    item.batch._id,
-    student._id,
-  );
-
-  console.log("Mid Term API response:", res);
-  console.log("Annual marksheet:", item);
-
-  const marksheet = res?.marksheet;
-
-  // Stop here if the Mid Term marksheet does not exist
-  if (!marksheet) {
-    ErrorNotification(
-      "Mid Term marksheet not found for this student. Please check the saved Mid Term result."
-    );
-    return;
-  }
-
-  term1 = {
-    instituteName: institute?.name,
-    examName: marksheet.name,
-    batchName: item.batch.name,
-    studentName: item.student?.name,
-    rollNumber: item.student?.rollNumber,
-    enrolment: item.student?.enrollmentNo,
-    marks: marksheet.marks,
-    activity: marksheet.activity,
-    skills: marksheet.skills,
-    totalMarks: marksheet.totalMarks,
-    percentage: marksheet.percentage,
-    overallGrade: marksheet.overallGrade,
-    status: marksheet.status,
-    allsubjecttotal: marksheet.marks.length * 100,
-    date: new Date(marksheet.date).toLocaleDateString("en-GB"),
-    session: marksheet.session,
-    fName: student.parentName,
-    address: student.address,
-    parentNumber: student.parentNumber,
-    dob: formatDate(student.dateOfBirth),
-    photo: base64Photo,
-    instituteLogo: base64Logo,
-    principalSignature: base64Signature,
-    instituteAdress: student.instituteId.address,
-    institutePhone: student.instituteId.institutePhoneNumber,
-    qr,
-  };
-
-  term2 = {
-    instituteName: institute?.name,
-    examName: item.name,
-    batchName: item.batch.name,
-    studentName: item.student?.name,
-    rollNumber: item.student?.rollNumber,
-    enrolment: item.student?.enrollmentNo,
-    marks: item.marks,
-    activity: item.activity,
-    skills: item.skills,
-    totalMarks: item.totalMarks,
-    percentage: item.percentage,
-    overallGrade: item.overallGrade,
-    status: item.status,
-    allsubjecttotal: item.marks.length * 100,
-    date: new Date(item.date).toLocaleDateString("en-GB"),
-    session: item.session,
-    fName: student.parentName,
-    address: student.address,
-    parentNumber: student.parentNumber,
-    dob: formatDate(student.dateOfBirth),
-    photo: base64Photo,
-    instituteLogo: base64Logo,
-    principalSignature: base64Signature,
-    instituteAdress: student.instituteId.address,
-    institutePhone: student.instituteId.institutePhoneNumber,
-    qr,
-  };
-                                  } else {
-                                    term1 = {
-                                      instituteName: institute?.name,
-                                      examName: item.name,
-                                      batchName: item.batch.name,
-                                      studentName: item.student?.name,
-                                      rollNumber: item.student?.rollNumber,
-                                      enrolment: item.student?.enrollmentNo,
-                                      marks: item.marks,
-                                      activity: item.activity,
-                                      skills: item.skills,
-                                      totalMarks: item.totalMarks,
-                                      percentage: item.percentage,
-                                      overallGrade: item.overallGrade,
-                                      status: item.status,
-                                      allsubjecttotal: item.marks.length * 100,
-                                      date: new Date(
-                                        item.date,
-                                      ).toLocaleDateString("en-GB"),
-                                      session: item.session,
-                                      fName: student.parentName,
-                                      address: student.address,
-                                      parentNumber: student.parentNumber,
-                                      dob: formatDate(student.dateOfBirth),
-
-                                      // ✅ Base64 images
-                                      photo: base64Photo,
-                                      instituteLogo: base64Logo,
-                                      principalSignature: base64Signature,
-
-                                      instituteAdress:
-                                        student.instituteId.address,
-                                      institutePhone:
-                                        student.instituteId
-                                          .institutePhoneNumber,
-
-                                      qr,
-                                    };
-                                  }
-
-                                  let html = "";
-
-                                  if (term1 || term2) {
-                                    console.log(
-                                      "check before print : ",
-                                      filterExam,
-                                      term1.marks,
-                                      term2.marks,
-                                    );
-                                    console.log("isAcadmy : ", isAcadmy);
-
-                                    if (isAcadmy) {
-                                      html = createAcadmyMarksheetPdf(term1);
-                                    } else if (
-                                      filterExam.includes("Annual") &&
-                                      term1.marks &&
-                                      term1.marks.length
-                                    ) {
-                                      html = createCombinedMarksheetPdf(
-                                        term1,
-                                        term2,
-                                      );
-                                    } else {
-                                      html = createMarksheetPdf(term1);
-                                    }
-
-                                    const printWindow = window.open(
-                                      "",
-                                      "_blank",
-                                    );
-
-                                    if (printWindow) {
-                                      printWindow.document.open();
-
-                                      printWindow.document.write(html);
-
-                                      printWindow.document.close();
-
-                                      setTimeout(() => {
-                                        printWindow.focus();
-
-                                        printWindow.print();
-
-                                        printWindow.onafterprint = () => {
-                                          printWindow.close();
-                                        };
-                                      }, 500);
-                                    }
-                                  }
-                                })
-                                .catch((e) => {
-                                  console.log(e);
-                                });
-                            }}
-                          >
-                            Download
-                          </Menu.Item> */}
-
+                       
                           <Menu.Item
-  leftSection={<IconDownload size={18} />}
-  onClick={async () => {
-    try {
-      const url = `https://shikshapay.cloud/marksheet/${item._id}`;
-      const qr = await QRCode.toDataURL(url);
-      const isAcadmy = institute?.isAcadmy;
 
+    onClick={async () => {
+    try {
+      // 1. QR Code URL
+       const url = `https://shikshapay.cloud/marksheet/${item._id}`;
+      const qr = await QRCode.toDataURL(url);
+
+
+      // 2. Get Student Details
       const res: any = await GetStudentDetail(item.student._id);
-      const student = res.student;
+      const student = res?.student;
 
       if (!student) {
-        ErrorNotification("Student details not found!");
+        ErrorNotification("Student details not found.");
         return;
       }
 
+      // 3. Get Institute Details
+      const instituteData = student.instituteId;
+
+      // 4. Get Selected Marksheet Design IDs
+      const midTermDesignId =
+        instituteData?.midTermMarksheetDesignId;
+
+      const annualTermDesignId =
+        instituteData?.annualTermMarksheetDesignId;
+
+     
+    //     // 3. Convert images to base64
       const base64Photo = await getBase64Image(student.profilePic);
-      const base64Logo = await getBase64Image(student.instituteId.logo);
+      // const base64Logo = await getBase64Image(instituteData?.logo);
+        const base64Logo = await getBase64Image(student.instituteId.logo);
       const base64Signature = await getBase64Image(
-        student.instituteId.signature,
+        instituteData?.signature
       );
 
-      // Common student and institute details
-      const commonData = {
-        instituteName: institute?.name,
+      // 6. Common Data
+       const commonData = {
+        instituteName: instituteData?.name || institute?.name,
         batchName: item.batch?.name,
-        studentName: item.student?.name,
+        studentName: student.name || item.student?.name,
         rollNumber: item.student?.rollNumber,
         enrolment: item.student?.enrollmentNo,
         fName: student.parentName,
+        mName: student.motherName,
         address: student.address,
         parentNumber: student.parentNumber,
         dob: formatDate(student.dateOfBirth),
         photo: base64Photo,
         instituteLogo: base64Logo,
         principalSignature: base64Signature,
-        instituteAdress: student.instituteId.address,
-        institutePhone: student.instituteId.institutePhoneNumber,
+        instituteAdress: instituteData?.address,
+        institutePhone: instituteData?.institutePhoneNumber,
         qr,
       };
 
-      // Current selected marksheet (Mid TERM or Annual TERM)
+      const currentMarks = getNormalizedMarks(item?.marks ?? []);
+const currentSummary = calculateOverall(currentMarks);
+
+      // 7. Current Marksheet Data
       const currentMarksheet = {
         ...commonData,
-        examName: item.name,
-        marks: item.marks ?? [],
-        activity: item.activity ?? [],
-        skills: item.skills ?? [],
-        totalMarks: item.totalMarks,
-        percentage: item.percentage,
-        overallGrade: item.overallGrade,
-        status: item.status,
-        allsubjecttotal: (item.marks ?? []).length * 100,
-        date: new Date(item.date).toLocaleDateString("en-GB"),
-        session: item.session,
+
+        examName: item?.name ?? "",
+        activity: item?.activity ?? [],
+        skills: item?.skills ?? [],
+        
+        
+marks: currentMarks,
+totalMarks: currentSummary.totalMarks,
+percentage: currentSummary.percentage,
+overallGrade: currentSummary.overallGrade,
+status: currentSummary.status,
+allsubjecttotal: currentMarks.filter(
+  (mark: any) => !isCoScholastic(mark.subjectType)
+).length * 100,
+
+        date: item?.date
+          ? new Date(item.date).toLocaleDateString("en-GB")
+          : "",
+
+        session: item?.session,
       };
 
-      let term1: any = currentMarksheet;
-      let term2: any = currentMarksheet;
+      // 8. Select Marksheet Design
       let html = "";
 
-      // Academy: retain the existing academy PDF
-      if (isAcadmy) {
-        html = createAcadmyMarksheetPdf(currentMarksheet);
-      } else if (filterExam?.includes("Annual")) {
-        // Annual TERM: try to fetch the Mid TERM marksheet
-        let midMarksheet: any = null;
+      const examName = item?.name?.toLowerCase() ?? "";
 
-        try {
-          const midResponse: any = await GetMidExamMarksheet(
-            item.batch?._id ?? props.batchId,
-            item.student?._id,
+      const isMidTerm = examName.includes("mid");
+      const isAnnualTerm = examName.includes("annual");
+
+      // ==========================================
+      // MID TERM MARKSHEET
+      // ==========================================
+      if (isMidTerm) {
+        html = getMidTermMarksheetHtml(
+          currentMarksheet,
+          midTermDesignId
+        );
+
+        if (!html) {
+          ErrorNotification(
+            `No matching Mid Term design found: ${
+              midTermDesignId || "not selected"
+            }`
           );
-
-          console.log("Mid Term API response:", midResponse);
-          console.log("Annual marksheet:", item);
-
-          midMarksheet = midResponse?.marksheet ?? null;
-        } catch (error) {
-          // If the API returns 404 or another error,
-          // Annual TERM can still be downloaded independently.
-          console.warn("Mid Term marksheet unavailable:", error);
+          return;
         }
-
-        term2 = currentMarksheet;
-
-        if (midMarksheet?.marks?.length) {
-          term1 = {
-            ...commonData,
-            examName: midMarksheet.name,
-            marks: midMarksheet.marks,
-            activity: midMarksheet.activity ?? [],
-            skills: midMarksheet.skills ?? [],
-            totalMarks: midMarksheet.totalMarks,
-            percentage: midMarksheet.percentage,
-            overallGrade: midMarksheet.overallGrade,
-            status: midMarksheet.status,
-            allsubjecttotal: midMarksheet.marks.length * 100,
-            date: new Date(midMarksheet.date).toLocaleDateString("en-GB"),
-            session: midMarksheet.session,
-          };
-
-          // Both terms exist: generate combined PDF
-          html = createCombinedMarksheetPdf(term1, term2);
-        } else {
-          // Mid TERM missing: generate Annual TERM PDF only
-          html = createMarksheetPdf(currentMarksheet);
-        }
-      } else {
-        // Mid TERM selected: generate its single PDF
-        html = createMarksheetPdf(currentMarksheet);
       }
 
-      if (!html) {
-        ErrorNotification("Unable to generate marksheet PDF!");
+      // ==========================================
+      // ANNUAL TERM MARKSHEET
+      // ==========================================
+      else if (isAnnualTerm) {
+        let midMarksheet: any = null;
+
+        // Fetch Mid Term Marksheet
+        try {
+          const midResponse: any = await GetMidExamMarksheet(
+            item?.batch?._id ?? props.batchId,
+            item?.student?._id
+          );
+
+          midMarksheet =
+            midResponse?.marksheet ??
+            midResponse?.data?.marksheet ??
+            null;
+        } catch (error) {
+          console.error(
+            "Mid Term marksheet fetch error:",
+            error
+          );
+
+          ErrorNotification(
+            "Unable to fetch Mid Term marksheet."
+          );
+          return;
+        }
+
+        if (!midMarksheet?.marks?.length) {
+          ErrorNotification(
+            "Mid Term marksheet not found. Please create the Mid Term marksheet first."
+          );
+          return;
+        }
+const term1Marks = getNormalizedMarks(midMarksheet?.marks ?? []);
+const term1Summary = calculateOverall(term1Marks);
+        // Prepare Term 1 Data
+        const term1 = {
+          ...commonData,
+
+          examName: midMarksheet?.name ?? "Mid Term",
+          activity: midMarksheet?.activity ?? [],
+          skills: midMarksheet?.skills ?? [],
+          
+        
+          marks: term1Marks,
+totalMarks: term1Summary.totalMarks,
+percentage: term1Summary.percentage,
+overallGrade: term1Summary.overallGrade,
+status: term1Summary.status,
+allsubjecttotal: term1Marks.filter(
+  (mark: any) => !isCoScholastic(mark.subjectType)
+).length * 100,
+
+          date: midMarksheet?.date
+            ? new Date(
+                midMarksheet.date
+              ).toLocaleDateString("en-GB")
+            : "",
+
+          session: midMarksheet?.session,
+        };
+
+        // Prepare Term 2 Data
+        const term2 = currentMarksheet;
+
+        // Generate Annual Marksheet According to Design
+        html = getAnnualTermMarksheetHtml(
+          term1,
+          term2,
+          annualTermDesignId
+        );
+
+        if (!html) {
+          ErrorNotification(
+            `No matching Annual Term design found: ${
+              annualTermDesignId || "not selected"
+            }`
+          );
+          return;
+        }
+      } else {
+        ErrorNotification(
+          `Unsupported exam: ${item?.name ?? "Unknown"}`
+        );
         return;
       }
 
-      // Open print window
+      // ==========================================
+      // 9. Validate Generated HTML
+      // ==========================================
+      if (!html) {
+        ErrorNotification(
+          "Failed to generate marksheet."
+        );
+        return;
+      }
+
+      // ==========================================
+      // 10. Open Print Window
+      // ==========================================
       const printWindow = window.open("", "_blank");
 
       if (!printWindow) {
         ErrorNotification(
-          "Please allow pop-ups in your browser to download the marksheet.",
+          "Please allow pop-ups to print the marksheet."
         );
         return;
       }
@@ -1241,24 +1056,29 @@ const Marksheet = (props: {
       printWindow.document.write(html);
       printWindow.document.close();
 
-      // Print after the HTML has rendered
+      // ==========================================
+      // 11. Print Marksheet
+      // ==========================================
       printWindow.onload = () => {
         printWindow.focus();
         printWindow.print();
       };
 
-      // Fallback in case onload fires before the handler is attached
+      // Fallback for HTML that loads before onload is assigned
       setTimeout(() => {
         if (!printWindow.closed) {
           printWindow.focus();
-          printWindow.print();
         }
-      }, 1000);
+      }, 500);
     } catch (error) {
-      console.error("Download marksheet error:", error);
-      ErrorNotification("Failed to generate marksheet!");
+      console.error("Marksheet generation error:", error);
+
+      ErrorNotification(
+        "Something went wrong while generating the marksheet."
+      );
     }
   }}
+
 >
   Download
 </Menu.Item>

@@ -40,8 +40,12 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
     student: string;
     marks: {
       subjectName: string;
+       subjectType?: string;
       theory_marks: number;
       practical_marks: number;
+       periodic_test: number;
+  note_book: number;
+  subject_enrichment: number;
       obtained_marks: number;
       grade: string;
     }[];
@@ -54,7 +58,7 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
     date: new Date()
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [subjects, setSubjects] = useState<{ _id: string, name: string }[]>([]);  //state me savee krvana batch student
+  const [subjects, setSubjects] = useState<{ _id: string, name: string, type: string }[]>([]);  //state me savee krvana batch student
   const [resultDate, setResultDate] = useState<Date>(new Date());
   const [session, setSession] = useState<string>("");
   useEffect(() => {
@@ -74,12 +78,39 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
           return {
             _id: sub._id,
             name: sub.name,
-
+  type: sub.type,
           }
         })
         setSubjects(formatted);
 
         //  setTeachers(teacherByInstituteBatch);
+//ye add 
+        setMarksData((prev) => ({
+  ...prev,
+  marks: formatted.map((subject: any) => {
+    const existingMark = prev.marks.find(
+      (mark: any) => mark.subjectName === subject.name
+    );
+
+    return {
+      subjectName: subject.name,
+      subjectType: subject.type,
+      theory_marks: existingMark?.theory_marks ?? 0,
+      // practical_marks: existingMark?.practical_marks ?? 0,
+        periodic_test: existingMark?.periodic_test ?? 0,
+  note_book: existingMark?.note_book ?? 0,
+  subject_enrichment: existingMark?.subject_enrichment ?? 0,
+
+  practical_marks:
+    (Number(existingMark?.periodic_test) || 0) +
+    (Number(existingMark?.note_book) || 0) +
+    (Number(existingMark?.subject_enrichment) || 0),
+
+      obtained_marks: existingMark?.obtained_marks ?? 0,
+      grade: existingMark?.grade ?? "",
+    };
+  }),
+}));
         setIsLoading(false);
       })
       .catch((e) => {
@@ -89,50 +120,123 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
   }, [opened, batchId]);
 
 
-  const processMarks = (marksArray: any[]) => {
-    return marksArray.map((item) => {
-      const obtained = item.theory_marks + item.practical_marks;
 
+const isCoScholastic = (type?: string) =>
+  type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ?? false;
+
+  
+// const processMarks = (marksArray: any[]) => {
+//   return marksArray.map((item) => {
+//     // Co-scholastic subjects use the manually selected grade.
+// if (isCoScholastic(item.subjectType)) {
+//       return {
+//         ...item,
+//         theory_marks: 0,
+//         practical_marks: 0,
+//         obtained_marks: 0,
+//         grade: item.grade,
+//       };
+//     }
+
+//     // Scholastic subjects use numerical marks.
+//     const obtained =
+//       (Number(item.theory_marks) || 0) +
+//       (Number(item.practical_marks) || 0);
+
+//     return {
+//       ...item,
+//       obtained_marks: obtained,
+//       grade: GetGrade(obtained),
+//     };
+//   });
+// };
+
+const processMarks = (marksArray: any[]) => {
+  return marksArray.map((item) => {
+    // Co-scholastic subjects: only grade, no numerical marks.
+    if (isCoScholastic(item.subjectType)) {
       return {
         ...item,
-        obtained_marks: obtained,
-        grade: GetGrade(obtained),
+        theory_marks: 0,
+        practical_marks: 0,
+        periodic_test: 0,
+        note_book: 0,
+        subject_enrichment: 0,
+        obtained_marks: 0,
+        grade: item.grade ?? "",
       };
-    });
-  };
+    }
 
-  const calculateOverall = (marks: any[]) => {
-    let total = 0;
+    const periodicTest = Number(item.periodic_test) || 0;
+    const noteBook = Number(item.note_book) || 0;
+    const subjectEnrichment = Number(item.subject_enrichment) || 0;
+    const theory = Number(item.theory_marks) || 0;
 
-    marks.forEach((m: any) => {
-      let obtained_marks = m.practical_marks + m.theory_marks
-      total += obtained_marks;
+    // Practical = Periodic Test + Notebook + Subject Enrichment
+    const practical =
+      periodicTest + noteBook + subjectEnrichment;
 
-    });
-
-    const percentage = total / marks.length;
-
-    // 👉 Grade (same function use kar sakta hai)
-    const overallGrade = GetGrade(percentage);
-
-    // 👉 Status logic (customize kar sakta hai)
-    const isFail = marks.some((m: any) => m.obtained_marks < 33);
-
-    const status = isFail ? "Fail" : "Pass";
-
+    const obtained = theory + practical;
 
     return {
-      totalMarks: total,
-      percentage,
-      overallGrade,
-      status,
+      ...item,
+      theory_marks: theory,
+      periodic_test: periodicTest,
+      note_book: noteBook,
+      subject_enrichment: subjectEnrichment,
+      practical_marks: practical,
+      obtained_marks: obtained,
+      grade: GetGrade(obtained),
     };
+  });
+};
+
+const calculateOverall = (marks: any[]) => {
+  // Overall result only uses scholastic subjects.
+  const scholasticMarks = marks.filter(
+    (item) => !isCoScholastic(item.subjectType)
+  );
+
+  const total = scholasticMarks.reduce(
+    (sum, item) =>
+      sum +
+      (Number(item.theory_marks) || 0) +
+      (Number(item.practical_marks) || 0),
+    0
+  );
+
+  const percentage =
+    scholasticMarks.length > 0
+      ? total / scholasticMarks.length
+      : 0;
+
+  const overallGrade = GetGrade(percentage);
+
+  const isFail = scholasticMarks.some(
+    (item) =>
+      (Number(item.theory_marks) || 0) +
+        (Number(item.practical_marks) || 0) <
+      33
+  );
+
+  return {
+    totalMarks: total,
+    percentage,
+    overallGrade,
+    status:
+      scholasticMarks.length === 0
+        ? "Pass"
+        : isFail
+          ? "Fail"
+          : "Pass",
   };
+};
 
   const CreateSingleMarksheet = () => {
     const updatedMarks = processMarks(marksData.marks);
 
-    const overall = calculateOverall(marksData.marks);
+    // const overall = calculateOverall(marksData.marks);
+    const overall = calculateOverall(updatedMarks);
     const payload = {
       ...marksData,
       name: selectedExam,
@@ -210,84 +314,248 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
             w={150}
           />
         </Flex>
-        {/* 🔹 INPUT HEADER */}
-        <Flex gap={10} mt={20}>
-          <Text fw={600} w="40%">
-            Subject Name
-          </Text>
-          <Text fw={600} w="30%">
-            Theory
-          </Text>
-          <Text fw={600} w="30%">
-            Practical
-          </Text>
-        </Flex>
+     
+        
+<Text fw={700} size="md" mt="md" c="blue">
+  Scholastic Subjects
+</Text>
 
+{/* <Flex gap={10} mt={10}>
+  <Text fw={600} w="40%">Subject Name</Text>
+  <Text fw={600} w="30%">Theory</Text>
+  <Text fw={600} w="30%">Practical</Text>
+</Flex> */}
+<Flex gap={8} mt={10} align="center">
+  <Text fw={600} w="25%">Subject</Text>
+  <Text fw={600} ml={50} w="20%">Theory</Text>
+  <Text fw={500} w="16%">Periodic </Text>
+  <Text fw={500} w="16%">Notebook </Text>
+  <Text fw={500}  w="20%">Enrichment</Text>
+</Flex>
 
+{subjects
+  .filter((item) => !isCoScholastic(item.type))
+  .map((item) => {
+    const index = subjects.findIndex(
+      (subject) => subject._id === item._id
+    );
 
-        {subjects.map((item, index) => (
-          <Flex gap={10} key={index}>
+    return (
+      <Flex key={item._id} gap={10} align="center">
+        <Text w="40%" size="sm">
+          {item.name}
+        </Text>
 
-            {/* SUBJECT NAME (TEXT ONLY) */}
-            <Text w="40%" mt={8}>
-              {item.name}
-            </Text>
+        <TextInput
+          placeholder="Theory Marks"
+          type="number"
+          w="30%"
+          value={marksData.marks[index]?.theory_marks ?? 0}
+          onChange={(e) => {
+            const value = e.target.value;
 
-            {/* THEORY INPUT */}
-            <TextInput
-              placeholder="Theory Marks"
-              style={{ width: "30%" }}
-              value={marksData.marks[index]?.theory_marks ?? ""}
-              onChange={(e) => {
-                const value = e.target.value;
+            setMarksData((prev) => {
+              const updatedMarks = [...prev.marks];
 
-                setMarksData((prev) => {
-                  const updatedMarks = [...prev.marks];
-                  //  subjectName: subjects[index]?.name,
+              updatedMarks[index] = {
+                ...updatedMarks[index],
+                subjectName: item.name,
+                subjectType: item.type,
+                 theory_marks: value === "" ? 0: Number(value),
+              };
 
-                  updatedMarks[index] = {
-                    ...updatedMarks[index],
-                    theory_marks: value === "" ? 0 : Number(value),
-                    subjectName: item.name
+              return { ...prev, marks: updatedMarks };
+            });
+          }}
+        />
 
-                  };
+        {/* <TextInput
+          placeholder="Practical Marks"
+          type="number"
+          w="30%"
+          value={marksData.marks[index]?.practical_marks ?? 0}
+          onChange={(e) => {
+            const value = e.target.value;
 
-                  return {
-                    ...prev,
-                    marks: updatedMarks,
-                  };
-                });
-              }}
-            />
+            setMarksData((prev) => {
+              const updatedMarks = [...prev.marks];
 
-            {/* PRACTICAL INPUT */}
-            <TextInput
-              placeholder="Practical Marks"
-              style={{ width: "30%" }}
-              value={marksData.marks[index]?.practical_marks ?? ""}
-              onChange={(e) => {
-                const value = e.target.value;
+              updatedMarks[index] = {
+                ...updatedMarks[index],
+                subjectName: item.name,
+                subjectType: item.type,
+                practical_marks: value === "" ? 0 : Number(value),
+              };
 
-                setMarksData((prev) => {
-                  const updatedMarks = [...prev.marks];
+              return { ...prev, marks: updatedMarks };
+            });
+          }}
+        /> */}
 
+        {/* Periodic Test: maximum 10 */}
+<TextInput
+  placeholder="0-10"
+  type="number"
+  min={0}
+  max={10}
+  w="16%"
+  value={marksData.marks[index]?.periodic_test ?? 0}
+  onChange={(e) => {
+    const rawValue = e.target.value;
+    const value =
+      rawValue === ""
+        ? 0
+        : Math.min(10, Math.max(0, Number(rawValue) || 0));
 
-                  updatedMarks[index] = {
-                    ...updatedMarks[index],
-                    practical_marks: value === "" ? 0 : Number(value)
-                  };
+    setMarksData((prev) => {
+      const updatedMarks = [...prev.marks];
+      const current = updatedMarks[index];
 
-                  return {
-                    ...prev,
-                    marks: updatedMarks,
-                  };
-                });
-              }}
-            />
+      const periodicTest = value;
+      const noteBook = Number(current?.note_book) || 0;
+      const subjectEnrichment =
+        Number(current?.subject_enrichment) || 0;
 
-          </Flex>
-        ))}
+      updatedMarks[index] = {
+        ...current,
+        subjectName: item.name,
+        subjectType: item.type,
+        periodic_test: periodicTest,
+        practical_marks:
+          periodicTest + noteBook + subjectEnrichment,
+      };
 
+      return { ...prev, marks: updatedMarks };
+    });
+  }}
+/>
+
+{/* Notebook: maximum 5 */}
+<TextInput
+  placeholder="0-5"
+  type="number"
+  min={0}
+  max={5}
+  w="16%"
+  value={marksData.marks[index]?.note_book ?? 0}
+  onChange={(e) => {
+    const rawValue = e.target.value;
+    const value =
+      rawValue === ""
+        ? 0
+        : Math.min(5, Math.max(0, Number(rawValue) || 0));
+
+    setMarksData((prev) => {
+      const updatedMarks = [...prev.marks];
+      const current = updatedMarks[index];
+
+      const periodicTest = Number(current?.periodic_test) || 0;
+      const noteBook = value;
+      const subjectEnrichment =
+        Number(current?.subject_enrichment) || 0;
+
+      updatedMarks[index] = {
+        ...current,
+        subjectName: item.name,
+        subjectType: item.type,
+        note_book: noteBook,
+        practical_marks:
+          periodicTest + noteBook + subjectEnrichment,
+      };
+
+      return { ...prev, marks: updatedMarks };
+    });
+  }}
+/>
+
+{/* Subject Enrichment: maximum 5 */}
+<TextInput
+  placeholder="0-5"
+  type="number"
+  min={0}
+  max={5}
+  w="18%"
+  value={marksData.marks[index]?.subject_enrichment ?? 0}
+  onChange={(e) => {
+    const rawValue = e.target.value;
+    const value =
+      rawValue === ""
+        ? 0
+        : Math.min(5, Math.max(0, Number(rawValue) || 0));
+
+    setMarksData((prev) => {
+      const updatedMarks = [...prev.marks];
+      const current = updatedMarks[index];
+
+      const periodicTest = Number(current?.periodic_test) || 0;
+      const noteBook = Number(current?.note_book) || 0;
+      const subjectEnrichment = value;
+
+      updatedMarks[index] = {
+        ...current,
+        subjectName: item.name,
+        subjectType: item.type,
+        subject_enrichment: subjectEnrichment,
+        practical_marks:
+          periodicTest + noteBook + subjectEnrichment,
+      };
+
+      return { ...prev, marks: updatedMarks };
+    });
+  }}
+/>
+      </Flex>
+    );
+  })}
+
+{/* CO-SCHOLASTIC SUBJECTS */}
+<Text fw={700} size="md" mt="xl" c="orange">
+  Co-scholastic Subjects
+</Text>
+
+{subjects
+  .filter((item) => isCoScholastic(item.type))
+  .map((item) => {
+    const index = subjects.findIndex(
+      (subject) => subject._id === item._id
+    );
+
+    return (
+      <Flex key={item._id} gap={10} align="center">
+        <Text w="40%" size="sm">
+          {item.name}
+        </Text>
+
+        <TextInput
+          placeholder="Enter Grade (A1, A, B2...)"
+          w="60%"
+          value={marksData.marks[index]?.grade ?? ""}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            setMarksData((prev) => {
+              const updatedMarks = [...prev.marks];
+
+              updatedMarks[index] = {
+                ...updatedMarks[index],
+                subjectName: item.name,
+                subjectType: item.type,
+                theory_marks: 0,
+                practical_marks: 0,
+                obtained_marks: 0,
+                grade: value,
+              };
+
+              return {
+                ...prev,
+                marks: updatedMarks,
+              };
+            });
+          }}
+        />
+      </Flex>
+    );
+  })}
 
         {/* 🔹 BUTTON */}
         <Box mt={20}>

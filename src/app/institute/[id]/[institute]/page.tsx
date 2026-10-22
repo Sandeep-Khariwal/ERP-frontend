@@ -16,6 +16,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
+
 // Lazily loaded — only the active tab is ever visible, so none of these
 // (and their heavy dependencies, e.g. charting/marketing SDKs) need to be
 // part of the JS that ships before the user has even picked a tab.
@@ -46,6 +47,13 @@ const TransportPage = dynamic(() => import("@/app/components/institute/transport
 const IntegrationsPage = dynamic(() => import("@/app/components/marketing/meta/IntegrationPage"), { loading: tabLoading });
 const LeadsPage = dynamic(() => import("@/app/components/marketing/meta/LeadsDashboard"), { loading: tabLoading });
 const WhatsAppPage = dynamic(() => import("@/app/components/marketing/whatsapp/WhatsappLeads"), { loading: tabLoading });
+const SelectMarksheet = dynamic(
+  () =>
+    import("@/app/components/institute/insideBatch/SelectMarksheet").then(
+      (m) => m.SelectMarksheet
+    ),
+  { loading: tabLoading }
+);
 
 const dashboard = () => {
 
@@ -197,6 +205,7 @@ const dashboard = () => {
             {Tabs.LEADS === selectedTab && <LeadsPage />}
             {Tabs.WHATSAPPLEADS === selectedTab && <WhatsAppPage />}
             {Tabs.INTEGRATION === selectedTab && <IntegrationsPage />}
+            {Tabs.MARKSHEET === selectedTab && <SelectMarksheet  instituteId={institute?._id || ""}/>}
 
             {Tabs.TEACHER === selectedTab && (
               <InstituteTeachers userType={UserType.OTHERS} />
