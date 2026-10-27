@@ -55,7 +55,7 @@ const StudentListCard = (props: {
           fw={600}
           c={"#4F4F4F"}
         >
-          <Text>{props.student.uniqueRoll}</Text>
+          <Text>{props.student.rollNumber}</Text>
         </Flex>
         <Flex
           w={"20%"}
