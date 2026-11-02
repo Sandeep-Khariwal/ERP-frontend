@@ -51,6 +51,8 @@ export interface StudentPayload {
   phoneNumber: string[];
   parentNumber: string;
   gender?: string;
+    height?: number;
+  weight?: number;
   instituteId: string;
   batchId?: string;
   admissionNumber?: string;

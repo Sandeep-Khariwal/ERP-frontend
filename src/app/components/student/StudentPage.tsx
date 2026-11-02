@@ -16,6 +16,7 @@ import StudentTestView from "./StudentTestView";
 import StudentTestCard from "./StudentTestCards";
 import StudentMeetingsPage from "./AllMeetings";
 import StudentTimeTable from "./StudentTimeTable";
+import StudentAdmitCardView from "../institute/insideBatch/examination/StudentAdmitCardView";
 
 export interface StudentOverView {
   _id: string;
@@ -75,7 +76,7 @@ const studentTabLabels: Record<string, string> = {
   TEST: "Test",
   Meetings: "Meeting",
  "Time Table": "Time Table",
-
+ Examination: "Examination",
 };
 
 const StudentPage = (props: StudentPageProps) => {
@@ -305,6 +306,20 @@ const StudentPage = (props: StudentPageProps) => {
     style={{ minWidth: 0 }}
   >
     <StudentTimeTable
+      studentId={student._id}
+      batchId={student.batchId?._id || ""}
+    />
+  </Stack>
+)}
+{StudentTabs.EXAMINATION === activeTab && (
+  <Stack
+    mt={4}
+    w="100%"
+    bg="white"
+    p={{ base: 4, sm: 10 }}
+    style={{ minWidth: 0 }}
+  >
+    <StudentAdmitCardView
       studentId={student._id}
       batchId={student.batchId?._id || ""}
     />

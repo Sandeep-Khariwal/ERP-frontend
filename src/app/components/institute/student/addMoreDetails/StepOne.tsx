@@ -11,6 +11,7 @@ import {
   Text,
   Autocomplete,
   TextInput,
+  NumberInput,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useMediaQuery } from "@mantine/hooks";
@@ -379,6 +380,35 @@ const StepOne = (props: {
             onChange={(value) => handleInputChange("gender", value)}
           />
         </Grid.Col>
+        <Grid.Col span={isMobile ? 12 : 6}>
+  <NumberInput
+    label="Student Height (cm)"
+    placeholder="Enter height in cm"
+    ff="Poppins"
+    radius="md"
+    min={0}
+    decimalScale={2}
+    allowNegative={false}
+    value={props.formData.height ?? ""}
+    onChange={(value) => handleInputChange("height", value)}
+    styles={{ input: { borderWidth: 2 } }}
+  />
+</Grid.Col>
+
+<Grid.Col span={isMobile ? 12 : 6}>
+  <NumberInput
+    label="Student Weight (kg)"
+    placeholder="Enter weight in kg"
+    ff="Poppins"
+    radius="md"
+    min={0}
+    decimalScale={2}
+    allowNegative={false}
+    value={props.formData.weight ?? ""}
+    onChange={(value) => handleInputChange("weight", value)}
+    styles={{ input: { borderWidth: 2 } }}
+  />
+</Grid.Col>
       </Grid>
       <Space h="md" />
     </Container>

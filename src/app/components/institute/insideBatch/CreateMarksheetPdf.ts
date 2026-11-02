@@ -1,6 +1,4 @@
-// import { createMarksheetPdf } from './CreateMarksheetPdf';
-import { GetStudentDetail } from "@/axios/institute/InstituteGetApi";
-import { useEffect, useState } from "react";
+
 
 export const createMarksheetPdf = (data: any) => {
   const getRemark = () => {

@@ -61,6 +61,10 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
   const [subjects, setSubjects] = useState<{ _id: string, name: string, type: string }[]>([]);  //state me savee krvana batch student
   const [resultDate, setResultDate] = useState<Date>(new Date());
   const [session, setSession] = useState<string>("");
+  
+const [presentDays, setPresentDays] = useState<string>("");
+const [totalDays, setTotalDays] = useState<string>("");
+
   useEffect(() => {
     // This modal is always mounted inside Marksheet.tsx (only its visual
     // Modal is toggled by `opened`), so without this guard it fetched the
@@ -124,32 +128,6 @@ const SingleStudentModal = ({ opened, onClose, batchId, batchStudents, refreshDa
 const isCoScholastic = (type?: string) =>
   type?.toLowerCase().replace(/[^a-z]/g, "").startsWith("coschol") ?? false;
 
-  
-// const processMarks = (marksArray: any[]) => {
-//   return marksArray.map((item) => {
-//     // Co-scholastic subjects use the manually selected grade.
-// if (isCoScholastic(item.subjectType)) {
-//       return {
-//         ...item,
-//         theory_marks: 0,
-//         practical_marks: 0,
-//         obtained_marks: 0,
-//         grade: item.grade,
-//       };
-//     }
-
-//     // Scholastic subjects use numerical marks.
-//     const obtained =
-//       (Number(item.theory_marks) || 0) +
-//       (Number(item.practical_marks) || 0);
-
-//     return {
-//       ...item,
-//       obtained_marks: obtained,
-//       grade: GetGrade(obtained),
-//     };
-//   });
-// };
 
 const processMarks = (marksArray: any[]) => {
   return marksArray.map((item) => {
@@ -245,6 +223,8 @@ const calculateOverall = (marks: any[]) => {
       date: resultDate,
       marks: updatedMarks,
       session: session,
+       presentDays: Number(presentDays),
+  totalDays: Number(totalDays),
       ...overall
 
     }
@@ -313,18 +293,37 @@ const calculateOverall = (marks: any[]) => {
             onChange={(e) => setSession(e.target.value)}
             w={150}
           />
+
+          
         </Flex>
+        <Flex gap={20} align="flex-end">
+<TextInput
+  placeholder="Present Days"
+  label="Present Days"
+  type="number"
+  min={0}
+  max={totalDays !== "" ? Number(totalDays) : undefined}
+  value={presentDays}
+  onChange={(e) => setPresentDays(e.target.value)}
+  w={150}
+/>
+
+<TextInput
+  placeholder="Total Days"
+  label="Total Days"
+  type="number"
+  min={0}
+  value={totalDays}
+  onChange={(e) => setTotalDays(e.target.value)}
+  w={150}
+/>
+</Flex> 
      
         
 <Text fw={700} size="md" mt="md" c="blue">
   Scholastic Subjects
 </Text>
 
-{/* <Flex gap={10} mt={10}>
-  <Text fw={600} w="40%">Subject Name</Text>
-  <Text fw={600} w="30%">Theory</Text>
-  <Text fw={600} w="30%">Practical</Text>
-</Flex> */}
 <Flex gap={8} mt={10} align="center">
   <Text fw={600} w="25%">Subject</Text>
   <Text fw={600} ml={50} w="20%">Theory</Text>
@@ -369,30 +368,7 @@ const calculateOverall = (marks: any[]) => {
           }}
         />
 
-        {/* <TextInput
-          placeholder="Practical Marks"
-          type="number"
-          w="30%"
-          value={marksData.marks[index]?.practical_marks ?? 0}
-          onChange={(e) => {
-            const value = e.target.value;
-
-            setMarksData((prev) => {
-              const updatedMarks = [...prev.marks];
-
-              updatedMarks[index] = {
-                ...updatedMarks[index],
-                subjectName: item.name,
-                subjectType: item.type,
-                practical_marks: value === "" ? 0 : Number(value),
-              };
-
-              return { ...prev, marks: updatedMarks };
-            });
-          }}
-        /> */}
-
-        {/* Periodic Test: maximum 10 */}
+  
 <TextInput
   placeholder="0-10"
   type="number"
@@ -567,7 +543,12 @@ const calculateOverall = (marks: any[]) => {
               background: "linear-gradient(135deg, #4B65F6, #6A5ACD)",
             }}
             onClick={() => CreateSingleMarksheet()}
-            disabled={!selectedExam || !selectedStudent || !marksData.marks.length || !session}
+            disabled={!selectedExam || !selectedStudent || !marksData.marks.length ||!session.trim() ||
+  presentDays === "" ||
+  totalDays === "" ||
+  Number(presentDays) < 0 ||
+  Number(totalDays) <= 0 ||
+  Number(presentDays) > Number(totalDays)}
 
           >
             Create Marksheet

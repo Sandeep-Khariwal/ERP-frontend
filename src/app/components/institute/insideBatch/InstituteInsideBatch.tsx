@@ -51,7 +51,7 @@ const DiaryPage = dynamic(() => import("./DiaryPage"), { loading: tabLoading });
 const StudyMaterialPage = dynamic(() => import("./StudyMaterialPage"), { loading: tabLoading });
 const SessionsPage = dynamic(() => import("./SessionsPage"), { loading: tabLoading });
 const GalleryPage = dynamic(() => import("./GalleryPage"), { loading: tabLoading });
-const ExaminationPage = dynamic(() => import("./ExaminationPage"), { loading: tabLoading });
+const ExaminationPage = dynamic(() => import("./examination/ExaminationPage"), { loading: tabLoading });
 const MeetingsPage = dynamic(() => import("../../meeting/MeetingPage"), { loading: tabLoading });
 const TimetablePage = dynamic(() => import("./timetable/TimeTablePage"), { loading: tabLoading });
 

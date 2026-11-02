@@ -43,11 +43,7 @@ import {
 } from "@/app/helperFunction/Notification";
 import { GetGrade } from "../helperFunctions";
 import { useAppSelector } from "@/app/redux/redux.hooks";
-import {
-  createAcadmyMarksheetPdf,
-  createCombinedMarksheetPdf,
-  createMarksheetPdf,
-} from "./CreateMarksheetPdf";
+
 import { formatDate } from "../../marketing/utility/utils";
 import QRCode from "qrcode";
 import { DeleteMarksheet } from "@/axios/institute/InstitutePutApi";
@@ -88,6 +84,8 @@ const [designLoading, setDesignLoading] = useState(false);
       name: string;
       batch: string;
       session: string;
+      presentDays?: number;
+totalDays?: number;
       student: {
         enrollmentNo: string;
         name: string;
@@ -161,6 +159,7 @@ const [designLoading, setDesignLoading] = useState(false);
 
     GetResult();
   }, []);
+
 useEffect(() => {
   const fetchSavedDesign = async () => {
     if (!institute?._id) return;
@@ -313,6 +312,28 @@ const calculateOverall = (marksArray: any[]) => {
         const name = student["Name"];
         const roll = student["Roll No"];
 
+        const presentDays = Number(student["Present Days"]);
+const totalDays = Number(student["Total Days"]);
+
+const attendanceInvalid =
+  student["Present Days"] === undefined ||
+  student["Present Days"] === "" ||
+  student["Total Days"] === undefined ||
+  student["Total Days"] === "" ||
+  !Number.isInteger(presentDays) ||
+  !Number.isInteger(totalDays) ||
+  presentDays < 0 ||
+  totalDays <= 0 ||
+  presentDays > totalDays;
+
+if (attendanceInvalid) {
+  errorFound = true;
+  ErrorNotification(
+    `Row ${index + 2}: Please enter valid Present Days and Total Days.`,
+  );
+  return null;
+}
+
         // ❌ VALIDATION 1: Roll number missing
         if (!roll) {
           errorFound = true;
@@ -325,9 +346,19 @@ const calculateOverall = (marksArray: any[]) => {
         const activitySubjectMap: any = {};
         const skillsSubjectMap: any = {};
 
+        // Object.keys(student).forEach((key) => {
+        //   if (key === "Name" || key === "Roll No" || key === "__rowNum__")
+        //     return;
         Object.keys(student).forEach((key) => {
-          if (key === "Name" || key === "Roll No" || key === "__rowNum__")
-            return;
+  if (
+    key === "Name" ||
+    key === "Roll No" ||
+    key === "Present Days" ||
+    key === "Total Days" ||
+    key === "__rowNum__"
+  ) {
+    return;
+  }
 
           if (key.includes("(THEORY)")) {
             const subject = key.replace(" (THEORY)", "").trim();
@@ -466,6 +497,8 @@ const calculateOverall = (marksArray: any[]) => {
           date: resultDate ? resultDate.toISOString() : null,
           rollNumber: roll.toString(),
           session: session,
+          presentDays: presentDays,
+totalDays: totalDays,
           activity: rawActivity,
           skills: rawSkills,
           ...overall,
@@ -875,6 +908,8 @@ const calculateOverall = (marksArray: any[]) => {
         enrolment: item.student?.enrollmentNo,
         fName: student.parentName,
         mName: student.motherName,
+        height: student.height,
+        weight: student.weight,
         address: student.address,
         parentNumber: student.parentNumber,
         dob: formatDate(student.dateOfBirth),
@@ -912,6 +947,8 @@ allsubjecttotal: currentMarks.filter(
           : "",
 
         session: item?.session,
+        presentDays: item?.presentDays ?? 0,
+totalDays: item?.totalDays ?? 0,
       };
 
       // 8. Select Marksheet Design
@@ -1003,6 +1040,8 @@ allsubjecttotal: term1Marks.filter(
             : "",
 
           session: midMarksheet?.session,
+          presentDays: midMarksheet?.presentDays ?? 0,
+totalDays: midMarksheet?.totalDays ?? 0,
         };
 
         // Prepare Term 2 Data
