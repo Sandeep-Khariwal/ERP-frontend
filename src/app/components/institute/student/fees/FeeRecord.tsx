@@ -109,6 +109,34 @@ const FeeRecordSection = (props: {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
+  const paymentOperationKeysRef = useRef<{
+    fee: { fingerprint: string; key: string } | null;
+    vanfare: { fingerprint: string; key: string } | null;
+  }>({ fee: null, vanfare: null });
+
+  const getPaymentOperationKey = (
+    type: "fee" | "vanfare",
+    records: Map<string, FeeRecordData>,
+  ) => {
+    const fingerprint = JSON.stringify(
+      Array.from(records.entries())
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([id, data]) => [
+          id,
+          data.amount,
+          new Date(data.paidDate).toISOString(),
+          data.description || "",
+        ]),
+    );
+    const existing = paymentOperationKeysRef.current[type];
+    if (existing?.fingerprint === fingerprint) {
+      return existing.key;
+    }
+
+    const key = crypto.randomUUID();
+    paymentOperationKeysRef.current[type] = { fingerprint, key };
+    return key;
+  };
 
 
 
@@ -184,30 +212,42 @@ const FeeRecordSection = (props: {
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
+    if (isSubmittingRef.current) return;
     if (!formValues.paymentDate) {
       showNotification({
         message: "Select date please!!",
       });
       return;
     }
+    isSubmittingRef.current = true;
     setIsLoading(true);
+    setIsSubmitting(true);
     try {
-      await UpdateMultipleFeeRecord(
+      const result = await UpdateMultipleFeeRecord(
         instituteDetails._id,
         feeRecordsMap,
         props.studentId,
+        undefined,
+        getPaymentOperationKey("fee", feeRecordsMap),
       );
+      if ("error" in result) {
+        throw new Error(result.error || "Fee payment update failed");
+      }
+      paymentOperationKeysRef.current.fee = null;
       setOpenPaymentModel(false);
       setFeeRecordsMap(new Map());
       await refreshInstallments();
     } catch (e) {
       console.log(e);
     } finally {
+      isSubmittingRef.current = false;
       setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleVanFareSubmit = async () => {
+    if (isSubmittingRef.current) return;
     if (!formValues.paymentDate) {
       showNotification({
         message: "Select date please!!",
@@ -215,22 +255,31 @@ const FeeRecordSection = (props: {
       return;
     }
 
+    isSubmittingRef.current = true;
     setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
-      await UpdateMultipleFeeRecord(
+      const result = await UpdateMultipleFeeRecord(
         instituteDetails._id,
         vanFareRecordsMap,
         props.studentId,
         "vanfare",
+        getPaymentOperationKey("vanfare", vanFareRecordsMap),
       );
+      if ("error" in result) {
+        throw new Error(result.error || "Van fare payment update failed");
+      }
+      paymentOperationKeysRef.current.vanfare = null;
       setOpenVanFareModal(false);
       setVanFareRecordsMap(new Map());
       await refreshInstallments();
     } catch (e) {
       console.log(e);
     } finally {
+      isSubmittingRef.current = false;
       setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -705,7 +754,13 @@ const FeeRecordSection = (props: {
               Cancel
             </Button>
 
-            <Button onClick={handleVanFareSubmit}>Update Van Fare</Button>
+            <Button
+              onClick={handleVanFareSubmit}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+            >
+              Update Van Fare
+            </Button>
           </Group>
         </Container>
       </Modal>
