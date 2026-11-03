@@ -291,10 +291,62 @@ const handleDownloadSalarySlip = async (salaryItem: Salary) => {
     // -----------------------------------
 
  
+// const logoUrl = instituteData?.logo || "";
+// const signatureUrl = instituteData?.signature || "";
+
+// console.log("SALARY SLIP INSTITUTE DATA:", instituteData);
+
+// const base64Logo = logoUrl
+//   ? await getBase64Image(logoUrl)
+//   : "";
+
+// const base64Signature = signatureUrl
+//   ? await getBase64Image(signatureUrl)
+//   : "";
+
+// const gstNo = instituteData?.gst?.number || "N/A";
+
+// console.log("LOGO BASE64:", base64Logo);
+// console.log("SIGNATURE BASE64:", base64Signature);
+// console.log("GST NUMBER:", gstNo);
+
+//     console.log("INSTITUTE DATA:", instituteData);
+
+    
+// const html = createSalarySlipPdf({
+//   // Institute Details
+//   instituteName: instituteData?.name || "Institute Name",
+//   instituteAddress: instituteData?.address || "",
+//   institutePhone: instituteData?.institutePhoneNumber || "",
+//   instituteLogo: base64Logo,
+//   instituteSignature: base64Signature,
+//   gstNo: gstNo,
+
+//   // Neeche aapka existing teacher aur salary data
+//   // bilkul same rehne do
+//   teacherName: props.teacherName || "N/A",
+//   teacherId: salaryItem.teacherId || props.teacherId,
+//   designation: props.designation || "Teacher",
+//   bankAccountNo: props.bankAccountNo || "N/A",
+//   payableDays: props.payableDays || 30,
+
+//   salaryMonth: salaryItem.month,
+//   salaryDate: salaryItem.salleryDate || salaryItem.createdAt,
+//   baseSalary: salaryItem.baseSalary,
+//   netSalary: salaryItem.netSalary,
+//   amountPaid: salaryItem.amountPaid,
+
+//   pfDeduction: salaryItem.deductions?.pf || 0,
+//   esiDeduction: salaryItem.deductions?.esi || 0,
+//   otherDeduction: salaryItem.deductions?.otherDeductions || 0,
+
+//   salleryStatus: salaryItem.salleryStatus,
+//   salleryMode: salaryItem.salleryMode,
+//   transactionReference: salaryItem.transactionReference,
+// });
+
 const logoUrl = instituteData?.logo || "";
 const signatureUrl = instituteData?.signature || "";
-
-console.log("SALARY SLIP INSTITUTE DATA:", instituteData);
 
 const base64Logo = logoUrl
   ? await getBase64Image(logoUrl)
@@ -304,26 +356,14 @@ const base64Signature = signatureUrl
   ? await getBase64Image(signatureUrl)
   : "";
 
-const gstNo = instituteData?.gst?.number || "N/A";
-
-console.log("LOGO BASE64:", base64Logo);
-console.log("SIGNATURE BASE64:", base64Signature);
-console.log("GST NUMBER:", gstNo);
-
-    console.log("INSTITUTE DATA:", instituteData);
-
-    
 const html = createSalarySlipPdf({
-  // Institute Details
   instituteName: instituteData?.name || "Institute Name",
   instituteAddress: instituteData?.address || "",
   institutePhone: instituteData?.institutePhoneNumber || "",
   instituteLogo: base64Logo,
   instituteSignature: base64Signature,
-  gstNo: gstNo,
+  gstNo: instituteData?.gst?.number || "N/A",
 
-  // Neeche aapka existing teacher aur salary data
-  // bilkul same rehne do
   teacherName: props.teacherName || "N/A",
   teacherId: salaryItem.teacherId || props.teacherId,
   designation: props.designation || "Teacher",
@@ -344,7 +384,6 @@ const html = createSalarySlipPdf({
   salleryMode: salaryItem.salleryMode,
   transactionReference: salaryItem.transactionReference,
 });
-
 
     // -----------------------------------
     // Print

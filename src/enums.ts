@@ -16,4 +16,5 @@ export enum UserTypes {
      LEADS = "leads",
      WHATSAPPLEADS = "whatsappleads",
      INTEGRATION = "integration",
+    MARKSHEET = "marksheet",
    }

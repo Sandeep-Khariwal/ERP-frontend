@@ -113,56 +113,6 @@ export const DesktopNavbar = (props: {
   const [transportUploadModal, setTransportUploadModal] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // const handleUpdateSchool = () => {
-  //   // ❌ agar kuch bhi change nahi hua
-  //   if (
-  //     schoolName === institute?.name &&
-  //     email === institute?.email &&
-  //     phone === institute?.PhoneNumber &&
-  //     address === institute?.address
-  //   ) {
-  //     ErrorNotification("No changes made!");
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-
-  //   updateschooldetails(institute?._id, {
-  //     name: schoolName,
-  //     email: email,
-  //     institutePhoneNumber: phone,
-  //     address: address,
-  //       gst: {
-  //   number: gstNumber,
-  // },
-  //   })
-  //     .then((res: any) => {
-  //       console.log("update school :", res);
-        
-  //       SuccessNotification("Changes Updated Successfully ✅");
-  //       dispatch(
-  //         setDetails({
-  //           ...institute,
-  //           name: schoolName,
-  //           email: email,
-  //           phoneNumber: phone,
-  //           address: address,
-  //            gst: {
-  //     ...institute?.gst,
-  //     number: gstNumber,
-  //   },
-  //         }),
-  //       );
-
-  //       setIsLoading(false);
-  //       setSettingsOpened(false); // modal close
-  //     })
-  //     .catch((err: any) => {
-  //       console.log(err);
-  //       ErrorNotification("Something went wrong ❌");
-  //       setIsLoading(false);
-  //     });
-  // };
   const handleUpdateSchool = () => {
   // ❌ agar kuch bhi change nahi hua
   if (
@@ -456,7 +406,24 @@ export const DesktopNavbar = (props: {
                 Add Stamp
               </Text>
             </Flex>
-
+<Flex
+  align="center"
+  gap={10}
+  style={{
+    padding: "10px",
+    borderRadius: "8px",
+    cursor: "pointer",
+  }}
+  onClick={() => {
+    setSettingsOpened(false);
+    props.onSelectTab(Tabs.MARKSHEET);
+  }}
+>
+  <PiStudent size={20} />
+  <Text size="sm" fw={500}>
+    Marksheet
+  </Text>
+</Flex>
           </Stack>
 
           {/* RIGHT SIDE */}
@@ -660,14 +627,7 @@ export const DesktopNavbar = (props: {
         onClose={() =>  setStampModalOpen(false)}
         institute={institute}
       />
-      {/* <Stack
-        w="100%"
-        h={"100vh"}
-        style={{
-          transition: "width 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-        p={0}
-      > */}
+    
       
     <Stack
   w={props.isCollapsed ? "80px" : "260px"}
@@ -740,43 +700,6 @@ export const DesktopNavbar = (props: {
           <Stack h={"90%"} align="center" justify="space-between">
             <Box w={"90%"}>
           
-              {/* <Box
-  onClick={props.onClickCollapse}
-  style={{
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: "32px",
-    height: "32px",
-    borderRadius: "8px",
-    background: "#EEF3FF",
-    color: "#2F6FED",
-    transition: "all 0.3s ease",
-  }}
-  title={props.isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
->
-  {props.isCollapsed ? (
-    <FaBars size={28} />
-  ) : (
-    <IoMdClose size={28} />
-  )}
-    <Box
-                  style={{
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    transition:
-                      "width 0.3s ease, opacity 0.3s ease, margin 0.3s ease",
-                    width: props.isCollapsed ? 0 : "auto",
-                    opacity: props.isCollapsed ? 0 : 1,
-                    marginLeft: props.isCollapsed ? 0 : 6,
-                  }}
-                >
-                  <Text fw={600} fz={20}>
-                    Collapse
-                  </Text>
-                </Box>
-</Box> */}
 
 <Flex
   onClick={props.onClickCollapse}
@@ -1439,20 +1362,7 @@ export const DesktopNavbar = (props: {
 
               <Divider size={1} color="#EDF1F7" mb={10} />
 
-              {/* <Flex
-                style={{ cursor: "pointer" }}
-                my={10}
-                align={"center"}
-                justify={props.isCollapsed ? "center" : "start"}
-                gap={10}
-              >
-                <IoSettingsOutline size={28}  />
-                {!props.isCollapsed && (
-                  <Text fw={600} fz={20}>
-                    Settings
-                  </Text>
-                )}
-              </Flex> */}
+           
               <Flex
                 style={{
                   cursor: "pointer",
