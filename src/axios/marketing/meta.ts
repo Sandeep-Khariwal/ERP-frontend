@@ -124,7 +124,9 @@ export function FetchConnectedPages() {
 }
 export function GetMetaConnectUrl() {
   return new Promise((resolve, reject) => {
-    ApiHelper.get(`${process.env.URL}/api/v1/oauth/meta/connect`)
+    ApiHelper.get(`${process.env.URL}/api/v1/oauth/meta/connect`, {
+      withCredentials: true,
+    })
       .then((response: any) => resolve(response))
       .catch((error: any) => reject(error));
   });
@@ -136,4 +138,3 @@ export function DisconnectMetaPage(pageId: string) {
       .catch((error: any) => reject(error));
   });
 }
-
