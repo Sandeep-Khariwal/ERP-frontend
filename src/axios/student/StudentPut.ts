@@ -6,29 +6,25 @@ export function UpdateMultipleFeeRecord(
   installments: Map<string, FeeRecordData>,
   studentId: string,
   type?: "fee" | "vanfare",
+  idempotencyKey?: string,
 ) {
+  const entries = Array.from(installments.entries());
+  const requestKey = idempotencyKey || crypto.randomUUID();
+  if (entries.length === 0) {
+    return Promise.resolve({ success: true, responses: [] });
+  }
 
-  const promises = Array.from(installments.entries()).map(([id, data]) => {
-
-    if (type === "vanfare") {
-
-      return UpdateVanfare(
-        id,
-        instituteId,
-        studentId,
-        data
-      );
-
-    }
-
-    return UpdateFeeRecord(
-      id,
-      instituteId,
-      studentId,
-      data
-    );
-  });
-
+  const promises = entries.map(([id, data]) =>
+    type === "vanfare"
+      ? UpdateVanfare(id, instituteId, studentId, data, `${requestKey}:${id}`)
+      : UpdateFeeRecord(
+          id,
+          instituteId,
+          studentId,
+          data,
+          `${requestKey}:${id}`,
+        ),
+  );
   return Promise.all(promises)
     .then((responses) => {
       return { success: true, responses };
@@ -42,12 +38,14 @@ export function UpdateFeeRecord(
   instituteId: string,
   studentId: string,
   data: FeeRecordData,
+  idempotencyKey?: string,
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(`${process.env.URL}/api/v1/student/updateFeeRecord/${id}`, {
       data,
       instituteId,
       studentId,
+      idempotencyKey,
     })
       .then((response) => resolve(response))
       .catch((error: any) => reject(error));
@@ -59,6 +57,7 @@ export function UpdateVanfare(
   instituteId: string,
   studentId: string,
   data: FeeRecordData,
+  idempotencyKey?: string,
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(
@@ -67,6 +66,7 @@ export function UpdateVanfare(
         data,
         instituteId,
         studentId,
+        idempotencyKey,
       }
     )
       .then((response) => resolve(response))
