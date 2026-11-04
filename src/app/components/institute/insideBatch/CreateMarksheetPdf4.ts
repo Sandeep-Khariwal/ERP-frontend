@@ -8,11 +8,11 @@ export const generateMidTermMarksheet4 = (data: any) => {
     if (data.remarks) return data.remarks;
     if (data.status === "Fail") return "Needs improvement. Work harder and try again.";
     const percentage = Number(data.percentage);
-    if (percentage >= 90) return "OUTSTANDING PERFORMANCE! KEEP SHINING.";
-    if (percentage >= 75) return "EXCELLENT PERFORMANCE! KEEP UP THE GOOD WORK.";
+    if (percentage >= 90) return "OUTSTANDING PERFORMANCE.";
+    if (percentage >= 75) return "EXCELLENT PERFORMANCE.";
     if (percentage >= 60) return "KEEP ASKING QUESTIONS AND STAY CURIOUS!";
-    if (percentage >= 40) return "SATISFACTORY PERFORMANCE. WORK HARDER.";
-    return "NEEDS IMPROVEMENT. FOCUS MORE ON STUDIES.";
+    if (percentage >= 40) return "SATISFACTORY PERFORMANCE.";
+    return "NEEDS IMPROVEMENT.";
   };
 
   const isCoScholastic = (type?: string) =>
@@ -137,6 +137,7 @@ table {
     </div>
     <div style="font-size: 13px; font-weight: bold; margin-top: 2px;">
       Session : ${data.session || "2026-2027"}
+     
     </div>
 
     
@@ -167,6 +168,18 @@ table {
       <td style="text-transform: uppercase;">${data.mName || "-"}</td>
       <td style="font-weight: bold;">DOB:</td>
       <td>${data.dob || "-"}</td>
+    </tr>
+     <tr>
+      <td style="font-weight: bold;">Student Height in Cm:</td>
+      <td style="text-transform: uppercase;">${data.height || "-"}</td>
+      <td style="font-weight: bold;">Student Weight in Kg:</td>
+      <td>${data.weight || "-"}</td>
+    </tr>
+     <tr>
+      <td style="font-weight: bold;">Present Days:</td>
+      <td style="text-transform: uppercase;">${data.presentDays ?? 0}</td>
+      <td style="font-weight: bold;">Total Days:</td>
+      <td> ${data.totalDays ?? 0}</td>
     </tr>
   </table>
 
@@ -380,11 +393,11 @@ export const generateAnnualMarksheet4 = (term1: any, term2: any) => {
   const getCombinedRemark = () => {
     if (term2.remarks) return term2.remarks;
     const avg = (Number(term1.percentage || 0) + Number(term2.percentage || 0)) / 2;
-    if (avg >= 90) return "OUTSTANDING PERFORMANCE THROUGHOUT THE YEAR! PROMOTED.";
-    if (avg >= 75) return "EXCELLENT PERFORMANCE! PROMOTED TO NEXT CLASS.";
-    if (avg >= 60) return "GOOD JOB! PROMOTED TO NEXT CLASS.";
-    if (avg >= 40) return "SATISFACTORY PERFORMANCE. PROMOTED TO NEXT CLASS.";
-    return "NEEDS IMPROVEMENT. WORK HARDER IN NEXT SESSION.";
+    if (avg >= 90) return "OUTSTANDING PERFORMANCE.";
+    if (avg >= 75) return "EXCELLENT PERFORMANCE.";
+    if (avg >= 60) return "GOOD JOB.";
+    if (avg >= 40) return "SATISFACTORY PERFORMANCE.";
+    return "NEEDS IMPROVEMENT. ";
   };
 
   // const grandTotalMarks = Number(term1.totalMarks || 0) + Number(term2.totalMarks || 0);
@@ -405,6 +418,18 @@ const overallPercentage = (
   2
 ).toFixed(2);
 
+const getOverallGrade = (percentage: number) => {
+  if (percentage >= 91) return "A1";
+  if (percentage >= 81) return "A2";
+  if (percentage >= 71) return "B1";
+  if (percentage >= 61) return "B2";
+  if (percentage >= 51) return "C1";
+  if (percentage >= 41) return "C2";
+  if (percentage >= 33) return "D";
+  return "E";
+};
+
+const overallGrade = getOverallGrade(Number(overallPercentage));
 
   return `<!DOCTYPE html>
 <html>
@@ -516,7 +541,7 @@ table {
   </div>
 
   <!-- PERSONAL DETAIL TABLE -->
-  <table class="table-bordered" style="font-size: 10.5px; margin-bottom: 6px;">
+  <table  style="font-size: 10.5px; margin-bottom: 6px;">
     <tr>
       <td style="width: 18%; font-weight: bold;">Student's Name:</td>
       <td style="width: 42%; font-weight: bold; text-transform: uppercase;">${term1.studentName || ""}</td>
@@ -535,6 +560,19 @@ table {
       <td style="font-weight: bold;">DOB:</td>
       <td>${term1.dob || "-"}</td>
     </tr>
+      <tr>
+      <td style="font-weight: bold;">Student Height in Cm:</td>
+      <td style="text-transform: uppercase;">${term1.height || "-"}</td>
+      <td style="font-weight: bold;">Student weight in Kg:</td>
+      <td>${term1.weight || "-"}</td>
+    </tr>
+
+      <tr>
+      <td style="font-weight: bold;">Present Days:</td>
+      <td style="text-transform: uppercase;">${term2.presentDays ?? 0}</td>
+      <td style="font-weight: bold;">Total Days:</td>
+      <td> ${term2.totalDays ?? 0}</td>
+    </tr>
   </table>
 
   <!-- ANNUAL SCHOLASTIC MARKS TABLE (TERM 1 + TERM 2) -->
@@ -546,7 +584,7 @@ table {
         <th colspan="5" style="padding: 2px;">TERM — II (100)</th>
          
       
-  <th colspan="5" style="padding: 2px;">
+  <th colspan="4" style="padding: 2px;">
       OVERALL (T-1+T-2)
     </th>
       
@@ -618,9 +656,17 @@ const combinedSubjectTotal = t1Half + t2Half;
         <td class="text-left" style="padding: 4px 6px;">Grand Total</td>
         <td colspan="5" class="text-center">Term I: ${term1.totalMarks || 0} (${Number(term1.percentage || 0).toFixed(2)}%)</td>
         <td colspan="5" class="text-center">Term II: ${term2.totalMarks || 0} (${Number(term2.percentage || 0).toFixed(2)}%)</td>
-        <td colspan="5" class="text-center">
-          ${grandTotalMarks}/${grandMaxMarks} (${overallPercentage}%)
-        </td>
+       
+        <td colspan="3" class="text-center" style="vertical-align: middle;">
+  ${grandTotalMarks}/${grandMaxMarks}
+  <br />
+  (${overallPercentage}%)
+</td>
+
+<td colspan="2" class="text-center" style="vertical-align: middle;">
+
+  <div style="margin-top: 4px;">${overallGrade}</div>
+</td>
       </tr>
     </tbody>
   </table>
@@ -653,21 +699,9 @@ const combinedSubjectTotal = t1Half + t2Half;
           : `<th>COMPUTER</th><th>G.K.</th><th>REASONING</th><th>ART &amp; CRAFT</th><th>FRENCH</th><th>ABACUS</th>`
       }
     </tr>
+   
     <tr>
-      <td style="font-weight: bold; text-align: left; padding-left: 6px;">Term — I</td>
-      ${
-        combinedCoScholastic.length > 0
-          ? combinedCoScholastic
-              .map(
-                (item: any) => `
-                <td style="font-weight: bold;">${item.grade || "-"}</td>`
-              )
-              .join("")
-          : `<td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>`
-      }
-    </tr>
-    <tr>
-      <td style="font-weight: bold; text-align: left; padding-left: 6px;">Term — II</td>
+      <td style="font-weight: bold; text-align: left; padding-left: 6px;">Annual Grade</td>
       ${
         combinedCoScholastic.length > 0
           ? combinedCoScholastic
@@ -723,6 +757,10 @@ const combinedSubjectTotal = t1Half + t2Half;
   <!-- REMARKS BOX -->
   <div style="border: 1px solid #000; padding: 4px 6px; margin-bottom: 12px; font-size: 10.5px;">
     <strong>Remarks:</strong> ${getCombinedRemark().toUpperCase()}
+  </div>
+
+    <div style="border: 1px solid #000; padding: 4px 6px; margin-bottom: 12px; font-size: 10.5px;">
+    <strong> Congratulations you are promoted to ________________Class.</strong>
   </div>
 
   <!-- SIGNATURES FOOTER -->

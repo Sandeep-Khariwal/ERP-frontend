@@ -78,6 +78,8 @@ export function CreateExamMarksheet(data: {
   name: string;
   batch: string;
   student: string;
+   presentDays: number;
+  totalDays: number;
   marks: {
     subjectName: string;
     subjectType?: string;
@@ -106,6 +108,8 @@ export async function CreateExamMarksheetForExcel(data: {
   name: string;
   batch: string;
   student: string;
+   presentDays: number;
+  totalDays: number;
   marks: {
     subjectName: string;
     subjectType?: string;
@@ -346,3 +350,5 @@ export function UpdatePaymentKeys(data: {
       .catch((error: any) => reject(error));
   });
 }
+
+

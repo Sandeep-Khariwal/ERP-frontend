@@ -143,8 +143,8 @@ export function createReceiptPdf(
         <div class="vanfare-left-box">
           <div class="vanfare-title">Vanfare (Transport Dues)</div>
           <div class="vanfare-row"><span>Total Assigned:</span> <b>${formatCurrency(totalVanfare)}</b></div>
-          <div class="vanfare-row" style="color: #27ae60;"><span>Total Paid:</span> <b>${formatCurrency(vanfarePaidSoFar)}</b></div>
-          <div class="vanfare-row" style="color: #c0392b; border-top: 0.5px dashed #ccc; padding-top: 2px;"><span>Remaining:</span> <b>${formatCurrency(remainingVanfare)}</b></div>
+          <div class="vanfare-row"><span>Total Paid:</span> <b>${formatCurrency(vanfarePaidSoFar)}</b></div>
+          <div class="vanfare-row" border-top: 0.5px dashed #ccc; padding-top: 2px;"><span>Remaining:</span> <b>${formatCurrency(remainingVanfare)}</b></div>
         </div>
 
         <p style="font-size: 7.5px; color: #777; margin-top: 5px;">
@@ -169,15 +169,15 @@ export function createReceiptPdf(
           <span>SGST (${gst.sgst}%)</span>
           <span>₹${currentSplitGst.toFixed(2)}</span>
         </div>
-        <div class="calc-row" style="color: #e74c3c; font-weight:bold; border-top: 1px solid #000;">
+        <div class="calc-row"  font-weight:bold; border-top: 1px solid #000;">
           <span>Pending Installment Fee</span>
           <span>${formatCurrency(remainingFee)}</span>
         </div>
-        <div class="calc-row" style="color: #e74c3c; font-weight:bold; ">
+        <div class="calc-row"  font-weight:bold; ">
           <span>Total Pending Fee</span>
           <span>${formatCurrency(totalRemaining)}</span>
         </div>
-        <div class="calc-row" style="color: #e74c3c; font-weight:bold;">
+        <div class="calc-row"  font-weight:bold;">
           <span>Pending Vanfare</span>
           <span>${formatCurrency(remainingVanfare)}</span>
         </div>

@@ -1,0 +1,1357 @@
+// "use client";
+
+// import { useState, useCallback, useEffect } from "react";
+
+// import {
+//   Box,
+//   Button,
+//   TextInput,
+//   Text,
+//   Title,
+//   Group,
+//   Stack,
+//   Drawer,
+//   Paper,
+//   Pagination,
+//   ThemeIcon,
+//   Flex,
+//   FileInput,
+//   Grid,
+//   Loader,
+//   Avatar,
+//   Modal,
+//   Menu,
+//   ActionIcon,
+// } from "@mantine/core";
+
+// import { useMediaQuery, useDisclosure } from "@mantine/hooks";
+
+// import {
+//   IconPlus,
+//   IconBook,
+//   IconCheck,
+//   IconX,
+//   IconUpload,
+//   IconSparkles,
+//   IconDownload,
+//   IconPhone,
+//   IconDotsVertical,
+//   IconTrash,
+// } from "@tabler/icons-react";
+
+// import { notifications } from "@mantine/notifications";
+
+// import { CreateExamination } from "@/axios/institute/InstitutePostApi";
+// import { DeleteExamination } from "@/axios/institute/InstituteDeleteApi";
+// import {
+//   GetAllStudentsFromBatch,
+//   GetExamination,
+// } from "@/axios/institute/InstituteGetApi";
+// import { UploadExamination } from "@/axios/institute/InstitutePutApi";
+// import {
+//   getBase64Image,
+//   SuccessNotification,
+// } from "@/app/helperFunction/Notification";
+// import { formatDate } from "../../marketing/utility/utils";
+// import { GenerateAdmitCard } from "./htmlContent/AdmitCard";
+// import { GetStudentForIdCard } from "@/axios/student/StudentGetApi";
+// import { GetUpCommingExams } from "@/axios/batch/BatchGetApi";
+
+// // ───────────────── TYPES ─────────────────
+
+// interface ExaminationItem {
+//   _id: string;
+//   title: string;
+//   url: string;
+// }
+
+// export interface UpcomingExaminationData {
+//   _id: string;
+//   name: string;
+//   subjectId: { _id: string; name: string };
+//   batchId: { _id: string; name: string };
+//   totalTime: number;
+//   startTime: Date;
+// }
+
+// interface EntryFormProps {
+//   onCancel: () => void;
+//   batchId: string;
+//   fetchNotes: () => void;
+//   isLoading?: boolean;
+//   setIsLoading?: (v: boolean) => void;
+// }
+
+// // ───────────────── FORM ─────────────────
+
+// function EntryForm({
+//   onCancel,
+//   batchId,
+//   fetchNotes,
+//   isLoading,
+//   setIsLoading,
+// }: EntryFormProps) {
+//   const [title, setTitle] = useState("");
+//   const [file, setFile] = useState<File | null>(null);
+
+//   const handleSave = async () => {
+//     if (!title || !file) {
+//       notifications.show({
+//         title: "Validation Error",
+//         message: "Please fill all required fields",
+//         color: "red",
+//         icon: <IconX size={16} />,
+//       });
+//       return;
+//     }
+
+//     try {
+//       setIsLoading?.(true);
+
+//       const formData = new FormData();
+//       formData.append("examination", file);
+
+//       // STEP 1 → Upload
+//       const uploadRes: any = await UploadExamination(formData);
+//       const uploadedUrl =
+//         uploadRes?.url || uploadRes?.data?.url || uploadRes?.response?.url;
+
+//       await CreateExamination({
+//         batchId,
+//         title,
+//         url: uploadedUrl,
+//       });
+
+//       SuccessNotification("Examination Added!");
+//       fetchNotes();
+//       onCancel();
+//       setTitle("");
+//       setFile(null);
+//     } catch (e) {
+//       console.log(e);
+//       notifications.show({
+//         title: "Upload Failed",
+//         message: "Unable to upload study material right now. Please try again.",
+//         color: "red",
+//         icon: <IconX size={16} />,
+//       });
+//     } finally {
+//       setIsLoading?.(false);
+//     }
+//   };
+
+//   return (
+//     <Stack gap="lg">
+//       <TextInput
+//         label="Examination Title"
+//         placeholder="Enter examination title"
+//         value={title}
+//         onChange={(e) => setTitle(e.currentTarget.value)}
+//         radius="xl"
+//         size="md"
+//         styles={{
+//           input: {
+//             border: "1px solid #e5dbff",
+//             background: "#faf7ff",
+//           },
+//         }}
+//       />
+
+//       <FileInput
+//         label="Examination File"
+//         placeholder="Choose file"
+//         value={file}
+//         onChange={setFile}
+//         radius="xl"
+//         size="md"
+//         leftSection={<IconUpload size={18} />}
+//         styles={{
+//           input: {
+//             border: "1px solid #e5dbff",
+//             background: "#faf7ff",
+//           },
+//         }}
+//       />
+
+//       <Group justify="flex-end" mt="md">
+//         <Button variant="default" radius="xl" onClick={onCancel}>
+//           Cancel
+//         </Button>
+
+//         <Button
+//           radius="xl"
+//           loading={isLoading}
+//           disabled={isLoading}
+//           onClick={handleSave}
+//           leftSection={<IconCheck size={18} />}
+//           style={{
+//             background: "linear-gradient(135deg, #2F6FED, #4F7CFB)",
+//           }}
+//         >
+//           Create Examination
+//         </Button>
+//       </Group>
+//     </Stack>
+//   );
+// }
+
+// // ───────────────── MAIN COMPONENT ─────────────────
+
+// export default function ExaminationPage(props: { batchId: string }) {
+//   const isMobile = useMediaQuery("(max-width: 768px)");
+
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [addDrawerOpen, { open: openAdd, close: closeAdd }] = useDisclosure(false);
+
+//   // States for Examination Collection
+//   const [entries, setEntries] = useState<ExaminationItem[]>([]);
+//   const [entryPage, setEntryPage] = useState(1);
+//   const EXAM_PAGE_SIZE = 6;
+
+//   // States for Deletion
+//   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+//   const [selectedExam, setSelectedExam] = useState<ExaminationItem | null>(null);
+
+//   // States for Students/Admit Cards
+//   const [examsData, setExamsData] = useState<UpcomingExaminationData[]>([]);
+//   const [students, setStudents] = useState<
+//     {
+//       _id: string;
+//       name: string;
+//       phoneNumber: string;
+//       parentName: string;
+//     }[]
+//   >([]);
+//   const [studentPage, setStudentPage] = useState(1);
+//   const STUDENT_PAGE_SIZE = 9;
+
+//   // ───────────────── FETCH LOGIC ─────────────────
+
+//   const fetchExaminations = useCallback(() => {
+//     if (!props.batchId) return;
+//     setIsLoading(true);
+
+//     GetExamination(props.batchId)
+//       .then((res: any) => {
+//         const data =
+//           res?.data?.examination || res?.data?.data?.examination || [];
+//         const formatted: ExaminationItem[] = data.map((item: any) => ({
+//           _id: item._id,
+//           title: item.title,
+//           url: item.url,
+//         }));
+//         setEntries(formatted);
+//       })
+//       .catch((e: any) => {
+//         notifications.show({
+//           title: "Something Went Wrong",
+//           message: "Unable to load study materials right now.",
+//           color: "red",
+//           icon: <IconX size={16} />,
+//         });
+//       })
+//       .finally(() => {
+//         setIsLoading(false);
+//       });
+//   }, [props.batchId, setIsLoading]);
+
+//   const fetchAllStudents = (id: string) => {
+//     GetAllStudentsFromBatch(id)
+//       .then((x: any) => {
+//         const { students } = x.students;
+//         const studentData = students.map((s: any) => {
+//           return {
+//             _id: s._id,
+//             name: s.name,
+//             phoneNumber: s.phoneNumber,
+//             parentName: s.parentName,
+//           };
+//         });
+//         setStudents(studentData);
+//       })
+//       .catch((e) => console.log(e));
+//   };
+
+//   const fetchUpcommingExams = (id: string) => {
+//     GetUpCommingExams(id)
+//       .then((res: any) => {
+//         setExamsData(res.data);
+//       })
+//       .catch((e: any) => console.log(e));
+//   };
+
+//   useEffect(() => {
+//     if (props.batchId) {
+//       fetchExaminations();
+//       fetchUpcommingExams(props.batchId);
+//       fetchAllStudents(props.batchId);
+//     }
+//   }, [props.batchId, fetchExaminations]);
+
+//   // ───────────────── DELETE LOGIC ─────────────────
+
+//   const handleDelete = async () => {
+//     if (!selectedExam) return;
+
+//     try {
+//       await DeleteExamination(selectedExam._id);
+//       SuccessNotification("Examination Deleted!");
+//       setDeleteModalOpen(false);
+//       fetchExaminations();
+//     } catch (error) {
+//       console.log(error);
+//       notifications.show({
+//         title: "Delete Failed",
+//         message: "Unable to delete examination",
+//         color: "red",
+//       });
+//     }
+//   };
+
+
+//   const downloadAdmitCard = (id: string) => {
+//   GetStudentForIdCard(id)
+//     .then(async (res: any) => {
+
+//       const studentInfo = res.student;
+
+//       const base64Profile = await getBase64Image(studentInfo.profilePic);
+//       const base64Logo = await getBase64Image(studentInfo.instituteId.logo);
+
+//     const idCardhtml = GenerateAdmitCard({
+//   schoolName: studentInfo.instituteId.name,
+//   schoolLogo: base64Logo,
+//   schoolAddress: studentInfo.instituteId.address,
+//   institutePhoneNumber: studentInfo.instituteId.phoneNumber,
+
+//   studentName: studentInfo.name,
+//   studentPhoto: base64Profile,
+
+//   className: studentInfo.batchId.name,
+//   rollNo: studentInfo.rollNo,
+//   entrollmentNum: studentInfo.entrollmentNum,
+
+//   dob: studentInfo.dob,
+//   phone: studentInfo.phoneNumber,
+//   address: studentInfo.address,
+
+//   principalSignature: studentInfo.instituteId.principalSignature,
+
+//   examsData: examsData,
+// });
+
+//       const printWindow = window.open("", "_blank");
+
+//       if (printWindow) {
+//         printWindow.document.open();
+//         printWindow.document.write(idCardhtml);
+//         printWindow.document.close();
+
+//         setTimeout(() => {
+//           printWindow.print();
+//         }, 1000);
+//       }
+//     })
+//     .catch((e) => {
+//       console.log(e);
+//     });
+// };
+//   // ───────────────── PAGINATION COMPUTATIONS ─────────────────
+
+//   const totalExamPages = Math.max(1, Math.ceil(entries.length / EXAM_PAGE_SIZE));
+//   const paginatedEntries = entries.slice(
+//     (entryPage - 1) * EXAM_PAGE_SIZE,
+//     entryPage * EXAM_PAGE_SIZE
+//   );
+
+//   const totalStudentPages = Math.max(1, Math.ceil(students.length / STUDENT_PAGE_SIZE));
+//   const paginatedStudents = students.slice(
+//     (studentPage - 1) * STUDENT_PAGE_SIZE,
+//     studentPage * STUDENT_PAGE_SIZE
+//   );
+
+//   return (
+//     <Box
+//       p={isMobile ? "sm" : "xl"}
+//       style={{
+//         minHeight: "100vh",
+//         fontFamily: "'DM Sans', sans-serif",
+//       }}
+//     >
+//       {/* HEADER BANNER */}
+//       <Paper
+//         radius="16px"
+//         p="xl"
+//         mb="xl"
+//         style={{
+//           background: "#EEF3FF",
+//           border: "1px solid #DCE7FF",
+//         }}
+//       >
+//         <Group justify="space-between">
+//           <Group>
+//             <Flex
+//               align="center"
+//               justify="center"
+//               style={{
+//                 width: 44,
+//                 height: 44,
+//                 borderRadius: "12px",
+//                 background: "#FFFFFF",
+//               }}
+//             >
+//               <IconSparkles size={22} color="#2F6FED" />
+//             </Flex>
+
+//             <div>
+//               <Title order={3} c="#1B2559">
+//                 Examinations
+//               </Title>
+
+//               <Text c="#5B6B8C" fz={13}>
+//                 View examination schedules and exam cards.
+//               </Text>
+//             </div>
+//           </Group>
+
+//           <Button
+//             leftSection={<IconPlus size={18} />}
+//             radius={10}
+//             size="md"
+//             onClick={openAdd}
+//             styles={{
+//               root: {
+//                 background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+//                 border: 0,
+//                 fontWeight: 600,
+//               },
+//             }}
+//           >
+//             New Examination
+//           </Button>
+//         </Group>
+//       </Paper>
+
+//       {/* LOADING STATE */}
+//       {isLoading ? (
+//         <Flex justify="center" mt={80}>
+//           <Loader color="blue" size="lg" type="bars" />
+//         </Flex>
+//       ) : (
+//         <Stack gap={40}>
+          
+//           {/* SECTION 1: EXAMINATION COLLECTION */}
+//           {entries.length === 0 ? (
+//             <Paper
+//               radius="16px"
+//               p={60}
+//               ta="center"
+//               style={{
+//                 background: "#FAFCFF",
+//                 border: "1px dashed #DCE7FF",
+//               }}
+//             >
+//               <ThemeIcon
+//                 size={72}
+//                 radius="100%"
+//                 mx="auto"
+//                 mb="md"
+//                 style={{
+//                   background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+//                 }}
+//               >
+//                 <IconBook size={36} />
+//               </ThemeIcon>
+
+//               <Title order={3} c="#1B2559">No Examination Found</Title>
+
+//               <Text c="#5B6B8C" mt={6}>
+//                 Upload examination schedules and notices
+//               </Text>
+
+//               <Button
+//                 mt="xl"
+//                 radius={10}
+//                 leftSection={<IconPlus size={18} />}
+//                 onClick={openAdd}
+//                 style={{
+//                   background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+//                 }}
+//               >
+//                 Create Examination
+//               </Button>
+//             </Paper>
+//           ) : (
+//             <Paper
+//               radius="16px"
+//               p="lg"
+//               style={{
+//                 background: "#fff",
+//                 border: "1px solid #F1F4F9",
+//               }}
+//             >
+//               <Group justify="space-between" mb="xl">
+//                 <div>
+//                   <Title
+//                     order={3}
+//                     style={{
+//                       color: "#1B2559",
+//                       fontWeight: 700,
+//                     }}
+//                   >
+//                     Examination collection
+//                   </Title>
+
+//                   <Text size="sm" c="#5B6B8C">
+//                     {entries.length} examinations found
+//                   </Text>
+//                 </div>
+//               </Group>
+
+//               <Grid gutter="xl">
+//                 {paginatedEntries.map((item) => (
+//                   <Grid.Col
+//                     key={item._id}
+//                     span={{
+//                       base: 12,
+//                       sm: 6,
+//                       lg: 4,
+//                     }}
+//                   >
+//                     <Paper
+//                       radius="16px"
+//                       p={0}
+//                       style={{
+//                         overflow: "hidden",
+//                         background: "#ffffff",
+//                         border: "1px solid #F1F4F9",
+//                         transition: "all .3s ease",
+//                         height: "100%",
+//                         display: "flex",
+//                         flexDirection: "column",
+//                       }}
+//                     >
+//                       <Stack gap={0}>
+//                         <Box
+//                           style={{
+//                             aspectRatio: "16 / 10",
+//                             overflow: "hidden",
+//                             background: "#f5f5f5",
+//                             position: "relative",
+//                           }}
+//                         >
+//                           {/* DELETE DROPDOWN MENU */}
+//                           <Menu shadow="md" width={180} position="bottom-end">
+//                             <Menu.Target>
+//                               <ActionIcon
+//                                 variant="filled"
+//                                 radius="xl"
+//                                 style={{
+//                                   position: "absolute",
+//                                   top: 12,
+//                                   right: 12,
+//                                   zIndex: 10,
+//                                   background: "rgba(255,255,255,0.9)",
+//                                   color: "#333",
+//                                 }}
+//                               >
+//                                 <IconDotsVertical size={16} />
+//                               </ActionIcon>
+//                             </Menu.Target>
+
+//                             <Menu.Dropdown>
+//                               <Menu.Item
+//                                 color="red"
+//                                 leftSection={<IconTrash size={16} />}
+//                                 onClick={() => {
+//                                   setSelectedExam(item);
+//                                   setDeleteModalOpen(true);
+//                                 }}
+//                               >
+//                                 Delete
+//                               </Menu.Item>
+//                             </Menu.Dropdown>
+//                           </Menu>
+
+//                           <img
+//                             src={item.url}
+//                             alt={item.title}
+//                             style={{
+//                               width: "100%",
+//                               height: "100%",
+//                               objectFit: "cover",
+//                               display: "block",
+//                             }}
+//                           />
+//                         </Box>
+
+//                         <Box
+//                           p="lg"
+//                           style={{
+//                             flex: 1,
+//                             display: "flex",
+//                             flexDirection: "column",
+//                           }}
+//                         >
+//                           <Text
+//                             fw={700}
+//                             size="lg"
+//                             mb="xs"
+//                             lineClamp={2}
+//                             style={{ minHeight: "56px" }}
+//                           >
+//                             {item.title}
+//                           </Text>
+
+//                           <Text size="sm" c="dimmed" mb="lg">
+//                             Examination Schedule
+//                           </Text>
+
+//                           <Box style={{ flexGrow: 1 }} />
+
+//                           <Button
+//                             component="a"
+//                             href={item.url}
+//                             target="_blank"
+//                             radius={10}
+//                             size="md"
+//                             fullWidth
+//                             style={{
+//                               background:
+//                                 "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+//                             }}
+//                           >
+//                             View Examination
+//                           </Button>
+//                         </Box>
+//                       </Stack>
+//                     </Paper>
+//                   </Grid.Col>
+//                 ))}
+//               </Grid>
+
+//               {entries.length > EXAM_PAGE_SIZE && (
+//                 <Flex
+//                   justify="space-between"
+//                   align="center"
+//                   mt="xl"
+//                   direction={isMobile ? "column" : "row"}
+//                   gap="sm"
+//                 >
+//                   <Text size="sm" c="dimmed">
+//                     Showing{" "}
+//                     {Math.min((entryPage - 1) * EXAM_PAGE_SIZE + 1, entries.length)} to{" "}
+//                     {Math.min(entryPage * EXAM_PAGE_SIZE, entries.length)} of{" "}
+//                     {entries.length} resources
+//                   </Text>
+
+//                   <Pagination
+//                     total={totalExamPages}
+//                     value={entryPage}
+//                     onChange={setEntryPage}
+//                     radius="xl"
+//                     size="sm"
+//                     styles={{
+//                       control: {
+//                         "&[data-active]": {
+//                           background: "#2F6FED",
+//                           borderColor: "#2F6FED",
+//                         },
+//                       },
+//                     }}
+//                   />
+//                 </Flex>
+//               )}
+//             </Paper>
+//           )}
+
+//           {/* SECTION 2: ONLINE TEST ADMIT CARD (Conditional Render) */}
+//           {examsData.length > 0 && (
+//             <Paper
+//               radius="24px"
+//               p="lg"
+//               style={{
+//                 background: "#fff",
+//                 border: "1px solid #f1ebff",
+//                 boxShadow: "0 10px 30px rgba(92,61,232,0.05)",
+//               }}
+//             >
+//               <Group justify="space-between" mb="xl">
+//                 <div>
+//                   <Title
+//                     order={2}
+//                     style={{
+//                       color: "#1a1a2e",
+//                       fontWeight: 800,
+//                       letterSpacing: "-0.5px",
+//                     }}
+//                   >
+//                     Online Test Admit Card
+//                   </Title>
+
+//                   <Text size="sm" c="dimmed" fw={500} mt={2}>
+//                     Select a student to generate and download their upcoming admit card
+//                   </Text>
+//                 </div>
+//                 <Box
+//                   px="md"
+//                   py="xs"
+//                   style={{
+//                     background: "#f4f0ff",
+//                     borderRadius: "20px",
+//                     color: "#2F6FED",
+//                     fontWeight: 600,
+//                     fontSize: "14px",
+//                   }}
+//                 >
+//                   {students.length} Total Students
+//                 </Box>
+//               </Group>
+
+//               {students.length === 0 ? (
+//                 <Paper radius="xl" p={60} ta="center" style={{ background: "#faf7ff" }}>
+//                   <Text c="dimmed">No students found in this batch.</Text>
+//                 </Paper>
+//               ) : (
+//                 <Grid gutter="lg">
+//                   {paginatedStudents.map((student) => (
+//                     <Grid.Col
+//                       key={student._id}
+//                       span={{
+//                         base: 12,
+//                         sm: 6,
+//                         lg: 4,
+//                       }}
+//                     >
+//                       <Paper
+//                         radius="16px"
+//                         p="lg"
+//                         style={{
+//                           background: "#ffffff",
+//                           border: "1px solid #ede7ff",
+//                           boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
+//                           transition: "all .2s ease-in-out",
+//                           cursor: "pointer",
+//                         }}
+//                         onMouseEnter={(e) => {
+//                           e.currentTarget.style.transform = "translateY(-4px)";
+//                           e.currentTarget.style.boxShadow =
+//                             "0 12px 30px rgba(92,61,232,0.12)";
+//                           e.currentTarget.style.borderColor = "#cdbdff";
+//                         }}
+//                         onMouseLeave={(e) => {
+//                           e.currentTarget.style.transform = "translateY(0)";
+//                           e.currentTarget.style.boxShadow =
+//                             "0 4px 20px rgba(0,0,0,0.02)";
+//                           e.currentTarget.style.borderColor = "#ede7ff";
+//                         }}
+//                       >
+//                         <Group align="flex-start" wrap="nowrap">
+//                           <Avatar
+//                             size="md"
+//                             radius="xl"
+//                             color="blue"
+//                             style={{
+//                               background: "linear-gradient(135deg, #e5dbff, #d1bfff)",
+//                               color: "#2F6FED",
+//                             }}
+//                           >
+//                             {student.name.charAt(0).toUpperCase()}
+//                           </Avatar>
+
+//                           <Box style={{ flex: 1 }}>
+//                             <Text fw={700} size="md" c="#1a1a2e" lineClamp={1}>
+//                               {student.name}
+//                             </Text>
+//                             <Group gap="xs" mt={4}>
+//                               <IconPhone size={14} color="#8e8e8e" />
+//                               <Text size="xs" c="dimmed">
+//                                 {student.phoneNumber || "No Contact"}
+//                               </Text>
+//                             </Group>
+//                           </Box>
+//                         </Group>
+
+//                         <Button
+//                           fullWidth
+//                           mt="md"
+//                           radius="xl"
+//                           variant="light"
+//                           color="blue"
+//                           leftSection={<IconDownload size={16} />}
+//                           onClick={() => downloadAdmitCard(student._id)}
+//                           style={{
+//                             fontWeight: 600,
+//                           }}
+//                         >
+//                           Download Admit Card
+//                         </Button>
+//                       </Paper>
+//                     </Grid.Col>
+//                   ))}
+//                 </Grid>
+//               )}
+
+//               {/* Premium Pagination Footer */}
+//               {students.length > STUDENT_PAGE_SIZE && (
+//                 <Flex
+//                   justify="space-between"
+//                   align="center"
+//                   mt={40}
+//                   pt={20}
+//                   style={{ borderTop: "1px solid #f1ebff" }}
+//                   direction={isMobile ? "column" : "row"}
+//                   gap="sm"
+//                 >
+//                   <Text size="sm" c="dimmed" fw={500}>
+//                     Showing{" "}
+//                     <span style={{ color: "#1a1a2e" }}>
+//                       {Math.min((studentPage - 1) * STUDENT_PAGE_SIZE + 1, students.length)}
+//                     </span>{" "}
+//                     to{" "}
+//                     <span style={{ color: "#1a1a2e" }}>
+//                       {Math.min(studentPage * STUDENT_PAGE_SIZE, students.length)}
+//                     </span>{" "}
+//                     of <span style={{ color: "#1a1a2e" }}>{students.length}</span>{" "}
+//                     students
+//                   </Text>
+
+//                   <Pagination
+//                     total={totalStudentPages}
+//                     value={studentPage}
+//                     onChange={setStudentPage}
+//                     radius="xl"
+//                     size="sm"
+//                     styles={{
+//                       control: {
+//                         border: "none",
+//                         "&[data-active]": {
+//                           background: "linear-gradient(135deg, #2F6FED, #4F7CFB)",
+//                           boxShadow: "0 4px 10px rgba(92,61,232,0.3)",
+//                         },
+//                       },
+//                     }}
+//                   />
+//                 </Flex>
+//               )}
+//             </Paper>
+//           )}
+//         </Stack>
+//       )}
+
+//       {/* DELETE MODAL */}
+//       <Modal
+//         opened={deleteModalOpen}
+//         onClose={() => setDeleteModalOpen(false)}
+//         title="Delete Examination"
+//         centered
+//         radius="xl"
+//       >
+//         <Text mb="lg">
+//           Are you sure you want to delete this examination?
+//         </Text>
+
+//         <Group justify="flex-end">
+//           <Button
+//             variant="default"
+//             radius="xl"
+//             onClick={() => setDeleteModalOpen(false)}
+//           >
+//             Cancel
+//           </Button>
+
+//           <Button
+//             color="red"
+//             radius="xl"
+//             leftSection={<IconTrash size={16} />}
+//             onClick={handleDelete}
+//           >
+//             Delete
+//           </Button>
+//         </Group>
+//       </Modal>
+
+//       {/* DRAWER FOR CREATING EXAM */}
+//       <Drawer
+//         opened={addDrawerOpen}
+//         onClose={closeAdd}
+//         title={
+//           <Group gap="xs">
+//             <ThemeIcon
+//               size={34}
+//               radius="xl"
+//               style={{
+//                 background: "linear-gradient(135deg, #2F6FED, #4F7CFB)",
+//               }}
+//             >
+//               <IconBook size={18} />
+//             </ThemeIcon>
+
+//             <Text fw={700} size="lg">
+//               Add Examination
+//             </Text>
+//           </Group>
+//         }
+//         position="right"
+//         size={isMobile ? "100%" : 460}
+//         padding="xl"
+//       >
+//         <EntryForm
+//           onCancel={closeAdd}
+//           batchId={props.batchId}
+//           fetchNotes={fetchExaminations}
+//           isLoading={isLoading}
+//           setIsLoading={setIsLoading}
+//         />
+//       </Drawer>
+//     </Box>
+//   );
+// }
+
+
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  Group,
+  Paper,
+  Select,
+  Stack,
+  Table,
+  Text,
+  Title,
+  Menu,
+  ActionIcon,
+  Modal,
+  Loader,
+  Badge,
+} from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
+import {
+  IconPlus,
+  IconDotsVertical,
+  IconTrash,
+  IconDownload,
+  IconSparkles,
+  IconCalendarEvent,
+} from "@tabler/icons-react";
+import { GetAllStudentsFromBatch } from "@/axios/institute/InstituteGetApi";
+import { GetStudentDetail } from "@/axios/institute/InstituteGetApi";
+import { SuccessNotification, ErrorNotification, getBase64Image } from "@/app/helperFunction/Notification";
+import { useAppSelector } from "@/app/redux/redux.hooks";
+import CreateAdmitCardModal from "./CreateAdmitCardModal";
+import { generateAdmitCardHtml } from "./AdmitCardDesignHelper";
+import { DeleteAdmitCard, GetBatchAdmitCards } from "@/axios/institute/ExaminatonApi";
+import { formatDate } from "@/app/components/marketing/utility/utils";
+
+interface AdmitCardRecord {
+  _id: string;
+  examName: string;
+  session: string;
+  batchId: string;
+  createdAt: string;
+  student: {
+    _id: string;
+    name: string;
+    rollNumber: string | number;
+    enrollmentNo?: string;
+  };
+  schedules: {
+    subjectName: string;
+    subjectCode?: string;
+    examDate: string;
+    examTime: string;
+    subjectType?: string;
+  }[];
+}
+
+export default function ExaminationPage(props: { batchId: string }) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const institute = useAppSelector((state: any) => state.instituteSlice.instituteDetails);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedAdmitCardId, setSelectedAdmitCardId] = useState<string>("");
+
+  const [batchStudents, setBatchStudents] = useState<
+    { _id: string; name: string; rollNumber: string | number }[]
+  >([]);
+
+  const [admitCards, setAdmitCards] = useState<AdmitCardRecord[]>([]);
+  const [filterExam, setFilterExam] = useState<string | null>(null);
+  const [availableExams, setAvailableExams] = useState<string[]>([]);
+
+  // 1. Fetch Students
+  const fetchStudents = useCallback(() => {
+    if (!props.batchId) return;
+    GetAllStudentsFromBatch(props.batchId)
+      .then((res: any) => {
+        const list = res?.students?.students || res?.students || [];
+        setBatchStudents(
+          list.map((st: any) => ({
+            _id: st._id,
+            name: st.name,
+            rollNumber: st.rollNumber || "-",
+          }))
+        );
+      })
+      .catch((e) => console.error(e));
+  }, [props.batchId]);
+
+  // 2. Fetch Generated Admit Cards
+  const fetchAdmitCards = useCallback(() => {
+    if (!props.batchId) return;
+    setIsLoading(true);
+
+    GetBatchAdmitCards(props.batchId)
+      .then((res: any) => {
+        const list: AdmitCardRecord[] = res?.admitCards || res?.data || [];
+        setAdmitCards(list);
+
+        // Extract unique exams for dropdown
+        const uniqueExams = Array.from(new Set(list.map((item) => item.examName)));
+        setAvailableExams(uniqueExams);
+        if (uniqueExams.length > 0 && !filterExam) {
+          setFilterExam(uniqueExams[0]);
+        }
+      })
+      .catch((err) => {
+        console.error("Admit card fetch error:", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [props.batchId, filterExam]);
+
+  useEffect(() => {
+    if (props.batchId) {
+      fetchStudents();
+      fetchAdmitCards();
+    }
+  }, [props.batchId, fetchStudents, fetchAdmitCards]);
+
+  // 3. Print / Download Admit Card
+  const handleDownload = async (record: AdmitCardRecord) => {
+    try {
+      // Fetch full student & institute details
+      const studentRes: any = await GetStudentDetail(record.student._id);
+      const student = studentRes?.student;
+
+      if (!student) {
+        ErrorNotification("Student information not found");
+        return;
+      }
+
+      const instituteData = student.instituteId || institute;
+
+      // Base64 Images
+      const studentPhoto = await getBase64Image(student.profilePic);
+      const instituteLogo = await getBase64Image(instituteData?.logo);
+      const principalSign = await getBase64Image(instituteData?.signature || instituteData?.principalSignature);
+
+      const html = generateAdmitCardHtml({
+        instituteName: instituteData?.name,
+        instituteLogo: instituteLogo,
+        instituteAddress: instituteData?.address,
+        institutePhone: instituteData?.institutePhoneNumber || instituteData?.phoneNumber,
+        instituteEmail: instituteData?.email,
+        principalSignature: principalSign,
+
+        examName: record.examName,
+        session: record.session,
+
+        studentName: student.name || record.student.name,
+        rollNumber: String(student.rollNumber || record.student.rollNumber || ""),
+        enrollmentNo: student.enrollmentNo || record.student.enrollmentNo || "",
+        batchName: student.batchId?.name || "Class",
+        fatherName: student.parentName,
+        motherName: student.motherName,
+        dob: student.dateOfBirth ? formatDate(student.dateOfBirth) : "",
+        studentPhoto: studentPhoto,
+
+        schedules: record.schedules.map((s) => ({
+          subjectName: s.subjectName,
+          subjectCode: s.subjectCode,
+          examDate: s.examDate ? formatDate(s.examDate) : "-",
+          examTime: s.examTime,
+          subjectType: s.subjectType,
+        })),
+      });
+
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        ErrorNotification("Please allow pop-ups to print the admit card");
+        return;
+      }
+
+      printWindow.document.open();
+      printWindow.document.write(html);
+      printWindow.document.close();
+
+      setTimeout(() => {
+        if (!printWindow.closed) {
+          printWindow.focus();
+          printWindow.print();
+        }
+      }, 500);
+    } catch (err) {
+      console.error(err);
+      ErrorNotification("Failed to generate admit card print view");
+    }
+  };
+
+  // 4. Delete Admit Card
+  const handleDelete = async () => {
+    if (!selectedAdmitCardId) return;
+
+    try {
+      await DeleteAdmitCard(selectedAdmitCardId);
+      SuccessNotification("Admit Card deleted successfully!");
+      setAdmitCards((prev) => prev.filter((item) => item._id !== selectedAdmitCardId));
+      setDeleteModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      ErrorNotification("Failed to delete admit card");
+    }
+  };
+
+  const filteredCards = filterExam
+    ? admitCards.filter((c) => c.examName.toLowerCase() === filterExam.toLowerCase())
+    : admitCards;
+
+  return (
+    <Box p={isMobile ? "sm" : "xl"} style={{ minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
+      {/* HEADER BANNER */}
+      <Paper
+        radius="16px"
+        p="xl"
+        mb="xl"
+        style={{
+          background: "#EEF3FF",
+          border: "1px solid #DCE7FF",
+        }}
+      >
+        <Flex
+          justify="space-between"
+          align={isMobile ? "flex-start" : "center"}
+          direction={isMobile ? "column" : "row"}
+          gap={16}
+        >
+          <Flex align="center" gap={14}>
+            <Flex
+              align="center"
+              justify="center"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "12px",
+                background: "#FFFFFF",
+              }}
+            >
+              <IconSparkles size={22} color="#2F6FED" />
+            </Flex>
+            <div>
+              <Title order={3} c="#1B2559">
+                Examinations & Admit Cards
+              </Title>
+              <Text c="#5B6B8C" fz={13}>
+                Create examination schedules, generate admit cards, and track issued hall tickets.
+              </Text>
+            </div>
+          </Flex>
+
+          <Button
+            leftSection={<IconPlus size={18} />}
+            radius={10}
+            size="md"
+            onClick={() => setOpenModal(true)}
+            styles={{
+              root: {
+                background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+                border: 0,
+                fontWeight: 600,
+              },
+            }}
+          >
+            New Examination
+          </Button>
+        </Flex>
+      </Paper>
+
+      {/* FILTER CONTROLS */}
+      <Flex justify="space-between" align="center" mb={16} wrap="wrap" gap={12}>
+        <Group>
+          <Text fw={700} fz={18} c="#1B2559">
+            Issued Admit Cards
+          </Text>
+          <Badge color="blue" variant="light" size="lg" radius="xl">
+            {filteredCards.length} Generated
+          </Badge>
+        </Group>
+
+        {availableExams.length > 0 && (
+          <Select
+            placeholder="Filter by Exam"
+            data={availableExams}
+            value={filterExam}
+            onChange={setFilterExam}
+            radius={10}
+            w={isMobile ? "100%" : 220}
+          />
+        )}
+      </Flex>
+
+      {/* TABLE */}
+      {isLoading ? (
+        <Flex justify="center" mt={80}>
+          <Loader color="blue" size="lg" type="bars" />
+        </Flex>
+      ) : filteredCards.length === 0 ? (
+        <Paper
+          radius="16px"
+          p={60}
+          ta="center"
+          style={{
+            background: "#FAFCFF",
+            border: "1px dashed #DCE7FF",
+          }}
+        >
+          <IconCalendarEvent size={48} color="#4F7CFB" style={{ margin: "0 auto 12px" }} />
+          <Title order={3} c="#1B2559">
+            No Admit Cards Found
+          </Title>
+          <Text c="#5B6B8C" mt={6}>
+            Click on "New Examination" to generate admit cards for your students.
+          </Text>
+          <Button
+            mt="xl"
+            radius={10}
+            leftSection={<IconPlus size={18} />}
+            onClick={() => setOpenModal(true)}
+            style={{
+              background: "linear-gradient(135deg, #4F7CFB 0%, #2F6FED 100%)",
+            }}
+          >
+            Create Admit Card
+          </Button>
+        </Paper>
+      ) : (
+        <Box
+          style={{
+            overflowX: "auto",
+            borderRadius: "16px",
+            border: "1px solid #F1F4F9",
+            background: "#fff",
+          }}
+        >
+          <Table
+            w="100%"
+            verticalSpacing={isMobile ? "sm" : "md"}
+            horizontalSpacing={isMobile ? "sm" : "xl"}
+            fz={isMobile ? 14 : 15}
+          >
+            <Table.Thead bg="#F7F9FC" style={{ borderBottom: "1px solid #EEF1F6" }}>
+              <Table.Tr>
+                <Table.Th ta="left" style={{ color: "#64748B", fontSize: 13 }}>Student Name</Table.Th>
+                <Table.Th ta="center" style={{ color: "#64748B", fontSize: 13 }}>Roll Number</Table.Th>
+                <Table.Th ta="center" style={{ color: "#64748B", fontSize: 13 }}>Exam Name</Table.Th>
+                <Table.Th ta="center" style={{ color: "#64748B", fontSize: 13 }}>Session</Table.Th>
+                <Table.Th ta="center" style={{ color: "#64748B", fontSize: 13 }}>Subjects</Table.Th>
+                <Table.Th ta="center" style={{ color: "#64748B", fontSize: 13 }}>Action</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+
+            <Table.Tbody>
+              {filteredCards.map((item) => (
+                <Table.Tr key={item._id} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                  <Table.Td ta="left" style={{ color: "#1B2559", fontWeight: 600 }}>
+                    {item.student?.name}
+                  </Table.Td>
+                  <Table.Td ta="center" style={{ color: "#64748B", fontWeight: 500 }}>
+                    {item.student?.rollNumber}
+                  </Table.Td>
+                  <Table.Td ta="center">
+                    <Badge variant="light" color="blue" radius="xl" size="md">
+                      {item.examName}
+                    </Badge>
+                  </Table.Td>
+                  <Table.Td ta="center" style={{ color: "#64748B" }}>
+                    {item.session}
+                  </Table.Td>
+                  <Table.Td ta="center" style={{ color: "#64748B" }}>
+                    {item.schedules?.length || 0} Subjects
+                  </Table.Td>
+                  <Table.Td ta="center">
+                    <Menu shadow="md" width={180} position="bottom-end">
+                      <Menu.Target>
+                        <ActionIcon variant="subtle" color="gray">
+                          <IconDotsVertical size={20} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item
+                          leftSection={<IconDownload size={16} />}
+                          onClick={() => handleDownload(item)}
+                        >
+                          Download / Print
+                        </Menu.Item>
+                        <Menu.Item
+                          color="red"
+                          leftSection={<IconTrash size={16} />}
+                          onClick={() => {
+                            setSelectedAdmitCardId(item._id);
+                            setDeleteModalOpen(true);
+                          }}
+                        >
+                          Delete
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Box>
+      )}
+
+      {/* CREATE ADMIT CARD MODAL */}
+      <CreateAdmitCardModal
+        opened={openModal}
+        onClose={() => setOpenModal(false)}
+        batchId={props.batchId}
+        batchStudents={batchStudents}
+        onSuccess={() => {
+          fetchAdmitCards();
+        }}
+      />
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <Modal
+        opened={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title={<Text fw={700} c="red">Delete Admit Card</Text>}
+        centered
+        radius="lg"
+      >
+        <Stack>
+          <Text size="sm" c="dimmed">
+            Are you sure you want to delete this admit card record? This action cannot be undone.
+          </Text>
+          <Group justify="flex-end">
+            <Button variant="default" radius="md" onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="red" radius="md" leftSection={<IconTrash size={16} />} onClick={handleDelete}>
+              Delete
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </Box>
+  );
+}

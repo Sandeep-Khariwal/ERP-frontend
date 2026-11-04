@@ -40,6 +40,8 @@ interface StudentFormValues {
   dateOfBirth: Date | undefined;
   address: string;
   gender: string;
+  height?: number | string;
+weight?: number | string;
   dateOfJoining: Date;
   transportFees?: number;
   parentNumber?: string;
@@ -87,6 +89,8 @@ export function AddMoreDetails(props: {
     admissionNumber: props.formData?.admissionNumber || "",
     motherName: props.formData?.motherName || "",
     gender: props.formData?.gender || "",
+    height: props.formData?.height ?? "",
+weight: props.formData?.weight ?? "",
     dateOfJoining: props.formData?.dateOfJoining || new Date(),
     van: props.formData.van,
     rollNumber: props.formData?.rollNumber || "",
@@ -156,6 +160,8 @@ export function AddMoreDetails(props: {
             address: student.address,
             parentNumber: student.parentNumber,
             gender: student.gender,
+            height: student.height ?? "",
+weight: student.weight ?? "",
             dateOfJoining: student.dateOfJoining
               ? new Date(student.dateOfJoining)
               : new Date(),
@@ -241,6 +247,14 @@ admissionNumber: student.admissionNumber || "",
         ),
         address: formValues.address,
         gender: formValues.gender,
+        height:
+  formValues.height === "" || formValues.height == null
+    ? undefined
+    : Number(formValues.height),
+weight:
+  formValues.weight === "" || formValues.weight == null
+    ? undefined
+    : Number(formValues.weight),
         instituteId: props.instituteId,
         batchId: props.batchId,
         email: formValues.email,
@@ -332,6 +346,8 @@ admissionNumber: student.admissionNumber || "",
             address: "",
             parentNumber: "",
             gender: "",
+            height: "",
+weight: "",
             dateOfJoining: new Date(),
             rollNumber: "",
             motherName: "",
@@ -375,6 +391,8 @@ admissionNumber: student.admissionNumber || "",
                 address: "",
                 parentNumber: "",
                 gender: "",
+                height: "",
+weight: "",
                 dateOfJoining: new Date(),
                 rollNumber: "",
                 motherName: "",
