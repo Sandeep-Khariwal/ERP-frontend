@@ -146,7 +146,7 @@ export default function PassOutStudents() {
     const response: any = await GetStudentMarksheets(studentId);
     // console.log("response : ",response);
     
-    const marksheet = response.marksheet[0];
+    const marksheet = response.marksheets[0];
 
     GetStudentDetail(studentId)
       .then(async (res: any) => {
