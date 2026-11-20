@@ -1,5 +1,13 @@
 import { getExamStartTime } from "@/app/helperFunction/Notification";
-import { UpcomingExaminationData } from "../ExaminationPage";
+
+export interface UpcomingExaminationData {
+  _id: string;
+  name: string;
+  subjectId: { _id: string; name: string };
+  batchId: { _id: string; name: string };
+  totalTime: number;
+  startTime: Date;
+}
 
 type StudentIdCardData = {
   schoolName: string;

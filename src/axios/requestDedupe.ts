@@ -56,3 +56,12 @@ export function dedupeInFlightRequest<T>(
 
   return promise;
 }
+
+export function clearInFlightRequest(key?: string) {
+  if (key) {
+    inFlight.delete(key);
+  } else {
+    inFlight.clear();
+  }
+}
+

@@ -145,6 +145,7 @@ const AddStaffModal = (props: {
           password: formData.password,
           institute: props.instituteId,
           selectedBatches: selectedBatches,
+          subjects: selectedSujects,
         })
           .then((x: any) => {
             setIsLoading(false);
@@ -187,6 +188,47 @@ const AddStaffModal = (props: {
         });
     }
   }, [props.isOpen, props.instituteId]);
+
+  // Dynamically load subjects for selected batches
+  useEffect(() => {
+    if (!selectedBatches.length) {
+      setAllSubjects([]);
+      setSelectedSubjects([]);
+      return;
+    }
+
+    Promise.all(
+      selectedBatches.map((bId) =>
+        GetAllSubjectsFromBatch(bId).catch(() => ({
+          subjects: { subjects: [], optionalSubjects: [] },
+        }))
+      )
+    ).then((results: any[]) => {
+      const unique = new Map<string, { label: string; value: string }>();
+      results.forEach((res) => {
+        const rawRegular =
+          res?.subjects?.subjects ||
+          (Array.isArray(res?.subjects) ? res.subjects : []);
+        const rawOptional = res?.subjects?.optionalSubjects || [];
+        const combined = [...rawRegular, ...rawOptional];
+
+        combined.forEach((s: any) => {
+          if (s && s._id && s.name && !unique.has(s._id)) {
+            unique.set(s._id, {
+              value: s._id,
+              label: s.name,
+            });
+          }
+        });
+      });
+      const list = Array.from(unique.values());
+      setAllSubjects(list);
+
+      // Prune selected subjects that are no longer available in the selected batches
+      const validIds = new Set(list.map((item) => item.value));
+      setSelectedSubjects((prev) => prev.filter((id) => validIds.has(id)));
+    });
+  }, [selectedBatches]);
 
   // function updateTeacher() {
   //   if (initialFormData) {
@@ -361,17 +403,28 @@ const AddStaffModal = (props: {
                 onChange={(value: string[]) => setSelectedBatches(value)}
                 placeholder="Select Batches"
                 label="Select Batches"
+                searchable
+                clearable
               />
             )}
-            {/* {selectedImageIndex === 2 && (
+            {selectedImageIndex === 2 && (
               <MultiSelect
-                data={allBatches}
-                value={selectedBatches}
-                onChange={(value: string[]) => setSelectedBatches(value)}
-                placeholder="Select Subject"
-                label="Select Subject"
+                data={allSubjects}
+                value={selectedSujects}
+                onChange={(value: string[]) => setSelectedSubjects(value)}
+                placeholder={
+                  !selectedBatches.length
+                    ? "Select batches first"
+                    : allSubjects.length === 0
+                    ? "No subjects in selected batches"
+                    : "Select Subjects"
+                }
+                label="Select Subjects"
+                disabled={!selectedBatches.length}
+                searchable
+                clearable
               />
-            )} */}
+            )}
           </>
         )}
       </Stack>

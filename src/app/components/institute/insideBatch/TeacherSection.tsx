@@ -15,6 +15,7 @@ import {
   Modal,
   MultiSelect,
   Pagination,
+  Select,
   Stack,
   Table,
   Text,
@@ -26,6 +27,7 @@ import { RemoveStudentFromBatch } from "@/axios/student/StudentDeleteApi";
 import {
   containsOnlyDigits,
   SuccessNotification,
+  ErrorNotification,
 } from "@/app/helperFunction/Notification";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
 import {
@@ -81,6 +83,8 @@ const TeachersSection = (props: {
   // Optional batchId -> batch name lookup, used to render a "Classes"
   // column in the main Teacher Directory table.
   batchMap?: Map<string, string>;
+  batches?: { _id: string; name: string }[];
+  onRefreshTeachers?: () => void;
 
   //   setEditStudentDetails: React.Dispatch<React.SetStateAction<boolean>>;
   //   setShowSelectedScreen: React.Dispatch<React.SetStateAction<Screen>>;
@@ -100,13 +104,20 @@ const TeachersSection = (props: {
     _id: string;
     name: string;
     phoneNumber: string;
-    subjects: { _id: string; name: string }[];
+    subjects: any[];
+    instituteBatches?: string[];
   }>({
     _id: "",
     name: "",
     phoneNumber: "",
     subjects: [],
+    instituteBatches: [],
   });
+  const [selectedModalBatchId, setSelectedModalBatchId] = useState<string>("");
+  const [modalBatchSubjects, setModalBatchSubjects] = useState<
+    { name: string; _id: string }[]
+  >([]);
+  const [isLoadingModalSubjects, setIsLoadingModalSubjects] = useState<boolean>(false);
   const [subjects, setSubjects] = useState<{ name: string; _id: string }[]>([]);
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
   const [teacherForm, setTeacherForm] = useState<{
@@ -130,17 +141,74 @@ const TeachersSection = (props: {
     if (props.isTeacherDashboard) {
       setTeachers(props.teachers || []);
     }
-  }, [props.teachers]);
+  }, [props.teachers, props.isTeacherDashboard]);
+
+  // Load batch subjects dynamically inside the Edit Teacher modal whenever selected class/batch changes
+  useEffect(() => {
+    if (!editTeacher || !selectedModalBatchId) {
+      setModalBatchSubjects([]);
+      setSelectedSubjectIds([]);
+      return;
+    }
+
+    setIsLoadingModalSubjects(true);
+    GetAllSubjectsFromBatch(selectedModalBatchId)
+      .then((res: any) => {
+        const rawRegular =
+          res?.subjects?.subjects ||
+          (Array.isArray(res?.subjects) ? res.subjects : []);
+        const rawOptional = res?.subjects?.optionalSubjects || [];
+        const combined = [...rawRegular, ...rawOptional];
+
+        const unique = new Map<string, { _id: string; name: string }>();
+        combined.forEach((s: any) => {
+          if (s && s._id && s.name && !unique.has(s._id)) {
+            unique.set(s._id, { _id: s._id, name: s.name });
+          }
+        });
+        const list = Array.from(unique.values());
+        setModalBatchSubjects(list);
+
+        // Preselect valid existing subjects for this teacher in this batch
+        const batchSubIds = new Set(list.map((s) => s._id));
+        const teacherSubs = (editTeacherId?.subjects || []).map((s: any) =>
+          typeof s === "object" ? s._id : s
+        );
+        const matchingSubs = teacherSubs.filter((id: string) =>
+          batchSubIds.has(id)
+        );
+        setSelectedSubjectIds(matchingSubs);
+        setIsLoadingModalSubjects(false);
+      })
+      .catch((e) => {
+        console.error("Error fetching modal batch subjects:", e);
+        setModalBatchSubjects([]);
+        setSelectedSubjectIds([]);
+        setIsLoadingModalSubjects(false);
+      });
+  }, [editTeacher, selectedModalBatchId]);
 
   useEffect(() => {
-    if (props.batchId) {
+    if (props.batchId && !props.isTeacherDashboard) {
       setIsLoading(true);
       GetAllTeachersFromBatch(props.batchId)
         .then((x: any) => {
           GetAllSubjectsFromBatch(props.batchId || "")
-            .then((x: any) => {
-              const { subjects } = x.subjects;
-              setSubjects(subjects);
+            .then((res: any) => {
+              const rawRegular =
+                res?.subjects?.subjects ||
+                (Array.isArray(res?.subjects) ? res.subjects : []);
+              const rawOptional = res?.subjects?.optionalSubjects || [];
+              const combined = [...rawRegular, ...rawOptional];
+
+              const unique = new Map<string, { _id: string; name: string }>();
+              combined.forEach((s: any) => {
+                if (s && s._id && s.name && !unique.has(s._id)) {
+                  unique.set(s._id, { _id: s._id, name: s.name });
+                }
+              });
+              const subList = Array.from(unique.values());
+              setSubjects(subList);
               setIsLoading(false);
             })
             .catch((e) => {
@@ -149,7 +217,7 @@ const TeachersSection = (props: {
             });
 
           const { teachers } = x;
-          const teachersData = teachers.map((s: any) => {
+          const teachersData = (Array.isArray(teachers) ? teachers : []).map((s: any) => {
             return {
               _id: s._id,
               name: s.name,
@@ -165,7 +233,7 @@ const TeachersSection = (props: {
           setIsLoading(false);
         });
     }
-  }, [props.batchId]);
+  }, [props.batchId, props.isTeacherDashboard]);
 
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [deletingTeacherId, setDeletingTeacherId] = useState<string>("");
@@ -211,21 +279,82 @@ const TeachersSection = (props: {
   };
 
   const editTeacherData = () => {
+    if (!editTeacherId._id) return;
     setIsLoading(true);
+
+    const phoneValue = Array.isArray(editTeacherId.phoneNumber)
+      ? editTeacherId.phoneNumber[0] || ""
+      : editTeacherId.phoneNumber;
+
     UpdateTeacher(editTeacherId._id, {
       name: editTeacherId.name,
-      phoneNumber: editTeacherId.phoneNumber,
+      phoneNumber: phoneValue,
       subjects: selectedSubjectIds,
+      batchId: selectedModalBatchId || undefined,
     })
-      .then(() => {
-        SuccessNotification("Teacher updated!!");
+      .then((res: any) => {
+        SuccessNotification("Teacher updated successfully!");
         setIsLoading(false);
         setEditTeacher(false);
+
+        if (props.onRefreshTeachers) {
+          props.onRefreshTeachers();
+        }
+
+        const updatedTeacher = res?.teacher;
+        if (updatedTeacher) {
+          if (props.setOriginalArrayOfTeachers) {
+            props.setOriginalArrayOfTeachers((prev) =>
+              prev.map((t) =>
+                t._id === updatedTeacher._id
+                  ? {
+                      ...t,
+                      name: updatedTeacher.name,
+                      phoneNumber: updatedTeacher.phoneNumber,
+                      instituteBatches:
+                        updatedTeacher.instituteBatches || t.instituteBatches,
+                      subjects: updatedTeacher.subjects || t.subjects,
+                    }
+                  : t
+              )
+            );
+          }
+          if (props.setTeachersInDashboard) {
+            props.setTeachersInDashboard((prev) =>
+              prev.map((t) =>
+                t._id === updatedTeacher._id
+                  ? {
+                      ...t,
+                      name: updatedTeacher.name,
+                      phoneNumber: updatedTeacher.phoneNumber,
+                      instituteBatches:
+                        updatedTeacher.instituteBatches || t.instituteBatches,
+                      subjects: updatedTeacher.subjects || t.subjects,
+                    }
+                  : t
+              )
+            );
+          }
+          setTeachers((prev) =>
+            prev.map((t) =>
+              t._id === updatedTeacher._id
+                ? {
+                    ...t,
+                    name: updatedTeacher.name,
+                    phoneNumber: updatedTeacher.phoneNumber,
+                    subjects: updatedTeacher.subjects || t.subjects,
+                  }
+                : t
+            )
+          );
+        }
       })
-      .catch((e) => {
-        console.log(e);
+      .catch((e: any) => {
+        console.error("Update teacher failed:", e);
         setIsLoading(false);
-        setEditTeacher(false);
+        ErrorNotification(
+          e?.response?.data?.message || "Failed to update teacher"
+        );
       });
   };
 
@@ -549,45 +678,7 @@ const TeachersSection = (props: {
 >
   Remove Teacher
 </Menu.Item>
-                        {props.batchId && (
-                          // <Menu.Item
-                          //   onClick={() => {
-                          //     setEditTeacher(true);
-                          //     setEditTeacherId(item);
-                          //     console.log(
-                          //       "batchId : ",
-                          //       item.subjects,
-                          //       props.batchId
-                          //     );
-                          //     const alreadyBatchAssigned = item.subjects.filter(
-                          //       (s: any) => s.batchId === props.batchId
-                          //     );
-                          //     setSelectedSubjectIds(
-                          //       alreadyBatchAssigned.map((s: any) => s._id)
-                          //     );
-                          //   }}
-                          // >
-                          //   <Flex align="center">
-                          //     <Flex align="center">
-                          //       <Box mr={2}>
-                          //         <Image
-                          //           src={"/editImg.png"}
-                          //           alt="profile"
-                          //           width={20}
-                          //           height={20}
-                          //         />
-                          //       </Box>
-                          //     </Flex>
-                          //     <Text
-                          //       // fz={16}
-                          //       ml={10}
-                          //       style={{ fontFamily: "Roboto" }}
-                          //     >
-                          //       Edit Teacher
-                          //     </Text>
-                          //   </Flex>
-                          // </Menu.Item>
-                          <Menu.Item
+                        <Menu.Item
   leftSection={<IconEdit size={18} stroke={1.7} />}
   styles={{
     item: {
@@ -603,21 +694,18 @@ const TeachersSection = (props: {
     },
   }}
   onClick={() => {
-    setEditTeacher(true);
+    const defaultBatch =
+      props.batchId ||
+      (item.instituteBatches && item.instituteBatches[0]) ||
+      (props.batches && props.batches[0]?._id) ||
+      "";
     setEditTeacherId(item);
-
-    const alreadyBatchAssigned = (item.subjects || []).filter(
-      (s: any) => s.batchId === props.batchId
-    );
-
-    setSelectedSubjectIds(
-      alreadyBatchAssigned.map((s: any) => s._id)
-    );
+    setSelectedModalBatchId(defaultBatch);
+    setEditTeacher(true);
   }}
 >
   Edit Teacher
 </Menu.Item>
-                        )}
                       </Menu.Dropdown>
                       
                     </Menu>
@@ -692,7 +780,11 @@ const TeachersSection = (props: {
           placeholder="Enter Phone Number"
           maxLength={10}
           mt={10}
-          value={editTeacherId.phoneNumber}
+          value={
+            Array.isArray(editTeacherId.phoneNumber)
+              ? editTeacherId.phoneNumber[0] || ""
+              : editTeacherId.phoneNumber
+          }
           onChange={(e) => {
             if (containsOnlyDigits(e.currentTarget.value)) {
               setEditTeacherId({
@@ -703,18 +795,56 @@ const TeachersSection = (props: {
           }}
           required
         />
+        <Select
+          label="Select Class / Batch"
+          placeholder="Select Class"
+          data={
+            props.batches && props.batches.length > 0
+              ? props.batches.map((b) => ({ value: b._id, label: b.name }))
+              : props.batchId
+              ? [
+                  {
+                    value: props.batchId,
+                    label: props.batchName || "Current Batch",
+                  },
+                ]
+              : []
+          }
+          value={selectedModalBatchId}
+          onChange={(val) => setSelectedModalBatchId(val || "")}
+          mt={10}
+          searchable
+          disabled={!props.isTeacherDashboard && !!props.batchId}
+        />
         <MultiSelect
-          data={subjects.map((subject) => ({
+          data={modalBatchSubjects.map((subject) => ({
             label: subject.name,
             value: subject._id,
           }))}
           mt={10}
           value={selectedSubjectIds || []}
           onChange={(value: string[]) => setSelectedSubjectIds(value)}
-          placeholder="Select Subjects"
+          placeholder={
+            !selectedModalBatchId
+              ? "Select class first"
+              : isLoadingModalSubjects
+              ? "Loading subjects..."
+              : modalBatchSubjects.length === 0
+              ? "No subjects in this batch"
+              : "Select Subjects"
+          }
           label="Select Subjects"
+          disabled={!selectedModalBatchId || isLoadingModalSubjects}
+          searchable
+          clearable
         />
-        <Button mt={10} variant="outline" onClick={editTeacherData}>
+        <Button
+          mt={16}
+          fullWidth
+          variant="outline"
+          onClick={editTeacherData}
+          loading={isLoading}
+        >
           Submit
         </Button>
       </Modal>

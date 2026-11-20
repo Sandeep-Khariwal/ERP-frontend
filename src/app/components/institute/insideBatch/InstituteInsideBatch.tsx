@@ -35,6 +35,8 @@ import TeacherProfile from "../teacher/TeacherProfile";
 import UploadExcelAdmission from "../student/addMoreDetails/UploadExcelAdmission";
 import { GetAllTeachersFromBatch } from "@/axios/institute/InstituteGetApi";
 import { GetAllSubjectsFromBatch } from "@/axios/batch/BatchGetApi";
+import { BookOpen } from "lucide-react";
+import { EditBatchSubjectsModal } from "../../dashboard/EditBatchSubjectsModal";
 
 // Lazily loaded — each of these is only ever shown for one active tab at a
 // time, so there's no reason to ship all of their code (and their heavy
@@ -139,6 +141,8 @@ export function InstituteInsideBatch(props: {
   const [takeAttendance, setTakeAttandance] = useState<boolean>(false);
   const [openAddMarksModal, setOpenAddMarksModal] = useState<boolean>(false);
   const [openFileAdmissionModal, setOpenFileAdmissionModal] =
+    useState<boolean>(false);
+  const [openManageSubjectsModal, setOpenManageSubjectsModal] =
     useState<boolean>(false);
 
   const [showSelectedScreen, setShowSelectedScreen] = useState<Screen>(
@@ -246,38 +250,51 @@ export function InstituteInsideBatch(props: {
         <Flex
           w={"100%"}
           align={"center"}
-          justify={"start"}
+          justify={"space-between"}
+          wrap="wrap"
           gap={14}
           pb={14}
           style={{ borderBottom: "1px solid #F1F4F9" }}
         >
-          <Flex
-            align="center"
-            justify="center"
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: "8px",
-              cursor: "pointer",
-              border: "1px solid #E2E8F0",
-            }}
-            onClick={() => props.onClickBack()}
-          >
-            <Image
-              src={"/backArrow.png"}
-              alt="back"
-              width={16}
-              height={13}
-            />
+          <Flex align="center" gap={14}>
+            <Flex
+              align="center"
+              justify="center"
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: "8px",
+                cursor: "pointer",
+                border: "1px solid #E2E8F0",
+              }}
+              onClick={() => props.onClickBack()}
+            >
+              <Image
+                src={"/backArrow.png"}
+                alt="back"
+                width={16}
+                height={13}
+              />
+            </Flex>
+            <Stack gap={0}>
+              <Text fz={12} fw={600} c="#8B96AD" style={{ fontFamily: "sans-serif" }}>
+                Academic workspace
+              </Text>
+              <Text fz={22} fw={700} c="#1B2559" style={{ fontFamily: "sans-serif" }}>
+                {props.batchName}
+              </Text>
+            </Stack>
           </Flex>
-          <Stack gap={0}>
-            <Text fz={12} fw={600} c="#8B96AD" style={{ fontFamily: "sans-serif" }}>
-              Academic workspace
-            </Text>
-            <Text fz={22} fw={700} c="#1B2559" style={{ fontFamily: "sans-serif" }}>
-              {props.batchName}
-            </Text>
-          </Stack>
+
+          <Button
+            leftSection={<BookOpen size={16} />}
+            variant="light"
+            color="blue"
+            radius="md"
+            onClick={() => setOpenManageSubjectsModal(true)}
+          >
+            Manage Subjects
+          </Button>
         </Flex>
 
         {/* 🔹 Tab Bar */}
@@ -632,6 +649,26 @@ export function InstituteInsideBatch(props: {
           setShowSelectedScreen={setShowSelectedScreen}
           setIsOpen={(val: boolean) => {
             setOpenAddStudentModal(val);
+          }}
+        />
+      )}
+
+      {/* 🔹 Manage Batch Subjects Modal */}
+      {openManageSubjectsModal && (
+        <EditBatchSubjectsModal
+          isOpen={openManageSubjectsModal}
+          onClose={() => setOpenManageSubjectsModal(false)}
+          batchId={props.batchId}
+          batchName={props.batchName}
+          onSuccess={(updatedList) => {
+            setSubject(updatedList);
+            GetAllSubjectsFromBatch(props.batchId)
+              .then((res: any) => {
+                if (res?.subjects?.subjects) {
+                  setSubject(res.subjects.subjects);
+                }
+              })
+              .catch(() => {});
           }}
         />
       )}

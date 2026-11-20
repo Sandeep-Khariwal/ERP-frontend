@@ -37,18 +37,25 @@
 
 
 import ApiHelper from "@/ApiHelper";
+import { clearInFlightRequest } from "../requestDedupe";
 
 export function UpdateTeacher(
   teacherId: string,
   data: {
     name: string;
-    phoneNumber: string;
+    phoneNumber: string | string[];
     subjects: string[];
+    batchId?: string;
   }
 ) {
   return new Promise((resolve, reject) => {
     ApiHelper.put(`${process.env.URL}/api/v1/teacher/update/${teacherId}`, data)
-      .then((response) => resolve(response))
+      .then((response) => {
+        if (data.batchId) {
+          clearInFlightRequest(`batch-subjects:${data.batchId}`);
+        }
+        resolve(response);
+      })
       .catch((error: any) => reject(error));
   });
 }

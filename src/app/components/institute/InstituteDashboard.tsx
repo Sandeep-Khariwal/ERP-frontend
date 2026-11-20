@@ -43,6 +43,7 @@ import { UserTypes } from "@/enums";
 import { usePathname, useRouter } from "next/navigation";
 import NoticeBoard from "./notice/NoticeBoard";
 import { GetInstituteSubjects } from "@/axios/institute/InstituteGetApi";
+import { EditBatchSubjectsModal } from "../dashboard/EditBatchSubjectsModal";
 import { InstituteStudentsPage } from "../institute/student/InstituteStudentsPage";
 import { Bell, Search } from "lucide-react";
 
@@ -63,6 +64,8 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [openAddBatchModal, setOpenAddBatchModal] = useState<boolean>(false);
   const [openEditCourseFee, setOpenEditCourseFee] = useState<boolean>(false);
+  const [openEditBatchSubjectsModal, setOpenEditBatchSubjectsModal] = useState<boolean>(false);
+  const [batchForSubjectEdit, setBatchForSubjectEdit] = useState<{ id: string; name: string } | null>(null);
   const [batchName, setBatchName] = useState<string>("");
   const dispatch = useAppDispatch();
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
@@ -733,7 +736,13 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
               onAddBatchButtonClick={() => {
                 setOpenAddBatchModal(true);
               }}
-              onEditBatchButtonClick={function (batchId: string): void {}}
+              onEditBatchButtonClick={(bId: string) => {
+                const target = batches.find((b: any) => b.id === bId);
+                if (target) {
+                  setBatchForSubjectEdit({ id: target.id, name: target.name });
+                  setOpenEditBatchSubjectsModal(true);
+                }
+              }}
             />
           </SimpleGrid>
 
@@ -889,6 +898,24 @@ export const InstituteDashboard = (props: { isShowTopCard?: boolean }) => {
           </Button>
         </Flex>
       </Modal>
+
+      {/* Edit Batch Subjects Modal */}
+      {openEditBatchSubjectsModal && batchForSubjectEdit && (
+        <EditBatchSubjectsModal
+          isOpen={openEditBatchSubjectsModal}
+          onClose={() => {
+            setOpenEditBatchSubjectsModal(false);
+            setBatchForSubjectEdit(null);
+          }}
+          batchId={batchForSubjectEdit.id}
+          batchName={batchForSubjectEdit.name}
+          onSuccess={() => {
+            if (institute?._id) {
+              getAllInstituteBatches();
+            }
+          }}
+        />
+      )}
     </>
   );
 };

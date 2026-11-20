@@ -7,7 +7,8 @@ export function CreateTeacher(data: {
     email:string,
     password:string,
     institute:string,
-    selectedBatches:string[]
+    selectedBatches:string[],
+    subjects?:string[]
 }) {
   return new Promise((resolve, reject) => {
     ApiHelper.post(

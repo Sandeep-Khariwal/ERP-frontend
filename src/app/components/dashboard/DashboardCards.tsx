@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { UserType } from "./InstituteBatchesSection";
 import { PromoteBatch, SetPassoutBatch } from "@/axios/batch/BatchPutApi";
 import { getBatchIconStyle } from "./batchIconMap";
-import { Plus, PenLine, Receipt, ArrowUpCircle, GraduationCap, Trash2 } from "lucide-react";
+import { Plus, PenLine, Receipt, ArrowUpCircle, GraduationCap, Trash2, BookOpen } from "lucide-react";
 
 export function SingleBatchCard(props: {
   id: string;
@@ -548,33 +548,28 @@ export function SingleBatchCard(props: {
                       </Flex>
                     </Menu.Item>
                   }
-                  {/* <Menu.Item
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    props.onEditBatchButtonClick();
-                  }}
-                >
-                  <Flex align="center">
+                  <Menu.Item
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      props.onEditBatchButtonClick();
+                    }}
+                  >
                     <Flex align="center">
-                      <Box mr={2}>
-                        <Image
-                          src={"/editImg.png"}
-                          alt="profile"
-                          width={20}
-                          height={20}
-                        />
-                      </Box>
+                      <Flex align="center">
+                        <Box mr={2}>
+                          <BookOpen size={18} color="#5B6B8C" />
+                        </Box>
+                      </Flex>
+                      <Text
+                        fz={16}
+                        fw={500}
+                        ml={10}
+                        style={{ fontFamily: "Roboto" }}
+                      >
+                        Manage Subjects
+                      </Text>
                     </Flex>
-                    <Text
-                      fz={16}
-                      fw={500}
-                      ml={10}
-                      style={{ fontFamily: "Roboto" }}
-                    >
-                      Edit Batch
-                    </Text>
-                  </Flex>
-                </Menu.Item> */}
+                  </Menu.Item>
 
                   <Menu.Item
                     onClick={(e) => {

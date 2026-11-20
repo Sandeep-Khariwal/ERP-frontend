@@ -86,9 +86,10 @@ const filteredTeachers = useMemo(() => {
 
     const matchesSubject =
       !selectedSubject ||
-      teacherSubjects.some(
-        (subject) => subject?._id === selectedSubject
-      );
+      teacherSubjects.some((subject: any) => {
+        const subId = typeof subject === "object" ? subject?._id : subject;
+        return subId === selectedSubject;
+      });
 
     // 3. Phone number string ya array dono support karega
     const phoneValue = Array.isArray(teacher.phoneNumber)
@@ -100,56 +101,49 @@ const filteredTeachers = useMemo(() => {
       !term ||
       String(teacher.name ?? "").toLowerCase().includes(term) ||
       phoneValue.toLowerCase().includes(term) ||
-      teacherSubjects.some((subject) =>
-        String(subject?.name ?? "").toLowerCase().includes(term)
-      );
+      teacherSubjects.some((subject: any) => {
+        const subName = typeof subject === "object" ? subject?.name : "";
+        return String(subName ?? "").toLowerCase().includes(term);
+      });
 
     return matchesClass && matchesSubject && matchesSearch;
   });
 }, [originalArrayOfTeachers, selectedClass, selectedSubject, search]);
 
   useEffect(() => {
+    // When class changes, always reset selectedSubject
+    setSelectedSubject("");
+
     if (selectedClass) {
       setIsLoading(true);
 
-      const teacherByInstituteBatch = originalArrayOfTeachers.filter((teach) =>
-        teach.instituteBatches.includes(selectedClass)
-      );
-
       GetAllSubjectsFromBatch(selectedClass)
         .then((x: any) => {
-          const { subjects } = x.subjects;
-          setSubjects(subjects);
+          const rawRegular =
+            x?.subjects?.subjects ||
+            (Array.isArray(x?.subjects) ? x.subjects : []);
+          const rawOptional = x?.subjects?.optionalSubjects || [];
+          const combined = [...rawRegular, ...rawOptional];
 
-          setTeachers(teacherByInstituteBatch);
+          const unique = new Map<string, { _id: string; name: string }>();
+          combined.forEach((s: any) => {
+            if (s && s._id && s.name && !unique.has(s._id)) {
+              unique.set(s._id, { _id: s._id, name: s.name });
+            }
+          });
+
+          setSubjects(Array.from(unique.values()));
           setIsLoading(false);
         })
         .catch((e) => {
-          console.log(e);
+          console.error("Error fetching batch subjects:", e);
+          setSubjects([]);
           setIsLoading(false);
         });
     } else {
-      setSelectedSubject("");
-      setTeachers(originalArrayOfTeachers);
+      setSubjects([]);
     }
   }, [selectedClass]);
-
-  useEffect(() => {
-    if (selectedSubject) {
-      const teacherBySubjects = originalArrayOfTeachers.filter((teach) =>
-        teach.subjects.map((i) => i._id).includes(selectedSubject)
-      );
-
-      setTeachers(teacherBySubjects);
-    } else if (selectedClass) {
-      const teacherByInstituteBatch = originalArrayOfTeachers.filter((teach) =>
-        teach.instituteBatches.includes(selectedClass)
-      );
-      setTeachers(teacherByInstituteBatch);
-    } else {
-      setTeachers(originalArrayOfTeachers);
-    }
-  }, [selectedSubject]);
 
   // Real client-side search across name / phone / subject name.
   // useEffect(() => {
@@ -427,21 +421,33 @@ const getAllTeachers = () => {
               />
               <Select
                 disabled={!selectedClass}
-                placeholder="Select Subject"
+                placeholder={
+                  !selectedClass
+                    ? "Select Class first"
+                    : subjects.length === 0
+                    ? "No subjects in this batch"
+                    : "Select Subject"
+                }
                 label="Select Teacher by Subject"
                 leftSection={<IconBook size={16} color="#8B96AD" />}
                 value={selectedSubject}
                 radius={10}
-                data={[{ _id: "", name: "Select Subject" }, ...subjects].map(
-                  (subject) => ({
-                    value: subject._id,
-                    label: subject.name,
-                  })
-                )}
-                defaultValue={selectedSubject}
+                data={
+                  subjects.length === 0
+                    ? []
+                    : [
+                        { value: "", label: "All Subjects" },
+                        ...subjects.map((subject) => ({
+                          value: subject._id,
+                          label: subject.name,
+                        })),
+                      ]
+                }
                 onChange={(selectedValues) => {
-                  setSelectedSubject(selectedValues!!);
+                  setSelectedSubject(selectedValues || "");
                 }}
+                searchable
+                clearable
               />
               <Button
                 variant="outline"
@@ -449,6 +455,7 @@ const getAllTeachers = () => {
                 radius={10}
                 onClick={() => {
                   setSelectedClass("");
+                  setSelectedSubject("");
                   setSearch("");
                 }}
               >
@@ -459,14 +466,15 @@ const getAllTeachers = () => {
             <Stack w={"100%"}>
               <TeachersSection
                 userType={props.userType}
-                // teachers={teachers}
                 teachers={filteredTeachers}
                 batchId={selectedClass}
                 isTeacherDashboard={true}
                 batchMap={batchMap}
+                batches={batches}
                 setOriginalArrayOfTeachers={setOriginalArrayOfTeachers}
                 setTeachersInDashboard={setTeachers}
                 setSelectTeacherId={setSelectTeacherId}
+                onRefreshTeachers={getAllTeachers}
               />
             </Stack>
           </Stack>
