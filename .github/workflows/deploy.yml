@@ -1,0 +1,192 @@
+
+name: Deploy ShikshaPay Frontend
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shikshapay-frontend-production
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-24.04
+
+    steps:
+      # 1. Checkout frontend source
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Build Next.js application
+      - name: Build frontend
+        run: npm run build
+
+      # 5. Prepare standalone deployment
+      - name: Prepare standalone build
+        run: |
+          test -f .next/standalone/server.js
+
+          mkdir -p .next/standalone/.next
+
+          cp -a .next/static .next/standalone/.next/
+
+          if [ -d public ]; then
+            cp -a public .next/standalone/
+          fi
+
+          tar -czf /tmp/shikshapay-standalone.tar.gz \
+            -C .next/standalone .
+
+      # 6. Configure SSH
+      - name: Configure SSH
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+
+      # 7. Transfer standalone build
+      - name: Upload frontend build
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+        run: |
+          RELEASE_ID="${GITHUB_SHA:0:7}-${GITHUB_RUN_ID}"
+          echo "RELEASE_ID=$RELEASE_ID" >> "$GITHUB_ENV"
+
+          scp -i ~/.ssh/id_ed25519 \
+            /tmp/shikshapay-standalone.tar.gz \
+            "$EC2_USERNAME@$EC2_HOST:/tmp/shikshapay-${RELEASE_ID}.tar.gz"
+
+      # 8. Deploy on existing EC2
+      - name: Deploy frontend on EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            "$EC2_USERNAME@$EC2_HOST" \
+            "bash -s -- '$RELEASE_ID'" <<'REMOTE'
+
+          set -e
+
+          BASE="/var/www/shikshapay"
+          RELEASE_ID="$1"
+          RELEASE_DIR="$BASE/releases/release-$RELEASE_ID"
+          ARCHIVE="/tmp/shikshapay-$RELEASE_ID.tar.gz"
+
+          mkdir -p "$BASE/releases"
+
+          OLD_TARGET=""
+
+          if [ -L "$BASE/current" ]; then
+            OLD_TARGET=$(readlink -f "$BASE/current")
+          fi
+
+          mkdir -p "$RELEASE_DIR"
+
+          tar -xzf "$ARCHIVE" -C "$RELEASE_DIR"
+
+          rm -f "$ARCHIVE"
+
+          # Create PM2 configuration
+          cat > "$RELEASE_DIR/ecosystem.config.cjs" <<'EOF'
+          module.exports = {
+            apps: [{
+              name: "shikshapay-frontend",
+              script: "server.js",
+              cwd: __dirname,
+              instances: 1,
+              exec_mode: "fork",
+              env: {
+                NODE_ENV: "production",
+                PORT: 3000,
+                HOSTNAME: "127.0.0.1"
+              }
+            }]
+          };
+          EOF
+
+          # Switch current release
+          ln -s "$RELEASE_DIR" "$BASE/current-$RELEASE_ID"
+
+          if [ -d "$BASE/current" ] && [ ! -L "$BASE/current" ]; then
+            rmdir "$BASE/current"
+          fi
+
+          mv -Tf "$BASE/current-$RELEASE_ID" "$BASE/current"
+
+          # Start or reload frontend only
+          pm2 startOrReload \
+            "$BASE/current/ecosystem.config.cjs" \
+            --update-env
+
+          # Check frontend health
+          if ! curl --retry 10 \
+            --retry-delay 3 \
+            --retry-connrefused \
+            -fsS http://127.0.0.1:3000/ \
+            -o /dev/null; then
+
+            echo "Frontend health check failed."
+
+            # Restore previous release if available
+            if [ -n "$OLD_TARGET" ] && [ -d "$OLD_TARGET" ]; then
+              ln -sfn "$OLD_TARGET" "$BASE/current.rollback"
+              mv -Tf "$BASE/current.rollback" "$BASE/current"
+
+              pm2 startOrReload \
+                "$BASE/current/ecosystem.config.cjs" \
+                --update-env
+            fi
+
+            exit 1
+          fi
+
+          # Save PM2 process list
+          pm2 save
+
+          # Keep only the latest two releases
+          find "$BASE/releases" \
+            -mindepth 1 -maxdepth 1 -type d \
+            -name 'release-*' \
+            -printf '%T@ %p\n' \
+            | sort -nr \
+            | tail -n +3 \
+            | cut -d' ' -f2- \
+            | while IFS= read -r dir; do
+                [ -n "$dir" ] && rm -rf -- "$dir"
+              done
+
+          echo "Frontend deployment successful."
+
+          REMOTE
+
+      # 9. Display deployment result
+      - name: Deployment completed
+        run: |
+          echo "ShikshaPay frontend deployment completed."
+          echo "Domain: https://shikshapay.cloud"
+          echo "Frontend port: 3000"
