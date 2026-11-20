@@ -1,3 +1,4 @@
+import { createAcadmyAnnualMarksheetPdf, createAcadmyMarksheetPdf } from "./CreateMarksheetAcademy";
 import {
   createMarksheetPdf,
   createCombinedMarksheetPdf,
@@ -29,6 +30,9 @@ export const getMidTermMarksheetHtml = (
        case "temp_5mid":
       return generateMidTermMarksheet4(data);
 
+       case "temp_6mid":
+      return createAcadmyMarksheetPdf(data);
+
     default:
       return "";
   }
@@ -55,6 +59,10 @@ export const getAnnualTermMarksheetHtml = (
 
         case "temp_5annual":
       return generateAnnualMarksheet4(term1, term2);
+
+        case "temp_6annual":
+      return createAcadmyAnnualMarksheetPdf(term1, term2);
+
 
     default:
       return "";

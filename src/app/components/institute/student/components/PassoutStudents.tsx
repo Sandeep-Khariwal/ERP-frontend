@@ -32,8 +32,9 @@ import {
 import { getBase64Image } from "@/app/helperFunction/Notification";
 import QRCode from "qrcode";
 import { formatDate } from "@/app/components/marketing/utility/utils";
-import { createAcadmyMarksheetPdf } from "../../insideBatch/CreateMarksheetPdf";
+
 import { useAppSelector } from "@/app/redux/redux.hooks";
+import { createAcadmyMarksheetPdf } from "../../insideBatch/CreateMarksheetAcademy";
 
 // --- Interfaces for Type Safety ---
 interface FeeRecord {
