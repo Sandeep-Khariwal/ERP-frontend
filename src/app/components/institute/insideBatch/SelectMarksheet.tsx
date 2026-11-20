@@ -515,6 +515,7 @@ import { generateAnnualMarksheet2, generateMidTermMarksheet2 } from "./CreateMar
 import { generateAnnualMarksheet3, generateMidTermMarksheet3 } from "./CreateMarksheetPdf3";
 import { useRouter } from "next/navigation";
 import { generateAnnualMarksheet4, generateMidTermMarksheet4 } from "./CreateMarksheetPdf4";
+import { createAcadmyAnnualMarksheetPdf, createAcadmyMarksheetPdf } from "./CreateMarksheetAcademy";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DUMMY DATA  (only for preview)
@@ -635,6 +636,14 @@ const marksheetDesignSets = [
     description: "A refined layout with a modern edge",
     midTerm: { id: "temp_5mid", label: "Mid Term", html: generateMidTermMarksheet4(dummySingle) },
     annualTerm: { id: "temp_5annual", label: "Annual Term", html: generateAnnualMarksheet4(dummyTerm1, dummyTerm2) },
+  },
+
+   {
+    id: "set_6",
+    label: "Design 6",
+    description: "Academy marksheet",
+    midTerm: { id: "temp_6mid", label: "Mid Term", html: createAcadmyMarksheetPdf(dummySingle) },
+    annualTerm: { id: "temp_6annual", label: "Annual Term", html: createAcadmyAnnualMarksheetPdf(dummyTerm1, dummyTerm2) },
   },
 ];
 
