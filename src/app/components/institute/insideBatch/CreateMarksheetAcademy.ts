@@ -629,14 +629,7 @@ export const createAcadmyAnnualMarksheetPdf = (term1: any, term2: any) => {
         }
       </div>
 
-      <!-- Class Teacher Signature -->
-      <div style="text-align: center; width: 30%;">
-        <div style="height: 45px;"></div>
-        <div style="border-top: 2px solid #9db9d4; width: 100%; font-size: 14px; font-style: italic;">
-          <span style="color: #1f4e8c; font-weight: bold;">Class Teacher</span>
-        </div>
-      </div>
-
+     
       <!-- Director / Principal Signature -->
       <div style="text-align: center; width: 35%; display: flex; flex-direction: column; align-items: center;">
         ${
