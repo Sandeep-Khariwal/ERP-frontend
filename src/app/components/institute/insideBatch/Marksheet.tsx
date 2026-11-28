@@ -260,6 +260,74 @@ const practical =
   });
 };
 
+
+const handleDownloadTemplate = async () => {
+  try {
+    if (!batchStudents.length) {
+      ErrorNotification("No students found in this batch!");
+      return;
+    }
+
+    if (!batchSubjects.length) {
+      ErrorNotification("No subjects found in this batch!");
+      return;
+    }
+
+    const XLSX = await import("xlsx");
+
+    // Current batch ke subjects
+    const headers = [
+      "Name",
+      "Roll No",
+      ...batchSubjects.map((subject) => subject.name),
+    ];
+
+    // Current batch ke students
+    const rows = batchStudents.map((student) => {
+      const row: any = {
+        Name: student.name,
+        "Roll No": student.rollNumber,
+      };
+
+      batchSubjects.forEach((subject) => {
+        row[subject.name] = "";
+      });
+
+      return row;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(rows, {
+      header: headers,
+    });
+
+    worksheet["!cols"] = headers.map((header) => ({
+      wch: Math.max(header.length + 5, 18),
+    }));
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Marksheet"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `Marksheet_Template_${props.batchId}.xlsx`
+    );
+
+    SuccessNotification("Excel Template Downloaded Successfully!");
+  } catch (error) {
+    console.error("Excel template error:", error);
+    ErrorNotification("Unable to download Excel template!");
+  }
+};
+
+
+
+
+
 const calculateOverall = (marksArray: any[]) => {
   const normalizedMarks = getNormalizedMarks(marksArray);
 
@@ -442,6 +510,26 @@ if (attendanceInvalid) {
             subjectMap[subject].subject_enrichment = student[key] || 0;
           }
 
+
+if (key.endsWith("(GRADE)")) {
+  const subject = key.replace("(GRADE)", "").trim();
+
+  if (!subjectMap[subject]) {
+    subjectMap[subject] = {
+      subjectName: subject,
+      theory_marks: 0,
+      practical_marks: 0,
+      periodic_test: 0,
+      note_book: 0,
+      subject_enrichment: 0,
+      grade: "",
+    };
+  }
+
+  subjectMap[subject].grade = student[key] || "";
+}
+
+
           if (key.includes("ACTIVITY")) {
             const subject = key.replace("(GRADE ACTIVITY)", "").trim();
 
@@ -470,6 +558,31 @@ if (attendanceInvalid) {
         });
 
         const rawMarks = Object.values(subjectMap);
+
+
+const allowedSubjects = batchSubjects.map((subject) =>
+  subject.name.trim().toLowerCase()
+);
+
+const invalidSubjects = rawMarks.filter(
+  (item: any) =>
+    !allowedSubjects.includes(
+      item.subjectName.trim().toLowerCase()
+    )
+);
+
+if (invalidSubjects.length > 0) {
+  errorFound = true;
+
+  ErrorNotification(
+    `Invalid subjects for this batch: ${invalidSubjects
+      .map((item: any) => item.subjectName)
+      .join(", ")}`
+  );
+
+  return null;
+}
+
         const typedRawMarks = rawMarks.map((item: any) => ({
   ...item,
   subjectType: getSubjectType(item.subjectName ?? ""),
@@ -493,6 +606,7 @@ if (attendanceInvalid) {
               std.name.toUpperCase() === name?.toUpperCase() ||
               Number(std.rollNumber) === Number(roll),
           )?._id,
+       
           marks,
           date: resultDate ? resultDate.toISOString() : null,
           rollNumber: roll.toString(),
@@ -1265,7 +1379,7 @@ totalDays: midMarksheet?.totalDays ?? 0,
           >
             Upload & Generate
           </Button>
-
+{/* 
           {institute.isAcadmy ? (
             <a
               href="https://docs.google.com/uc?export=download&id=1NhUESVU2B8mEVI67KR2QrFr2jdmSD9lf"
@@ -1304,7 +1418,24 @@ totalDays: midMarksheet?.totalDays ?? 0,
                 Download the sample excel file
               </Text>
             </a>
-          )}
+          )} */}
+
+          
+<Text
+  ta="center"
+  mt={5}
+  onClick={handleDownloadTemplate}
+  style={{
+    fontSize: "14px",
+    color: "#6A5ACD",
+    fontWeight: 500,
+    cursor: "pointer",
+    textDecoration: "underline",
+  }}
+>
+  Download the sample excel file
+</Text>
+
         </Stack>
       </Modal>
 
